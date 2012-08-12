@@ -185,6 +185,10 @@ public class RootbeerScene {
           is = new FileInputStream(filename);  
         } else {
           is = RootbeerScene.class.getResourceAsStream(filename);
+          if(is == null){
+            String jar_filename = filename.substring(Constants.JAR_CONTENTS_FOLDER.length());
+            is = RootbeerScene.class.getResourceAsStream(jar_filename);
+          }
         }
         if(is != null){
           if(isFilename(name)){

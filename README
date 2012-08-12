@@ -31,6 +31,13 @@ The original publication for Rootbeer was in HPCC-2012.
 
 This work is supported by the National Science Foundation.
 
+Building:
+1. download the github repo to rootbeer1/
+2. cd rootbeer1/
+3. ant
+4. ./pack-rootbeer (linux) or ./pack-rootbeer.bat (windows)
+5. use the rootbeer1/Rootbeer.jar (not dist/Rootbeer1.jar)
+
 Rootbeer is written by:
 Phil Pratt-Szeliga
 Syracuse University
