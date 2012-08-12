@@ -10,9 +10,7 @@ code is automatically generated.
 
 See doc/hpcc_rootbeer.pdf for the conference slides from HPCC-2012.
 
-The license is currently GPL, but I am planning on changing to a more
-permissive license. My overall goal is to get as many people using Rootbeer as
-possible.
+Rootbeer is licensed under the MIT license.
 
 Rootbeer was created using Test Driven Development and testing is essentially
 important in Rootbeer. Rootbeer is 20k lines of product code and 7k of test code
