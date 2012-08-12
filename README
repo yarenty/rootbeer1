@@ -15,7 +15,7 @@ permissive license. My overall goal is to get as many people using Rootbeer as
 possible.
 
 Rootbeer was created using Test Driven Development and testing is essentially
-important in Rootbeer. Rootbeer is 20k lines of product for and 7k of test code
+important in Rootbeer. Rootbeer is 20k lines of product code and 7k of test code
 and all tests pass on both Windows and Linux. The Rootbeer test case suite 
 covers every aspect of the Java Programming language except:
   1. native methods
