@@ -9,6 +9,7 @@ Rootbeer a static analysis of the Java Bytecode is done (using Soot) and CUDA
 code is automatically generated.
 
 See doc/hpcc_rootbeer.pdf for the conference slides from HPCC-2012.
+See doc/rootbeer1_paper.pdf for the conference paper from HPCC-2012.
 
 Rootbeer is licensed under the MIT license.
 
@@ -37,6 +38,13 @@ Building:
 3. ant
 4. ./pack-rootbeer (linux) or ./pack-rootbeer.bat (windows)
 5. use the rootbeer1/Rootbeer.jar (not dist/Rootbeer1.jar)
+
+CUDA Setup:
+You need to have the CUDA Toolkit and CUDA Driver installed to use Rootbeer.
+http://www.nvidia.com/content/cuda/cuda-downloads.html
+
+Twitter:
+Rootbeer announcements are pushed to @rootbeer_gpu
 
 Rootbeer is written by:
 Phil Pratt-Szeliga

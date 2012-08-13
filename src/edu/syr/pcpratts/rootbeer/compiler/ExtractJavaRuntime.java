@@ -34,12 +34,6 @@ public class ExtractJavaRuntime {
       ret.add(System.getProperty("java.home")+s+"lib"+s+"jce.jar");
       ret.add(System.getProperty("java.home")+s+"lib"+s+"charsets.jar");
       ret.add(System.getProperty("java.home")+s+"lib"+s+"jsse.jar");
-      //ret.add(System.getProperty("java.home")+s+".."+s+"lib"+s+"tools.jar");
-      
-      //if linux add rhino.jar
-      if(s.equals("/")){
-        ret.add(System.getProperty("java.home")+s+"lib"+s+"rhino.jar");
-      }
     }
     return ret;
   }  
