@@ -1,5 +1,6 @@
 #include "edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2.h"
 
+#include <assert.h>
 #include <cuda.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,6 +99,40 @@ void getBestDevice(){
   numMultiProcessors = max_multiprocessors;
 }
 
+/**
+* Throws a runtimeexception called CudaMemoryException
+* allocd - number of bytes tried to allocate
+* id - variable the memory assignment was for
+*/
+void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error) {
+	char msg[1024];
+	jclass exp;
+	jfieldID fid;
+
+	// check and make sure that error message isn't to big to fit in buffer
+	// 900 checked to give some wiggle room
+	assert(strlen(message) < 900);
+
+	if(error == CUDA_SUCCESS){
+		return;
+	}
+
+	exp = (*env)->FindClass(env,"edu/syr/pcpratts/rootbeer/runtime2/cuda/CudaErrorException");
+
+	switch(error){
+		case CUDA_ERROR_OUT_OF_MEMORY:
+			sprintf(msg, "CUDA_ERROR_OUT_OF_MEMORY: %s",message);
+			break;
+		default:
+			sprintf(msg, "ERROR STATUS:%i : %s", error, message);
+	}
+
+	fid = (*env)->GetFieldID(env,exp, "cudaError_enum", "I");
+	(*env)->SetLongField(env,exp,fid, (jint)error);
+
+    (*env)->ThrowNew(env,exp,msg);
+}
+
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  * Method:    setup
@@ -118,8 +153,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   {
     printf("error in cuInit\n");
   }
-
-  to_space_size = memSize();
   
   status = cuDeviceGetCount(&deviceCount);
   if (CUDA_SUCCESS != status) 
@@ -128,8 +161,22 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   }
 
   getBestDevice();
+
+  // ddb - moved memsize to be calculated after getBestDevice call as it uses
+  //       the cuDevice variable which isn't set yet from what I can see?
+  to_space_size = memSize();
+
   num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
+#if _DEBUG
+  printf("to_space_size (Bytes) = %i\n",to_space_size);
+  printf("num_blocks = %i\n",num_blocks);
+  printf("numMultiProcessors = %i\n",numMultiProcessors);
+  printf("max_threads_per_block = %i\n",max_threads_per_block);
+  printf("max_blocks_per_proc = %i\n",max_blocks_per_proc);
+  fflush(stdout);
+#endif
+
   status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
   if (CUDA_SUCCESS != status) 
   {
@@ -143,17 +190,21 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   to_space_size -= free_space;
   //to_space_size -= textureMemSize;
   bufferSize = to_space_size;
-  status = cuMemHostAlloc(&toSpace, to_space_size, 0);  
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemHostAlloc toSpace %d\n", status);
-  }
 
+  status = cuMemHostAlloc(&toSpace, to_space_size, 0);  
+  
+  if (CUDA_SUCCESS != status) {
+    throw_cuda_errror_exception(env, "toSpace memory allocation failed", status);
+    return;
+  }
+  
   status = cuMemAlloc(&gpuToSpace, to_space_size);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemAlloc toSpace %d\n", status);
-  }	
+  
+  if (CUDA_SUCCESS != status) {
+    throw_cuda_errror_exception(env, "gpuToSpace memory allocation failed", status);
+    return;
+  }
+  
 /*
   status = cuMemHostAlloc(&textureMemory, textureMemSize, 0);  
   if (CUDA_SUCCESS != status) 
@@ -168,46 +219,53 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   }
 */
   status = cuMemHostAlloc(&handlesMemory, num_blocks * sizeof(jlong), CU_MEMHOSTALLOC_WRITECOMBINED); 
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemHostAlloc handlesMemory %d\n", status);
+  
+  if (CUDA_SUCCESS != status) {
+    throw_cuda_errror_exception(env, "handlesMemory memory allocation failed", status);
+    return;
   }
 
   status = cuMemAlloc(&gpuHandlesMemory, num_blocks * sizeof(jlong)); 
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemAlloc handlesMemory %d\n", status);
-  }	
+  
+  if (CUDA_SUCCESS != status) {
+    throw_cuda_errror_exception(env, "gpuHandlesMemory memory allocation failed", status);
+    return;
+  }
 
   status = cuMemHostAlloc(&exceptionsMemory, num_blocks * sizeof(jlong), 0); 
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemHostAlloc exceptionsMemory %d\n", status);
+  
+  if (CUDA_SUCCESS != status) {
+    throw_cuda_errror_exception(env, "exceptionsMemory memory allocation failed", status);
+    return;
   }
 
   status = cuMemAlloc(&gpuExceptionsMemory, num_blocks * sizeof(jlong)); 
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemAlloc gpuExceptionsMemory %d\n", status);
-  }	
+ 
+  if (CUDA_SUCCESS != status) {
+    throw_cuda_errror_exception(env, "gpuExceptionsMemory memory allocation failed", status);
+    return;
+  }
 
   status = cuMemAlloc(&gcInfoSpace, gc_space_size);  
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemAlloc gcInfoSpace %d\n", status);
-  }	
+  
+  if (CUDA_SUCCESS != status) {
+    throw_cuda_errror_exception(env, "gcInfoSpace memory allocation failed", status);
+    return;
+  }
 
   status = cuMemAlloc(&gpuHeapEndPtr, 8);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemAlloc heapEndPtr %d\n", status);
-  }	
+  
+  if (CUDA_SUCCESS != status) {
+    throw_cuda_errror_exception(env, "gpuHeapEndPtr memory allocation failed", status);
+    return;
+  }
 
   status = cuMemAlloc(&gpuBufferSize, 8);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemAlloc bufferSizeMem %d\n", status);
-  }	
+  
+  if (CUDA_SUCCESS != status) {
+    throw_cuda_errror_exception(env, "gpuBufferSize memory allocation failed", status);
+    return;
+  }
 
   thisRefClass = (*env)->GetObjectClass(env, this_ref);
   setLongField(env, this_ref, "m_ToSpaceAddr", (jlong) toSpace);
