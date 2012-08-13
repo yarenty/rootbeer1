@@ -139,13 +139,15 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error) {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_setup
-  (JNIEnv *env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block)
+  (JNIEnv *env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jint free_space)
 {
   int status;
   jint num_blocks;
   int deviceCount = 0;
+  size_t f_mem;
+  size_t t_mem;
   size_t to_space_size;
-  size_t free_space = 500L*1024L*1024L;
+  //size_t free_space = 1530L*1024L*1024L;
   textureMemSize = 1;
   
   status = cuInit(0);
@@ -161,27 +163,32 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   }
 
   getBestDevice();
-
-  // ddb - moved memsize to be calculated after getBestDevice call as it uses
-  //       the cuDevice variable which isn't set yet from what I can see?
-  to_space_size = memSize();
-
+  
+  status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
+  if (CUDA_SUCCESS != status) 
+  {
+    printf("error in cuCtxCreate %d\n", status);
+  }
+  
+  // ddb - not using this as this returns the total memory not the free memory
+  //to_space_size = memSize();
+  
+  cuMemGetInfo(&f_mem, &t_mem);
+  
+  to_space_size = f_mem;
+  
   num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
 #if _DEBUG
-  printf("to_space_size (Bytes) = %i\n",to_space_size);
+
+  printf("Memory: %i(MB)/%i(MB) (Free/Total)\n",f_mem/1024/1024, t_mem/1024/1024);
+  
   printf("num_blocks = %i\n",num_blocks);
   printf("numMultiProcessors = %i\n",numMultiProcessors);
   printf("max_threads_per_block = %i\n",max_threads_per_block);
   printf("max_blocks_per_proc = %i\n",max_blocks_per_proc);
   fflush(stdout);
 #endif
-
-  status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuCtxCreate %d\n", status);
-  }
   
   gc_space_size = 1024;
   to_space_size -= (num_blocks * sizeof(jlong));
