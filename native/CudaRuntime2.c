@@ -77,16 +77,16 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error) {
 
     (*env)->ThrowNew(env,exp,msg);
 }
-
-size_t memSize(JNIEnv *env){
-  size_t ret;
-  int status;
-  
-  status = cuDeviceTotalMem(&ret, cuDevice);  
-  CHECK_STATUS(env,"error in cuDeviceTotalMem",status)
-
-  return ret;
-}
+//
+//size_t memSize(JNIEnv *env){
+//  size_t ret;
+//  int status;
+//  
+//  status = cuDeviceTotalMem(&ret, cuDevice);  
+//  CHECK_STATUS(env,"error in cuDeviceTotalMem",status)
+//
+//  return ret;
+//}
 
 void setLongField(JNIEnv *env, jobject obj, const char * name, jlong value){
 
