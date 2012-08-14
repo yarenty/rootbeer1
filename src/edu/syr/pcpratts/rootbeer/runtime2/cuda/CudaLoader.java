@@ -53,7 +53,7 @@ public class CudaLoader {
     // The os.arch property will also say "x86" on a
     // 64-bit machine using a 32-bit runtime
     String arch = System.getProperty("os.arch"); 
-    if(arch.equals("x86")){
+    if(arch.equals("x86") || arch.equals("i386")){
       return true;
     } else {
       return false;
