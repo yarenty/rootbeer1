@@ -1,3 +1,5 @@
+## Rootbeer
+
 The Rootbeer GPU Compiler makes it easy to use Graphics Processing Units from
 within Java.
 
