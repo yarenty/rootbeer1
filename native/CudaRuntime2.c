@@ -109,22 +109,19 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error) {
 	jclass exp;
 	jfieldID fid;
 
-	// check and make sure that error message isn't to big to fit in buffer
-	// 900 checked to give some wiggle room
-	assert(strlen(message) < 900);
-
 	if(error == CUDA_SUCCESS){
 		return;
 	}
 
 	exp = (*env)->FindClass(env,"edu/syr/pcpratts/rootbeer/runtime2/cuda/CudaErrorException");
 
+    // we truncate the message to 900 characters to stop any buffer overflow
 	switch(error){
 		case CUDA_ERROR_OUT_OF_MEMORY:
-			sprintf(msg, "CUDA_ERROR_OUT_OF_MEMORY: %s",message);
+			sprintf(msg, "CUDA_ERROR_OUT_OF_MEMORY: %.900s",message);
 			break;
 		default:
-			sprintf(msg, "ERROR STATUS:%i : %s", error, message);
+			sprintf(msg, "ERROR STATUS:%i : %.900s", error, message);
 	}
 
 	fid = (*env)->GetFieldID(env,exp, "cudaError_enum", "I");
