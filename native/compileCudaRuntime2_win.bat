@@ -8,12 +8,12 @@ if NOT EXIST "%vcvarsall%" (
 	EXIT
 )
 
-if NOT EXIST "%CUDA_PATH%"(
+if NOT EXIST "%CUDA_PATH%" (
 	echo Could not find Cuda Toolkit installed, as CUDA_PATH environment variable was not set
 	EXIT
 )
 
-if NOT EXIST "%JAVA_HOME%"(
+if NOT EXIST "%JAVA_HOME%" (
 	echo Could not find JDK installed, as JAVA_HOME environment variable was not set
 	EXIT
 )
@@ -32,4 +32,4 @@ if [%1] == [32] (
 )
 
 echo Copying dll to src\edu\syr\pcpratts\rootbeer\runtime2\native\
-move /-y .\cudaruntime.* ..\src\edu\syr\pcpratts\rootbeer\runtime2\native\
+move /-y .\cudaruntime.dll ..\src\edu\syr\pcpratts\rootbeer\runtime2\native\
