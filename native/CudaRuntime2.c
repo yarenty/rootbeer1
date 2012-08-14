@@ -179,7 +179,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   
   num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
-#if _DEBUG
+#if DEBUG
 
   printf("Memory: %i(MB)/%i(MB) (Free/Total)\n",f_mem/1024/1024, t_mem/1024/1024);
   

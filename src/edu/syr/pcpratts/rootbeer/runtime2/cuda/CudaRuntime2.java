@@ -77,7 +77,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     CudaLoader loader = new CudaLoader();
     loader.load();
     m_BlockShaper = new BlockShaper();
-    setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock());
+    setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), 1300*1024*1024);
     m_JobsToWrite = new ArrayList<Kernel>();
     m_JobsWritten = new ArrayList<Kernel>();  
     m_NotWritten = new ArrayList<Kernel>();
@@ -108,7 +108,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     test.run(m_ToSpace.get(0));
   }
   
-  private native void setup(int max_blocks_per_proc, int max_threads_per_block);
+  private native void setup(int max_blocks_per_proc, int max_threads_per_block, int free_memory);
   
   public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs){
     Stopwatch watch2 = new Stopwatch();
