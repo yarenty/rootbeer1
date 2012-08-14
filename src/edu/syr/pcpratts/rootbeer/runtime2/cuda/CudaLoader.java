@@ -17,27 +17,52 @@ import java.util.List;
 
 public class CudaLoader {
 
-  private List<String> m_LibCudas;
-  private List<String> m_Rootbeers;
+  private List<String> m_libCudas;
+  private List<String> m_rootbeers;
   
   public CudaLoader(){
-    m_LibCudas = new ArrayList<String>();
-    m_LibCudas.add("/usr/lib64/libcuda.so");
-    m_LibCudas.add("C:\\Windows\\System32\\nvcuda.dll");
+    m_libCudas = new ArrayList<String>();
+    m_rootbeers = new ArrayList<String>();
     
-    m_Rootbeers = new ArrayList<String>();
     if(File.separator.equals("/")){
-      m_Rootbeers.add("cudaruntime.so.1");
-      extract("cudaruntime.so.1");
+      if(is32Bit()){
+        m_libCudas.add("/usr/lib/libcuda.so");
+        m_rootbeers.add("cudaruntime_x86.so.1");
+        extract("cudaruntime_x86.so.1");
+      } else {
+        m_libCudas.add("/usr/lib64/libcuda.so");
+        m_rootbeers.add("cudaruntime_x64.so.1");
+        extract("cudaruntime_x64.so.1");
+      }
     } else {
-      m_Rootbeers.add("cudaruntime.dll");
-      extract("cudaruntime.dll");
+      if(is32Bit()){
+        m_libCudas.add("C:\\Windows\\System32\\nvcuda.dll"); 
+        m_rootbeers.add("cudaruntime_x86.dll");
+        extract("cudaruntime_x86.dll");
+      } else {
+        m_libCudas.add("C:\\Windows\\System32\\nvcuda.dll"); 
+        m_libCudas.add("C:\\Windows\\SysWow64\\nvcuda.dll");
+        m_rootbeers.add("cudaruntime_x64.dll");
+        extract("cudaruntime_x64.dll");
+      }
     }
   }
   
+  private boolean is32Bit(){
+    //http://mark.koli.ch/2009/10/javas-osarch-system-property-is-the-bitness-of-the-jre-not-the-operating-system.html  
+    // The os.arch property will also say "x86" on a
+    // 64-bit machine using a 32-bit runtime
+    String arch = System.getProperty("os.arch"); 
+    if(arch.equals("x86")){
+      return true;
+    } else {
+      return false;
+    } 
+  }
+  
   public void load(){   
-    doLoad(m_LibCudas);
-    doLoad(m_Rootbeers);
+    doLoad(m_libCudas);
+    doLoad(m_rootbeers);
   }
 
   private void doLoad(List<String> paths) {
