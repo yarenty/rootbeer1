@@ -6,6 +6,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define CHECK_STATUS(env,msg,status) \
+if (CUDA_SUCCESS != status) {\
+    throw_cuda_errror_exception(env, msg, status);\
+    return;\
+}
+
+#define CHECK_STATUS_RTN(env,msg,status,rtn) \
+if (CUDA_SUCCESS != status) {\
+    throw_cuda_errror_exception(env, msg, status);\
+    return rtn;\
+}
+
 static CUdevice cuDevice;
 static CUmodule cuModule;
 static CUfunction cuFunction;
@@ -34,70 +46,6 @@ static int numMultiProcessors;
 
 static int textureMemSize;
 static size_t gc_space_size;
-
-size_t memSize(){
-  size_t ret;
-  int status;
-  
-  status = cuDeviceTotalMem(&ret, cuDevice);  
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuDeviceTotalMem %d\n", status);
-  }
-
-  return ret;
-}
-
-void setLongField(JNIEnv *env, jobject obj, const char * name, jlong value){
-
-  jfieldID fid = (*env)->GetFieldID(env, thisRefClass, name, "J");
-  (*env)->SetLongField(env, obj, fid, value);
-}
-
-void getBestDevice(){
-  int num_devices;
-  int status;
-  int i;
-  CUdevice temp_device;
-  int curr_multiprocessors;
-  int max_multiprocessors = -1;
-  int max_i = -1;
-  
-  status = cuDeviceGetCount(&num_devices);   
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuDeviceGetCount\n");
-  }
-  for(i = 0; i < num_devices; ++i){
-    status = cuDeviceGet(&temp_device, i);
-    if (CUDA_SUCCESS != status) 
-    {
-      printf("error in cuDeviceGet\n");
-    }
-    status = cuDeviceGetAttribute(&curr_multiprocessors, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT, temp_device);    
-    if (CUDA_SUCCESS != status) 
-    {
-      printf("error in cuDeviceGetAttribute CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT\n");
-    }
-    if(curr_multiprocessors > max_multiprocessors)
-    {
-      max_multiprocessors = curr_multiprocessors;
-      max_i = i;
-    }
-  }
-
-  status = cuDeviceGet(&cuDevice, max_i); 
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuDeviceGetName\n");
-  }
-  status = cuDeviceGetAttribute(&maxGridDim, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X, cuDevice);    
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuDeviceGetAttribute CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X\n");
-  }
-  numMultiProcessors = max_multiprocessors;
-}
 
 /**
 * Throws a runtimeexception called CudaMemoryException
@@ -130,6 +78,57 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error) {
     (*env)->ThrowNew(env,exp,msg);
 }
 
+size_t memSize(JNIEnv *env){
+  size_t ret;
+  int status;
+  
+  status = cuDeviceTotalMem(&ret, cuDevice);  
+  CHECK_STATUS(env,"error in cuDeviceTotalMem",status)
+
+  return ret;
+}
+
+void setLongField(JNIEnv *env, jobject obj, const char * name, jlong value){
+
+  jfieldID fid = (*env)->GetFieldID(env, thisRefClass, name, "J");
+  (*env)->SetLongField(env, obj, fid, value);
+}
+
+void getBestDevice(JNIEnv *env){
+  int num_devices;
+  int status;
+  int i;
+  CUdevice temp_device;
+  int curr_multiprocessors;
+  int max_multiprocessors = -1;
+  int max_i = -1;
+  
+  status = cuDeviceGetCount(&num_devices);   
+  CHECK_STATUS(env,"error in cuDeviceGetCount",status)
+          
+  for(i = 0; i < num_devices; ++i){
+    status = cuDeviceGet(&temp_device, i);
+    CHECK_STATUS(env,"error in cuDeviceGet",status)
+            
+    status = cuDeviceGetAttribute(&curr_multiprocessors, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT, temp_device);    
+    CHECK_STATUS(env,"error in cuDeviceGetAttribute",status)
+            
+    if(curr_multiprocessors > max_multiprocessors)
+    {
+      max_multiprocessors = curr_multiprocessors;
+      max_i = i;
+    }
+  }
+
+  status = cuDeviceGet(&cuDevice, max_i); 
+  CHECK_STATUS(env,"error in cuDeviceGet",status)
+          
+  status = cuDeviceGetAttribute(&maxGridDim, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X, cuDevice);    
+  CHECK_STATUS(env,"error in cuDeviceGetAttribute",status)
+          
+  numMultiProcessors = max_multiprocessors;
+}
+
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  * Method:    setup
@@ -148,30 +147,22 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   textureMemSize = 1;
   
   status = cuInit(0);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuInit\n");
-  }
-  
+  CHECK_STATUS(env,"error in cuInit",status)
+          
   status = cuDeviceGetCount(&deviceCount);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuDeviceGet\n");
-  }
+  CHECK_STATUS(env,"error in cuDeviceGetCount",status)
 
-  getBestDevice();
+  getBestDevice(env);
   
   status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuCtxCreate %d\n", status);
-  }
+  CHECK_STATUS(env,"error in cuCtxCreate",status)
   
   // ddb - not using this as this returns the total memory not the free memory
   //to_space_size = memSize();
   
-  cuMemGetInfo(&f_mem, &t_mem);
-  
+  status = cuMemGetInfo (&f_mem, &t_mem);
+  CHECK_STATUS(env,"error in cuMemGetInfo",status)
+          
   to_space_size = f_mem;
   
   num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
@@ -196,18 +187,10 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   bufferSize = to_space_size;
 
   status = cuMemHostAlloc(&toSpace, to_space_size, 0);  
-  
-  if (CUDA_SUCCESS != status) {
-    throw_cuda_errror_exception(env, "toSpace memory allocation failed", status);
-    return;
-  }
-  
+  CHECK_STATUS(env,"toSpace memory allocation failed",status)
+    
   status = cuMemAlloc(&gpuToSpace, to_space_size);
-  
-  if (CUDA_SUCCESS != status) {
-    throw_cuda_errror_exception(env, "gpuToSpace memory allocation failed", status);
-    return;
-  }
+  CHECK_STATUS(env,"gpuToSpace memory allocation failed",status)
   
 /*
   status = cuMemHostAlloc(&textureMemory, textureMemSize, 0);  
@@ -223,53 +206,25 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   }
 */
   status = cuMemHostAlloc(&handlesMemory, num_blocks * sizeof(jlong), CU_MEMHOSTALLOC_WRITECOMBINED); 
-  
-  if (CUDA_SUCCESS != status) {
-    throw_cuda_errror_exception(env, "handlesMemory memory allocation failed", status);
-    return;
-  }
+  CHECK_STATUS(env,"handlesMemory memory allocation failed",status)
 
   status = cuMemAlloc(&gpuHandlesMemory, num_blocks * sizeof(jlong)); 
-  
-  if (CUDA_SUCCESS != status) {
-    throw_cuda_errror_exception(env, "gpuHandlesMemory memory allocation failed", status);
-    return;
-  }
+  CHECK_STATUS(env,"gpuHandlesMemory memory allocation failed",status)
 
   status = cuMemHostAlloc(&exceptionsMemory, num_blocks * sizeof(jlong), 0); 
-  
-  if (CUDA_SUCCESS != status) {
-    throw_cuda_errror_exception(env, "exceptionsMemory memory allocation failed", status);
-    return;
-  }
+  CHECK_STATUS(env,"exceptionsMemory memory allocation failed",status)
 
   status = cuMemAlloc(&gpuExceptionsMemory, num_blocks * sizeof(jlong)); 
- 
-  if (CUDA_SUCCESS != status) {
-    throw_cuda_errror_exception(env, "gpuExceptionsMemory memory allocation failed", status);
-    return;
-  }
+  CHECK_STATUS(env,"gpuExceptionsMemory memory allocation failed",status)
 
   status = cuMemAlloc(&gcInfoSpace, gc_space_size);  
-  
-  if (CUDA_SUCCESS != status) {
-    throw_cuda_errror_exception(env, "gcInfoSpace memory allocation failed", status);
-    return;
-  }
+  CHECK_STATUS(env,"gcInfoSpace memory allocation failed",status)
 
   status = cuMemAlloc(&gpuHeapEndPtr, 8);
-  
-  if (CUDA_SUCCESS != status) {
-    throw_cuda_errror_exception(env, "gpuHeapEndPtr memory allocation failed", status);
-    return;
-  }
+  CHECK_STATUS(env,"gpuHeapEndPtr memory allocation failed",status)
 
   status = cuMemAlloc(&gpuBufferSize, 8);
-  
-  if (CUDA_SUCCESS != status) {
-    throw_cuda_errror_exception(env, "gpuBufferSize memory allocation failed", status);
-    return;
-  }
+  CHECK_STATUS(env,"gpuBufferSize memory allocation failed",status)
 
   thisRefClass = (*env)->GetObjectClass(env, this_ref);
   setLongField(env, this_ref, "m_ToSpaceAddr", (jlong) toSpace);
@@ -357,79 +312,47 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   //void * cubin_file = readCubinFile("code_file.cubin");
   cubin_file = readCubinFileFromBuffers(env, buffers, size, total_size);
   status = cuModuleLoadData(&cuModule, cubin_file);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuModuleLoad %d\n", status);
-  }
+  CHECK_STATUS(env,"error in cuModuleLoad",status)
+  
   free(cubin_file);
 
   status = cuModuleGetFunction(&cuFunction, cuModule, "_Z5entryPcS_PiPxS1_S0_i"); 
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuModuleGetFunction %d\n", status);
-  }
+  CHECK_STATUS(env,"error in cuModuleGetFunction",status)
 
   status = cuFuncSetCacheConfig(cuFunction, CU_FUNC_CACHE_PREFER_L1);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuFuncSetCacheConfig %d\n", status);
-  }
+  CHECK_STATUS(env,"error in cuFuncSetCacheConfig",status)
 
   status = cuParamSetSize(cuFunction, (6 * sizeof(CUdeviceptr) + sizeof(int))); 
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuParamSetSize %d\n", status);
-  }
+  CHECK_STATUS(env,"error in cuParamSetSize",status)
 
   offset = 0;
   status = cuParamSetv(cuFunction, offset, (void *) &gcInfoSpace, sizeof(CUdeviceptr)); 
+  CHECK_STATUS(env,"error in cuParamSetv gcInfoSpace",status)
   offset += sizeof(CUdeviceptr);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuParamSetv gcInfoSpace %d\n", status);
-  }
 
   status = cuParamSetv(cuFunction, offset, (void *) &gpuToSpace, sizeof(CUdeviceptr)); 
+  CHECK_STATUS(env,"error in cuParamSetv gpuToSpace",status)
   offset += sizeof(CUdeviceptr);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuParamSetv gpuToSpace %d\n", status);
-  }
 
   status = cuParamSetv(cuFunction, offset, (void *) &gpuHandlesMemory, sizeof(CUdeviceptr)); 
+  CHECK_STATUS(env,"error in cuParamSetv gpuHandlesMemory %",status)
   offset += sizeof(CUdeviceptr);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuParamSetv gpuHandlesMemory %d\n", status);
-  }
 
   status = cuParamSetv(cuFunction, offset, (void *) &gpuHeapEndPtr, sizeof(CUdeviceptr)); 
+  CHECK_STATUS(env,"error in cuParamSetv gpuHeapEndPtr",status)
   offset += sizeof(CUdeviceptr);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuParamSetv heapEndPtr %d\n", status);
-  }
 
-  status = cuParamSetv(cuFunction, offset, (void *) &gpuBufferSize, sizeof(CUdeviceptr)); 
+  status = cuParamSetv(cuFunction, offset, (void *) &gpuBufferSize, sizeof(CUdeviceptr));
+  CHECK_STATUS(env,"error in cuParamSetv gpuBufferSize",status)
   offset += sizeof(CUdeviceptr); 
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuParamSetv bufferSizeMem %d\n", status);
-  }
 
   status = cuParamSetv(cuFunction, offset, (void *) &gpuExceptionsMemory, sizeof(CUdeviceptr)); 
+  CHECK_STATUS(env,"error in cuParamSetv gpuExceptionsMemory",status)
   offset += sizeof(CUdeviceptr);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuParamSetv gpuExceptionsMemory %d\n", status);
-  }
 
   status = cuParamSeti(cuFunction, offset, num_blocks); 
+  CHECK_STATUS(env,"error in cuParamSetv num_blocks",status)
   offset += sizeof(int);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuParamSetv gpuExceptionsMemory %d\n", status);
-  }
 }
 
 /*
@@ -465,27 +388,14 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
 */
 
   status = cuFuncSetBlockShape(cuFunction, block_shape, 1, 1);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuFuncSetBlockShape %d\n", status);
-    return (jint) status;
-  }
+  CHECK_STATUS_RTN(env,"error in cuFuncSetBlockShape",status, (jint)status)
 
   status = cuLaunchGrid(cuFunction, grid_shape, 1);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuLaunchGrid %d\n", status);
-    fflush(stdout);
-    return (jint) status;
-  }
+  CHECK_STATUS_RTN(env,"error in cuLaunchGrid",status, (jint)status)
 
   status = cuCtxSynchronize();  
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuCtxSynchronize %d\n", status);
-    return (jint) status;
-  }
-
+  CHECK_STATUS_RTN(env,"error in cuCtxSynchronize",status, (jint)status)
+  
   cuMemcpyDtoH(infoSpace, gcInfoSpace, gc_space_size);
   heapEndPtr = infoSpace[1];
   cuMemcpyDtoH(toSpace, gpuToSpace, heapEndPtr);
