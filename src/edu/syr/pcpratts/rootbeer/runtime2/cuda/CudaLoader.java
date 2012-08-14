@@ -24,6 +24,12 @@ public class CudaLoader {
     m_libCudas = new ArrayList<String>();
     m_rootbeers = new ArrayList<String>();
     
+    if ("Mac OS X".equals(System.getProperty("os.name")){
+        m_libCudas.add("/usr/local/cuda/lib/libcuda.dylib");
+        m_rootbeers.add("cudaruntime.dylib");
+        extract("cudaruntime.dylib");
+    }
+    else
     if(File.separator.equals("/")){
       if(is32Bit()){
         m_libCudas.add("/usr/lib/libcuda.so");
@@ -53,7 +59,7 @@ public class CudaLoader {
     // The os.arch property will also say "x86" on a
     // 64-bit machine using a 32-bit runtime
     String arch = System.getProperty("os.arch"); 
-    if(arch.equals("x86") || arch.equals("i386")){
+    if(arch.equals("x86")){
       return true;
     } else {
       return false;
