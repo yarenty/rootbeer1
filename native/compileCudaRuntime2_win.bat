@@ -20,16 +20,19 @@ if NOT EXIST "%JAVA_HOME%" (
 
 if [%1] == [32] (
 	@call "%vcvarsall%" x86
-	cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /I"%CUDA_INC_PATH%" CudaRuntime2.c FastMemory.c Handles.c Cuda2DeviceMemory.c /link "%CUDA_PATH%\lib\Win32\cuda.lib" /DLL /OUT:cudaruntime.dll /MACHINE:X86
+	cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /I"%CUDA_INC_PATH%" CudaRuntime2.c FastMemory.c Handles.c Cuda2DeviceMemory.c /link "%CUDA_PATH%\lib\Win32\cuda.lib" /DLL /OUT:cudaruntime_x86.dll /MACHINE:X86
+	
+	echo Copying dll to src\edu\syr\pcpratts\rootbeer\runtime2\native\
+	move /-y .\cudaruntime_x86.dll ..\src\edu\syr\pcpratts\rootbeer\runtime2\native\
 ) else (
 	if [%1] == [64] (
-		@call "%vcvarsall%" amd64
-		cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /I"%CUDA_INC_PATH%" CudaRuntime2.c FastMemory.c Handles.c Cuda2DeviceMemory.c /link "%CUDA_PATH%\lib\x64\cuda.lib" /DLL /OUT:cudaruntime.dll /MACHINE:X64
+			@call "%vcvarsall%" amd64
+			cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /I"%CUDA_INC_PATH%" CudaRuntime2.c FastMemory.c Handles.c Cuda2DeviceMemory.c /link "%CUDA_PATH%\lib\x64\cuda.lib" /DLL /OUT:cudaruntime_x64.dll /MACHINE:X64
+			
+			echo Copying dll to src\edu\syr\pcpratts\rootbeer\runtime2\native\
+			move /-y .\cudaruntime_x64.dll ..\src\edu\syr\pcpratts\rootbeer\runtime2\native\
 		) else (
 		echo Must specify which 32 or 64 bit build, e.g.compileCudaRuntime2.bat 32
 		EXIT 0
 	)
 )
-
-echo Copying dll to src\edu\syr\pcpratts\rootbeer\runtime2\native\
-move /-y .\cudaruntime.dll ..\src\edu\syr\pcpratts\rootbeer\runtime2\native\
