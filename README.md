@@ -8,10 +8,12 @@ bindings, the developer must write the GPU kernel in CUDA or OpenCL. With
 Rootbeer a static analysis of the Java Bytecode is done (using Soot) and CUDA
 code is automatically generated.
 
-See doc/hpcc_rootbeer.pdf for the conference slides from HPCC-2012.
-See doc/rootbeer1_paper.pdf for the conference paper from HPCC-2012.
+See `doc/hpcc_rootbeer.pdf` for the conference slides from HPCC-2012.
+See `doc/rootbeer1_paper.pdf` for the conference paper from HPCC-2012.
 
 Rootbeer is licensed under the MIT license.
+
+## Development notes
 
 Rootbeer was created using Test Driven Development and testing is essentially
 important in Rootbeer. Rootbeer is 20k lines of product code and 7k of test code
@@ -25,29 +27,35 @@ covers every aspect of the Java Programming language except:
 This means that all of the familar Java code you have been writing can be
 executed on the GPU
 
-The original publication for Rootbeer was in HPCC-2012.
-  "Rootbeer: Seamlessly using GPUs from Java"
-  Philip C. Pratt-Szeliga, James W. Fawcett, Roy D. Welch.
+The original publication for Rootbeer was in HPCC-2012.<br />
+  "Rootbeer: Seamlessly using GPUs from Java"<br />
+  Philip C. Pratt-Szeliga, James W. Fawcett, Roy D. Welch.<br />
   To appear in HPCC-2012.
 
 This work is supported by the National Science Foundation.
 
-Building:
-1. download the github repo to rootbeer1/
-2. cd rootbeer1/
-3. ant
-4. ./pack-rootbeer (linux) or ./pack-rootbeer.bat (windows)
-5. use the rootbeer1/Rootbeer.jar (not dist/Rootbeer1.jar)
+## Building
 
-CUDA Setup:
+1. Clone the github repo to `rootbeer1/`
+2. `cd rootbeer1/`
+3. `ant`
+4. `./pack-rootbeer` (linux) or `./pack-rootbeer.bat` (windows)
+5. Use the `rootbeer1/Rootbeer.jar` (not `dist/Rootbeer1.jar`)
+
+## CUDA Setup
+
 You need to have the CUDA Toolkit and CUDA Driver installed to use Rootbeer.
-http://www.nvidia.com/content/cuda/cuda-downloads.html
+Download it from http://www.nvidia.com/content/cuda/cuda-downloads.html
 
-Twitter:
+## Twitter
+
 Rootbeer announcements are pushed to @rootbeer_gpu
 
+## About
+
 Rootbeer is written by:
-Phil Pratt-Szeliga
-Syracuse University
-pcpratts@chirrup.org
+
+Phil Pratt-Szeliga<br />
+Syracuse University<br />
+pcpratts@chirrup.org<br />
 http://chirrup.org/
