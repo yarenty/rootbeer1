@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
 import edu.syr.pcpratts.rootbeer.Configuration;
 import edu.syr.pcpratts.rootbeer.Constants;
+import edu.syr.pcpratts.rootbeer.Main;
 import edu.syr.pcpratts.rootbeer.runtime.Serializer;
 import edu.syr.pcpratts.rootbeer.runtime.ParallelRuntime;
 import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
@@ -76,6 +77,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     watch.start();    
     CudaLoader loader = new CudaLoader();
     loader.load();
+        
     m_BlockShaper = new BlockShaper();
     setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), 1300*1024*1024);
     m_JobsToWrite = new ArrayList<Kernel>();
@@ -109,6 +111,11 @@ public class CudaRuntime2 implements ParallelRuntime {
   }
   
   private native void setup(int max_blocks_per_proc, int max_threads_per_block, int free_memory);
+  
+  /**
+   * Prints the cuda device details to the screen
+   */
+  public static native void printDeviceInfo();
   
   public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs){
     Stopwatch watch2 = new Stopwatch();

@@ -7,17 +7,19 @@
 
 package edu.syr.pcpratts.rootbeer;
 
+import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaLoader;
+import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaRuntime2;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
   
   public int m_mode;
-  
+  private int m_num_args;
   private boolean m_runTests;
   private String m_testCase;
   private boolean m_simpleCompile;
-  
+  private static boolean m_printDeviceInfo = false;
   private String m_mainJar;
   private List<String> m_libJars;
   private List<String> m_directories;
@@ -31,6 +33,8 @@ public class Main {
   }
   
   private void parseArgs(String[] args) {
+    m_num_args = args.length;
+    
     for(int i = 0; i < args.length; ++i){
       String arg = args[i];
       if(arg.equals("-nemu")){
@@ -58,6 +62,8 @@ public class Main {
         m_runTests = true;
         m_testCase = safeGet(args, i+1, "-runtest");
         ++i;
+      } else if(arg.equals("-printdeviceinfo")){
+        m_printDeviceInfo = true;
       } else {      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);
@@ -77,6 +83,19 @@ public class Main {
   }
 
   private void run() {
+    // Now we have loaded the dll's if we need to print the device details to it
+    if(m_printDeviceInfo){
+        if(m_num_args == 1){
+            CudaLoader loader = new CudaLoader();
+            loader.load();
+            CudaRuntime2.printDeviceInfo();
+        } else {
+            System.out.println("-printdeviceinfo can only be used by itself. Remove other arguments.");  
+            System.out.flush();
+            return;
+        }
+    }
+    
     if(m_runTests){
       RootbeerTest test = new RootbeerTest();
       test.runTests(m_testCase);
