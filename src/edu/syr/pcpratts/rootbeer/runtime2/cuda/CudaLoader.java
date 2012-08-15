@@ -24,7 +24,7 @@ public class CudaLoader {
     m_libCudas = new ArrayList<String>();
     m_rootbeers = new ArrayList<String>();
     
-    if ("Mac OS X".equals(System.getProperty("os.name")){
+    if ("Mac OS X".equals(System.getProperty("os.name"))){
         m_libCudas.add("/usr/local/cuda/lib/libcuda.dylib");
         m_rootbeers.add("cudaruntime.dylib");
         extract("cudaruntime.dylib");
