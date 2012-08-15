@@ -210,6 +210,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
             printf("Maximum dimension y of grid:   %i\n", a);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z,cuDevice) == CUDA_SUCCESS)
             printf("Maximum dimension z of grid:   %i\n", a);
+			
+		cuCtxDestroy(cuContext);
     } 
 }
 
