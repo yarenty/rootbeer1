@@ -17,7 +17,7 @@ public class Main {
   public int m_mode;
   private int m_num_args;
   private boolean m_runTests;
-  private boolean m_disable_class_remapping=false;
+  private static boolean m_disable_class_remapping=false;
   private String m_testCase;
   private boolean m_simpleCompile;
   private static boolean m_printDeviceInfo = false;
@@ -31,6 +31,10 @@ public class Main {
     m_directories = new ArrayList<String>();
     m_mode = Configuration.MODE_GPU;
     m_simpleCompile = false;
+  }
+
+  public static boolean disable_class_remapping(){
+    return m_disable_class_remapping;
   }
   
   private void parseArgs(String[] args) {
