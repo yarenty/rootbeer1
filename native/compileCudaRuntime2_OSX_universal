@@ -1,0 +1,9 @@
+#!/bin/sh
+
+rm -f *.o
+llvm-gcc -arch i386 -arch x86_64 -g -c -I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers -I/usr/local/cuda/include/ CudaRuntime2.c -o CudaRuntime2.o
+llvm-gcc -arch i386 -arch x86_64 -g -c -I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers -I/usr/local/cuda/include/ FastMemory.c -o FastMemory.o
+llvm-gcc -arch i386 -arch x86_64 -g -c -I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers -I/usr/local/cuda/include/ Handles.c -o Handles.o
+llvm-gcc -arch i386 -arch x86_64  -g -c -I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers -I/usr/local/cuda/include/ Cuda2DeviceMemory.c -o Cuda2DeviceMemory.o
+gcc -arch i386 -arch x86_64 -shared -Wl -o cudaruntime.dylib CudaRuntime2.o FastMemory.o Handles.o Cuda2DeviceMemory.o -lc -lcuda -L/usr/local/cuda/lib
+cp cudaruntime.dylib ../src/edu/syr/pcpratts/rootbeer/runtime2/native/
