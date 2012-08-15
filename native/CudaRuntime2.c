@@ -152,7 +152,11 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  
     for (i = 0; i < num_devices; ++i)
     {
-        status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, (CUdevice)i);  
+        CUdevice dev;
+        status = cuDeviceGet(&dev, i);
+        CHECK_STATUS(env,"error in cuDeviceGet",status)
+
+        status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, dev);  
         CHECK_STATUS(env,"error in cuCtxCreate",status)
                 
         printf("\nGPU:%d\n", i);
