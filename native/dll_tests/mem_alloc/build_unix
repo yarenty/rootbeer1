@@ -1,0 +1,4 @@
+#!/bin/sh
+
+gcc -m32 -I/usr/local/cuda/include/ mem_alloc.c -o mem_alloc.o
+gcc -m32 Wl -o mem_alloc mem_alloc.o -lcuda
