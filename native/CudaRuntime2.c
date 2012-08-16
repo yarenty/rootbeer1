@@ -169,7 +169,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
             printf("Name:                          %s\n", str);
         
         if(cuMemGetInfo(&free_mem, &total_mem) == CUDA_SUCCESS)
-            printf("Total global memory:           %i/%i (Free/Total) MBytes\n", free_mem/1024/1024, total_mem/1024/1024);
+            printf("Total global memory:           %zu/%zu (Free/Total) MBytes\n", free_mem/1024/1024, total_mem/1024/1024);
         
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK,cuDevice) == CUDA_SUCCESS)
             printf("Total registers per block:     %i\n", a);
