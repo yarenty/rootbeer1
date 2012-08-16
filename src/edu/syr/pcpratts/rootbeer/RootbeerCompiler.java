@@ -82,11 +82,15 @@ public class RootbeerCompiler {
     KernelReachableMethods reachable_finder = new KernelReachableMethods();
     List<String> reachables = reachable_finder.get(run_on_gpu_classes);
     RootbeerScene.v().setReachableMethods(reachables);
+
+    ClassRemappingTransform transform = null;
     
-    System.out.println("Remapping some classes to GPU versions...");
-    ClassRemappingTransform transform = new ClassRemappingTransform(false);
-    transform.run(reachables);
-    transform.finishClone();
+    if(!Main.disable_class_remapping()){
+        System.out.println("Remapping some classes to GPU versions...");
+        transform = new ClassRemappingTransform(false);
+        transform.run(reachables);
+        transform.finishClone();
+    }
     
     Transform2 transform2 = new Transform2();
     for(String cls : run_on_gpu_classes){
@@ -99,7 +103,10 @@ public class RootbeerCompiler {
     }    
     
     List<String> app_classes = m_loader.getVisitedClasses();
-    app_classes.addAll(transform.getModifiedClasses());
+    
+    if(!Main.disable_class_remapping())
+        app_classes.addAll(transform.getModifiedClasses());
+    
     for(String cls : app_classes){
       writeClassFile(cls);
       writeJimpleFile(cls);
