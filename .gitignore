@@ -27,3 +27,4 @@ native/FastMemory.obj
 native/CudaRuntime2.obj
 glob:native/nativecpudev.so.1
 glob:*.so.1
+/.project
