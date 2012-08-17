@@ -1,1 +1,2 @@
 java.lang.Math => edu.syr.pcpratts.rootbeer.runtime.remap.java.lang.Math
+edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.CallsPrivateMethod => edu.syr.pcpratts.rootbeer.runtime.remap.DoesntCallPrivateMethod

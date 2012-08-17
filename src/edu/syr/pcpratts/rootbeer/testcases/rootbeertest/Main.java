@@ -10,11 +10,13 @@ package edu.syr.pcpratts.rootbeer.testcases.rootbeertest;
 import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
 import edu.syr.pcpratts.rootbeer.test.TestSerialization;
 import edu.syr.pcpratts.rootbeer.test.TestSerializationFactory;
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.arraysum.ArraySumTest;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer4Test;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.*;
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.RemapTest;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteArrays;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CharArrays;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArrays;
@@ -74,6 +76,8 @@ public class Main implements TestSerializationFactory {
     ret.add(new StepFilterTest());
     ret.add(new GpuListTest());
     ret.add(new WhileTrueTest());
+    ret.add(new ArraySumTest());
+    ret.add(new RemapTest());
     return ret;
   }
 }
