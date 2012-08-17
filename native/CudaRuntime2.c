@@ -138,7 +138,7 @@ void getBestDevice(JNIEnv *env){
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_printDeviceInfo
-  (JNIEnv *env, jclass c)
+  (JNIEnv *env, jclass cls)
 {
     int i, a=0, b=0, status;
     int num_devices = 0;
@@ -153,7 +153,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  
     for (i = 0; i < num_devices; ++i)
     {
-    	CUdevice dev;
+    	  CUdevice dev;
         status = cuDeviceGet(&dev, i);
         CHECK_STATUS(env,"error in cuDeviceGet",status)
 
@@ -178,26 +178,22 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_PITCH,dev) == CUDA_SUCCESS)
             printf("Maximum memory pitch:          %i\n", a);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_BLOCK,dev) == CUDA_SUCCESS)
-            printf("Maximum threads per block:     %i\n", a);
-        
+            printf("Maximum threads per block:     %i\n", a);        
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK,dev) == CUDA_SUCCESS)
-            printf("Total shared memory per block  %i Bytes\n", a);
-        
+            printf("Total shared memory per block  %.2f MB\n", a/1024.0/1024.0);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_CLOCK_RATE,dev) == CUDA_SUCCESS)
             printf("Clock rate:                    %.2f MHz\n",  a/1000000.0);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE,dev) == CUDA_SUCCESS)
-            printf("Memory Clock rate:             %i\n",  a);
-        
+            printf("Memory Clock rate:             %.2f\n",  a/1000000.0);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_TOTAL_CONSTANT_MEMORY,dev) == CUDA_SUCCESS)
-            printf("Total constant memory:         %u\n",  a);
+            printf("Total constant memory:         %.2f MB\n",  a/1024.0/1024.0);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_INTEGRATED,dev) == CUDA_SUCCESS)
-            printf("Integrated:                    %u\n",  a);
-        
+            printf("Integrated:                    %i\n",  a);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR,dev) == CUDA_SUCCESS)
             printf("Max threads per multiprocessor:%i\n",  a);    
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,dev) == CUDA_SUCCESS)
             printf("Number of multiprocessors:     %i\n",  a);    
-            
+      
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_X,dev) == CUDA_SUCCESS)
             printf("Maximum dimension x of block:  %i\n", a);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_Y,dev) == CUDA_SUCCESS)
@@ -211,6 +207,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
             printf("Maximum dimension y of grid:   %i\n", a);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z,dev) == CUDA_SUCCESS)
             printf("Maximum dimension z of grid:   %i\n", a);
+			
+		cuCtxDestroy(cuContext);
     } 
 }
 

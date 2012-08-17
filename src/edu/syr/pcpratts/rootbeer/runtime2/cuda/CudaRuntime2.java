@@ -79,7 +79,9 @@ public class CudaRuntime2 implements ParallelRuntime {
     loader.load();
         
     m_BlockShaper = new BlockShaper();
-    setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), 1300*1024*1024);
+    // the 200*1024*1024 factor here is the amount of free memory that should NOT
+    // be allocated for transfering data to and from the gpu
+    setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), 200*1024*1024);
     m_JobsToWrite = new ArrayList<Kernel>();
     m_JobsWritten = new ArrayList<Kernel>();  
     m_NotWritten = new ArrayList<Kernel>();
