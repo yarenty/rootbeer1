@@ -138,9 +138,10 @@ void getBestDevice(JNIEnv *env){
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_printDeviceInfo
-  (JNIEnv *env, jclass c)
+  (JNIEnv *env, jclass cls)
 {
     int i, a=0, b=0, status;
+    size_t c,d;
     int num_devices = 0;
     char str[1024];
  
@@ -167,8 +168,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
         if(cuDeviceGetName(str,1024,cuDevice) == CUDA_SUCCESS)
             printf("Name:                          %s\n", str);
         
-        if(cuMemGetInfo(&a, &b) == CUDA_SUCCESS)
-            printf("Total global memory:           %i/%i (Free/Total) MBytes\n", a/1024/1024, b/1024/1024);
+        if(cuMemGetInfo(&c, &d) == CUDA_SUCCESS)
+            printf("Total global memory:           %.2f/%.2f (Free/Total) MBytes\n", c/1024.0/1024.0, d/1024.0/1024.0);
         
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK,cuDevice) == CUDA_SUCCESS)
             printf("Total registers per block:     %i\n", a);
@@ -180,17 +181,17 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
             printf("Maximum threads per block:     %i\n", a);
         
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK,cuDevice) == CUDA_SUCCESS)
-            printf("Total shared memory per block  %i Bytes\n", a);
+            printf("Total shared memory per block  %.2f MB\n", a/1024.0/1024.0);
         
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_CLOCK_RATE,cuDevice) == CUDA_SUCCESS)
             printf("Clock rate:                    %.2f MHz\n",  a/1000000.0);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE,cuDevice) == CUDA_SUCCESS)
-            printf("Memory Clock rate:             %i\n",  a);
+            printf("Memory Clock rate:             %.2f\n",  a/1000000.0);
         
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_TOTAL_CONSTANT_MEMORY,cuDevice) == CUDA_SUCCESS)
-            printf("Total constant memory:         %u\n",  a);
+            printf("Total constant memory:         %.2f MB\n",  a/1024.0/1024.0);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_INTEGRATED,cuDevice) == CUDA_SUCCESS)
-            printf("Integrated:                    %u\n",  a);
+            printf("Integrated:                    %i\n",  a);
         
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR,cuDevice) == CUDA_SUCCESS)
             printf("Max threads per multiprocessor:%i\n",  a);    
