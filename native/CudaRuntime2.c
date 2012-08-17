@@ -141,9 +141,9 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   (JNIEnv *env, jclass cls)
 {
     int i, a=0, b=0, status;
-    size_t c,d;
     int num_devices = 0;
     char str[1024];
+    size_t free_mem, total_mem;
  
     status = cuInit(0);
     CHECK_STATUS(env,"error in cuInit",status)
@@ -168,8 +168,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
         if(cuDeviceGetName(str,1024,cuDevice) == CUDA_SUCCESS)
             printf("Name:                          %s\n", str);
         
-        if(cuMemGetInfo(&c, &d) == CUDA_SUCCESS)
-            printf("Total global memory:           %.2f/%.2f (Free/Total) MBytes\n", c/1024.0/1024.0, d/1024.0/1024.0);
+        if(cuMemGetInfo(&free_mem, &total_mem) == CUDA_SUCCESS)
+            printf("Total global memory:           %zu/%zu (Free/Total) MBytes\n", free_mem/1024/1024, total_mem/1024/1024);
         
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK,cuDevice) == CUDA_SUCCESS)
             printf("Total registers per block:     %i\n", a);
