@@ -30,6 +30,8 @@ public class ClassRemapping {
     m_RuntimeClassesJar = new ArrayList<String>();
     put("java.util.concurrent.atomic.AtomicLong", "edu.syr.pcpratts.rootbeer.runtime.remap.GpuAtomicLong");
     put("java.util.Random", "edu.syr.pcpratts.rootbeer.runtime.remap.Random");
+    put("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.CallsPrivateMethod", "edu.syr.pcpratts.rootbeer.runtime.remap.DoesntCallPrivateMethod");
+    put("java.lang.Math", "edu.syr.pcpratts.rootbeer.runtime.remap.java.lang.Math");
   }
 
   private void put(String key, String value) {
@@ -141,6 +143,9 @@ public class ClassRemapping {
           break;
         }
         String[] tokens = line.split("=>");
+        if(tokens.length != 2){
+          continue;
+        }
         m_ClonedMap.put(tokens[0].trim(), tokens[1].trim()); 
         put(tokens[0].trim(), tokens[1].trim()); 
       }      
