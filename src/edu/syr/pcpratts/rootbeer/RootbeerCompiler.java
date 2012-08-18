@@ -86,10 +86,10 @@ public class RootbeerCompiler {
     ClassRemappingTransform transform = null;
     
     if(!Main.disable_class_remapping()){
-        System.out.println("Remapping some classes to GPU versions...");
-        transform = new ClassRemappingTransform(false);
-        transform.run(reachables);
-        transform.finishClone();
+      System.out.println("Remapping some classes to GPU versions...");
+      transform = new ClassRemappingTransform(false);
+      transform.run(reachables);
+      transform.finishClone();
     }
     
     Transform2 transform2 = new Transform2();
@@ -104,8 +104,9 @@ public class RootbeerCompiler {
     
     List<String> app_classes = m_loader.getVisitedClasses();
     
-    if(!Main.disable_class_remapping())
-        app_classes.addAll(transform.getModifiedClasses());
+    if(!Main.disable_class_remapping()){
+      app_classes.addAll(transform.getModifiedClasses());
+    }
     
     for(String cls : app_classes){
       writeClassFile(cls);

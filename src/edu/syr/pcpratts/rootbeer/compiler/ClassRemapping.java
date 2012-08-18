@@ -13,11 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import soot.SootClass;
 
 public class ClassRemapping {
@@ -159,5 +155,9 @@ public class ClassRemapping {
     ret.addAll(m_RuntimeClasses);
     ret.addAll(m_ClonedMap.values());
     return ret;
+  }
+
+  public Collection<String> getValues() {
+    return m_Map.values();
   }
 }

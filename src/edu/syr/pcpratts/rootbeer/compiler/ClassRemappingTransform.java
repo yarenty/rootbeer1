@@ -38,25 +38,25 @@ import soot.jimple.ThisRef;
 
 public class ClassRemappingTransform {
 
-  private ClassRemapping m_ClassRemapping;
-  private Map<SootField, List<FieldRef>> m_FieldsToFix; 
-  private Set<String> m_Modified;
-  private String m_CurrClass;
-  private boolean m_HasNext;
-  private boolean m_AppClass;
+  private ClassRemapping m_classRemapping;
+  private Map<SootField, List<FieldRef>> m_fieldsToFix; 
+  private Set<String> m_modified;
+  private String m_currClass;
+  private boolean m_hasNext;
+  private boolean m_appClass;
   
   public ClassRemappingTransform(boolean map_runtime){
-    m_ClassRemapping = new ClassRemapping();
+    m_classRemapping = new ClassRemapping();
     if(!map_runtime){
-      m_ClassRemapping.loadMap();
+      m_classRemapping.loadMap();
     }
-    m_FieldsToFix = new HashMap<SootField, List<FieldRef>>();
-    m_Modified = new HashSet<String>();
-    m_HasNext = true;
+    m_fieldsToFix = new HashMap<SootField, List<FieldRef>>();
+    m_modified = new HashSet<String>();
+    m_hasNext = true;
   }
   
   public void reset(){
-    m_HasNext = false;
+    m_hasNext = false;
   }
   
   public void run(List<String> reachable_methods){
@@ -64,8 +64,8 @@ public class ClassRemappingTransform {
     for(String method : reachable_methods){
       String cls_name = sig_util.classFromMethodSig(method);
       SootClass soot_class = RootbeerScene.v().getClass(cls_name);
-      m_AppClass = soot_class.isApplicationClass();
-      m_CurrClass = cls_name;
+      m_appClass = soot_class.isApplicationClass();
+      m_currClass = cls_name;
       String sub_sig = sig_util.methodSubSigFromMethodSig(method);
       SootMethod soot_method = soot_class.getMethod(sub_sig);
       visit(soot_method);
@@ -78,9 +78,9 @@ public class ClassRemappingTransform {
   }
   
   private void run(String cls, boolean app_class){
-    m_CurrClass = cls;
+    m_currClass = cls;
     SootClass soot_class = RootbeerScene.v().getClass(cls);
-    m_AppClass = app_class;
+    m_appClass = app_class;
     List<SootMethod> methods = soot_class.getMethods();
     for(SootMethod method : methods){
       visit(method);
@@ -88,7 +88,7 @@ public class ClassRemappingTransform {
   }
   
   public void finishClone(){
-    List<String> cloned = m_ClassRemapping.getCloned();
+    List<String> cloned = m_classRemapping.getCloned();
     for(String cls : cloned){
       run(cls, true);
     }
@@ -96,15 +96,18 @@ public class ClassRemappingTransform {
   }
   
   public Set<String> getModifiedClasses(){
-    return m_Modified;
+    Set<String> ret = new HashSet<String>();
+    ret.addAll(m_modified);
+    ret.addAll(m_classRemapping.getValues());
+    return ret;
   }
   
   public void setModified(){
-    m_Modified.add(m_CurrClass);
+    m_modified.add(m_currClass);
   }
   
   public void fixFields(){
-    Iterator<SootField> iter = m_FieldsToFix.keySet().iterator();
+    Iterator<SootField> iter = m_fieldsToFix.keySet().iterator();
     while(iter.hasNext()){
       SootField curr = iter.next();
       SootField orig = curr;
@@ -129,14 +132,18 @@ public class ClassRemappingTransform {
           curr.setType(new_type);
         }
       }
-      List<FieldRef> refs = m_FieldsToFix.get(orig);
+      List<FieldRef> refs = m_fieldsToFix.get(orig);
       for(FieldRef ref : refs){
         ref.setFieldRef(curr.makeRef());
       }
     }
   }
   
-  private void visit(SootMethod method) {    
+  private void visit(SootMethod method) { 
+    SootClass soot_class = method.getDeclaringClass();
+    if(m_classRemapping.containsKey(soot_class.getName())){
+      return;
+    }
     Body body = RootbeerScene.v().getBody(method);
     if(body == null)
       return;
@@ -260,17 +267,17 @@ public class ClassRemappingTransform {
   }
 
   private boolean shouldMap(SootClass soot_class) {
-    if(m_AppClass){
-      if(m_ClassRemapping.containsKey(soot_class.getName())){
+    if(m_appClass){
+      if(m_classRemapping.containsKey(soot_class.getName())){
         setModified();
         return true;
       } else {
         return false;
       }
     } else {
-      if(m_ClassRemapping.containsKey(soot_class.getName()) && !m_ClassRemapping.cloned(m_CurrClass)){
-        m_HasNext = true;
-        m_ClassRemapping.cloneClass(m_CurrClass);
+      if(m_classRemapping.containsKey(soot_class.getName()) && !m_classRemapping.cloned(m_currClass)){
+        m_hasNext = true;
+        m_classRemapping.cloneClass(m_currClass);
       }
       return false;
     }
@@ -289,21 +296,21 @@ public class ClassRemappingTransform {
   }
   
   public ClassRemapping getClassRemapping(){
-    return m_ClassRemapping;
+    return m_classRemapping;
   }
 
   private SootClass getMapping(SootClass soot_class) {
-    String new_class = m_ClassRemapping.get(soot_class.getName());
+    String new_class = m_classRemapping.get(soot_class.getName());
     return RootbeerScene.v().getClass(new_class);
   }
 
   private void addField(SootField field, FieldRef ref) {
     List<FieldRef> refs;
-    if(m_FieldsToFix.containsKey(field)){
-      refs = m_FieldsToFix.get(field);
+    if(m_fieldsToFix.containsKey(field)){
+      refs = m_fieldsToFix.get(field);
     } else {
       refs = new ArrayList<FieldRef>();
-      m_FieldsToFix.put(field, refs);
+      m_fieldsToFix.put(field, refs);
     }
     refs.add(ref);
   }
@@ -345,7 +352,7 @@ public class ClassRemappingTransform {
   }
 
   public boolean hasNext() {
-    return m_HasNext;
+    return m_hasNext;
   }
 
 }
