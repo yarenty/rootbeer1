@@ -61,7 +61,11 @@ public class CudaTweaks extends Tweaks {
 
       String command;
       if(File.separator.equals("/")){
-        command = "/usr/local/cuda/bin/nvcc "+modelString+" -arch sm_20 -cubin "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
+        String cuda_path = System.getenv("CUDA_BIN_PATH");
+        if(cuda_path == null){
+          cuda_path = "/usr/local/cuda/bin";
+        }
+        command = cuda_path + "/nvcc "+modelString+" -arch sm_20 -cubin "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
       } else {
         GenerateClScript generate = new GenerateClScript();
         File cl_script = generate.execute(generated, code_file);
