@@ -11,6 +11,7 @@ import edu.syr.pcpratts.rootbeer.compiler.AddBasicClass;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.util.JimpleWriter;
 import java.util.List;
+import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
 
@@ -27,7 +28,7 @@ public class PrintClass {
       }
     }
     try {
-      SootClass soot_class = RootbeerScene.v().getClass(cls);
+      SootClass soot_class = Scene.v().getSootClass(cls);
       JimpleWriter writer = new JimpleWriter();
       writer.write("copied", soot_class);
     } catch(Exception ex){
@@ -36,7 +37,7 @@ public class PrintClass {
   }
 
   private void loadClass(String cls) {
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     List<SootMethod> methods = soot_class.getMethods();
     for(SootMethod method : methods){
       if(method.isConcrete())

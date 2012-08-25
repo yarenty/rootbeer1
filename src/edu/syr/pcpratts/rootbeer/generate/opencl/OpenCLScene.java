@@ -36,22 +36,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import soot.ArrayType;
-import soot.BooleanType;
-import soot.ByteType;
-import soot.CharType;
-import soot.DoubleType;
-import soot.FloatType;
-import soot.IntType;
-import soot.Local;
-import soot.LongType;
-import soot.RefType;
-import soot.ShortType;
-import soot.SootClass;
-import soot.SootField;
-import soot.SootMethod;
-import soot.Type;
-import soot.VoidType;
+import soot.*;
 import soot.jimple.NewMultiArrayExpr;
 
 public class OpenCLScene {
@@ -411,11 +396,11 @@ public class OpenCLScene {
   }
 
   private void addBuiltinRequirements() {
-    SootClass string_class = RootbeerScene.v().getClass("java.lang.String");
+    SootClass string_class = Scene.v().getSootClass("java.lang.String");
     SootMethod ctor_method = string_class.getMethod("void <init>(char[])");
     addMethod(ctor_method);
     
-    SootClass rootbeer_gpu_class = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
+    SootClass rootbeer_gpu_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
     SootMethod getThreadId = rootbeer_gpu_class.getMethodByName("getThreadId");
     addMethod(getThreadId);
     
@@ -423,15 +408,15 @@ public class OpenCLScene {
     OpenCLArrayType ocl_array = new OpenCLArrayType(char_array);
     m_ArrayTypes.add(ocl_array);
     
-    SootClass throwable_class = RootbeerScene.v().getClass("java.lang.Throwable");
+    SootClass throwable_class = Scene.v().getSootClass("java.lang.Throwable");
     SootMethod getStackTrace = throwable_class.getMethod("java.lang.StackTraceElement[] getStackTrace()");
     addMethod(getStackTrace);
         
-    SootClass stack_trace_elem = RootbeerScene.v().getClass("java.lang.StackTraceElement");
+    SootClass stack_trace_elem = Scene.v().getSootClass("java.lang.StackTraceElement");
     SootMethod stack_ctor = stack_trace_elem.getMethod("void <init>(java.lang.String,java.lang.String,java.lang.String,int)");
     addMethod(stack_ctor);
     
-    SootClass out_of_mem = RootbeerScene.v().getClass("java.lang.OutOfMemoryError");
+    SootClass out_of_mem = Scene.v().getSootClass("java.lang.OutOfMemoryError");
     SootMethod out_ctor = out_of_mem.getMethod("void <init>()");
     addMethod(out_ctor);
     addType(out_of_mem.getType());
@@ -440,7 +425,7 @@ public class OpenCLScene {
   }
 
   private void addType(String cls){
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     addType(soot_class.getType());
   }
   

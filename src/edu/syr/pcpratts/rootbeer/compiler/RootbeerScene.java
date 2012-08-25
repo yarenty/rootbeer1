@@ -106,7 +106,7 @@ public class RootbeerScene {
   public List<String> getApplicationClasses(){
     return m_ApplicationClasses;
   }
-  
+  /*
   public SootClass getClass(String name){
     if(m_Classes.containsKey(name))
       return m_Classes.get(name);
@@ -136,7 +136,8 @@ public class RootbeerScene {
     }
     return cls;
   }
-  
+  */
+  /*
   public Body getBody(SootMethod method){
     if(m_Bodies.containsKey(method.getSignature())){
       return m_Bodies.get(method.getSignature());
@@ -158,7 +159,7 @@ public class RootbeerScene {
     m_Bodies.put(method.getSignature(), ret);
     return ret;
   }
-  
+  */
   public void sootLoadClass(String name, int level){
     m_SootLoadedClasses.put(name, level);
   }
@@ -258,22 +259,22 @@ public class RootbeerScene {
   }
     
   private void fixupClass(String cls){
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     LinkedList<SootClass> queue = new LinkedList<SootClass>();
     queue.addAll( soot_class.getInterfaces() );
     soot_class.getInterfaces().clear();
     while( !queue.isEmpty() ) {
       SootClass iface = queue.removeFirst();
-      iface = RootbeerScene.v().getClass(iface.getName());
+      iface = Scene.v().getSootClass(iface.getName());
       soot_class.addInterface(iface);
     }
     if(soot_class.hasSuperclass()){
       SootClass super_class = soot_class.getSuperclass();
-      soot_class.setSuperclass(RootbeerScene.v().getClass(super_class.getName()));
+      soot_class.setSuperclass(Scene.v().getSootClass(super_class.getName()));
     }
     if(soot_class.hasOuterClass()){
       SootClass outer_class = soot_class.getOuterClass();
-      soot_class.setOuterClass(RootbeerScene.v().getClass(outer_class.getName()));
+      soot_class.setOuterClass(Scene.v().getSootClass(outer_class.getName()));
     } 
     if(soot_class.hasSuperclass()){
       fixupClass(soot_class.getSuperclass().getName());
@@ -329,7 +330,7 @@ public class RootbeerScene {
     Scene.v().loadNecessaryClasses();
     
     for(String cls : m_GetClassClasses){
-      getClass(cls);
+      Scene.v().getSootClass(cls);
     }
   }
 
@@ -360,7 +361,7 @@ public class RootbeerScene {
   public void writeCopiedClasses(){
     for(String classname : m_Classes.keySet()){
       try {
-        SootClass cls = getClass(classname);
+        SootClass cls = Scene.v().getSootClass(classname);
         JimpleWriter writer = new JimpleWriter();
         writer.write("copied", cls);
       } catch(Exception ex){

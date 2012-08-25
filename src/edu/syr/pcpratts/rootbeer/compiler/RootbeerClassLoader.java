@@ -18,16 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import soot.ArrayType;
-import soot.Body;
-import soot.PatchingChain;
-import soot.RefType;
-import soot.SootClass;
-import soot.SootMethod;
-import soot.Type;
-import soot.Unit;
-import soot.Value;
-import soot.ValueBox;
+import soot.*;
 import soot.jimple.FieldRef;
 import soot.jimple.InvokeExpr;
 
@@ -86,7 +77,7 @@ public class RootbeerClassLoader {
       String cls = m_VisitedClasses.get(i);
       if(cls.equals("java.lang.Object"))
         continue;
-      SootClass soot_class = RootbeerScene.v().getClass(cls);
+      SootClass soot_class = Scene.v().getSootClass(cls);
       List<SootMethod> methods = soot_class.getMethods();
       for(SootMethod method : methods){
         if(m_VisitedMethods.contains(method.getSignature()))
@@ -96,7 +87,7 @@ public class RootbeerClassLoader {
     } 
     
     for(String cls : m_AppClasses){
-      SootClass soot_class = RootbeerScene.v().getClass(cls);  
+      SootClass soot_class = Scene.v().getSootClass(cls);  
       soot_class.setApplicationClass();
     }
     
@@ -122,7 +113,7 @@ public class RootbeerClassLoader {
   private void loadMethod(String cls, String method, boolean load_classes_for_method){
     loadAllClasses(cls);
     
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     SootMethod soot_method = null; 
         
     while(true){
@@ -147,7 +138,7 @@ public class RootbeerClassLoader {
   
   private void loadBody(SootMethod soot_method){
     if(soot_method.isConcrete()){
-      Body body = RootbeerScene.v().getBody(soot_method);
+      Body body = soot_method.getActiveBody();
       loadFieldRefsForBody(body);
       List<String> methods = findMethodCallsForBody(body);
       for(String sig : methods){
@@ -179,7 +170,7 @@ public class RootbeerClassLoader {
   }
   
   private void loadClass(String cls) {
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     addHierarchy(soot_class);
   }
   

@@ -114,7 +114,7 @@ public class FieldReadWriteInspector {
       soot_type = base_type;
     }
 
-    SootClass soot_class = RootbeerScene.v().getClass(soot_type.toString());
+    SootClass soot_class = Scene.v().getSootClass(soot_type.toString());
     if(mWritenOnGpuFieldsClassesChecked.contains(soot_type.toString()))
       return false;
     mWritenOnGpuFieldsClassesChecked.add(soot_type.toString());

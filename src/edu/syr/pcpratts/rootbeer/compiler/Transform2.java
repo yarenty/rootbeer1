@@ -10,6 +10,7 @@ package edu.syr.pcpratts.rootbeer.compiler;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.GenerateRuntimeBasicBlock;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
+import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
 
@@ -26,7 +27,7 @@ public class Transform2 {
     
     System.out.println("Running Transform2 on: "+cls);
     
-    SootClass soot_class1 = RootbeerScene.v().getClass(cls);
+    SootClass soot_class1 = Scene.v().getSootClass(cls);
     SootMethod method = soot_class1.getMethod("void gpuMethod()");
     
     //generate RuntimeBasicBlock and GcObjectVisitor
@@ -40,7 +41,7 @@ public class Transform2 {
 
     //add an interface to the class
     SootClass soot_class = method.getDeclaringClass();
-    SootClass iface_class = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.CompiledKernel");
+    SootClass iface_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.CompiledKernel");
     soot_class.addInterface(iface_class);
     
     OpenCLScene.releaseV();

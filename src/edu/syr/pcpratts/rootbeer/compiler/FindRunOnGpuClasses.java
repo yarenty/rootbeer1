@@ -10,6 +10,7 @@ package edu.syr.pcpratts.rootbeer.compiler;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import soot.Scene;
 import soot.SootClass;
 import soot.util.Chain;
 
@@ -20,7 +21,7 @@ public class FindRunOnGpuClasses {
     List<String> ret = new ArrayList<String>();
     for(String cls : app_classes){
       try {
-        SootClass soot_class = RootbeerScene.v().getClass(cls);
+        SootClass soot_class = Scene.v().getSootClass(cls);
         if(matches(soot_class)){
           ret.add(soot_class.getName());
         }

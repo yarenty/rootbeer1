@@ -15,18 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import soot.ArrayType;
-import soot.Body;
-import soot.Local;
-import soot.RefType;
-import soot.SootClass;
-import soot.SootField;
-import soot.SootMethod;
-import soot.SootMethodRef;
-import soot.Type;
-import soot.Unit;
-import soot.Value;
-import soot.ValueBox;
+import soot.*;
 import soot.jimple.CastExpr;
 import soot.jimple.FieldRef;
 import soot.jimple.InvokeExpr;
@@ -63,7 +52,7 @@ public class ClassRemappingTransform {
     SignatureUtil sig_util = new SignatureUtil();
     for(String method : reachable_methods){
       String cls_name = sig_util.classFromMethodSig(method);
-      SootClass soot_class = RootbeerScene.v().getClass(cls_name);
+      SootClass soot_class = Scene.v().getSootClass(cls_name);
       m_appClass = soot_class.isApplicationClass();
       m_currClass = cls_name;
       String sub_sig = sig_util.methodSubSigFromMethodSig(method);
@@ -73,13 +62,13 @@ public class ClassRemappingTransform {
   }
   
   public void run(String cls) {
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     run(cls, soot_class.isApplicationClass());
   }
   
   private void run(String cls, boolean app_class){
     m_currClass = cls;
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     m_appClass = app_class;
     List<SootMethod> methods = soot_class.getMethods();
     for(SootMethod method : methods){
@@ -144,7 +133,7 @@ public class ClassRemappingTransform {
     if(m_classRemapping.containsKey(soot_class.getName())){
       return;
     }
-    Body body = RootbeerScene.v().getBody(method);
+    Body body = method.getActiveBody();
     if(body == null)
       return;
     fixArguments(method);
@@ -301,7 +290,7 @@ public class ClassRemappingTransform {
 
   private SootClass getMapping(SootClass soot_class) {
     String new_class = m_classRemapping.get(soot_class.getName());
-    return RootbeerScene.v().getClass(new_class);
+    return Scene.v().getSootClass(new_class);
   }
 
   private void addField(SootField field, FieldRef ref) {

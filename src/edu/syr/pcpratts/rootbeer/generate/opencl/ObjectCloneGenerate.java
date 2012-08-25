@@ -13,6 +13,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import soot.Scene;
 import soot.SootClass;
 
 public class ObjectCloneGenerate {
@@ -60,7 +61,7 @@ public class ObjectCloneGenerate {
   }
 
   private void cloneRefType(StringBuilder ret, String key, OpenCLClass ocl_class) {
-    SootClass soot_class = RootbeerScene.v().getClass(key);
+    SootClass soot_class = Scene.v().getSootClass(key);
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     int type = OpenCLScene.v().getClassType(soot_class.getType());
     ret.append("  else if(type == "+type+"){\n");

@@ -17,10 +17,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import soot.Local;
-import soot.RefType;
-import soot.SootClass;
-import soot.VoidType;
+import soot.*;
 import soot.jimple.LongConstant;
 
 public class VisitorReadGenStatic extends AbstractVisitorGen {
@@ -86,7 +83,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     BytecodeLanguage bcl = new BytecodeLanguage();
     m_Bcl.push(bcl);
     bcl.openClass(soot_class);
-    SootClass mem = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
     bcl.startStaticMethod(method_name, VoidType.v(), mem.getType(), m_ThisRef.getType());
     
     Local memory = bcl.refParameter(0);
@@ -132,7 +129,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
   private void callReader(SootClass soot_class) {    
     BytecodeLanguage bcl = m_Bcl.top();
     String method_name = getReaderName(soot_class);
-    SootClass mem = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
     bcl.pushMethod(soot_class, method_name, VoidType.v(), mem.getType(), m_ThisRef.getType());
     bcl.invokeStaticMethodNoRet(m_CurrMem.top(), m_GcObjVisitor.top());
   }
