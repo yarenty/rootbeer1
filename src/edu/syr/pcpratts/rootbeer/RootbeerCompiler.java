@@ -12,6 +12,7 @@ import edu.syr.pcpratts.rootbeer.compiler.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.NativeCpuTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
+import edu.syr.pcpratts.rootbeer.util.CurrJarName;
 import edu.syr.pcpratts.rootbeer.util.JarEntryHelp;
 import edu.syr.pcpratts.rootbeer.util.JimpleWriter;
 import java.io.File;
@@ -127,7 +128,8 @@ public class RootbeerCompiler {
     Pack p = new Pack();
     String main_jar = Constants.OUTPUT_JAR_FOLDER + File.separator + "partial-ret.jar";
     List<String> lib_jars = new ArrayList<String>();
-    lib_jars.add("Rootbeer.jar");
+    CurrJarName jar_name = new CurrJarName();
+    lib_jars.add(jar_name.get());
     p.run(main_jar, lib_jars, outjar_name);
   }
 

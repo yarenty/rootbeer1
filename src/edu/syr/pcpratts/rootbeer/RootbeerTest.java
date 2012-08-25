@@ -13,6 +13,7 @@ import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
 import edu.syr.pcpratts.rootbeer.test.LoadTestSerialization;
 import edu.syr.pcpratts.rootbeer.test.TestException;
 import edu.syr.pcpratts.rootbeer.test.TestSerialization;
+import edu.syr.pcpratts.rootbeer.util.CurrJarName;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -29,11 +30,13 @@ public class RootbeerTest {
   public void runTests(String test_case) {
     RootbeerCompiler compiler = new RootbeerCompiler();
     String dest_jar = "output.jar";   
+    CurrJarName jar_name = new CurrJarName();
+    String rootbeer_jar = jar_name.get();
     try {
       if(test_case == null){
-        compiler.compile("Rootbeer.jar", dest_jar);
+        compiler.compile(rootbeer_jar, dest_jar);
       } else {
-        compiler.compile("Rootbeer.jar", dest_jar, test_case);
+        compiler.compile(rootbeer_jar, dest_jar, test_case);
       }
       
       JarClassLoader loader_factory = new JarClassLoader(dest_jar);
