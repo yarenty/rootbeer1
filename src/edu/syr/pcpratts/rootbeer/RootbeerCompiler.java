@@ -83,14 +83,10 @@ public class RootbeerCompiler {
     m_fastLoader.addClassPath(getRuntimeJars());
     m_fastLoader.init();
     
-    List<String> kernel_classes = m_fastLoader.findKernelClasses();    
-    for(String kernel_class : kernel_classes){
-      System.out.println("kernel_class: "+kernel_class);
-    }
+    List<String> kernel_classes = m_fastLoader.findKernelClasses(); 
     FindKernelForTestCase finder = new FindKernelForTestCase();
     String kernel = finder.get(test_case, kernel_classes);
     kernel_classes.clear();
-    System.out.println("to test: "+kernel);
     kernel_classes.add(kernel);
     
     compileForKernels(outname, kernel_classes);

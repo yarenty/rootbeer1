@@ -7,17 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import soot.ByteType;
-import soot.CharType;
-import soot.DoubleType;
-import soot.FloatType;
-import soot.IntType;
-import soot.Local;
-import soot.LongType;
-import soot.ShortType;
-import soot.Type;
-import soot.Value;
-import soot.VoidType;
+import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 
@@ -36,6 +26,11 @@ public class BclMemory {
 
   public void writeByte(Value value){
     mBcl.pushMethod(mBcl.getTypeString(mMem), "writeByte", VoidType.v(), ByteType.v());
+    mBcl.invokeMethodNoRet(mMem, value);
+  }
+
+  public void writeBoolean(Value value){
+    mBcl.pushMethod(mBcl.getTypeString(mMem), "writeBoolean", VoidType.v(), BooleanType.v());
     mBcl.invokeMethodNoRet(mMem, value);
   }
 
@@ -77,6 +72,8 @@ public class BclMemory {
     Type type = curr.getType();
     if(type instanceof ByteType){
       writeByte(curr);
+    } else if(type instanceof BooleanType){
+      writeBoolean(curr);
     } else if(type instanceof ShortType){
       writeShort(curr);
     } else if(type instanceof CharType){
@@ -135,6 +132,11 @@ public class BclMemory {
     mBcl.pushMethod(mMem, "readByte", ByteType.v());
     return mBcl.invokeMethodRet(mMem);
   }
+  
+  Local readBoolean() {
+    mBcl.pushMethod(mMem, "readBoolean", BooleanType.v());
+    return mBcl.invokeMethodRet(mMem);
+  }
 
   Local readShort(){
     mBcl.pushMethod(mMem, "readShort", ShortType.v());
@@ -179,6 +181,8 @@ public class BclMemory {
   Local readVar(Type type) {
     if(type instanceof ByteType){
       return readByte();
+    } else if(type instanceof BooleanType){
+      return readBoolean();
     } else if(type instanceof ShortType){
       return readShort();
     } else if(type instanceof CharType){

@@ -194,4 +194,8 @@ public class AbstractVisitorGen {
     }
   }
   
+  protected String toConstant(String name) {
+    return name.replace(".", "/");
+  }
+  
 }
