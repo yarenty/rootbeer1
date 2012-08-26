@@ -78,6 +78,11 @@ public class FastWholeProgram {
     m_ignorePackages.add("beaver.");
     m_ignorePackages.add("polyglot.");
     m_ignorePackages.add("org.antlr.");
+    m_ignorePackages.add("java_cup.");
+    m_ignorePackages.add("ppg.");
+    m_ignorePackages.add("antlr.");
+    m_ignorePackages.add("jas.");
+    m_ignorePackages.add("scm.");  
     
     m_keepPackages = new ArrayList<String>();
     m_keepPackages.add("edu.syr.pcpratts.rootbeer.testcases.");

@@ -8,7 +8,6 @@
 package edu.syr.pcpratts.rootbeer;
 
 import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerClassLoader;
 import edu.syr.pcpratts.rootbeer.compiler.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.NativeCpuTweaks;

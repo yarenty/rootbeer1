@@ -20,11 +20,11 @@ public class SynchronizedMethod2RunOnGpu implements Kernel {
 
   @Override
   public void gpuMethod() {
-    //try {
-    //  increment();
-    //} catch(Throwable ex){
-    //  value1++;
-    //}    
+    try {
+      increment();
+    } catch(Throwable ex){
+      value1++;
+    }    
   }
   
   private void increment(){

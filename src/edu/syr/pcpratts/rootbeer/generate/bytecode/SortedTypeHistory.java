@@ -8,7 +8,6 @@
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import edu.syr.pcpratts.rootbeer.compiler.ClassRemapping;
-import edu.syr.pcpratts.rootbeer.compiler.IgnorePackages;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.TreeNode;
 import edu.syr.pcpratts.rootbeer.util.SignatureUtil;

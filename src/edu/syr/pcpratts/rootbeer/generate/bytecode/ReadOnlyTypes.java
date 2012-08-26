@@ -52,7 +52,7 @@ public class ReadOnlyTypes {
       return;
     m_Inspected.add(sig);
     
-    Body body = method.getActiveBody();
+    Body body = method.retrieveActiveBody();
     if(body == null)
       return;
     inspectBody(body);
