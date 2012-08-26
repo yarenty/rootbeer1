@@ -46,6 +46,10 @@ public class FastWholeProgram {
   private Set<String> m_cgVisited;
   private List<String> m_bodiesClasses;
   private final Logger m_log;
+  private List<String> m_ignorePackages;
+  private List<String> m_keepPackages;
+  private List<String> m_runtimeClasses;
+  private Set<String> m_resolvedMethods;
 
   public FastWholeProgram() {
     m_log = Logger.getLogger("edu.syr.pcpratts");
@@ -62,6 +66,41 @@ public class FastWholeProgram {
     m_resolver = new FastClassResolver(m_tempFolder, m_classPaths);
 
     m_applicationClasses = new ArrayList<String>();
+    
+    m_ignorePackages = new ArrayList<String>();
+    m_ignorePackages.add("edu.syr.pcpratts.compressor.");
+    m_ignorePackages.add("edu.syr.pcpratts.deadmethods.");
+    m_ignorePackages.add("edu.syr.pcpratts.jpp.");
+    m_ignorePackages.add("edu.syr.pcpratts.rootbeer.");
+    m_ignorePackages.add("pack.");
+    m_ignorePackages.add("jasmin.");
+    m_ignorePackages.add("soot.");
+    m_ignorePackages.add("beaver.");
+    m_ignorePackages.add("polyglot.");
+    m_ignorePackages.add("org.antlr.");
+    
+    m_keepPackages = new ArrayList<String>();
+    m_keepPackages.add("edu.syr.pcpratts.rootbeer.testcases.");
+    m_keepPackages.add("edu.syr.pcpratts.rootbeer.runtime.remap.");
+    
+    m_runtimeClasses = new ArrayList<String>();
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.generate.bytecode.Constants");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.RootbeerFactory");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.Rootbeer");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.Kernel");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.CompiledKernel");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.Serializer");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestSerialization");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestSerializationFactory");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestException");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestExceptionFactory");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.PrivateFields");
+    
+    m_resolvedMethods = new HashSet<String>();
   }
 
   /**
@@ -162,6 +201,8 @@ public class FastWholeProgram {
   private void loadToBodies() {
     m_callGraph = new FastCallGraph();
     m_bodiesClasses = new ArrayList<String>();
+    m_bodiesClasses.addAll(m_applicationClasses);
+    m_bodiesClasses.addAll(m_runtimeClasses);
     for (SootMethod entry : m_entryMethods) {
       String class_name = entry.getDeclaringClass().getName();
       if (m_bodiesClasses.contains(class_name) == false) {
@@ -172,8 +213,11 @@ public class FastWholeProgram {
     m_cgWorkQueue = new LinkedList<String>();
     m_cgVisited = new HashSet<String>();
 
-    for (SootMethod method : m_entryMethods) {
-      m_cgWorkQueue.add(method.getSignature());
+    for(String soot_class_str : m_bodiesClasses){
+      SootClass soot_class = Scene.v().getSootClass(soot_class_str);
+      for(SootMethod method : soot_class.getMethods()){
+        m_cgWorkQueue.add(method.getSignature());
+      }
     }
     while (m_cgWorkQueue.isEmpty() == false) {
       String curr_signature = m_cgWorkQueue.get(0);
@@ -188,6 +232,10 @@ public class FastWholeProgram {
 
   private SootMethod fullyResolveMethod(String method_signature){
     final String soot_class_str = SignatureUtil.classFromMethodSig(method_signature);
+    if(m_resolvedMethods.contains(method_signature)){
+      return m_resolver.resolveMethod(method_signature);
+    }
+    m_resolvedMethods.add(method_signature);
     m_log.log(Level.FINER, "Resolving to bodies:  "+soot_class_str);
     m_resolver.resolveClass(soot_class_str, SootClass.BODIES);
     SootMethod curr = m_resolver.resolveMethod(method_signature);
@@ -293,7 +341,10 @@ public class FastWholeProgram {
           break;
         }
         if(entry.isDirectory() == false){
-          m_applicationClasses.add(filenameToClass(entry.getName()));
+          String class_name = filenameToClass(entry.getName());
+          if(ignorePackage(class_name) == false){
+            m_applicationClasses.add(class_name);
+          }
         }
         WriteJarEntry writer = new WriteJarEntry();
         writer.write(entry, is, m_tempFolder);
@@ -473,5 +524,28 @@ public class FastWholeProgram {
       }
     }
     return ret;
+  }
+
+  public List<String> getApplicationClasses() {
+    return m_applicationClasses;
+  }
+
+  private boolean ignorePackage(String class_name) {
+    for(String runtime_class : m_runtimeClasses){
+      if(class_name.equals(runtime_class)){
+        return false;
+      }
+    }
+    for(String keep_package : m_keepPackages){
+      if(class_name.startsWith(keep_package)){
+        return false;
+      }
+    }
+    for(String ignore_package : m_ignorePackages){
+      if(class_name.startsWith(ignore_package)){
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -38,7 +38,6 @@ public class RootbeerCompiler {
 
   private String m_classOutputFolder;
   private String m_jimpleOutputFolder;
-  private RootbeerClassLoader m_loader;
   private FastWholeProgram m_fastLoader;
   
   public RootbeerCompiler(){
@@ -122,25 +121,22 @@ public class RootbeerCompiler {
     for(String cls : run_on_gpu_classes){
       transform2.run(cls);
     }
-                
-    List<String> copy = m_loader.getClassesToCopy();
-    for(String cls : copy){
-      copyClass(cls);  
-    }    
     
-    List<String> app_classes = m_loader.getVisitedClasses();
+    List<String> app_classes = m_fastLoader.getApplicationClasses();
     
     if(!Main.disable_class_remapping()){
       app_classes.addAll(transform.getModifiedClasses());
     }
     
     for(String cls : app_classes){
+      loadAllMethods(cls);
       writeClassFile(cls);
       writeJimpleFile(cls);
     }
     
     List<String> added_classes = RootbeerScene.v().getAddedClasses();
     for(String cls : added_classes){
+      loadAllMethods(cls);
       writeClassFile(cls);
       writeJimpleFile(cls);
     }    
@@ -408,5 +404,17 @@ public class RootbeerCompiler {
     new File(folder).mkdirs();
     
     return cls;
+  }
+
+  private void loadAllMethods(String cls) {
+    SootClass soot_class = Scene.v().getSootClass(cls);
+    List<SootMethod> methods = soot_class.getMethods();
+    for(SootMethod method : methods){
+      if(method.isConcrete()){
+        Body body = method.getActiveBody();
+        SpecialInvokeFixup fixup = new SpecialInvokeFixup();
+        method.setActiveBody(fixup.fixup(body));
+      }
+    }
   }
 }

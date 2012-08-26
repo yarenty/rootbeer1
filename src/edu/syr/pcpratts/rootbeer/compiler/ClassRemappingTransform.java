@@ -133,7 +133,7 @@ public class ClassRemappingTransform {
     if(m_classRemapping.containsKey(soot_class.getName())){
       return;
     }
-    Body body = method.getActiveBody();
+    Body body = method.retrieveActiveBody();
     if(body == null)
       return;
     fixArguments(method);

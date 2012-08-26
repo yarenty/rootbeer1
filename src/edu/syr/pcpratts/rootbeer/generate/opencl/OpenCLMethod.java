@@ -207,7 +207,7 @@ public class OpenCLMethod {
       ret.append("}\n");
       if(isConstructor()){
         ret.append(getMethodDecl(true)+"{\n"); 
-        OpenCLBody ocl_body = new OpenCLBody(m_sootMethod.getActiveBody());
+        OpenCLBody ocl_body = new OpenCLBody(m_sootMethod.retrieveActiveBody());
         ret.append(ocl_body.getBody());
         ret.append("}\n");
       }
