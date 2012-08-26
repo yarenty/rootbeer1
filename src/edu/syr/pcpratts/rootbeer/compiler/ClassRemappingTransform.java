@@ -114,6 +114,9 @@ public class ClassRemappingTransform {
         }
       } else if(type instanceof ArrayType){
         ArrayType array_type = (ArrayType) type;
+        if(array_type.baseType instanceof RefType == false){
+          continue;
+        }
         RefType ref_type = (RefType) array_type.baseType;
         if(shouldMap(ref_type.getSootClass())){
           SootClass new_class = getMapping(ref_type.getSootClass());

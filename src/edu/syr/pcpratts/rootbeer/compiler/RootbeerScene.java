@@ -25,9 +25,11 @@ public class RootbeerScene {
 
   private List<String> m_addedClasses;
   private List<String> m_reachables;
+  private List<SootClass> m_allClasses;
   
   public RootbeerScene(){
     m_addedClasses = new ArrayList<String>();
+    m_allClasses = new ArrayList<SootClass>();
   }
   
   public void addClass(SootClass new_class) {
@@ -47,5 +49,15 @@ public class RootbeerScene {
 
   public List<String> getReachableMethods() {
     return m_reachables;
+  }
+
+  public List<SootClass> getAllClasses() {
+    return m_allClasses;
+  }
+  
+  public void addAllClass(SootClass soot_class){
+    if(m_allClasses.contains(soot_class) == false){
+      m_allClasses.add(soot_class);
+    }
   }
 }

@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.classloader;
 
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.util.SystemOutHandler;
 import java.io.File;
 import java.io.FileInputStream;
@@ -188,6 +189,7 @@ public class FastWholeProgram {
   
   public void init() {
     try {
+      System.out.println("loading application jars...");
       for (String path : m_paths) {
         File file = new File(path);
         if (file.isDirectory()) {
@@ -204,6 +206,7 @@ public class FastWholeProgram {
   }
   
   private void loadToBodies() {
+    System.out.println("loading to bodies...");
     m_callGraph = new FastCallGraph();
     m_bodiesClasses = new ArrayList<String>();
     m_bodiesClasses.addAll(m_applicationClasses);
@@ -241,11 +244,12 @@ public class FastWholeProgram {
       return m_resolver.resolveMethod(method_signature);
     }
     m_resolvedMethods.add(method_signature);
-    m_log.log(Level.FINER, "Resolving to bodies:  "+soot_class_str);
-    m_resolver.resolveClass(soot_class_str, SootClass.BODIES);
+    //m_log.log(Level.FINER, "Resolving to bodies:  "+soot_class_str);
+    SootClass soot_class = m_resolver.resolveClass(soot_class_str, SootClass.BODIES);
+    RootbeerScene.v().addAllClass(soot_class);
     SootMethod curr = m_resolver.resolveMethod(method_signature);
     if (curr == null || curr.isConcrete() == false) {
-      m_log.log(Level.FINER, "Unable to find a concrete body for "+soot_class_str);
+      //m_log.log(Level.FINER, "Unable to find a concrete body for "+soot_class_str);
       return null;
     } //hack to make sure it really loads it all
     SootClass actual_class = curr.getDeclaringClass();
@@ -258,15 +262,13 @@ public class FastWholeProgram {
     if(curr == null){
       return;
     }
-    m_log.log(Level.FINEST, "call graph dfs: "+curr.getSignature());
+    //m_log.log(Level.FINEST, "call graph dfs: "+curr.getSignature());
 
-  //For some weird reason,  curr.hasActiveBody() returns false, even though 
-  //curr.retrieveActiveBody() returns a body... go figure
     Body body = null;
     try{
       body = curr.retrieveActiveBody();
     } catch (RuntimeException e){
-      m_log.log(Level.FINER, "cannot find body for method: "+curr.getSignature());
+      //m_log.log(Level.FINER, "cannot find body for method: "+curr.getSignature());
       return;
     }
     
@@ -361,6 +363,7 @@ public class FastWholeProgram {
   }
 
   private void loadToSignatures() throws Exception {
+    System.out.println("loading to signatures...");
     File root = new File(m_tempFolder);
     loadToSignatures(root);
   }
@@ -374,6 +377,7 @@ public class FastWholeProgram {
   }
 
   private void loadBuiltIns() {
+    System.out.println("loading built-ins...");
     addBasicClass("java.lang.Object");
     addBasicClass("java.lang.Class", SootClass.SIGNATURES);
 
@@ -451,7 +455,7 @@ public class FastWholeProgram {
     if (m_applicationClasses.contains(name) == false) {
       return;
     }
-    m_log.log(Level.FINE, "Loading class to signature: "+name);
+    //m_log.log(Level.FINE, "Loading class to signature: "+name);
 
     SootClass loaded = m_resolver.resolveClass(name, SootClass.SIGNATURES);
     m_classes.put(name, loaded);
@@ -475,6 +479,7 @@ public class FastWholeProgram {
   }
 
   private void detectEntryPoints() {
+    System.out.println("detecting entry points...");
     for (SootClass sc : m_classes.values()) {
       Chain<SootClass> ifaces = sc.getInterfaces();
       Iterator<SootClass> iter = ifaces.iterator();
@@ -523,9 +528,15 @@ public class FastWholeProgram {
     
     List<String> ret = new ArrayList<String>();
     for(SootMethod method : m_entryMethods){
-      String soot_class = method.getDeclaringClass().toString();
-      if(ret.contains(soot_class) == false){
-        ret.add(soot_class);
+      SootClass soot_class = method.getDeclaringClass();
+      for(SootClass iface : soot_class.getInterfaces()){
+        if(iface.getName().equals("edu.syr.pcpratts.rootbeer.runtime.Kernel") == false){
+          continue;
+        }
+        String name = soot_class.getName();
+        if(ret.contains(name) == false){
+          ret.add(name);
+        }
       }
     }
     return ret;

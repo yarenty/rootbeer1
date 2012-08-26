@@ -66,7 +66,7 @@ public class ClassHierarchy {
     if(mMap.containsKey(class_name))
       return mMap.get(class_name);
 
-    Iterator<SootClass> iter = Scene.v().getApplicationClasses().iterator();
+    Iterator<SootClass> iter = RootbeerScene.v().getAllClasses().iterator();
     List<SootClass> ret = new ArrayList<SootClass>();
     while(iter.hasNext()){
       SootClass next = iter.next();

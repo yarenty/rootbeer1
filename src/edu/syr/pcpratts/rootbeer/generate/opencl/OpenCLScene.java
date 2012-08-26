@@ -11,7 +11,6 @@ import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.TypeHistory;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.ReadOnlyTypes;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.SortedTypeHistory;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;

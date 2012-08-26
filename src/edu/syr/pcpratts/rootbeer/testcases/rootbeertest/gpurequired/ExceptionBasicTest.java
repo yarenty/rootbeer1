@@ -5,7 +5,6 @@
  * See the file LICENSE for copying permission.
  */
 
-/*
 package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
@@ -35,4 +34,3 @@ public class ExceptionBasicTest implements TestException {
     return false;
   }
 }
-*/

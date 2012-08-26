@@ -23,7 +23,7 @@ public class CloneClass {
     for(SootMethod method : methods){
       SootMethod new_method = new SootMethod(method.getName(), method.getParameterTypes(), method.getReturnType(), method.getModifiers(), method.getExceptions());
       if(method.isConcrete()){
-        Body body = method.getActiveBody();
+        Body body = method.retrieveActiveBody();
         new_method.setActiveBody((Body) body.clone());
       }
       ret.addMethod(new_method);

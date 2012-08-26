@@ -37,7 +37,7 @@ public class MethodFinder {
           }
         }
         if(curr_class.hasSuperclass() == false){
-          m_log.warning("cannot find method: "+method_sig);
+          //m_log.warning("cannot find method: "+method_sig);
           return null;
         }
         curr_class = curr_class.getSuperclass();

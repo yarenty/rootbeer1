@@ -13,6 +13,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.NativeCpuTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import edu.syr.pcpratts.rootbeer.util.CurrJarName;
+import edu.syr.pcpratts.rootbeer.util.DeleteFolder;
 import edu.syr.pcpratts.rootbeer.util.JarEntryHelp;
 import edu.syr.pcpratts.rootbeer.util.JimpleWriter;
 import java.io.File;
@@ -40,6 +41,8 @@ public class RootbeerCompiler {
   private FastWholeProgram m_fastLoader;
   
   public RootbeerCompiler(){
+    clearOutputFolders();
+    
     m_classOutputFolder = Constants.OUTPUT_CLASS_FOLDER;
     m_jimpleOutputFolder = "output-jimple";
     
@@ -81,9 +84,13 @@ public class RootbeerCompiler {
     m_fastLoader.init();
     
     List<String> kernel_classes = m_fastLoader.findKernelClasses();    
+    for(String kernel_class : kernel_classes){
+      System.out.println("kernel_class: "+kernel_class);
+    }
     FindKernelForTestCase finder = new FindKernelForTestCase();
     String kernel = finder.get(test_case, kernel_classes);
     kernel_classes.clear();
+    System.out.println("to test: "+kernel);
     kernel_classes.add(kernel);
     
     compileForKernels(outname, kernel_classes);
@@ -415,5 +422,12 @@ public class RootbeerCompiler {
         method.setActiveBody(fixup.fixup(body));
       }
     }
+  }
+  
+  private void clearOutputFolders() {
+    DeleteFolder deleter = new DeleteFolder();
+    deleter.delete(Constants.OUTPUT_JAR_FOLDER);
+    deleter.delete(Constants.OUTPUT_CLASS_FOLDER);
+    deleter.delete(Constants.OUTPUT_SHIMPLE_FOLDER);
   }
 }
