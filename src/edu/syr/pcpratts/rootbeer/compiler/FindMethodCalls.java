@@ -49,7 +49,7 @@ public class FindMethodCalls {
     if(method.isConcrete() == false){
       return new HashSet<SootMethod>();
     }
-    Body body = method.getActiveBody();
+    Body body = RootbeerScene.v().getBody(method);
     return findForBody(body);
   }
 }

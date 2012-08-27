@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import soot.*;
-import soot.jimple.ClassConstant;
-import soot.jimple.IntConstant;
+import soot.Local;
+import soot.RefType;
+import soot.SootClass;
+import soot.VoidType;
 import soot.jimple.LongConstant;
-import soot.jimple.StringConstant;
 
 public class VisitorReadGenStatic extends AbstractVisitorGen {
   
@@ -61,8 +61,6 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
       SootClass soot_class = node.getSootClass();
       if(soot_class.isApplicationClass()){
         attachAndCallReader(soot_class, node.getChildren());
-      } else {
-        doReader(soot_class);
       }
     }
     
@@ -88,7 +86,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     BytecodeLanguage bcl = new BytecodeLanguage();
     m_Bcl.push(bcl);
     bcl.openClass(soot_class);
-    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
     bcl.startStaticMethod(method_name, VoidType.v(), mem.getType(), m_ThisRef.getType());
     
     Local memory = bcl.refParameter(0);
@@ -134,54 +132,8 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
   private void callReader(SootClass soot_class) {    
     BytecodeLanguage bcl = m_Bcl.top();
     String method_name = getReaderName(soot_class);
-    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
     bcl.pushMethod(soot_class, method_name, VoidType.v(), mem.getType(), m_ThisRef.getType());
     bcl.invokeStaticMethodNoRet(m_CurrMem.top(), m_GcObjVisitor.top());
-  }
-
-  private void doReader(SootClass soot_class) {
-    BytecodeLanguage bcl = m_Bcl.top();
-    Local memory = m_CurrMem.top();
-    Local gc_visit = m_GcObjVisitor.top();
-    
-    List<OpenCLField> static_fields = m_StaticOffsets.getStaticFields(soot_class);
-    
-    BclMemory bcl_mem = new BclMemory(bcl, memory);
-    SootClass obj = Scene.v().getSootClass("java.lang.Object");
-    for(OpenCLField field : static_fields){
-      Local field_value;
-      
-      if(field.getType().isRefType()){
-        bcl_mem.useStaticPointer();
-        bcl_mem.setAddress(LongConstant.v(m_StaticOffsets.getIndex(field)));
-        Local ref = bcl_mem.readRef();
-        bcl_mem.useInstancePointer();
-        
-        field_value = bcl.refStaticField(soot_class.getType(), field.getName());
-        
-        bcl.pushMethod(m_ThisRef, "readFromHeap", obj.getType(), obj.getType(), BooleanType.v(), LongType.v());
-        field_value = bcl.invokeMethodRet(m_ThisRef, field_value, IntConstant.v(0), ref);
-      } else {
-        bcl_mem.useStaticPointer();
-        bcl_mem.setAddress(LongConstant.v(m_StaticOffsets.getIndex(field)));
-        field_value = bcl_mem.readVar(field.getType().getSootType());
-        bcl_mem.useInstancePointer();
-      }
-      
-      if(soot_class.isApplicationClass()){
-        bcl.setStaticField(field.getSootField(), field_value);
-      } else {
-        SootClass string = Scene.v().getSootClass("java.lang.String");
-        SootClass cls = Scene.v().getSootClass("java.lang.Class");
-        if(field.getType().isRefType()){
-          bcl.pushMethod(gc_visit, "writeStaticField", VoidType.v(), cls.getType(), string.getType(), obj.getType());
-          bcl.invokeMethodNoRet(gc_visit, ClassConstant.v(toConstant(soot_class.getName())), StringConstant.v(field.getName()), field_value);
-        } else {
-          bcl.pushMethod(gc_visit, "writeStatic"+field.getType().getCapitalName()+"Field", VoidType.v(), cls.getType(), string.getType(), field.getType().getSootType());
-          bcl.invokeMethodNoRet(gc_visit, ClassConstant.v(toConstant(soot_class.getName())), StringConstant.v(field.getName()), field_value);
-        }
-      }
-      
-    } 
   }
 }

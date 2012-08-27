@@ -18,7 +18,7 @@ public class FindKernelForTestCase {
   
   public String get(String test_case, List<String> kernels){
     m_kernels = kernels;
-    SootClass test_class = Scene.v().getSootClass(test_case);
+    SootClass test_class = RootbeerScene.v().getClass(test_case);
     List<SootMethod> methods = test_class.getMethods();
     for(SootMethod method : methods){
       String kernel = searchMethod(method);
@@ -30,7 +30,7 @@ public class FindKernelForTestCase {
   }
 
   private String searchMethod(SootMethod method) {
-    Body body = method.retrieveActiveBody();
+    Body body = RootbeerScene.v().getBody(method);
     List<ValueBox> boxes = body.getUseAndDefBoxes();
     for(ValueBox box : boxes){
       Value value = box.getValue();

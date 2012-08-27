@@ -10,7 +10,13 @@ package edu.syr.pcpratts.rootbeer.generate.opencl;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import java.util.HashSet;
 import java.util.Set;
-import soot.*;
+import soot.ArrayType;
+import soot.RefType;
+import soot.SootClass;
+import soot.SootField;
+import soot.SootMethod;
+import soot.Type;
+import soot.Value;
 import soot.jimple.CastExpr;
 import soot.jimple.FieldRef;
 import soot.jimple.InvokeExpr;
@@ -84,7 +90,7 @@ public class FindMethodsFieldsAndArrayTypes {
     //make sure SootField is what is really in the Scene
     SootField field = field_ref.getField();
     SootClass soot_class = field.getDeclaringClass();
-    soot_class = Scene.v().getSootClass(soot_class.getName());
+    soot_class = RootbeerScene.v().getClass(soot_class.getName());
     field = soot_class.getField(field.getSubSignature());
     
     OpenCLScene.v().addField(field);

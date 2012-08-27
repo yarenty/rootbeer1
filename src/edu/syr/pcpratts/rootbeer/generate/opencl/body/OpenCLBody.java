@@ -20,7 +20,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import soot.*;
+import soot.Body;
+import soot.Local;
+import soot.PatchingChain;
+import soot.SootClass;
+import soot.SootMethod;
+import soot.Trap;
+import soot.Unit;
 import soot.jimple.GotoStmt;
 import soot.jimple.IfStmt;
 import soot.jimple.JimpleBody;
@@ -59,7 +65,7 @@ public class OpenCLBody {
     m_SootMethod = method;
 
     m_SootClass = method.getDeclaringClass();
-    Body body = method.getActiveBody();
+    Body body = RootbeerScene.v().getBody(method);
     setup(body);
   }
   
@@ -237,7 +243,7 @@ public class OpenCLBody {
       initFieldsForClass(soot_class, ret);      
       if(soot_class.getName().equals("java.lang.Object"))
         break;
-      soot_class = Scene.v().getSootClass(soot_class.getSuperclass().getName());
+      soot_class = RootbeerScene.v().getClass(soot_class.getSuperclass().getName());
       if(soot_class.getName().equals("java.lang.Object"))
         break;
     }

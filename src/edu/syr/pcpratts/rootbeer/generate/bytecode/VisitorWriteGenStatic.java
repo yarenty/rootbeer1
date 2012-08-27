@@ -17,7 +17,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import soot.*;
+import soot.BooleanType;
+import soot.Local;
+import soot.LongType;
+import soot.RefType;
+import soot.SootClass;
+import soot.Type;
+import soot.VoidType;
 import soot.jimple.ClassConstant;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
@@ -91,7 +97,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
   private void callWriter(SootClass soot_class){    
     BytecodeLanguage bcl = m_Bcl.top();
     String method_name = getWriterName(soot_class);
-    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
     bcl.pushMethod(soot_class, method_name, VoidType.v(), mem.getType(), m_GcObjVisitor.top().getType());
     bcl.invokeStaticMethodNoRet(m_CurrMem.top(), m_GcObjVisitor.top());
   }
@@ -110,7 +116,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     BytecodeLanguage bcl = new BytecodeLanguage();
     m_Bcl.push(bcl);
     bcl.openClass(soot_class);
-    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
     bcl.startStaticMethod(method_name, VoidType.v(), mem.getType(), m_GcObjVisitor.top().getType());
     
     Local memory = bcl.refParameter(0);
@@ -140,23 +146,16 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     List<OpenCLField> static_fields = m_StaticOffsets.getStaticFields(soot_class);
     
     BclMemory bcl_mem = new BclMemory(bcl, memory);
-    SootClass obj = Scene.v().getSootClass("java.lang.Object");
+    SootClass obj = RootbeerScene.v().getClass("java.lang.Object");
     for(OpenCLField field : static_fields){
       Local field_value;
       if(soot_class.isApplicationClass()){
         field_value = bcl.refStaticField(soot_class.getType(), field.getName());
       } else {
-        SootClass string = Scene.v().getSootClass("java.lang.String");
-        SootClass cls = Scene.v().getSootClass("java.lang.Class");
+        SootClass string = RootbeerScene.v().getClass("java.lang.String");
+        SootClass cls = RootbeerScene.v().getClass("java.lang.Class");
         bcl.pushMethod(gc_visit, "readStaticField", obj.getType(), cls.getType(), string.getType());
-        Local obj_field_value = bcl.invokeMethodRet(gc_visit, ClassConstant.v(toConstant(soot_class.getName())), StringConstant.v(field.getName()));
-        if(field.getType().isRefType()){
-          field_value = obj_field_value;
-        } else {
-          Local capital_value = bcl.cast(field.getType().getCapitalType(), obj_field_value);
-          bcl.pushMethod(capital_value, field.getType().getName()+"Value", field.getType().getSootType());
-          field_value = bcl.invokeMethodRet(capital_value);
-        }
+        field_value = bcl.invokeMethodRet(gc_visit, ClassConstant.v(toConstant(soot_class.getName())), StringConstant.v(field.getName()));
       }
       if(field.getType().isRefType()){
         bcl.pushMethod(gc_visit, "writeToHeap", LongType.v(), obj.getType(), BooleanType.v());
@@ -173,4 +172,9 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
       }
     } 
   }
+
+  private String toConstant(String name) {
+    return name.replace(".", "/");
+  }
+  
 }

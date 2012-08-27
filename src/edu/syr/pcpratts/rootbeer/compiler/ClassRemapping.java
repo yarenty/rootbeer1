@@ -14,7 +14,6 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.*;
-import soot.Scene;
 import soot.SootClass;
 
 public class ClassRemapping {
@@ -50,7 +49,7 @@ public class ClassRemapping {
     put(class_name, new_name);
     m_ClonedMap.put(class_name, new_name);
     
-    SootClass soot_class = Scene.v().getSootClass(class_name);
+    SootClass soot_class = RootbeerScene.v().getClass(class_name);
     CloneClass cloner = new CloneClass();
     SootClass new_class = cloner.execute(soot_class, new_name);
     new_class.setApplicationClass();

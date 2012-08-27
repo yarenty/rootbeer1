@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer1Test;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer2Test;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ExceptionBasicTest;
+//import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ExceptionBasicTest;
 
 public class ExMain implements TestExceptionFactory {
 
   public List<TestException> getProviders() {
     List<TestException> ret = new ArrayList<TestException>();
-    ret.add(new ExceptionBasicTest());
+    //ret.add(new ExceptionBasicTest());
     ret.add(new NullPointer1Test());
     ret.add(new NullPointer2Test());
     return ret;

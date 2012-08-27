@@ -19,7 +19,19 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import soot.*;
+import soot.ArrayType;
+import soot.BooleanType;
+import soot.ByteType;
+import soot.Local;
+import soot.Modifier;
+import soot.RefType;
+import soot.SootClass;
+import soot.SootField;
+import soot.SootMethod;
+import soot.Type;
+import soot.Unit;
+import soot.Value;
+import soot.VoidType;
 import soot.jimple.IntConstant;
 import soot.jimple.Jimple;
 import soot.jimple.JimpleBody;
@@ -69,7 +81,7 @@ public class GenerateRuntimeBasicBlock {
   private void makeGetCodeMethodThatReturnsBytes(String filename) {
     BytecodeLanguage bcl = new BytecodeLanguage();
     bcl.openClass(mSootClass);
-    SootClass string = Scene.v().getSootClass("java.lang.String");
+    SootClass string = RootbeerScene.v().getClass("java.lang.String");
     bcl.startMethod("getCubin", string.getType());
     Local thisref = bcl.refThis();
     bcl.returnValue(StringConstant.v(filename));
@@ -92,7 +104,7 @@ public class GenerateRuntimeBasicBlock {
 
     //java string constants encoded in a class file have a maximum size of 65535...
     //$r1 = new java.lang.StringBuilder;
-    SootClass string_builder_soot_class = Scene.v().getSootClass("java.lang.StringBuilder");
+    SootClass string_builder_soot_class = RootbeerScene.v().getClass("java.lang.StringBuilder");
     Local r1 = jimple.newLocal("r1", string_builder_soot_class.getType());
     Value r1_assign_rhs = jimple.newNewExpr(string_builder_soot_class.getType());
     Unit r1_assign = jimple.newAssignStmt(r1, r1_assign_rhs);
@@ -109,7 +121,7 @@ public class GenerateRuntimeBasicBlock {
     Unit r2_assign_r1 = jimple.newAssignStmt(r2, r1);
     assembler.add(r2_assign_r1);
     
-    SootClass string_class = Scene.v().getSootClass("java.lang.String");
+    SootClass string_class = RootbeerScene.v().getClass("java.lang.String");
     List parameter_types = new ArrayList();
     parameter_types.add(string_class.getType());
     SootMethod string_builder_append = string_builder_soot_class.getMethod("append", parameter_types, string_builder_soot_class.getType());

@@ -18,7 +18,18 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import soot.*;
+import soot.ArrayType;
+import soot.Body;
+import soot.Local;
+import soot.PatchingChain;
+import soot.RefType;
+import soot.SootClass;
+import soot.SootMethod;
+import soot.Type;
+import soot.Unit;
+import soot.Value;
+import soot.ValueBox;
+import soot.VoidType;
 import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
@@ -28,12 +39,12 @@ import soot.jimple.StaticInvokeExpr;
  * @author pcpratts
  */
 public class OpenCLMethod {
-  private final SootMethod m_sootMethod;
+  private final SootMethod m_SootMethod;
   private SootClass m_SootClass;
   private Set<String> m_DontMangleMethods;
   
   public OpenCLMethod(SootMethod soot_method, SootClass soot_class){
-    m_sootMethod = soot_method;
+    m_SootMethod = soot_method;
     m_SootClass = soot_class;
     createDontMangleMethods();
   }
@@ -43,7 +54,7 @@ public class OpenCLMethod {
     if(isConstructor()){
       ret.append("int");
     } else {
-      OpenCLType return_type = new OpenCLType(m_sootMethod.getReturnType());
+      OpenCLType return_type = new OpenCLType(m_SootMethod.getReturnType());
       ret.append(return_type.getRefString());
     }
     return ret.toString();
@@ -51,7 +62,7 @@ public class OpenCLMethod {
   
   private String getRestOfArgumentListStringInternal(){
     StringBuilder ret = new StringBuilder();
-    List args = m_sootMethod.getParameterTypes();
+    List args = m_SootMethod.getParameterTypes();
     
     if(args.size() != 0)
       ret.append(", ");
@@ -76,7 +87,7 @@ public class OpenCLMethod {
     String address_space_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     if(isConstructor() == true){
       ret.append(address_space_qual+" char * gc_info");
-    } else if((isConstructor() == false || override_ctor == true) && m_sootMethod.isStatic() == false){
+    } else if((isConstructor() == false || override_ctor == true) && m_SootMethod.isStatic() == false){
       ret.append(address_space_qual+" char * gc_info, int thisref");
     } else {
       ret.append(address_space_qual+" char * gc_info");
@@ -137,7 +148,7 @@ public class OpenCLMethod {
     StaticOffsets static_offsets = new StaticOffsets();
     int junk_index = static_offsets.getEndIndex() - 4;
     int mystery_index = junk_index - 4;
-    if(m_sootMethod.isStatic()){
+    if(m_SootMethod.isStatic()){
       int offset = static_offsets.getIndex(m_SootClass);
       ret += "char * mem = edu_syr_pcpratts_gc_deref(gc_info, 0);\n";
       ret += "char * trash = mem + "+junk_index+";\n";
@@ -176,7 +187,7 @@ public class OpenCLMethod {
           if(isSynchronized()){
             ret.append(synchronizedEnter()); 
           }
-          OpenCLBody ocl_body = new OpenCLBody(m_sootMethod, isConstructor());
+          OpenCLBody ocl_body = new OpenCLBody(m_SootMethod, isConstructor());
           ret.append(ocl_body.getBody());
           if(isSynchronized()){
             if(isLinux()){
@@ -197,8 +208,8 @@ public class OpenCLMethod {
           }
         }
       } catch(RuntimeException ex){
-        System.out.println("Error creating method body: "+m_sootMethod.getSignature());
-        OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, m_SootClass);
+        System.out.println("Error creating method body: "+m_SootMethod.getSignature());
+        OpenCLMethod ocl_method = new OpenCLMethod(m_SootMethod, m_SootClass);
         if(ocl_method.returnsAValue())
           ret.append("return 0;\n");
         else
@@ -207,7 +218,7 @@ public class OpenCLMethod {
       ret.append("}\n");
       if(isConstructor()){
         ret.append(getMethodDecl(true)+"{\n"); 
-        OpenCLBody ocl_body = new OpenCLBody(m_sootMethod.retrieveActiveBody());
+        OpenCLBody ocl_body = new OpenCLBody(RootbeerScene.v().getBody(m_SootMethod));
         ret.append(ocl_body.getBody());
         ret.append("}\n");
       }
@@ -253,7 +264,7 @@ public class OpenCLMethod {
     List<SootClass> hierarchy;
     if(base_type instanceof ArrayType){
       hierarchy = new ArrayList<SootClass>();
-      SootClass obj = Scene.v().getSootClass("java.lang.Object");
+      SootClass obj = RootbeerScene.v().getClass("java.lang.Object");
       hierarchy.add(obj);
     } else if (base_type instanceof RefType){
       RefType ref_type = (RefType) base_type;
@@ -302,7 +313,7 @@ public class OpenCLMethod {
   }
 
   private String writeInstanceInvoke(InstanceInvokeExpr arg0, String method_prefix, SootClass soot_class){
-    OpenCLMethod corrected_this = new OpenCLMethod(m_sootMethod, soot_class);
+    OpenCLMethod corrected_this = new OpenCLMethod(m_SootMethod, soot_class);
     StringBuilder ret = new StringBuilder();
     Value base = arg0.getBase();
     if(base instanceof Local == false)
@@ -349,7 +360,7 @@ public class OpenCLMethod {
   }
 
   public boolean isConstructor(){
-    String method_name = m_sootMethod.getName();
+    String method_name = m_SootMethod.getName();
     if(method_name.equals("<init>"))
       return true;
     return false;
@@ -365,14 +376,14 @@ public class OpenCLMethod {
       ret += "_body";  
     }
     if(m_DontMangleMethods.contains(ret) == false)
-      ret += NameMangling.v().mangleArgs(m_sootMethod);
+      ret += NameMangling.v().mangleArgs(m_SootMethod);
     return ret;
   }
 
   private String getBaseMethodName(){
     OpenCLClass ocl_class = new OpenCLClass(m_SootClass);
 
-    String method_name = m_sootMethod.getName();
+    String method_name = m_SootMethod.getName();
     //here I use a certain uuid for init so there is low chance of collisions
     method_name = method_name.replace("<init>", "init"+OpenCLScene.v().getUuid());
 
@@ -395,7 +406,7 @@ public class OpenCLMethod {
   public void findAllUsedMethodsAndFields() {
     Body body;
     try {
-      body = m_sootMethod.getActiveBody();
+      body = RootbeerScene.v().getBody(m_SootMethod);
       if(body == null)
         return;
     } catch(RuntimeException ex){
@@ -415,16 +426,16 @@ public class OpenCLMethod {
     }
   }
   public List<SootClass> getHierarchy(){
-    SootClass soot_class = m_sootMethod.getDeclaringClass();
+    SootClass soot_class = m_SootMethod.getDeclaringClass();
     return OpenCLScene.v().getClassHierarchy(soot_class);
   }
   
   public void findAllUsedArrayTypes() {
-    SootClass soot_class = m_sootMethod.getDeclaringClass();
+    SootClass soot_class = m_SootMethod.getDeclaringClass();
 
     Body body;
     try {
-      body = m_sootMethod.getActiveBody();
+      body = m_SootMethod.getActiveBody();
     } catch(RuntimeException ex){
       //if there is no body, return.
       return;
@@ -444,7 +455,7 @@ public class OpenCLMethod {
   private boolean methodIsRuntimeBasicBlockRun() {
     if(m_SootClass.getName().equals("edu.syr.pcpratts.javaautogpu.runtime.RuntimeBasicBlock") == false)
       return false;
-    if(m_sootMethod.getName().equals("run") == false)
+    if(m_SootMethod.getName().equals("run") == false)
       return false;
     return true;
   }
@@ -452,14 +463,14 @@ public class OpenCLMethod {
   public boolean returnsAValue() {
     if(isConstructor())
       return true;
-    Type t = m_sootMethod.getReturnType();
+    Type t = m_SootMethod.getReturnType();
     if(t instanceof VoidType)
       return false;
     return true;
   }
 
   public boolean isSynchronized() {
-    return m_sootMethod.isSynchronized();
+    return m_SootMethod.isSynchronized();
   }
   
   private void createDontMangleMethods() {

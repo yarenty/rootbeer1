@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import soot.ArrayType;
-import soot.Scene;
 import soot.SootClass;
 
 public class ClassHierarchy {
@@ -40,7 +39,7 @@ public class ClassHierarchy {
   private void addBuiltIn(String cls){
     mMaxType++;
     List<SootClass> lst = new ArrayList<SootClass>();
-    SootClass soot_class = Scene.v().getSootClass(cls);
+    SootClass soot_class = RootbeerScene.v().getClass(cls);
     lst.add(soot_class);
     mMap.put(cls, lst);
   }
@@ -66,7 +65,7 @@ public class ClassHierarchy {
     if(mMap.containsKey(class_name))
       return mMap.get(class_name);
 
-    Iterator<SootClass> iter = RootbeerScene.v().getAllClasses().iterator();
+    Iterator<SootClass> iter = RootbeerScene.v().getClasses();
     List<SootClass> ret = new ArrayList<SootClass>();
     while(iter.hasNext()){
       SootClass next = iter.next();
@@ -78,7 +77,7 @@ public class ClassHierarchy {
           }
           if(curr.hasSuperclass()){
             curr = curr.getSuperclass();
-            curr = Scene.v().getSootClass(curr.getName());
+            curr = RootbeerScene.v().getClass(curr.getName());
           } else {
             break;
           }

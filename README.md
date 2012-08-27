@@ -70,10 +70,6 @@ is going to do.
 Phil Pratt-Szeliga is still a PhD student at Syracuse University. All the code
 was written by Phil. Dr. Jim Fawcett and Dr. Roy Welch are Phil's PhD advisors.
 
-## Help
-
-Rootbeer mailing list: [http://chirrup.org/pipermail/rootbeer-dev/](http://chirrup.org/pipermail/rootbeer-dev/)
-
 ## About
 
 Rootbeer is written by:

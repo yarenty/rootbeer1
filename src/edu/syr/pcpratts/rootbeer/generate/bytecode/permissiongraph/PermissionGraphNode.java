@@ -13,33 +13,23 @@ import soot.SootClass;
 
 public class PermissionGraphNode {
 
-  private SootClass m_class;
-  private List<SootClass> m_children;
+  private SootClass m_Class;
+  private List<SootClass> m_Children;
   
   public PermissionGraphNode(SootClass soot_class){
-    m_class = soot_class;
-    m_children = new ArrayList<SootClass>();
+    m_Class = soot_class;
+    m_Children = new ArrayList<SootClass>();
   }
 
   public void addChild(SootClass soot_class) {
-    m_children.add(soot_class);
+    m_Children.add(soot_class);
   }
   
   public List<SootClass> getChildren(){
-    return m_children;
+    return m_Children;
   }
   
   public SootClass getSootClass(){
-    return m_class;
-  }
-  
-  @Override
-  public String toString(){
-    String ret = "";
-    ret += "root: "+m_class.getName()+"\n";
-    for(SootClass child : m_children){
-      ret += "child: "+child.getName();
-    }
-    return ret;
+    return m_Class;
   }
 }

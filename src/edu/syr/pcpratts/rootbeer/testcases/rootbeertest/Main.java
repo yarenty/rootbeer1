@@ -63,7 +63,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new SameClassUsedTwiceTest2());
     ret.add(new RefTypeArrays());
     ret.add(new StrictMathTest()); 
-    //ret.add(new AtomicLongTest());
+    ret.add(new AtomicLongTest());
     ret.add(new NativeStrictMathTest());  
     ret.add(new SimpleSynchronizedTest());
     ret.add(new SynchronizedMethodTest());
@@ -75,7 +75,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new StringTest());
     ret.add(new StepFilterTest());
     ret.add(new GpuListTest());
-    //ret.add(new WhileTrueTest());
+    ret.add(new WhileTrueTest());
     ret.add(new ArraySumTest());
     ret.add(new RemapTest());
     return ret;

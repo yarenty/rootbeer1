@@ -14,7 +14,14 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import soot.*;
+import soot.ArrayType;
+import soot.Body;
+import soot.RefType;
+import soot.SootClass;
+import soot.SootMethod;
+import soot.Type;
+import soot.Value;
+import soot.ValueBox;
 import soot.jimple.FieldRef;
 import soot.jimple.InvokeExpr;
 
@@ -46,14 +53,14 @@ public class GcHeapReadWriteAdder {
     mMethodsInspected.add(method);
     
     SootClass soot_class = method.getDeclaringClass();
-    soot_class = Scene.v().getSootClass(soot_class.getName());
+    soot_class = RootbeerScene.v().getClass(soot_class.getName());
     
     while(true){
       mTypeHistory.addType(soot_class.getType());
       if(soot_class.hasSuperclass() == false)
         break;
       soot_class = soot_class.getSuperclass();
-      soot_class = Scene.v().getSootClass(soot_class.getName());
+      soot_class = RootbeerScene.v().getClass(soot_class.getName());
       if(soot_class.getName().equals("java.lang.Object"))
         break;
     }

@@ -8,9 +8,12 @@
 package edu.syr.pcpratts.rootbeer.runtime;
 
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import org.apache.commons.collections.map.IdentityMap;
 
 public abstract class Serializer {
@@ -163,110 +166,6 @@ public abstract class Serializer {
         Field f = cls.getDeclaredField(name);
         f.setAccessible(true);
         f.set(null, value);  
-        return;
-      } catch(Exception ex){
-        cls = cls.getSuperclass();
-      }
-    }
-  }
-  
-  public void writeStaticByteField(Class cls, String name, byte value){
-    while(true){
-      try {
-        Field f = cls.getDeclaredField(name);
-        f.setAccessible(true);
-        f.setByte(null, value);  
-        return;
-      } catch(Exception ex){
-        cls = cls.getSuperclass();
-      }
-    }
-  }
-  
-  public void writeStaticBooleanField(Class cls, String name, boolean value){
-    while(true){
-      try {
-        Field f = cls.getDeclaredField(name);
-        f.setAccessible(true);
-        f.setBoolean(null, value);  
-        return;
-      } catch(Exception ex){
-        cls = cls.getSuperclass();
-      }
-    }
-  }
-  
-  public void writeStaticCharField(Class cls, String name, char value){
-    while(true){
-      try {
-        Field f = cls.getDeclaredField(name);
-        f.setAccessible(true);
-        f.setChar(null, value);  
-        return;
-      } catch(Exception ex){
-        cls = cls.getSuperclass();
-      }
-    }
-  }
-  
-  public void writeStaticShortField(Class cls, String name, short value){
-    while(true){
-      try {
-        Field f = cls.getDeclaredField(name);
-        f.setAccessible(true);
-        f.setShort(null, value);  
-        return;
-      } catch(Exception ex){
-        cls = cls.getSuperclass();
-      }
-    }
-  }
-  
-  public void writeStaticIntField(Class cls, String name, int value){
-    while(true){
-      try {
-        Field f = cls.getDeclaredField(name);
-        f.setAccessible(true);
-        f.setInt(null, value);  
-        return;
-      } catch(Exception ex){
-        cls = cls.getSuperclass();
-      }
-    }
-  }
-  
-  public void writeStaticLongField(Class cls, String name, long value){
-    while(true){
-      try {
-        Field f = cls.getDeclaredField(name);
-        f.setAccessible(true);
-        f.setLong(null, value);  
-        return;
-      } catch(Exception ex){
-        cls = cls.getSuperclass();
-      }
-    }
-  }
-  
-  public void writeStaticFloatField(Class cls, String name, float value){
-    while(true){
-      try {
-        Field f = cls.getDeclaredField(name);
-        f.setAccessible(true);
-        f.setFloat(null, value);  
-        return;
-      } catch(Exception ex){
-        cls = cls.getSuperclass();
-      }
-    }
-  }
-  
-  public void writeStaticDoubleField(Class cls, String name, double value){
-    while(true){
-      try {
-        Field f = cls.getDeclaredField(name);
-        f.setAccessible(true);
-        f.setDouble(null, value);  
         return;
       } catch(Exception ex){
         cls = cls.getSuperclass();
