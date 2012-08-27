@@ -57,9 +57,11 @@ to github on Windows, Linux and Mac on a variety of GPU models. Please email
 pcpratts@chirrup.org if you are have resources and are interested in helping 
 out.
 
-## Twitter
+## Information about Rootbeer
 
 Rootbeer announcements are pushed to @rootbeer_gpu
+
+Rootbeer mailing list: [http://chirrup.org/pipermail/rootbeer-dev/](http://chirrup.org/pipermail/rootbeer-dev/)
 
 ## Clarifications
 
