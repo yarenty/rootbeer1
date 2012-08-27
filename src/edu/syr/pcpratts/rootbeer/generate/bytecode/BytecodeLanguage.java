@@ -52,7 +52,7 @@ public class BytecodeLanguage {
   public SootClass makeClass(String name){
     SootClass ret = new SootClass(name, Modifier.PUBLIC);
 
-    SootClass object_soot_class = RootbeerScene.v().getClass("java.lang.Object");
+    SootClass object_soot_class = Scene.v().getSootClass("java.lang.Object");
     ret.setSuperclass(object_soot_class);
     RootbeerScene.v().addClass(ret);
     ret.setApplicationClass();
@@ -65,7 +65,7 @@ public class BytecodeLanguage {
     SootClass ret = new SootClass(name, Modifier.PUBLIC);
 
     //set superclass
-    SootClass parent_class = RootbeerScene.v().getClass(parent);
+    SootClass parent_class = Scene.v().getSootClass(parent);
     ret.setSuperclass(parent_class);
 
     RootbeerScene.v().addClass(ret);
@@ -87,7 +87,7 @@ public class BytecodeLanguage {
 
 
   public void openClass(String name){
-    mCurrClass = RootbeerScene.v().getClass(name);
+    mCurrClass = Scene.v().getSootClass(name);
   }
 
   public void openClass(SootClass soot_class){
@@ -202,7 +202,7 @@ public class BytecodeLanguage {
   }
 
   public void pushMethod(String class_name, String method_name, Type return_type, Type... arg_types){
-    SootClass soot_class = RootbeerScene.v().getClass(class_name);
+    SootClass soot_class = Scene.v().getSootClass(class_name);
     SootClass org_class = soot_class;
     List<Type> args = convertTypeArrayToList(arg_types);
     SootMethod soot_method;
@@ -221,7 +221,7 @@ public class BytecodeLanguage {
           } else {
             throw new RuntimeException("no upper class");
           }
-          soot_class = RootbeerScene.v().getClass(soot_class.getName());
+          soot_class = Scene.v().getSootClass(soot_class.getName());
         } catch(RuntimeException ex1){
           System.out.println(class_name+": "+method_name);     
           System.out.println("Args:");
@@ -358,7 +358,7 @@ public class BytecodeLanguage {
 
   public Local refInstanceField(Local base, String field_name){
     Type base_type = base.getType();
-    SootClass base_class = RootbeerScene.v().getClass(base_type.toString());
+    SootClass base_class = Scene.v().getSootClass(base_type.toString());
     SootField field = getFieldByName(base_class, field_name);
     Local ret = jimple.newLocal(getLocalName(), field.getType());
 
@@ -374,7 +374,7 @@ public class BytecodeLanguage {
   }
 
   Local refStaticField(Type base_type, String field_name) {
-    SootClass base_class = RootbeerScene.v().getClass(base_type.toString());
+    SootClass base_class = Scene.v().getSootClass(base_type.toString());
     SootField field = getFieldByName(base_class, field_name);
     Local ret = jimple.newLocal(getLocalName(), field.getType());
 
@@ -386,7 +386,7 @@ public class BytecodeLanguage {
 
   public void refInstanceFieldToInput(Local base, String field_name, Local input){
     Type base_type = base.getType();
-    SootClass base_class = RootbeerScene.v().getClass(base_type.toString());
+    SootClass base_class = Scene.v().getSootClass(base_type.toString());
     SootField field = getFieldByName(base_class, field_name);
 
     Value rhs = jimple.newInstanceFieldRef(base, field.makeRef());
@@ -396,7 +396,7 @@ public class BytecodeLanguage {
   
   public void refInstanceFieldFromInput(Local base, String field_name, Local input){
     Type base_type = base.getType();
-    SootClass base_class = RootbeerScene.v().getClass(base_type.toString());
+    SootClass base_class = Scene.v().getSootClass(base_type.toString());
     SootField field = getFieldByName(base_class, field_name);
 
     Value rhs = jimple.newInstanceFieldRef(base, field.makeRef());
@@ -446,7 +446,7 @@ public class BytecodeLanguage {
   }
 
   public Local newInstance(String mClassName, Value... params) {
-    SootClass soot_class = RootbeerScene.v().getClass(mClassName);
+    SootClass soot_class = Scene.v().getSootClass(mClassName);
     Local u1_lhs = jimple.newLocal(getLocalName(), soot_class.getType());
     Value u1_rhs = jimple.newNewExpr(soot_class.getType());
     Unit u1 = jimple.newAssignStmt(u1_lhs, u1_rhs);

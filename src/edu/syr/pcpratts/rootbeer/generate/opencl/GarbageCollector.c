@@ -392,14 +392,15 @@ $$__device__$$ int instance_getter_java_lang_Throwable_stackTrace($$__global$$ c
 $$__device__$$ void instance_setter_java_lang_Throwable_stackTrace($$__global$$ char * gc_info, int thisref, int parameter0, int * exception);
 
 $$__device__$$ int java_lang_Throwable_fillInStackTrace($$__global$$ char * gc_info, int thisref, int * exception){
-  int trace = java_lang_StackTraceElement__array_new(gc_info, 8, exception);
-  instance_setter_java_lang_Throwable_stackTrace(gc_info, thisref, trace, exception);
+  //int trace = java_lang_StackTraceElement__array_new(gc_info, 8, exception);
+  //instance_setter_java_lang_Throwable_stackTrace(gc_info, thisref, trace, exception);
   return thisref;
 }
 
 $$__device__$$ int java_lang_Throwable_getStackTraceElement($$__global$$ char * gc_info, int thisref, int parameter0, int * exception){
-  int array = instance_getter_java_lang_Throwable_stackTrace(gc_info, thisref, exception);
-  return java_lang_StackTraceElement__array_get(gc_info, array, parameter0, exception);
+  //int array = instance_getter_java_lang_Throwable_stackTrace(gc_info, thisref, exception);
+  //return java_lang_StackTraceElement__array_get(gc_info, array, parameter0, exception);
+  return -1;
 }
 
 $$__device__$$ int java_lang_Throwable_getStackTraceDepth($$__global$$ char * gc_info, int thisref, int * exception){
