@@ -166,7 +166,7 @@ public abstract class Serializer {
         return;
       } catch(Exception ex){
         cls = cls.getSuperclass();
-      }
+      } 
     }
   }
   

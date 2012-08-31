@@ -7,12 +7,10 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraph;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraphNode;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
-import edu.syr.pcpratts.rootbeer.util.Stack;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
