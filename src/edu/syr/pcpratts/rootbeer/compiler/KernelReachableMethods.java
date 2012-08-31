@@ -101,7 +101,7 @@ public class KernelReachableMethods {
     if(method.isConcrete() == false){
       return false;
     }
-    Body body = method.getActiveBody();
+    Body body = method.retrieveActiveBody();
     if(body == null){
       return false;
     }

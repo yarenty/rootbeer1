@@ -58,20 +58,25 @@ public class MethodHierarchies {
   
   private class MethodHierarchy {
     
-    private String mMethodSubsignature;
-    private List<SootClass> mClassHierarchy;
+    private String m_methodSubsignature;
+    private SootMethod m_sootMethod;
+    private List<SootClass> m_hierarchy;
     
     public MethodHierarchy(SootMethod method){
-      mMethodSubsignature = method.getSubSignature();
-      mClassHierarchy = OpenCLScene.v().getClassHierarchy(method.getDeclaringClass());
+      if(method.getName().equals("expandCapacity")){
+        System.out.println("hello world");
+      }
+      m_methodSubsignature = method.getSubSignature();
+      m_sootMethod = method;
     }
     
     public List<OpenCLMethod> getMethods(){
       List<OpenCLMethod> ret = new ArrayList<OpenCLMethod>();
-      for(SootClass soot_class : mClassHierarchy){
+      List<SootClass> class_hierarchy = OpenCLScene.v().getClassHierarchy(m_sootMethod.getDeclaringClass());
+      for(SootClass soot_class : class_hierarchy){
         SootMethod soot_method = null;
         try {
-          soot_method = soot_class.getMethod(mMethodSubsignature);
+          soot_method = soot_class.getMethod(m_methodSubsignature);
         } catch(Exception ex){
           continue;
         }
@@ -82,21 +87,23 @@ public class MethodHierarchies {
     }
         
     public boolean isPolyMorphic(){
-      if(mClassHierarchy.size() > 1)
+      List<SootClass> class_hierarchy = OpenCLScene.v().getClassHierarchy(m_sootMethod.getDeclaringClass());
+      if(class_hierarchy.size() > 1)
         return true;
       return false;
     }
     
     public OpenCLPolymorphicMethod getOpenCLPolyMorphicMethod(){
-      for(SootClass soot_class : mClassHierarchy){
+      List<SootClass> class_hierarchy = OpenCLScene.v().getClassHierarchy(m_sootMethod.getDeclaringClass());
+      for(SootClass soot_class : class_hierarchy){
         try {
-          SootMethod soot_method = soot_class.getMethod(mMethodSubsignature);
+          SootMethod soot_method = soot_class.getMethod(m_methodSubsignature);
           return new OpenCLPolymorphicMethod(soot_method);
         } catch(RuntimeException ex){
           continue;
         }
       }
-      throw new RuntimeException("Cannot find class: "+mMethodSubsignature);
+      throw new RuntimeException("Cannot find class: "+m_methodSubsignature);
     }
     
     @Override
@@ -104,19 +111,26 @@ public class MethodHierarchies {
       if(o instanceof MethodHierarchy == false)
         return false;
       MethodHierarchy other = (MethodHierarchy) o;
-      if(mMethodSubsignature.equals(other.mMethodSubsignature) == false)
+      if(m_methodSubsignature.equals(other.m_methodSubsignature) == false)
         return false;
-      if(mClassHierarchy == other.mClassHierarchy == false)
+      saveHierarchy();
+      other.saveHierarchy();
+      if(m_hierarchy == other.m_hierarchy == false){
         return false;
+      }
       return true;
     }
 
     @Override
     public int hashCode() {
-      int hash = 5;
-      hash = 19 * hash + (this.mMethodSubsignature != null ? this.mMethodSubsignature.hashCode() : 0);
-      hash = 19 * hash + (this.mClassHierarchy != null ? this.mClassHierarchy.hashCode() : 0);
+      int hash = 7;
+      hash = 59 * hash + (this.m_methodSubsignature != null ? this.m_methodSubsignature.hashCode() : 0);
+      hash = 59 * hash + (this.m_hierarchy != null ? this.m_hierarchy.hashCode() : 0);
       return hash;
+    }
+
+    private void saveHierarchy() {
+      m_hierarchy = OpenCLScene.v().getClassHierarchy(m_sootMethod.getDeclaringClass());
     }
   }
 }

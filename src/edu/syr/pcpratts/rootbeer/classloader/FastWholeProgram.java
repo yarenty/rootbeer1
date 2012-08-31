@@ -272,6 +272,9 @@ public class FastWholeProgram {
       return;
     }
     
+    SootClass soot_class = curr.getDeclaringClass();
+    soot_class.setApplicationClass();
+    
     //Search for all invokes and add them to the call graph
     for (Unit curr_unit : body.getUnits()){
       for (ValueBox box : (List<ValueBox>)curr_unit.getUseAndDefBoxes()) {
