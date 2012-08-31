@@ -229,6 +229,13 @@ public class OpenCLScene {
     mUsesGarbageCollector = false;
     findAllUsedClassesMethodsFieldsAndArrayTypes();
     StringBuilder ret = new StringBuilder();
+    
+    //for some reason all the types are not found. if we run this first they are found
+    headerString();
+    garbageCollectorString();
+    methodPrototypesString();
+    methodBodiesString();
+    
     ret.append(headerString());
     ret.append(garbageCollectorString());
     ret.append(methodPrototypesString());
