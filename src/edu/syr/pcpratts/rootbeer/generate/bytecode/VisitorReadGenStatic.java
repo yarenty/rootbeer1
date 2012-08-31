@@ -158,7 +158,10 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
         bcl_mem.useInstancePointer();
         
         if(soot_class.isApplicationClass()){
-          field_value = bcl.refStaticField(soot_class.getType(), field.getName());
+          bcl_mem.useStaticPointer();
+          bcl_mem.setAddress(LongConstant.v(m_StaticOffsets.getIndex(field)));
+          field_value = bcl_mem.readVar(field.getType().getSootType());
+          bcl_mem.useInstancePointer();
         } else {
           SootClass string = Scene.v().getSootClass("java.lang.String");
           SootClass cls = Scene.v().getSootClass("java.lang.Class");

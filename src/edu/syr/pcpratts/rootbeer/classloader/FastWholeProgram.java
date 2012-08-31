@@ -64,9 +64,9 @@ public class FastWholeProgram {
     File file = new File(m_tempFolder);
     file.mkdirs();
 
-    m_resolver = new FastClassResolver(m_tempFolder, m_classPaths);
-
     m_applicationClasses = new ArrayList<String>();
+    
+    m_resolver = new FastClassResolver(m_tempFolder, m_classPaths, m_applicationClasses);
     
     m_ignorePackages = new ArrayList<String>();
     m_ignorePackages.add("edu.syr.pcpratts.compressor.");

@@ -45,9 +45,11 @@ public class FastClassResolver {
   private PrintWriter m_missingClassLog;
   private MethodFinder m_methodFinder;
   private final Logger m_log;
+  private List<String> m_appClasses;
   
-	public FastClassResolver (String temp_folder, List<String> class_paths) {
+	public FastClassResolver (String temp_folder, List<String> class_paths, List<String> app_classes) {
     m_log = Logger.getLogger("edu.syr.pcpratts");
+    m_appClasses = app_classes;
     worklist[SootClass.HIERARCHY] = new LinkedList<SootClass>();
     worklist[SootClass.SIGNATURES] = new LinkedList<SootClass>();
     worklist[SootClass.BODIES] = new LinkedList<SootClass>();
@@ -67,16 +69,19 @@ public class FastClassResolver {
    * to a class. If/when the class is resolved, it will be resolved into this
    * SootClass.
    * */
-  public SootClass makeClassRef(String className) {
-    if(Scene.v().containsClass(className))
-      return Scene.v().getSootClass(className);
+  public SootClass makeClassRef(String class_name) {
+    if(Scene.v().containsClass(class_name))
+      return Scene.v().getSootClass(class_name);
 
-    SootClass newClass;
-    newClass = new SootClass(className);
-    newClass.setResolvingLevel(SootClass.DANGLING);
-    Scene.v().addClass(newClass);
-
-    return newClass;
+    SootClass new_class;
+    new_class = new SootClass(class_name);
+    new_class.setResolvingLevel(SootClass.DANGLING);
+    Scene.v().addClass(new_class);
+    if(m_appClasses.contains(class_name)){
+      new_class.setApplicationClass();
+    }
+    
+    return new_class;
   }
 
 
