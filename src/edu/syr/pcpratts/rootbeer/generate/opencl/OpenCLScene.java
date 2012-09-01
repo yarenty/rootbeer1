@@ -8,6 +8,8 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.Constants;
+import edu.syr.pcpratts.rootbeer.classloader.FastCallGraph;
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.TypeHistory;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
@@ -402,6 +404,7 @@ public class OpenCLScene {
   }
 
   private void addBuiltinRequirements() {
+    FastWholeProgram.v().loadToBodyLater("<java.lang.String: void <init>(char[])>");
     SootClass string_class = Scene.v().getSootClass("java.lang.String");
     SootMethod ctor_method = string_class.getMethod("void <init>(char[])");
     addMethod(ctor_method);

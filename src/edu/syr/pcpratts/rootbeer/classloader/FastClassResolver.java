@@ -90,29 +90,37 @@ public class FastClassResolver {
    * decide to resolve other classes as well. If the class has already
    * been resolved, just returns the class that was already resolved.
    * */
-  public SootClass resolveClass(String className, int desiredLevel) {
-    SootClass resolvedClass = makeClassRef(className);
-    addToResolveWorklist(resolvedClass, desiredLevel);
+  public SootClass resolveClass(String class_name, int desired_level) {
+    SootClass resolved_class = makeClassRef(class_name);
+    if(resolved_class.resolvingLevel() >= desired_level){
+      return resolved_class;
+    }
+    addToResolveWorklist(resolved_class, desired_level);
     processResolveWorklist();
-    return resolvedClass;
+    return resolved_class;
   }
 
   /** Resolve all classes on toResolveWorklist. */
   private void processResolveWorklist() {
-    for( int i = SootClass.BODIES; i >= SootClass.HIERARCHY; i-- ) {
-      while( !worklist[i].isEmpty() ) {
-        SootClass sc = (SootClass) worklist[i].removeFirst();
-        if(m_bodiesClasses != null){
-          if(m_bodiesClasses.contains(sc.getName()) == false){
-            bringToSignatures(sc);
-            continue;
+    while(true){
+      for( int i = SootClass.BODIES; i >= SootClass.HIERARCHY; i-- ) {
+        while( !worklist[i].isEmpty() ) {
+          SootClass sc = (SootClass) worklist[i].removeFirst();
+          if(m_bodiesClasses != null){
+            if(m_bodiesClasses.contains(sc.getName()) == false){
+              bringToSignatures(sc);
+              continue;
+            }
+          }
+          switch(i) {
+            case SootClass.BODIES: bringToBodies(sc); break;
+            case SootClass.SIGNATURES: bringToSignatures(sc); break;
+            case SootClass.HIERARCHY: bringToHierarchy(sc); break;
           }
         }
-        switch(i) {
-          case SootClass.BODIES: bringToBodies(sc); break;
-          case SootClass.SIGNATURES: bringToSignatures(sc); break;
-          case SootClass.HIERARCHY: bringToHierarchy(sc); break;
-        }
+      }
+      if(allEmpty(worklist)){
+        return;
       }
     }
   }
@@ -129,8 +137,10 @@ public class FastClassResolver {
   }
   
   private void addToResolveWorklist(SootClass sc, int desiredLevel) {
-    if( sc.resolvingLevel() >= desiredLevel ) return;
-      worklist[desiredLevel].add(sc);
+    if( sc.resolvingLevel() >= desiredLevel ) {
+      return;
+    }
+    worklist[desiredLevel].add(sc);
   }
 
   /** Hierarchy - we know the hierarchy of the class and that's it
@@ -139,8 +149,13 @@ public class FastClassResolver {
   private void bringToHierarchy(SootClass sc) {
     if(sc.resolvingLevel() >= SootClass.HIERARCHY ) return;
     sc.setResolvingLevel(SootClass.HIERARCHY);
-
+    
     String className = sc.getName();
+    
+    List<SootMethod> methods = sc.getMethods();
+    for(SootMethod method : methods){
+      sc.removeMethod(method);
+    }
     
     try {
       InputStream fin = getInputStream(className);
@@ -176,7 +191,7 @@ public class FastClassResolver {
     if(sc.resolvingLevel() >= SootClass.SIGNATURES ){ return; }
     bringToHierarchy(sc);
     sc.setResolvingLevel(SootClass.SIGNATURES);
-
+    
     for (SootField f : sc.getFields())
       addToResolveWorklist( f.getType(), SootClass.HIERARCHY );
     for (SootMethod m : sc.getMethods()){
@@ -209,7 +224,7 @@ public class FastClassResolver {
     if(sc.resolvingLevel() >= SootClass.BODIES ) return;
     bringToSignatures(sc);
     sc.setResolvingLevel(SootClass.BODIES);
-
+    
     {
       Collection references = classToTypesHierarchy.get(sc);
       if( references == null ) return;
@@ -217,7 +232,7 @@ public class FastClassResolver {
       Iterator it = references.iterator();
       while( it.hasNext() ) {
         final Object o = it.next();
-
+        
         if( o instanceof String ) {
           addToResolveWorklist((String) o, SootClass.HIERARCHY);
         } else if( o instanceof Type ) {
@@ -376,5 +391,21 @@ public class FastClassResolver {
   public SootClass forceResolveClass(String name, int level) {
     m_bodiesClasses.add(name);
     return resolveClass(name, level);
+  }
+
+  public void clearBodyClasses() {
+    m_bodiesClasses = null;
+  }
+
+  private boolean allEmpty(LinkedList<SootClass>[] worklist) {
+    for(LinkedList<SootClass> sub_list : worklist){
+      if(sub_list == null){
+        continue;
+      }
+      if(sub_list.isEmpty() == false){
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -63,9 +63,6 @@ public class MethodHierarchies {
     private List<SootClass> m_hierarchy;
     
     public MethodHierarchy(SootMethod method){
-      if(method.getName().equals("expandCapacity")){
-        System.out.println("hello world");
-      }
       m_methodSubsignature = method.getSubSignature();
       m_sootMethod = method;
     }

@@ -10,8 +10,8 @@ package edu.syr.pcpratts.rootbeer.runtime;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
-import org.apache.commons.collections.map.IdentityMap;
 
 public abstract class Serializer {
 
@@ -24,7 +24,7 @@ public abstract class Serializer {
   private ReadOnlyAnalyzer m_Analyzer;
   
   static {
-    mWriteToGpuCache = new IdentityMap();
+    mWriteToGpuCache = new IdentityHashMap<Object, Long>();
     mReadFromGpuCache = new HashMap<Long, Object>();
   }
   

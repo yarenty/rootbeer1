@@ -34,6 +34,7 @@ import soot.jimple.Stmt;
 import soot.util.Chain;
 
 public class FastWholeProgram {
+  private static FastWholeProgram m_instance;
 
   private final List<String> m_paths;
   private final List<String> m_classPaths;
@@ -52,7 +53,14 @@ public class FastWholeProgram {
   private List<String> m_runtimeClasses;
   private Set<String> m_resolvedMethods;
 
-  public FastWholeProgram() {
+  public static FastWholeProgram v(){
+    if(m_instance == null){
+      m_instance = new FastWholeProgram();
+    }
+    return m_instance;
+  }
+  
+  private FastWholeProgram() {
     m_log = Logger.getLogger("edu.syr.pcpratts");
     showAllLogging();
     m_paths = new ArrayList<String>();
@@ -84,6 +92,7 @@ public class FastWholeProgram {
     m_ignorePackages.add("antlr.");
     m_ignorePackages.add("jas.");
     m_ignorePackages.add("scm.");  
+    m_ignorePackages.add("java.");
     
     m_keepPackages = new ArrayList<String>();
     m_keepPackages.add("edu.syr.pcpratts.rootbeer.testcases.");
@@ -238,7 +247,7 @@ public class FastWholeProgram {
     }
   }
 
-  private SootMethod fullyResolveMethod(String method_signature){
+  private SootMethod fullyResolveMethod(String method_signature, boolean force_resolve){
     final String soot_class_str = SignatureUtil.classFromMethodSig(method_signature);
     if(m_resolvedMethods.contains(method_signature)){
       return m_resolver.resolveMethod(method_signature);
@@ -253,12 +262,25 @@ public class FastWholeProgram {
       return null;
     } //hack to make sure it really loads it all
     SootClass actual_class = curr.getDeclaringClass();
-    m_resolver.forceResolveClass(actual_class.getName(), SootClass.BODIES);
+    if(force_resolve){
+      m_resolver.forceResolveClass(actual_class.getName(), SootClass.BODIES);
+    } else {
+      m_resolver.resolveClass(actual_class.getName(), SootClass.BODIES);
+    }      
     return curr;
   }
   
+  public void loadToBodyLater(String curr_signature){
+    SootMethod curr = fullyResolveMethod(curr_signature, false);
+    loadToBody(curr, false);
+  }
+  
   private void loadToBody(String curr_signature) {
-    SootMethod curr = fullyResolveMethod(curr_signature);
+    SootMethod curr = fullyResolveMethod(curr_signature, true);
+    loadToBody(curr, true);
+  }
+  
+  private void loadToBody(SootMethod curr, boolean force_resolve){
     if(curr == null){
       return;
     }
@@ -284,11 +306,16 @@ public class FastWholeProgram {
           try {
             final SootMethodRef method_ref = expr.getMethodRef();
             final String class_name = method_ref.declaringClass().getName();
+            
+            if(ignorePackage(class_name)){
+              continue;
+            }
+            
             if (m_bodiesClasses.contains(class_name) == false) {
               m_bodiesClasses.add(class_name);
             }
             final String dest_sig = method_ref.getSignature();
-            SootMethod dest_method = fullyResolveMethod(dest_sig);
+            SootMethod dest_method = fullyResolveMethod(dest_sig, force_resolve);
             if(dest_method == null){
               continue;
             }
@@ -307,7 +334,7 @@ public class FastWholeProgram {
           }
         }
       }
-    }
+    } 
   }
 
   private void extractPath(String path) throws Exception {
@@ -351,6 +378,9 @@ public class FastWholeProgram {
           break;
         }
         if(entry.isDirectory() == false){
+          if(entry.getName().endsWith(".class") == false){
+            continue;
+          }
           String class_name = filenameToClass(entry.getName());
           if(ignorePackage(class_name) == false){
             m_applicationClasses.add(class_name);
@@ -522,13 +552,7 @@ public class FastWholeProgram {
     detectEntryPoints();
     loadBuiltIns();
     loadToBodies();
-    
-    for (SootClass sc : m_classes.values()){
-      if (sc.resolvingLevel() == SootClass.BODIES){
-        addConstructorsToEntryPoints(sc);
-      }
-    }
-    
+        
     List<String> ret = new ArrayList<String>();
     for(SootMethod method : m_entryMethods){
       SootClass soot_class = method.getDeclaringClass();
@@ -542,6 +566,9 @@ public class FastWholeProgram {
         }
       }
     }
+    
+    m_resolver.clearBodyClasses();
+    
     return ret;
   }
 

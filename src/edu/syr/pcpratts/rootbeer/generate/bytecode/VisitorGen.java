@@ -230,7 +230,7 @@ public class VisitorGen extends AbstractVisitorGen {
     Local thisref = bcl.refThis();
 
     String parent_name = parent_class.getName();
-    if(parent_class.isLibraryClass()){    
+    if(parent_class.isLibraryClass()) {    
       if(parent_class.declaresMethod("void <init>()")){
         bcl.pushMethod(parent_name, "<init>", VoidType.v());
         bcl.invokeMethodNoRet(thisref);

@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
@@ -29,12 +30,12 @@ import soot.jimple.StaticInvokeExpr;
  */
 public class OpenCLMethod {
   private final SootMethod m_sootMethod;
-  private SootClass m_SootClass;
-  private Set<String> m_DontMangleMethods;
+  private SootClass m_sootClass;
+  private Set<String> m_dontMangleMethods;
   
   public OpenCLMethod(SootMethod soot_method, SootClass soot_class){
     m_sootMethod = soot_method;
-    m_SootClass = soot_class;
+    m_sootClass = soot_class;
     createDontMangleMethods();
   }
   
@@ -138,7 +139,7 @@ public class OpenCLMethod {
     int junk_index = static_offsets.getEndIndex() - 4;
     int mystery_index = junk_index - 4;
     if(m_sootMethod.isStatic()){
-      int offset = static_offsets.getIndex(m_SootClass);
+      int offset = static_offsets.getIndex(m_sootClass);
       ret += "char * mem = edu_syr_pcpratts_gc_deref(gc_info, 0);\n";
       ret += "char * trash = mem + "+junk_index+";\n";
       ret += "char * mystery = mem + "+mystery_index+";\n";
@@ -168,6 +169,7 @@ public class OpenCLMethod {
   }
   
   public String getMethodBody(){
+    loadToBody();
     StringBuilder ret = new StringBuilder();
     if(shouldEmitBody()){
       ret.append(getMethodDecl(false)+"{\n");
@@ -198,7 +200,7 @@ public class OpenCLMethod {
         }
       } catch(RuntimeException ex){
         System.out.println("Error creating method body: "+m_sootMethod.getSignature());
-        OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, m_SootClass);
+        OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, m_sootClass);
         if(ocl_method.returnsAValue())
           ret.append("return 0;\n");
         else
@@ -263,7 +265,7 @@ public class OpenCLMethod {
     }
 
     if(hierarchy.size() == 1 || isConstructor() || arg0 instanceof SpecialInvokeExpr){
-      return writeInstanceInvoke(arg0, "", m_SootClass);
+      return writeInstanceInvoke(arg0, "", m_sootClass);
     } else if(hierarchy.size() == 0){
       System.out.println("size = 0");
       return null;
@@ -313,9 +315,6 @@ public class OpenCLMethod {
     }
 
     String function_name = method_prefix+corrected_this.getPolymorphicName();
-    if(function_name.equals("invoke_java_lang_StringBuffer_expandCapacity0_4_")){
-      System.out.println(function_name);
-    }
     ret.append(function_name+"(");
     List args = arg0.getArgs();
     List<String> args_list = new ArrayList<String>();
@@ -368,13 +367,13 @@ public class OpenCLMethod {
     if(ctor_body){
       ret += "_body";  
     }
-    if(m_DontMangleMethods.contains(ret) == false)
+    if(m_dontMangleMethods.contains(ret) == false)
       ret += NameMangling.v().mangleArgs(m_sootMethod);
     return ret;
   }
 
   private String getBaseMethodName(){
-    OpenCLClass ocl_class = new OpenCLClass(m_SootClass);
+    OpenCLClass ocl_class = new OpenCLClass(m_sootClass);
 
     String method_name = m_sootMethod.getName();
     //here I use a certain uuid for init so there is low chance of collisions
@@ -386,7 +385,7 @@ public class OpenCLMethod {
   
   private boolean shouldEmitBody(){
     String ret = getBaseMethodName();
-    if(m_DontMangleMethods.contains(ret))
+    if(m_dontMangleMethods.contains(ret))
       return false;
     return true;
   }
@@ -446,7 +445,7 @@ public class OpenCLMethod {
   }
 
   private boolean methodIsRuntimeBasicBlockRun() {
-    if(m_SootClass.getName().equals("edu.syr.pcpratts.javaautogpu.runtime.RuntimeBasicBlock") == false)
+    if(m_sootClass.getName().equals("edu.syr.pcpratts.javaautogpu.runtime.RuntimeBasicBlock") == false)
       return false;
     if(m_sootMethod.getName().equals("run") == false)
       return false;
@@ -467,36 +466,44 @@ public class OpenCLMethod {
   }
   
   private void createDontMangleMethods() {
-    m_DontMangleMethods = new HashSet<String>();
-    m_DontMangleMethods.add("java_lang_StrictMath_exp");
-    m_DontMangleMethods.add("java_lang_StrictMath_log");
-    m_DontMangleMethods.add("java_lang_StrictMath_log10");
-    m_DontMangleMethods.add("java_lang_StrictMath_sqrt");
-    m_DontMangleMethods.add("java_lang_StrictMath_cbrt");
-    m_DontMangleMethods.add("java_lang_StrictMath_IEEEremainder");    
-    m_DontMangleMethods.add("java_lang_StrictMath_ceil");
-    m_DontMangleMethods.add("java_lang_StrictMath_floor");
-    m_DontMangleMethods.add("java_lang_StrictMath_sin");
-    m_DontMangleMethods.add("java_lang_StrictMath_cos");
-    m_DontMangleMethods.add("java_lang_StrictMath_tan");
-    m_DontMangleMethods.add("java_lang_StrictMath_asin");
-    m_DontMangleMethods.add("java_lang_StrictMath_acos");
-    m_DontMangleMethods.add("java_lang_StrictMath_atan");
-    m_DontMangleMethods.add("java_lang_StrictMath_atan2");
-    m_DontMangleMethods.add("java_lang_StrictMath_pow");
-    m_DontMangleMethods.add("java_lang_StrictMath_sinh");
-    m_DontMangleMethods.add("java_lang_StrictMath_cosh");
-    m_DontMangleMethods.add("java_lang_StrictMath_tanh");
-    m_DontMangleMethods.add("java_lang_Double_doubleToLongBits");
-    m_DontMangleMethods.add("java_lang_Double_longBitsToDouble");
-    m_DontMangleMethods.add("java_lang_System_arraycopy");
-    m_DontMangleMethods.add("java_lang_Throwable_fillInStackTrace");
-    m_DontMangleMethods.add("java_lang_Throwable_getStackTraceDepth");
-    m_DontMangleMethods.add("java_lang_Throwable_getStackTraceElement");
-    m_DontMangleMethods.add("java_lang_Object_clone");
-    m_DontMangleMethods.add("java_lang_OutOfMemoryError_initab850b60f96d11de8a390800200c9a66");
-    m_DontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu");
-    m_DontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId");
+    m_dontMangleMethods = new HashSet<String>();
+    m_dontMangleMethods.add("java_lang_StrictMath_exp");
+    m_dontMangleMethods.add("java_lang_StrictMath_log");
+    m_dontMangleMethods.add("java_lang_StrictMath_log10");
+    m_dontMangleMethods.add("java_lang_StrictMath_sqrt");
+    m_dontMangleMethods.add("java_lang_StrictMath_cbrt");
+    m_dontMangleMethods.add("java_lang_StrictMath_IEEEremainder");    
+    m_dontMangleMethods.add("java_lang_StrictMath_ceil");
+    m_dontMangleMethods.add("java_lang_StrictMath_floor");
+    m_dontMangleMethods.add("java_lang_StrictMath_sin");
+    m_dontMangleMethods.add("java_lang_StrictMath_cos");
+    m_dontMangleMethods.add("java_lang_StrictMath_tan");
+    m_dontMangleMethods.add("java_lang_StrictMath_asin");
+    m_dontMangleMethods.add("java_lang_StrictMath_acos");
+    m_dontMangleMethods.add("java_lang_StrictMath_atan");
+    m_dontMangleMethods.add("java_lang_StrictMath_atan2");
+    m_dontMangleMethods.add("java_lang_StrictMath_pow");
+    m_dontMangleMethods.add("java_lang_StrictMath_sinh");
+    m_dontMangleMethods.add("java_lang_StrictMath_cosh");
+    m_dontMangleMethods.add("java_lang_StrictMath_tanh");
+    m_dontMangleMethods.add("java_lang_Double_doubleToLongBits");
+    m_dontMangleMethods.add("java_lang_Double_longBitsToDouble");
+    m_dontMangleMethods.add("java_lang_System_arraycopy");
+    m_dontMangleMethods.add("java_lang_Throwable_fillInStackTrace");
+    m_dontMangleMethods.add("java_lang_Throwable_getStackTraceDepth");
+    m_dontMangleMethods.add("java_lang_Throwable_getStackTraceElement");
+    m_dontMangleMethods.add("java_lang_Object_clone");
+    m_dontMangleMethods.add("java_lang_OutOfMemoryError_initab850b60f96d11de8a390800200c9a66");
+    m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu");
+    m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId");
+  }
+
+  public String getSignature() {
+    return m_sootMethod.getSignature();
+  }
+
+  private void loadToBody() {
+    FastWholeProgram.v().loadToBodyLater(m_sootMethod.getSignature());
   }
 
 

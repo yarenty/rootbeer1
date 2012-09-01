@@ -52,7 +52,7 @@ public class RootbeerCompiler {
       Tweaks.setInstance(new NativeCpuTweaks());
     }
     
-    m_fastLoader = new FastWholeProgram();
+    m_fastLoader = FastWholeProgram.v();
   }
   
   public void compile(String main_jar, List<String> lib_jars, List<String> dirs, String dest_jar) {

@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.compiler;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -74,12 +75,14 @@ public class KernelReachableMethods {
     if(m_ret.contains(signature) == false){
       m_ret.add(signature);
     }    
-    Body body = method.getActiveBody();
+    Body body = method.retrieveActiveBody();
     List<ValueBox> boxes = body.getUseAndDefBoxes();
     for(ValueBox box : boxes){
       Value value = box.getValue();
       if(value instanceof InvokeExpr){
         InvokeExpr expr = (InvokeExpr) value;
+        SootMethodRef ref = expr.getMethodRef();
+        FastWholeProgram.v().loadToBodyLater(ref.getSignature());
         SootMethod method2 = expr.getMethod();
         dfs(method2);
       }
