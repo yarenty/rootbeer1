@@ -299,8 +299,6 @@ public class CudaRuntime2 implements ParallelRuntime {
       long ref = m_ExceptionHandles.readLong();
       if(ref != 0){
         long ref_num = ref >> 4;
-        System.out.println("ref: "+ref);
-        System.out.println("ref_num: "+ref_num);
         if(ref_num == Constants.NullPointerNumber){
           throw new NullPointerException(); 
         } else if(ref_num == Constants.OutOfMemoryNumber){

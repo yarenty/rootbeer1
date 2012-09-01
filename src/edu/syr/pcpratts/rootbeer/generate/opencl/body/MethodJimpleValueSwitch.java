@@ -318,7 +318,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
 
   public void caseInstanceOfExpr(InstanceOfExpr arg0) {
-    throw new UnsupportedOperationException("Not supported yet.");
+    mOutput.append("instanceof: <"+arg0.toString()+" >");
   }
 
   public void caseNewArrayExpr(NewArrayExpr arg0) {

@@ -505,6 +505,4 @@ public class OpenCLMethod {
   private void loadToBody() {
     FastWholeProgram.v().loadToBodyLater(m_sootMethod.getSignature());
   }
-
-
 }

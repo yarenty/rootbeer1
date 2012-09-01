@@ -20,22 +20,22 @@ import soot.SootMethod;
  */
 public class MethodHierarchies {
 
-  private Set<MethodHierarchy> mHierarchies;
+  private Set<MethodHierarchy> m_hierarchies;
   
   public MethodHierarchies(){
-    mHierarchies = new LinkedHashSet<MethodHierarchy>();
+    m_hierarchies = new LinkedHashSet<MethodHierarchy>();
   }
   
   public void addMethod(SootMethod method){
     MethodHierarchy new_hierarchy = new MethodHierarchy(method);
-    if(mHierarchies.contains(new_hierarchy) == false)
-      mHierarchies.add(new_hierarchy);
+    if(m_hierarchies.contains(new_hierarchy) == false)
+      m_hierarchies.add(new_hierarchy);
   }
   
   public List<OpenCLMethod> getMethods(){
     List<OpenCLMethod> ret = new ArrayList<OpenCLMethod>();
     //for each method    
-    for(MethodHierarchy method_hierarchy : mHierarchies){
+    for(MethodHierarchy method_hierarchy : m_hierarchies){
       //get the list of classes in the hierarchy
       List<OpenCLMethod> methods = method_hierarchy.getMethods();
       for(OpenCLMethod method : methods){ 
@@ -48,7 +48,7 @@ public class MethodHierarchies {
   public List<OpenCLPolymorphicMethod> getPolyMorphicMethods(){
     List<OpenCLPolymorphicMethod> ret = new ArrayList<OpenCLPolymorphicMethod>();
     //for each method    
-    for(MethodHierarchy method_hierarchy : mHierarchies){
+    for(MethodHierarchy method_hierarchy : m_hierarchies){
       if(method_hierarchy.isPolyMorphic()){
         ret.add(method_hierarchy.getOpenCLPolyMorphicMethod());
       }

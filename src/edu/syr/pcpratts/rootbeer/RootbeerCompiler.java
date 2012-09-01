@@ -12,10 +12,7 @@ import edu.syr.pcpratts.rootbeer.compiler.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.NativeCpuTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
-import edu.syr.pcpratts.rootbeer.util.CurrJarName;
-import edu.syr.pcpratts.rootbeer.util.DeleteFolder;
-import edu.syr.pcpratts.rootbeer.util.JarEntryHelp;
-import edu.syr.pcpratts.rootbeer.util.JimpleWriter;
+import edu.syr.pcpratts.rootbeer.util.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,7 +22,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -82,11 +81,13 @@ public class RootbeerCompiler {
     m_fastLoader.addPath(jar_filename);
     m_fastLoader.addClassPath(getRuntimeJars());
     m_fastLoader.init();
+    m_fastLoader.singleKernel();
     
-    List<String> kernel_classes = m_fastLoader.findKernelClasses(); 
     FindKernelForTestCase finder = new FindKernelForTestCase();
-    String kernel = finder.get(test_case, kernel_classes);
-    kernel_classes.clear();
+    String kernel = finder.get(test_case, m_fastLoader.getApplicationClasses());
+    m_fastLoader.findKernelClasses(kernel); 
+    
+    List<String> kernel_classes = new ArrayList<String>();
     kernel_classes.add(kernel);
     
     compileForKernels(outname, kernel_classes);
@@ -105,7 +106,7 @@ public class RootbeerCompiler {
   
   private void compileForKernels(String outname, List<String> run_on_gpu_classes) throws Exception {
     
-    System.out.println("Finding kernel reachable methods...");
+    System.out.println("finding kernel reachable methods...");
     KernelReachableMethods reachable_finder = new KernelReachableMethods();
     List<String> reachables = reachable_finder.get(run_on_gpu_classes);
     RootbeerScene.v().setReachableMethods(reachables);
@@ -113,21 +114,29 @@ public class RootbeerCompiler {
     ClassRemappingTransform transform = null;
     
     if(!Main.disable_class_remapping()){
-      System.out.println("Remapping some classes to GPU versions...");
+      System.out.println("remapping some classes to GPU versions...");
       transform = new ClassRemappingTransform(false);
       transform.run(reachables);
       transform.finishClone();
     }
-    
+            
     Transform2 transform2 = new Transform2();
     for(String cls : run_on_gpu_classes){
       transform2.run(cls);
     }
     
-    List<String> app_classes = m_fastLoader.getApplicationClasses();
+    Set<String> app_classes = new HashSet<String>();
     
     if(!Main.disable_class_remapping()){
       app_classes.addAll(transform.getModifiedClasses());
+    }
+    
+    SignatureUtil util = new SignatureUtil();
+    for(String method_sig : reachables){
+      String class_name = util.classFromMethodSig(method_sig);
+      if(app_classes.contains(class_name) == false){
+        app_classes.add(class_name);
+      }
     }
     
     for(String cls : app_classes){
@@ -413,7 +422,8 @@ public class RootbeerCompiler {
     List<SootMethod> methods = soot_class.getMethods();
     for(SootMethod method : methods){
       if(method.isConcrete()){
-        Body body = method.getActiveBody();
+        m_fastLoader.loadToBodyLater(method.getSignature());
+        Body body = method.retrieveActiveBody();
         SpecialInvokeFixup fixup = new SpecialInvokeFixup();
         method.setActiveBody(fixup.fixup(body));
       }
