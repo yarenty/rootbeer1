@@ -46,6 +46,7 @@ public class FastClassResolver {
   private MethodFinder m_methodFinder;
   private final Logger m_log;
   private List<String> m_appClasses;
+  private Map<String, String> m_filenameToJar;
   
 	public FastClassResolver (String temp_folder, List<String> class_paths, List<String> app_classes) {
     m_log = Logger.getLogger("edu.syr.pcpratts");
@@ -58,6 +59,7 @@ public class FastClassResolver {
     m_refFinder = new MethodRefFinder();
     m_packageNameCache = new HashMap<String, Set<String>>();
     m_methodFinder = new MethodFinder();
+    m_filenameToJar = new HashMap<String, String>();
     try {
       m_missingClassLog = new PrintWriter("missing_classes.txt");
     } catch(Exception ex){
@@ -297,6 +299,7 @@ public class FastClassResolver {
         if(entry.getName().equals(filename) == false){
           continue;
         }
+        m_filenameToJar.put(filename, jar);
         WriteJarEntry writer = new WriteJarEntry();
         writer.write(entry, fin, m_tempFolder);
         fin.close();
@@ -407,5 +410,9 @@ public class FastClassResolver {
       }
     }
     return true;
+  }
+
+  public String getJarNameForFilename(String filename) {
+    return m_filenameToJar.get(filename);
   }
 }

@@ -29,6 +29,7 @@ import soot.jimple.InvokeExpr;
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
+import javax.swing.text.html.HTMLDocument;
 import soot.*;
 import soot.jimple.Stmt;
 import soot.util.Chain;
@@ -295,7 +296,15 @@ public class FastWholeProgram {
     }
     
     SootClass soot_class = curr.getDeclaringClass();
-    soot_class.setApplicationClass();
+    if(force_resolve){
+      soot_class.setApplicationClass();
+    } else {
+      String filename = classToFilename(soot_class.getName());
+      String jar_name = m_resolver.getJarNameForFilename(filename);
+      if(isApplicationJar(jar_name)){
+        soot_class.setApplicationClass();
+      }
+    }
     
     //Search for all invokes and add them to the call graph
     for (Unit curr_unit : body.getUnits()){
@@ -538,15 +547,6 @@ public class FastWholeProgram {
     m_log.setLevel(Level.ALL);
     m_log.addHandler(handler);
   }
-
-  /**
-   * Detects constructors and static initializers and adds them to the entry points.
-   * @param sc the soot class object
-   */
-  private void addConstructorsToEntryPoints(SootClass sc) {
-    m_entryMethods.addAll(DetectionUtils.findConstructors(sc));
-    m_entryMethods.addAll(DetectionUtils.findStaticInitializers(sc));
-  }
   
   public List<String> findKernelClasses() {
     detectEntryPoints();
@@ -593,5 +593,16 @@ public class FastWholeProgram {
       }
     }
     return false;
+  }
+
+  private String classToFilename(String name) {
+    name = name.replace(".", "/");
+    name += ".class";
+    name = "/" + name;
+    return name;
+  }
+
+  private boolean isApplicationJar(String jar_name) {
+    return m_paths.contains(jar_name);
   }
 }
