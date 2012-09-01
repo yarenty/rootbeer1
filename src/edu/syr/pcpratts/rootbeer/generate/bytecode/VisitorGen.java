@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
@@ -230,11 +231,12 @@ public class VisitorGen extends AbstractVisitorGen {
     Local thisref = bcl.refThis();
 
     String parent_name = parent_class.getName();
-    if(parent_class.isLibraryClass()) {    
+    if(FastWholeProgram.v().isApplicationClass(parent_class) == false){
       if(parent_class.declaresMethod("void <init>()")){
         bcl.pushMethod(parent_name, "<init>", VoidType.v());
         bcl.invokeMethodNoRet(thisref);
       } else {
+        FastWholeProgram.v().isApplicationClass(parent_class);
         System.out.println("Library class "+parent_name+" on the GPU does not have a void constructor");
         System.exit(-1);
       }

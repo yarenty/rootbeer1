@@ -22,6 +22,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
+import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -378,11 +379,14 @@ public class OpenCLScene {
     
     addBuiltinRequirements();
     
-    Set<SootMethod> dfs_methods = FastWholeProgram.v().getDfsMethods(m_codeSegment.getRootMethod());
-    Iterator<SootMethod> iter = dfs_methods.iterator();
+    SignatureUtil util = new SignatureUtil();
+    
+    Set<String> dfs_methods = FastWholeProgram.v().getDfsMethods(m_codeSegment.getRootMethod());
+    Iterator<String> iter = dfs_methods.iterator();
     while(iter.hasNext()){
-      SootMethod curr = iter.next();
-      addMethod(curr);
+      String sig = iter.next();
+      SootClass soot_class = Scene.v().getSootClass(util.classFromMethodSig(sig));
+      addMethod(soot_class.getMethod(util.methodSubSigFromMethodSig(sig)));
     }
 
     m_codeSegment.findAllUsedMethodsAndFields();

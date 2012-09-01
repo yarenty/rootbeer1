@@ -39,6 +39,7 @@ public class FastClassResolver {
 
   private String m_tempFolder;
   private List<String> m_classPaths;
+  private List<String> m_paths;
   private List<String> m_bodiesClasses;
   private MethodRefFinder m_refFinder;
   private Map<String, Set<String>> m_packageNameCache;
@@ -48,7 +49,7 @@ public class FastClassResolver {
   private List<String> m_appClasses;
   private Map<String, String> m_filenameToJar;
   
-	public FastClassResolver (String temp_folder, List<String> class_paths, List<String> app_classes) {
+	public FastClassResolver (String temp_folder, List<String> class_paths, List<String> paths, List<String> app_classes) {
     m_log = Logger.getLogger("edu.syr.pcpratts");
     m_appClasses = app_classes;
     worklist[SootClass.HIERARCHY] = new LinkedList<SootClass>();
@@ -56,6 +57,7 @@ public class FastClassResolver {
     worklist[SootClass.BODIES] = new LinkedList<SootClass>();
     m_tempFolder = temp_folder;
     m_classPaths = class_paths;
+    m_paths = paths;
     m_refFinder = new MethodRefFinder();
     m_packageNameCache = new HashMap<String, Set<String>>();
     m_methodFinder = new MethodFinder();
@@ -275,7 +277,7 @@ public class FastClassResolver {
     if(file.exists()){
       return new FileInputStream(filename);
     } else {
-      m_log.fine("searching for: "+filename);
+      //m_log.fine("searching for: "+filename);
       findClass(className);
       file = new File(filename);
       if(file.exists() == false){
@@ -310,7 +312,7 @@ public class FastClassResolver {
     return false;
   }
   
-  private void findClass(String className) throws Exception {
+  public void findClass(String className) throws Exception {
     String package_name = getPackageName(className);
     String filename = className.replace(".", "/");
     filename += ".class";
@@ -341,7 +343,13 @@ public class FastClassResolver {
   }
 
   public void cachePackageNames() {
-    for(String jar : m_classPaths){
+    Set<String> to_cache = new HashSet<String>();
+    to_cache.addAll(m_classPaths);
+    to_cache.addAll(m_paths);
+    String[] to_cache_array = new String[to_cache.size()];
+    to_cache_array = to_cache.toArray(to_cache_array);
+    Arrays.sort(to_cache_array);
+    for(String jar : to_cache_array){
       if(jar.endsWith(".jar")){
         m_log.fine("caching package names for: "+jar);
         try {
@@ -412,7 +420,14 @@ public class FastClassResolver {
     return true;
   }
 
-  public String getJarNameForFilename(String filename) {
+  public String getJarNameForFilename(String filename, String class_name) {
+    if(m_filenameToJar.containsKey(filename) == false){
+      try {
+        findClass(class_name);
+      } catch(Exception ex){
+        //ignore
+      }
+    }
     return m_filenameToJar.get(filename);
   }
 }

@@ -432,6 +432,7 @@ public class RootbeerCompiler {
   
   private void clearOutputFolders() {
     DeleteFolder deleter = new DeleteFolder();
+    deleter.delete(Constants.JAR_CONTENTS_FOLDER);
     deleter.delete(Constants.OUTPUT_JAR_FOLDER);
     deleter.delete(Constants.OUTPUT_CLASS_FOLDER);
     deleter.delete(Constants.OUTPUT_SHIMPLE_FOLDER);

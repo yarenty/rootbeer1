@@ -54,8 +54,8 @@ public class FastWholeProgram {
   private List<String> m_keepPackages;
   private List<String> m_runtimeClasses;
   private Set<String> m_resolvedMethods;
-  private Map<SootMethod, Set<SootMethod>> m_dfsMethods;
-  private Set<SootMethod> m_currDfsMethods;
+  private Map<SootMethod, Set<String>> m_dfsMethods;
+  private Set<String> m_currDfsMethods;
   private String m_kernelOverrideClass;
   private boolean m_singleKernel;
 
@@ -80,7 +80,7 @@ public class FastWholeProgram {
 
     m_applicationClasses = new ArrayList<String>();
     
-    m_resolver = new FastClassResolver(m_tempFolder, m_classPaths, m_applicationClasses);
+    m_resolver = new FastClassResolver(m_tempFolder, m_classPaths, m_paths, m_applicationClasses);
     
     m_ignorePackages = new ArrayList<String>();
     m_ignorePackages.add("edu.syr.pcpratts.compressor.");
@@ -126,7 +126,7 @@ public class FastWholeProgram {
     m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.PrivateFields");
     
     m_resolvedMethods = new HashSet<String>();
-    m_dfsMethods = new HashMap<SootMethod, Set<SootMethod>>();
+    m_dfsMethods = new HashMap<SootMethod, Set<String>>();
     m_cgWorkQueue = new LinkedList<String>();
   }
 
@@ -248,11 +248,12 @@ public class FastWholeProgram {
       SootMethod root_method = soot_class.getMethod("void gpuMethod()");
       loadToBodyRootMethod(root_method);
     } else {
-      for(int i = 0; i < m_bodiesClasses.size(); ++i){
-        String soot_class_str = m_bodiesClasses.get(i);
+      for(int i = 0; i < m_applicationClasses.size(); ++i){
+        String soot_class_str = m_applicationClasses.get(i);
         SootClass soot_class = Scene.v().getSootClass(soot_class_str);
-        for(SootMethod method : soot_class.getMethods()){
-          loadToBodyRootMethod(method);
+        if(soot_class.declaresMethod("void gpuMethod()")){
+          SootMethod root_method = soot_class.getMethod("void gpuMethod()");
+          loadToBodyRootMethod(root_method);
         }
       }
     }
@@ -261,7 +262,7 @@ public class FastWholeProgram {
   private void loadToBodyRootMethod(SootMethod method){
     m_cgWorkQueue.add(method.getSignature());
     if(m_singleKernel == false){
-      m_currDfsMethods = new HashSet<SootMethod>();
+      m_currDfsMethods = new HashSet<String>();
     }
     m_dfsMethods.put(method, m_currDfsMethods);
     m_cgVisited.clear();
@@ -310,6 +311,12 @@ public class FastWholeProgram {
     loadToBody(curr, true);
   }
   
+  public boolean isApplicationClass(SootClass soot_class){
+    String filename = classToFilename(soot_class.getName());
+    String jar_name = m_resolver.getJarNameForFilename(filename, soot_class.getName());
+    return isApplicationJar(jar_name);
+  }
+  
   private void loadToBody(SootMethod curr, boolean force_resolve){
     if(curr == null){
       return;
@@ -317,8 +324,8 @@ public class FastWholeProgram {
     
     //m_log.log(Level.FINEST, "call graph dfs: "+curr.getSignature());
     
-    if(m_currDfsMethods.contains(curr) == false){
-      m_currDfsMethods.add(curr);
+    if(m_currDfsMethods.contains(curr.getSignature()) == false){
+      m_currDfsMethods.add(curr.getSignature());
     }
 
     Body body = null;
@@ -331,7 +338,7 @@ public class FastWholeProgram {
     
     SootClass soot_class = curr.getDeclaringClass();
     String filename = classToFilename(soot_class.getName());
-    String jar_name = m_resolver.getJarNameForFilename(filename);
+    String jar_name = m_resolver.getJarNameForFilename(filename, soot_class.getName());
     if(isApplicationJar(jar_name)){
       soot_class.setApplicationClass();
     }
@@ -652,7 +659,6 @@ public class FastWholeProgram {
   private String classToFilename(String name) {
     name = name.replace(".", "/");
     name += ".class";
-    name = "/" + name;
     return name;
   }
 
@@ -660,7 +666,7 @@ public class FastWholeProgram {
     return m_paths.contains(jar_name);
   }
 
-  public Set<SootMethod> getDfsMethods(SootMethod entry) {
+  public Set<String> getDfsMethods(SootMethod entry) {
     if(m_singleKernel){
       return m_currDfsMethods;
     }
@@ -674,7 +680,7 @@ public class FastWholeProgram {
   }
 
   public void singleKernel() {
-    m_currDfsMethods = new HashSet<SootMethod>();
+    m_currDfsMethods = new HashSet<String>();
     m_singleKernel = true;
   }
 }
