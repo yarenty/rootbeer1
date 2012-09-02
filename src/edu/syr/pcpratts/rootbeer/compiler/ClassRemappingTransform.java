@@ -50,13 +50,19 @@ public class ClassRemappingTransform {
   }
   
   public void run(List<String> reachable_methods){
+    Set<String> visited = new HashSet<String>();
     SignatureUtil sig_util = new SignatureUtil();
-    for(String method : reachable_methods){
-      String cls_name = sig_util.classFromMethodSig(method);
+    for(String method_sig : reachable_methods){
+      if(visited.contains(method_sig)){
+        continue;
+      }
+      visited.add(method_sig);
+      
+      String cls_name = sig_util.classFromMethodSig(method_sig);
       SootClass soot_class = Scene.v().getSootClass(cls_name);
       m_appClass = FastWholeProgram.v().isApplicationClass(soot_class);
       m_currClass = cls_name;
-      String sub_sig = sig_util.methodSubSigFromMethodSig(method);
+      String sub_sig = sig_util.methodSubSigFromMethodSig(method_sig);
       SootMethod soot_method = soot_class.getMethod(sub_sig);
       visit(soot_method);
     }
@@ -351,5 +357,26 @@ public class ClassRemappingTransform {
   public boolean hasNext() {
     return m_hasNext;
   }
+/*
+  private String remapMethodSig(String method_sig) {
+    SignatureUtil util = new SignatureUtil();
+    String cls = util.classFromMethodSig(method_sig);
+    String method_name = util.methodName(method_sig);
+    String return_type = util.getReturnType(method_sig);
+    List<String> params = util.getMethodParams(method_sig);
+    cls = stringRemap(cls);
+    for(int i = 0; i < params.size(); ++i){
+      params.set(i, stringRemap(params.get(i)));
+    }
+    String new_sig = util.buildSignature(cls, method_name, return_type, params);
+  }
 
+  private String stringRemap(String type){
+    if(m_classRemapping.containsKey(type)){
+      m_hasNext = true;
+      return m_classRemapping.get(type);
+    }
+    return type;
+  }
+  */
 }

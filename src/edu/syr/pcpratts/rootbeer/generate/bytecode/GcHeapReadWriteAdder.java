@@ -28,6 +28,7 @@ public class GcHeapReadWriteAdder {
   }
 
   public void add(CodeSegment block){
+    System.out.println("generating serialization bytecode...");
     mTypeHistory = OpenCLScene.v().getTypeHistory();;
     SootClass block_class = block.getRootSootClass();
     mMethodsInspected = new HashSet<SootMethod>();

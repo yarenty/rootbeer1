@@ -21,11 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -105,32 +101,53 @@ public class RootbeerCompiler {
     compileForKernels(outname, kernel_classes);
   }
   
-  private void compileForKernels(String outname, List<String> run_on_gpu_classes) throws Exception {
+  private void compileForKernels(String outname, List<String> kernel_classes) throws Exception {
     
-    String[] sorted = new String[run_on_gpu_classes.size()];
-    sorted = run_on_gpu_classes.toArray(sorted);
+    String[] sorted = new String[kernel_classes.size()];
+    sorted = kernel_classes.toArray(sorted);
     Arrays.sort(sorted);
-    run_on_gpu_classes.clear();
+    kernel_classes.clear();
     for(String cls : sorted){
-      run_on_gpu_classes.add(cls);
+      kernel_classes.add(cls);
     }
     
-    System.out.println("finding kernel reachable methods...");
-    KernelReachableMethods reachable_finder = new KernelReachableMethods();
-    List<String> reachables = reachable_finder.get(run_on_gpu_classes);
-    RootbeerScene.v().setReachableMethods(reachables);
-
+    Map<String, List<String>> reachables = new HashMap<String, List<String>>();
+    List<String> all_reachables = new ArrayList<String>();
+    
+    for(String kernel : kernel_classes){
+      SootClass soot_class = Scene.v().getSootClass(kernel);
+      SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
+      FastWholeProgram.v().getDfsMethods(kernel_method);
+      
+      System.out.println("finding kernel reachable methods for: "+soot_class.getShortName()+"...");
+    
+      KernelReachableMethods reachable_finder = new KernelReachableMethods();
+      List<String> one_class = new ArrayList<String>();
+      one_class.add(kernel);
+      List<String> curr_reachables = reachable_finder.get(one_class);
+    
+      all_reachables.addAll(curr_reachables);
+      reachables.put(kernel, curr_reachables);
+    }
+      
     ClassRemappingTransform transform = null;
     
     if(!Main.disable_class_remapping()){
       System.out.println("remapping some classes to GPU versions...");
       transform = new ClassRemappingTransform(false);
-      transform.run(reachables);
+      transform.run(all_reachables);
       transform.finishClone();
     }
-            
+    
     Transform2 transform2 = new Transform2();
-    for(String cls : run_on_gpu_classes){
+    for(String cls : kernel_classes){
+      List<String> curr_reachables = reachables.get(cls);
+      RootbeerScene.v().setReachableMethods(curr_reachables);
+      
+      SootClass soot_class = Scene.v().getSootClass(cls);
+      SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
+      FastWholeProgram.v().getDfsMethods(kernel_method);
+      
       transform2.run(cls);
     }
     
@@ -141,7 +158,7 @@ public class RootbeerCompiler {
     }
     
     SignatureUtil util = new SignatureUtil();
-    for(String method_sig : reachables){
+    for(String method_sig : all_reachables){
       String class_name = util.classFromMethodSig(method_sig);
       if(app_classes.contains(class_name) == false){
         app_classes.add(class_name);
@@ -441,7 +458,6 @@ public class RootbeerCompiler {
   
   private void clearOutputFolders() {
     DeleteFolder deleter = new DeleteFolder();
-    deleter.delete(Constants.JAR_CONTENTS_FOLDER);
     deleter.delete(Constants.OUTPUT_JAR_FOLDER);
     deleter.delete(Constants.OUTPUT_CLASS_FOLDER);
     deleter.delete(Constants.OUTPUT_SHIMPLE_FOLDER);

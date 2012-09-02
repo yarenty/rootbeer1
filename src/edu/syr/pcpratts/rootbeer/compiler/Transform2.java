@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.compiler;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.GenerateRuntimeBasicBlock;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import soot.Scene;
@@ -25,7 +24,7 @@ public class Transform2 {
   public void run(String cls){     
     OpenCLScene.v();
     
-    System.out.println("Running Transform2 on: "+cls);
+    System.out.println("running Transform2 on: "+cls);
     
     SootClass soot_class1 = Scene.v().getSootClass(cls);
     SootMethod method = soot_class1.getMethod("void gpuMethod()");

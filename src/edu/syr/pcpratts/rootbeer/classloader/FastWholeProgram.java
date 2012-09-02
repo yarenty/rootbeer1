@@ -374,7 +374,7 @@ public class FastWholeProgram {
                   continue;
                 }
 
-                //m_log.log(Level.FINEST, "Adding edge: {0} to {1}", new Object[]{curr.getSignature(), dest_sig});
+                //m_log.log(Level.FINEST, "adding edge: "+curr.getSignature()+" -> "+dest_sig);
                 //m_callGraph.addEdge(curr.getSignature(), dest_sig, (Stmt) curr_unit);
                 m_cgWorkQueue.add(dest_sig);
               }
@@ -670,7 +670,12 @@ public class FastWholeProgram {
     if(m_singleKernel){
       return m_currDfsMethods;
     }
-    m_currDfsMethods = m_dfsMethods.get(entry);
+    if(m_dfsMethods.containsKey(entry) == false){
+      m_currDfsMethods = new HashSet<String>();
+      m_dfsMethods.put(entry, m_currDfsMethods);
+    } else {
+      m_currDfsMethods = m_dfsMethods.get(entry);
+    }
     return m_currDfsMethods;
   }
 

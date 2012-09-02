@@ -53,7 +53,7 @@ public class OpenCLScene {
   private boolean m_usesGarbageCollector;
   private SootClass m_rootSootClass;
   private int m_endOfStatics;
-  private List<Type> m_yypes;
+  private List<Type> m_types;
   private ReadOnlyTypes m_readOnlyTypes;
   private TypeHistory m_typeHistory;
   private Map<ArrayType, List<Integer>> m_multiArrayDimensions;
@@ -69,7 +69,7 @@ public class OpenCLScene {
     m_oclToSoot = new HashMap<String, String>();
     m_arrayTypes = new LinkedHashSet<OpenCLArrayType>();
     m_methodHierarchies = new MethodHierarchies();
-    m_yypes = new ArrayList<Type>();
+    m_types = new ArrayList<Type>();
     m_multiArrayDimensions = new HashMap<ArrayType, List<Integer>>();
   }
 
@@ -463,13 +463,13 @@ public class OpenCLScene {
   }
   
   public void addType(Type type) {
-    if(m_yypes.contains(type) == false){
-      m_yypes.add(type);
+    if(m_types.contains(type) == false){
+      m_types.add(type);
     }
   }
   
   public List<Type> getTypes(){
-    return m_yypes;
+    return m_types;
   }
 
   public ReadOnlyTypes getReadOnlyTypes(){
