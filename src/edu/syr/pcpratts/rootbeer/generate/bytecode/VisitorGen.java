@@ -8,11 +8,9 @@
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
-import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -215,7 +213,7 @@ public class VisitorGen extends AbstractVisitorGen {
     mSentinalCtorsCreated.add(soot_class.getName());
     
     soot_class = Scene.v().getSootClass(soot_class.getName());
-    if(soot_class.isLibraryClass())
+    if(FastWholeProgram.v().isApplicationClass(soot_class) == false)
       return;
     
     if(soot_class.declaresMethod("void <init>(edu.syr.pcpratts.rootbeer.runtime.Sentinal)")){
@@ -236,7 +234,6 @@ public class VisitorGen extends AbstractVisitorGen {
         bcl.pushMethod(parent_name, "<init>", VoidType.v());
         bcl.invokeMethodNoRet(thisref);
       } else {
-        FastWholeProgram.v().isApplicationClass(parent_class);
         System.out.println("Library class "+parent_name+" on the GPU does not have a void constructor");
         System.exit(-1);
       }

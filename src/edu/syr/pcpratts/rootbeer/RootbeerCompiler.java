@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -105,6 +106,14 @@ public class RootbeerCompiler {
   }
   
   private void compileForKernels(String outname, List<String> run_on_gpu_classes) throws Exception {
+    
+    String[] sorted = new String[run_on_gpu_classes.size()];
+    sorted = run_on_gpu_classes.toArray(sorted);
+    Arrays.sort(sorted);
+    run_on_gpu_classes.clear();
+    for(String cls : sorted){
+      run_on_gpu_classes.add(cls);
+    }
     
     System.out.println("finding kernel reachable methods...");
     KernelReachableMethods reachable_finder = new KernelReachableMethods();
