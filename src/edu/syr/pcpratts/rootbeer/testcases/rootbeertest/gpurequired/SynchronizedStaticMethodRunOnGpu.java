@@ -20,16 +20,16 @@ public class SynchronizedStaticMethodRunOnGpu implements Kernel {
 
   @Override
   public void gpuMethod() {
-    //try {
-    //  increment();
-    //} catch(Throwable ex){
-    //  value1++;
-    //}    
+    try {
+      increment();
+    } catch(Throwable ex){
+      value1++;
+    }    
   }
   
   private void increment(){
-    //m_Shared.increment();
-    //throw new RuntimeException();
+    m_Shared.increment();
+    throw new RuntimeException();
   }
   
   boolean compare(SynchronizedStaticMethodRunOnGpu grhs) {

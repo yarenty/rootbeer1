@@ -7,25 +7,14 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
-import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import soot.ArrayType;
-import soot.BooleanType;
-import soot.IntType;
-import soot.Local;
-import soot.LongType;
-import soot.RefType;
-import soot.SootClass;
-import soot.SootField;
-import soot.SootMethod;
-import soot.Type;
-import soot.VoidType;
+import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.NullConstant;
 
@@ -83,7 +72,7 @@ public class VisitorGen extends AbstractVisitorGen {
    */
     
   private void makeGetLengthMethod(){    
-    SootClass object_soot_class = RootbeerScene.v().getClass("java.lang.Object");
+    SootClass object_soot_class = Scene.v().getSootClass("java.lang.Object");
     m_Bcl.top().startMethod("doGetSize", IntType.v(), object_soot_class.getType());
     m_ThisRef = m_Bcl.top().refThis();
     mParam0 = m_Bcl.top().refParameter(0);
@@ -98,7 +87,7 @@ public class VisitorGen extends AbstractVisitorGen {
   }
 
   private void makeGetSizeMethod(){
-    SootClass object_soot_class = RootbeerScene.v().getClass("java.lang.Object");
+    SootClass object_soot_class = Scene.v().getSootClass("java.lang.Object");
     m_Bcl.top().startMethod("getArrayLength", IntType.v(), object_soot_class.getType());
     m_ThisRef = m_Bcl.top().refThis();
     mParam0 = m_Bcl.top().refParameter(0);
@@ -147,7 +136,7 @@ public class VisitorGen extends AbstractVisitorGen {
         
     if(type instanceof ArrayType){
       ArrayType atype = (ArrayType) type;
-      SootClass constants_soot_class = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.generate.bytecode.Constants");
+      SootClass constants_soot_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.generate.bytecode.Constants");
       Local size = m_Bcl.top().refStaticField(constants_soot_class.getType(), "ArrayOffsetSize");
       Local element_size = m_Bcl.top().local(IntType.v());
       OpenCLType ocl_type = new OpenCLType(atype.baseType);
@@ -194,8 +183,8 @@ public class VisitorGen extends AbstractVisitorGen {
   
   private void addGetVisitorMethodToRuntimeBasicBlock() {
     m_Bcl.top().openClass(mRuntimeBasicBlock);
-    SootClass gc_object_visitor_soot_class = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.Serializer");
-    SootClass mem_cls = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass gc_object_visitor_soot_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.Serializer");
+    SootClass mem_cls = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
     m_Bcl.top().startMethod("getSerializer", gc_object_visitor_soot_class.getType(), mem_cls.getType(), mem_cls.getType());
     Local param0 = m_Bcl.top().refParameter(0);
     Local param1 = m_Bcl.top().refParameter(1);
@@ -205,7 +194,7 @@ public class VisitorGen extends AbstractVisitorGen {
   }
 
   private void makeCtor() {
-    SootClass mem_cls = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem_cls = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
 
     m_Bcl.top().startMethod("<init>", VoidType.v(), mem_cls.getType(), mem_cls.getType());
     Local this_ref = m_Bcl.top().refThis();
@@ -223,8 +212,8 @@ public class VisitorGen extends AbstractVisitorGen {
       return;
     mSentinalCtorsCreated.add(soot_class.getName());
     
-    soot_class = RootbeerScene.v().getClass(soot_class.getName());
-    if(soot_class.isLibraryClass())
+    soot_class = Scene.v().getSootClass(soot_class.getName());
+    if(FastWholeProgram.v().isApplicationClass(soot_class) == false)
       return;
     
     if(soot_class.declaresMethod("void <init>(edu.syr.pcpratts.rootbeer.runtime.Sentinal)")){
@@ -232,7 +221,7 @@ public class VisitorGen extends AbstractVisitorGen {
     }
     
     SootClass parent_class = soot_class.getSuperclass();
-    parent_class = RootbeerScene.v().getClass(parent_class.getName());
+    parent_class = Scene.v().getSootClass(parent_class.getName());
 
     BytecodeLanguage bcl = new BytecodeLanguage();
     bcl.openClass(soot_class);
@@ -240,7 +229,7 @@ public class VisitorGen extends AbstractVisitorGen {
     Local thisref = bcl.refThis();
 
     String parent_name = parent_class.getName();
-    if(parent_class.isLibraryClass()){    
+    if(FastWholeProgram.v().isApplicationClass(parent_class) == false){
       if(parent_class.declaresMethod("void <init>()")){
         bcl.pushMethod(parent_name, "<init>", VoidType.v());
         bcl.invokeMethodNoRet(thisref);

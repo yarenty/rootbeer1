@@ -8,10 +8,10 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.Constants;
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.TypeHistory;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.ReadOnlyTypes;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.SortedTypeHistory;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
@@ -22,6 +22,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
+import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -36,54 +37,40 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import soot.ArrayType;
-import soot.BooleanType;
-import soot.ByteType;
-import soot.CharType;
-import soot.DoubleType;
-import soot.FloatType;
-import soot.IntType;
-import soot.Local;
-import soot.LongType;
-import soot.RefType;
-import soot.ShortType;
-import soot.SootClass;
-import soot.SootField;
-import soot.SootMethod;
-import soot.Type;
-import soot.VoidType;
+import org.apache.commons.codec.digest.DigestUtils;
+import soot.*;
 import soot.jimple.NewMultiArrayExpr;
 
 public class OpenCLScene {
-  private static OpenCLScene mInstance;
-  private static int mCurrentIdent;
-  private ClassHierarchy mClassHierarchy;
-  private Map<String, OpenCLClass> m_Classes;
-  private Map<String, String> m_OclToSoot;
-  private Set<OpenCLArrayType> m_ArrayTypes;
-  private CodeSegment codeSegment;
-  private MethodHierarchies mMethodHierarchies;
-  private boolean mUsesGarbageCollector;
-  private SootClass rootSootClass;
-  private int mEndOfStatics;
-  private List<Type> mTypes;
-  private ReadOnlyTypes m_ReadOnlyTypes;
-  private TypeHistory m_TypeHistory;
-  private Map<ArrayType, List<Integer>> m_MultiArrayDimensions;
+  private static OpenCLScene m_instance;
+  private static int m_curentIdent;
+  private ClassHierarchy m_classHierarchy;
+  private Map<String, OpenCLClass> m_classes;
+  private Map<String, String> m_oclToSoot;
+  private Set<OpenCLArrayType> m_arrayTypes;
+  private CodeSegment m_codeSegment;
+  private MethodHierarchies m_methodHierarchies;
+  private boolean m_usesGarbageCollector;
+  private SootClass m_rootSootClass;
+  private int m_endOfStatics;
+  private List<Type> m_types;
+  private ReadOnlyTypes m_readOnlyTypes;
+  private TypeHistory m_typeHistory;
+  private Map<ArrayType, List<Integer>> m_multiArrayDimensions;
   
   static {
-    mCurrentIdent = 0;
+    m_curentIdent = 0;
   }
 
   private void resetInstance(){
-    codeSegment = null;
-    mClassHierarchy = new ClassHierarchy();
-    m_Classes = new LinkedHashMap<String, OpenCLClass>();
-    m_OclToSoot = new HashMap<String, String>();
-    m_ArrayTypes = new LinkedHashSet<OpenCLArrayType>();
-    mMethodHierarchies = new MethodHierarchies();
-    mTypes = new ArrayList<Type>();
-    m_MultiArrayDimensions = new HashMap<ArrayType, List<Integer>>();
+    m_codeSegment = null;
+    m_classHierarchy = new ClassHierarchy();
+    m_classes = new LinkedHashMap<String, OpenCLClass>();
+    m_oclToSoot = new HashMap<String, String>();
+    m_arrayTypes = new LinkedHashSet<OpenCLArrayType>();
+    m_methodHierarchies = new MethodHierarchies();
+    m_types = new ArrayList<Type>();
+    m_multiArrayDimensions = new HashMap<ArrayType, List<Integer>>();
   }
 
   private OpenCLScene(){
@@ -91,18 +78,18 @@ public class OpenCLScene {
   }
 
   public static OpenCLScene v(){
-    if(mInstance == null)
-      mInstance = new OpenCLScene();
-    return mInstance;
+    if(m_instance == null)
+      m_instance = new OpenCLScene();
+    return m_instance;
   }
 
   public static void releaseV(){
-    mInstance = null;
-    mCurrentIdent++;
+    m_instance = null;
+    m_curentIdent++;
   }
   
   public String getIdent(){
-    return "" + mCurrentIdent;
+    return "" + m_curentIdent;
   }
 
   public String getUuid(){
@@ -110,7 +97,7 @@ public class OpenCLScene {
   }
 
   public List<SootClass> getClassHierarchy(SootClass soot_class){
-    return mClassHierarchy.getClassHierarchy(soot_class);
+    return m_classHierarchy.getClassHierarchy(soot_class);
   }
 
   public int getClassTypeNonRef(Type type){
@@ -139,7 +126,7 @@ public class OpenCLScene {
     String type_string = type.toString();
     if(type instanceof ArrayType){
       ArrayType array_type = (ArrayType) type;
-      return 10 + mClassHierarchy.getClassTypeArray(array_type);
+      return 10 + m_classHierarchy.getClassTypeArray(array_type);
     } else if(type_string.equals("java.lang.String")){
       return 8;
     } else if(type_string.equals("java.lang.OutOfMemoryError")){
@@ -148,14 +135,14 @@ public class OpenCLScene {
       return Constants.NullPointerNumber; 
     } else if(type instanceof RefType){
       RefType ref_type = (RefType) type;
-      return 10 + mClassHierarchy.getClassType(ref_type.getSootClass());
+      return 10 + m_classHierarchy.getClassType(ref_type.getSootClass());
     } else {
       return getClassTypeNonRef(type);
     }
   }
 
   public int getEndOfStatics(){
-    return mEndOfStatics;
+    return m_endOfStatics;
   }
 
   public int getClassType(SootClass soot_class){
@@ -169,39 +156,39 @@ public class OpenCLScene {
     ocl_class.addMethod(new OpenCLMethod(soot_method, soot_class));
 
     //add the method 
-    mMethodHierarchies.addMethod(soot_method);
-    mClassHierarchy.getClassHierarchy(soot_class);
+    m_methodHierarchies.addMethod(soot_method);
+    m_classHierarchy.getClassHierarchy(soot_class);
   }
 
   public void addArrayType(OpenCLArrayType array_type){
-    if(m_ArrayTypes.contains(array_type))
+    if(m_arrayTypes.contains(array_type))
       return;
-    m_ArrayTypes.add(array_type);
+    m_arrayTypes.add(array_type);
     
     ArrayType soot_type = array_type.getArrayType();
     for(int i = 1; i < soot_type.numDimensions; ++i){
       ArrayType new_type = ArrayType.v(soot_type.baseType, i);
       OpenCLArrayType new_ocl_type = new OpenCLArrayType(new_type);
-      if(m_ArrayTypes.contains(new_ocl_type))
+      if(m_arrayTypes.contains(new_ocl_type))
         continue;
-      m_ArrayTypes.add(new_ocl_type);                
+      m_arrayTypes.add(new_ocl_type);                
     }
   }
 
   public OpenCLClass getOpenCLClass(SootClass soot_class){
     //add the class to the scene if it is not there allready
     OpenCLClass ocl_class = new OpenCLClass(soot_class);
-    if(m_Classes.containsKey(ocl_class.getName()))
-      ocl_class = m_Classes.get(ocl_class.getName());
-    m_Classes.put(ocl_class.getName(), ocl_class);
-    m_OclToSoot.put(ocl_class.getName(), soot_class.getName());
+    if(m_classes.containsKey(ocl_class.getName()))
+      ocl_class = m_classes.get(ocl_class.getName());
+    m_classes.put(ocl_class.getName(), ocl_class);
+    m_oclToSoot.put(ocl_class.getName(), soot_class.getName());
     return ocl_class;
   }
 
   public void addField(SootField soot_field){
     SootClass soot_class = soot_field.getDeclaringClass();
 
-    List<SootClass> hierarchy = mClassHierarchy.getClassHierarchy(soot_class);
+    List<SootClass> hierarchy = m_classHierarchy.getClassHierarchy(soot_class);
     for(SootClass curr : hierarchy){
       OpenCLClass ocl_class = getOpenCLClass(curr);
       ocl_class.findAllUsedMethodsAndFields();
@@ -213,7 +200,7 @@ public class OpenCLScene {
   }
 
   private String getRuntimeBasicBlockClassName(){
-    SootClass soot_class = rootSootClass;
+    SootClass soot_class = m_rootSootClass;
     OpenCLClass ocl_class = getOpenCLClass(soot_class);
     return ocl_class.getName();
   }
@@ -234,21 +221,36 @@ public class OpenCLScene {
   }
 
   public void setUsingGarbageCollector(){
-    mUsesGarbageCollector = true;
+    m_usesGarbageCollector = true;
   }
 
   public boolean getUsingGarbageCollector(){
-    return mUsesGarbageCollector;
+    return m_usesGarbageCollector;
   }
   
   private String makeSourceCode() throws Exception {
-    mUsesGarbageCollector = false;
+    m_usesGarbageCollector = false;
     findAllUsedClassesMethodsFieldsAndArrayTypes();
     StringBuilder ret = new StringBuilder();
+
     ret.append(headerString());
     ret.append(garbageCollectorString());
     ret.append(methodPrototypesString());
     ret.append(methodBodiesString());
+    String prev_hash = "";
+    String curr_hash = DigestUtils.md5Hex(ret.toString());
+    
+    while(prev_hash.equals(curr_hash) == false){
+      ret = new StringBuilder();
+      
+      ret.append(headerString());
+      ret.append(garbageCollectorString());
+      ret.append(methodPrototypesString());
+      ret.append(methodBodiesString());
+      
+      prev_hash = curr_hash;
+      curr_hash = DigestUtils.md5Hex(ret.toString());
+    }
 
     String cuda_code;
     //for debugging you can read the cuda code from a generated.cu
@@ -301,17 +303,17 @@ public class OpenCLScene {
     //using a set so duplicates get filtered out.
     Set<String> protos = new HashSet<String>();
     StringBuilder ret = new StringBuilder();
-    List<OpenCLMethod> methods = mMethodHierarchies.getMethods();
+    List<OpenCLMethod> methods = m_methodHierarchies.getMethods();
     for(OpenCLMethod method : methods){ 
       protos.add(method.getMethodPrototype());
     }    
-    List<OpenCLPolymorphicMethod> poly_methods = mMethodHierarchies.getPolyMorphicMethods();
+    List<OpenCLPolymorphicMethod> poly_methods = m_methodHierarchies.getPolyMorphicMethods();
     for(OpenCLPolymorphicMethod poly_method : poly_methods){
       protos.add(poly_method.getMethodPrototype());
     }
     FieldCodeGeneration gen = new FieldCodeGeneration();
-    protos.add(gen.prototypes(m_Classes, codeSegment.getReadWriteFieldInspector()));
-    for(OpenCLArrayType array_type : m_ArrayTypes){
+    protos.add(gen.prototypes(m_classes, m_codeSegment.getReadWriteFieldInspector()));
+    for(OpenCLArrayType array_type : m_arrayTypes){
       protos.add(array_type.getPrototypes());
     }
     Iterator<String> iter = protos.iterator();
@@ -323,31 +325,31 @@ public class OpenCLScene {
 
   private String methodBodiesString() throws IOException{
     StringBuilder ret = new StringBuilder();
-    if(mUsesGarbageCollector)
+    if(m_usesGarbageCollector)
       ret.append("#define USING_GARBAGE_COLLECTOR\n");
     //a set is used so duplicates get filtered out
     Set<String> bodies = new HashSet<String>();
     
     ArrayCopyGenerate arr_generate = new ArrayCopyGenerate();
-    bodies.add(arr_generate.get(m_ArrayTypes));
+    bodies.add(arr_generate.get(m_arrayTypes));
     
     ObjectCloneGenerate clone_generate = new ObjectCloneGenerate();
-    bodies.add(clone_generate.get(m_ArrayTypes, m_Classes, m_OclToSoot));
+    bodies.add(clone_generate.get(m_arrayTypes, m_classes, m_oclToSoot));
     
-    List<OpenCLMethod> methods = mMethodHierarchies.getMethods();
+    List<OpenCLMethod> methods = m_methodHierarchies.getMethods();
     for(OpenCLMethod method : methods){ 
       bodies.add(method.getMethodBody());
     }
-    List<OpenCLPolymorphicMethod> poly_methods = mMethodHierarchies.getPolyMorphicMethods();
+    List<OpenCLPolymorphicMethod> poly_methods = m_methodHierarchies.getPolyMorphicMethods();
     for(OpenCLPolymorphicMethod poly_method : poly_methods){
       bodies.add(poly_method.getMethodBody());
     }
     FieldTypeSwitch type_switch = new FieldTypeSwitch();
     FieldCodeGeneration gen = new FieldCodeGeneration();
-    String field_bodies = gen.bodies(m_Classes, 
-      codeSegment.getReadWriteFieldInspector(), type_switch);
+    String field_bodies = gen.bodies(m_classes, 
+      m_codeSegment.getReadWriteFieldInspector(), type_switch);
     bodies.add(field_bodies);
-    for(OpenCLArrayType array_type : m_ArrayTypes){
+    for(OpenCLArrayType array_type : m_arrayTypes){
       bodies.add(array_type.getBodies());
     }
     Iterator<String> iter = bodies.iterator();
@@ -362,7 +364,7 @@ public class OpenCLScene {
   
   public OffsetCalculator getOffsetCalculator(SootClass soot_class){
     FieldCloner cloner = new FieldCloner();
-    cloner.setup(m_Classes);
+    cloner.setup(m_classes);
     List<CompositeField> composites = cloner.getCompositeFields();
     for(CompositeField composite : composites){
       List<SootClass> classes = composite.getClasses();
@@ -376,62 +378,78 @@ public class OpenCLScene {
     FindMethodsFieldsAndArrayTypes.reset();
     
     addBuiltinRequirements();
-
-    codeSegment.findAllUsedMethodsAndFields();
-
-    List<OpenCLMethod> all_methods = mMethodHierarchies.getMethods();
-    for(OpenCLMethod method : all_methods){
-      method.findAllUsedMethodsAndFields();
+    
+    SignatureUtil util = new SignatureUtil();
+    
+    Set<String> dfs_methods = FastWholeProgram.v().getDfsMethods(m_codeSegment.getRootMethod());
+    Iterator<String> iter = dfs_methods.iterator();
+    while(iter.hasNext()){
+      String sig = iter.next();
+      SootClass soot_class = Scene.v().getSootClass(util.classFromMethodSig(sig));
+      addMethod(soot_class.getMethod(util.methodSubSigFromMethodSig(sig)));
     }
 
-    codeSegment.findAllUsedArrayTypes();
+    m_codeSegment.findAllUsedMethodsAndFields();
+
+    int prev_size = 0;
+    List<OpenCLMethod> all_methods = m_methodHierarchies.getMethods();
+    while(prev_size != all_methods.size()){
+      prev_size = all_methods.size();
+      all_methods = m_methodHierarchies.getMethods();
+      for(OpenCLMethod method : all_methods){
+        method.findAllUsedMethodsAndFields();
+      }
+    }
+
+    m_codeSegment.findAllUsedArrayTypes();
     
-    all_methods = mMethodHierarchies.getMethods();
+    all_methods = m_methodHierarchies.getMethods();
     for(OpenCLMethod method : all_methods){
       method.findAllUsedArrayTypes();
     }
     
-    m_TypeHistory = new TypeHistory(codeSegment.getRootSootClass());
+    m_typeHistory = new TypeHistory(m_codeSegment.getRootSootClass());
     List<Type> scene_types = OpenCLScene.v().getTypes();
     for(Type scene_type : scene_types){
-      m_TypeHistory.addType(scene_type);
+      m_typeHistory.addType(scene_type);
     }
   }
 
   public void addCodeSegment(CodeSegment codeSegment){
     resetInstance();
-    this.codeSegment = codeSegment;
-    rootSootClass = codeSegment.getRootSootClass();    
-    m_ReadOnlyTypes = new ReadOnlyTypes(codeSegment.getRootMethod());
-    getOpenCLClass(rootSootClass);
+    this.m_codeSegment = codeSegment;
+    m_rootSootClass = codeSegment.getRootSootClass();    
+    m_readOnlyTypes = new ReadOnlyTypes(codeSegment.getRootMethod());
+    getOpenCLClass(m_rootSootClass);
   }
 
   public boolean isArrayLocalWrittenTo(Local local){
-    return codeSegment.getReadWriteFieldInspector().localRepresentingArrayIsWrittenOnGpu(local);
+    return m_codeSegment.getReadWriteFieldInspector().localRepresentingArrayIsWrittenOnGpu(local);
   }
 
   private void addBuiltinRequirements() {
-    SootClass string_class = RootbeerScene.v().getClass("java.lang.String");
+    FastWholeProgram.v().loadToBodyLater("<java.lang.String: void <init>(char[])>");
+    SootClass string_class = Scene.v().getSootClass("java.lang.String");
     SootMethod ctor_method = string_class.getMethod("void <init>(char[])");
     addMethod(ctor_method);
     
-    SootClass rootbeer_gpu_class = RootbeerScene.v().getClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
+    SootClass rootbeer_gpu_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
     SootMethod getThreadId = rootbeer_gpu_class.getMethodByName("getThreadId");
     addMethod(getThreadId);
     
     ArrayType char_array = ArrayType.v(CharType.v(), 1);
     OpenCLArrayType ocl_array = new OpenCLArrayType(char_array);
-    m_ArrayTypes.add(ocl_array);
+    m_arrayTypes.add(ocl_array);
     
-    SootClass throwable_class = RootbeerScene.v().getClass("java.lang.Throwable");
+    SootClass throwable_class = Scene.v().getSootClass("java.lang.Throwable");
     SootMethod getStackTrace = throwable_class.getMethod("java.lang.StackTraceElement[] getStackTrace()");
     addMethod(getStackTrace);
         
-    SootClass stack_trace_elem = RootbeerScene.v().getClass("java.lang.StackTraceElement");
+    SootClass stack_trace_elem = Scene.v().getSootClass("java.lang.StackTraceElement");
     SootMethod stack_ctor = stack_trace_elem.getMethod("void <init>(java.lang.String,java.lang.String,java.lang.String,int)");
     addMethod(stack_ctor);
     
-    SootClass out_of_mem = RootbeerScene.v().getClass("java.lang.OutOfMemoryError");
+    SootClass out_of_mem = Scene.v().getSootClass("java.lang.OutOfMemoryError");
     SootMethod out_ctor = out_of_mem.getMethod("void <init>()");
     addMethod(out_ctor);
     addType(out_of_mem.getType());
@@ -440,30 +458,30 @@ public class OpenCLScene {
   }
 
   private void addType(String cls){
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     addType(soot_class.getType());
   }
   
   public void addType(Type type) {
-    if(mTypes.contains(type) == false){
-      mTypes.add(type);
+    if(m_types.contains(type) == false){
+      m_types.add(type);
     }
   }
   
   public List<Type> getTypes(){
-    return mTypes;
+    return m_types;
   }
 
   public ReadOnlyTypes getReadOnlyTypes(){
-    return m_ReadOnlyTypes;
+    return m_readOnlyTypes;
   }
 
   public boolean isRootClass(SootClass soot_class) {
-    return soot_class.getName().equals(rootSootClass.getName());
+    return soot_class.getName().equals(m_rootSootClass.getName());
   }
   
   public List<Type> getOrderedHistory() {        
-    List<Type> ordered_history = m_TypeHistory.getHistory();    
+    List<Type> ordered_history = m_typeHistory.getHistory();    
     SortedTypeHistory sorter = new SortedTypeHistory();
     List<Type> all_possible_types = sorter.sort(ordered_history);    
     return all_possible_types;
@@ -480,21 +498,21 @@ public class OpenCLScene {
   }
 
   public TypeHistory getTypeHistory() {
-    return m_TypeHistory;
+    return m_typeHistory;
   }
 
   public Map<String, OpenCLClass> getClassMap(){
-    return m_Classes;
+    return m_classes;
   }
 
   public void addNewMultiArray(NewMultiArrayExpr expr) {
     ArrayType type = expr.getBaseType();
     List<Integer> dimensions;
-    if(m_MultiArrayDimensions.containsKey(type)){
-      dimensions = m_MultiArrayDimensions.get(type);
+    if(m_multiArrayDimensions.containsKey(type)){
+      dimensions = m_multiArrayDimensions.get(type);
     } else {
       dimensions = new ArrayList<Integer>();
-      m_MultiArrayDimensions.put(type, dimensions);
+      m_multiArrayDimensions.put(type, dimensions);
     }
     int dim = expr.getSizeCount();
     if(dimensions.contains(dim))
@@ -503,6 +521,6 @@ public class OpenCLScene {
   }
   
   public List<Integer> getMultiArrayDimensions(ArrayType type){
-    return m_MultiArrayDimensions.get(type);
+    return m_multiArrayDimensions.get(type);
   }
 }

@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import soot.Scene;
 import soot.SootClass;
 
 public class ReverseClassHierarchy {
@@ -31,7 +32,7 @@ public class ReverseClassHierarchy {
     Set<String> visited = new HashSet<String>();
     for(String key : key_set){
       OpenCLClass ocl_class = classes.get(key);
-      SootClass soot_class = RootbeerScene.v().getClass(ocl_class.getJavaName());
+      SootClass soot_class = Scene.v().getSootClass(ocl_class.getJavaName());
       if(soot_class.hasSuperclass() == false)
         continue;
       SootClass parent = soot_class.getSuperclass();
@@ -51,7 +52,7 @@ public class ReverseClassHierarchy {
         if(visited.contains(key))
           continue;
         OpenCLClass ocl_class = classes.get(key);
-        SootClass soot_class = RootbeerScene.v().getClass(ocl_class.getJavaName());
+        SootClass soot_class = Scene.v().getSootClass(ocl_class.getJavaName());
         if(soot_class.hasSuperclass() == false)
           continue;
         SootClass parent = soot_class.getSuperclass();
@@ -80,7 +81,7 @@ public class ReverseClassHierarchy {
   }
 
   private void addClass(String cls) {
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(soot_class);
     m_Classes.put(cls, ocl_class);
   }

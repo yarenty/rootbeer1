@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
@@ -18,18 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import soot.ArrayType;
-import soot.Body;
-import soot.Local;
-import soot.PatchingChain;
-import soot.RefType;
-import soot.SootClass;
-import soot.SootMethod;
-import soot.Type;
-import soot.Unit;
-import soot.Value;
-import soot.ValueBox;
-import soot.VoidType;
+import soot.*;
 import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
@@ -39,13 +29,13 @@ import soot.jimple.StaticInvokeExpr;
  * @author pcpratts
  */
 public class OpenCLMethod {
-  private final SootMethod m_SootMethod;
-  private SootClass m_SootClass;
-  private Set<String> m_DontMangleMethods;
+  private final SootMethod m_sootMethod;
+  private SootClass m_sootClass;
+  private Set<String> m_dontMangleMethods;
   
   public OpenCLMethod(SootMethod soot_method, SootClass soot_class){
-    m_SootMethod = soot_method;
-    m_SootClass = soot_class;
+    m_sootMethod = soot_method;
+    m_sootClass = soot_class;
     createDontMangleMethods();
   }
   
@@ -54,7 +44,7 @@ public class OpenCLMethod {
     if(isConstructor()){
       ret.append("int");
     } else {
-      OpenCLType return_type = new OpenCLType(m_SootMethod.getReturnType());
+      OpenCLType return_type = new OpenCLType(m_sootMethod.getReturnType());
       ret.append(return_type.getRefString());
     }
     return ret.toString();
@@ -62,7 +52,7 @@ public class OpenCLMethod {
   
   private String getRestOfArgumentListStringInternal(){
     StringBuilder ret = new StringBuilder();
-    List args = m_SootMethod.getParameterTypes();
+    List args = m_sootMethod.getParameterTypes();
     
     if(args.size() != 0)
       ret.append(", ");
@@ -87,7 +77,7 @@ public class OpenCLMethod {
     String address_space_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     if(isConstructor() == true){
       ret.append(address_space_qual+" char * gc_info");
-    } else if((isConstructor() == false || override_ctor == true) && m_SootMethod.isStatic() == false){
+    } else if((isConstructor() == false || override_ctor == true) && m_sootMethod.isStatic() == false){
       ret.append(address_space_qual+" char * gc_info, int thisref");
     } else {
       ret.append(address_space_qual+" char * gc_info");
@@ -148,8 +138,8 @@ public class OpenCLMethod {
     StaticOffsets static_offsets = new StaticOffsets();
     int junk_index = static_offsets.getEndIndex() - 4;
     int mystery_index = junk_index - 4;
-    if(m_SootMethod.isStatic()){
-      int offset = static_offsets.getIndex(m_SootClass);
+    if(m_sootMethod.isStatic()){
+      int offset = static_offsets.getIndex(m_sootClass);
       ret += "char * mem = edu_syr_pcpratts_gc_deref(gc_info, 0);\n";
       ret += "char * trash = mem + "+junk_index+";\n";
       ret += "char * mystery = mem + "+mystery_index+";\n";
@@ -179,6 +169,7 @@ public class OpenCLMethod {
   }
   
   public String getMethodBody(){
+    loadToBody();
     StringBuilder ret = new StringBuilder();
     if(shouldEmitBody()){
       ret.append(getMethodDecl(false)+"{\n");
@@ -187,7 +178,7 @@ public class OpenCLMethod {
           if(isSynchronized()){
             ret.append(synchronizedEnter()); 
           }
-          OpenCLBody ocl_body = new OpenCLBody(m_SootMethod, isConstructor());
+          OpenCLBody ocl_body = new OpenCLBody(m_sootMethod, isConstructor());
           ret.append(ocl_body.getBody());
           if(isSynchronized()){
             if(isLinux()){
@@ -208,8 +199,8 @@ public class OpenCLMethod {
           }
         }
       } catch(RuntimeException ex){
-        System.out.println("Error creating method body: "+m_SootMethod.getSignature());
-        OpenCLMethod ocl_method = new OpenCLMethod(m_SootMethod, m_SootClass);
+        System.out.println("Error creating method body: "+m_sootMethod.getSignature());
+        OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, m_sootClass);
         if(ocl_method.returnsAValue())
           ret.append("return 0;\n");
         else
@@ -218,7 +209,7 @@ public class OpenCLMethod {
       ret.append("}\n");
       if(isConstructor()){
         ret.append(getMethodDecl(true)+"{\n"); 
-        OpenCLBody ocl_body = new OpenCLBody(RootbeerScene.v().getBody(m_SootMethod));
+        OpenCLBody ocl_body = new OpenCLBody(m_sootMethod.retrieveActiveBody());
         ret.append(ocl_body.getBody());
         ret.append("}\n");
       }
@@ -264,7 +255,7 @@ public class OpenCLMethod {
     List<SootClass> hierarchy;
     if(base_type instanceof ArrayType){
       hierarchy = new ArrayList<SootClass>();
-      SootClass obj = RootbeerScene.v().getClass("java.lang.Object");
+      SootClass obj = Scene.v().getSootClass("java.lang.Object");
       hierarchy.add(obj);
     } else if (base_type instanceof RefType){
       RefType ref_type = (RefType) base_type;
@@ -274,7 +265,7 @@ public class OpenCLMethod {
     }
 
     if(hierarchy.size() == 1 || isConstructor() || arg0 instanceof SpecialInvokeExpr){
-      return writeInstanceInvoke(arg0, "", m_SootClass);
+      return writeInstanceInvoke(arg0, "", m_sootClass);
     } else if(hierarchy.size() == 0){
       System.out.println("size = 0");
       return null;
@@ -313,7 +304,7 @@ public class OpenCLMethod {
   }
 
   private String writeInstanceInvoke(InstanceInvokeExpr arg0, String method_prefix, SootClass soot_class){
-    OpenCLMethod corrected_this = new OpenCLMethod(m_SootMethod, soot_class);
+    OpenCLMethod corrected_this = new OpenCLMethod(m_sootMethod, soot_class);
     StringBuilder ret = new StringBuilder();
     Value base = arg0.getBase();
     if(base instanceof Local == false)
@@ -323,7 +314,8 @@ public class OpenCLMethod {
       ret.append("edu_syr_pcpratts_gc_assign (gc_info, \n&"+local.getName()+", ");
     }
 
-    ret.append(method_prefix+corrected_this.getPolymorphicName()+"(");
+    String function_name = method_prefix+corrected_this.getPolymorphicName();
+    ret.append(function_name+"(");
     List args = arg0.getArgs();
     List<String> args_list = new ArrayList<String>();
     args_list.add("gc_info");
@@ -360,7 +352,7 @@ public class OpenCLMethod {
   }
 
   public boolean isConstructor(){
-    String method_name = m_SootMethod.getName();
+    String method_name = m_sootMethod.getName();
     if(method_name.equals("<init>"))
       return true;
     return false;
@@ -375,15 +367,15 @@ public class OpenCLMethod {
     if(ctor_body){
       ret += "_body";  
     }
-    if(m_DontMangleMethods.contains(ret) == false)
-      ret += NameMangling.v().mangleArgs(m_SootMethod);
+    if(m_dontMangleMethods.contains(ret) == false)
+      ret += NameMangling.v().mangleArgs(m_sootMethod);
     return ret;
   }
 
   private String getBaseMethodName(){
-    OpenCLClass ocl_class = new OpenCLClass(m_SootClass);
+    OpenCLClass ocl_class = new OpenCLClass(m_sootClass);
 
-    String method_name = m_SootMethod.getName();
+    String method_name = m_sootMethod.getName();
     //here I use a certain uuid for init so there is low chance of collisions
     method_name = method_name.replace("<init>", "init"+OpenCLScene.v().getUuid());
 
@@ -393,7 +385,7 @@ public class OpenCLMethod {
   
   private boolean shouldEmitBody(){
     String ret = getBaseMethodName();
-    if(m_DontMangleMethods.contains(ret))
+    if(m_dontMangleMethods.contains(ret))
       return false;
     return true;
   }
@@ -406,7 +398,7 @@ public class OpenCLMethod {
   public void findAllUsedMethodsAndFields() {
     Body body;
     try {
-      body = RootbeerScene.v().getBody(m_SootMethod);
+      body = m_sootMethod.getActiveBody();
       if(body == null)
         return;
     } catch(RuntimeException ex){
@@ -426,16 +418,16 @@ public class OpenCLMethod {
     }
   }
   public List<SootClass> getHierarchy(){
-    SootClass soot_class = m_SootMethod.getDeclaringClass();
+    SootClass soot_class = m_sootMethod.getDeclaringClass();
     return OpenCLScene.v().getClassHierarchy(soot_class);
   }
   
   public void findAllUsedArrayTypes() {
-    SootClass soot_class = m_SootMethod.getDeclaringClass();
+    SootClass soot_class = m_sootMethod.getDeclaringClass();
 
     Body body;
     try {
-      body = m_SootMethod.getActiveBody();
+      body = m_sootMethod.getActiveBody();
     } catch(RuntimeException ex){
       //if there is no body, return.
       return;
@@ -453,9 +445,9 @@ public class OpenCLMethod {
   }
 
   private boolean methodIsRuntimeBasicBlockRun() {
-    if(m_SootClass.getName().equals("edu.syr.pcpratts.javaautogpu.runtime.RuntimeBasicBlock") == false)
+    if(m_sootClass.getName().equals("edu.syr.pcpratts.javaautogpu.runtime.RuntimeBasicBlock") == false)
       return false;
-    if(m_SootMethod.getName().equals("run") == false)
+    if(m_sootMethod.getName().equals("run") == false)
       return false;
     return true;
   }
@@ -463,48 +455,54 @@ public class OpenCLMethod {
   public boolean returnsAValue() {
     if(isConstructor())
       return true;
-    Type t = m_SootMethod.getReturnType();
+    Type t = m_sootMethod.getReturnType();
     if(t instanceof VoidType)
       return false;
     return true;
   }
 
   public boolean isSynchronized() {
-    return m_SootMethod.isSynchronized();
+    return m_sootMethod.isSynchronized();
   }
   
   private void createDontMangleMethods() {
-    m_DontMangleMethods = new HashSet<String>();
-    m_DontMangleMethods.add("java_lang_StrictMath_exp");
-    m_DontMangleMethods.add("java_lang_StrictMath_log");
-    m_DontMangleMethods.add("java_lang_StrictMath_log10");
-    m_DontMangleMethods.add("java_lang_StrictMath_sqrt");
-    m_DontMangleMethods.add("java_lang_StrictMath_cbrt");
-    m_DontMangleMethods.add("java_lang_StrictMath_IEEEremainder");    
-    m_DontMangleMethods.add("java_lang_StrictMath_ceil");
-    m_DontMangleMethods.add("java_lang_StrictMath_floor");
-    m_DontMangleMethods.add("java_lang_StrictMath_sin");
-    m_DontMangleMethods.add("java_lang_StrictMath_cos");
-    m_DontMangleMethods.add("java_lang_StrictMath_tan");
-    m_DontMangleMethods.add("java_lang_StrictMath_asin");
-    m_DontMangleMethods.add("java_lang_StrictMath_acos");
-    m_DontMangleMethods.add("java_lang_StrictMath_atan");
-    m_DontMangleMethods.add("java_lang_StrictMath_atan2");
-    m_DontMangleMethods.add("java_lang_StrictMath_pow");
-    m_DontMangleMethods.add("java_lang_StrictMath_sinh");
-    m_DontMangleMethods.add("java_lang_StrictMath_cosh");
-    m_DontMangleMethods.add("java_lang_StrictMath_tanh");
-    m_DontMangleMethods.add("java_lang_Double_doubleToLongBits");
-    m_DontMangleMethods.add("java_lang_Double_longBitsToDouble");
-    m_DontMangleMethods.add("java_lang_System_arraycopy");
-    m_DontMangleMethods.add("java_lang_Throwable_fillInStackTrace");
-    m_DontMangleMethods.add("java_lang_Throwable_getStackTraceDepth");
-    m_DontMangleMethods.add("java_lang_Throwable_getStackTraceElement");
-    m_DontMangleMethods.add("java_lang_Object_clone");
-    m_DontMangleMethods.add("java_lang_OutOfMemoryError_initab850b60f96d11de8a390800200c9a66");
-    m_DontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu");
-    m_DontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId");
+    m_dontMangleMethods = new HashSet<String>();
+    m_dontMangleMethods.add("java_lang_StrictMath_exp");
+    m_dontMangleMethods.add("java_lang_StrictMath_log");
+    m_dontMangleMethods.add("java_lang_StrictMath_log10");
+    m_dontMangleMethods.add("java_lang_StrictMath_sqrt");
+    m_dontMangleMethods.add("java_lang_StrictMath_cbrt");
+    m_dontMangleMethods.add("java_lang_StrictMath_IEEEremainder");    
+    m_dontMangleMethods.add("java_lang_StrictMath_ceil");
+    m_dontMangleMethods.add("java_lang_StrictMath_floor");
+    m_dontMangleMethods.add("java_lang_StrictMath_sin");
+    m_dontMangleMethods.add("java_lang_StrictMath_cos");
+    m_dontMangleMethods.add("java_lang_StrictMath_tan");
+    m_dontMangleMethods.add("java_lang_StrictMath_asin");
+    m_dontMangleMethods.add("java_lang_StrictMath_acos");
+    m_dontMangleMethods.add("java_lang_StrictMath_atan");
+    m_dontMangleMethods.add("java_lang_StrictMath_atan2");
+    m_dontMangleMethods.add("java_lang_StrictMath_pow");
+    m_dontMangleMethods.add("java_lang_StrictMath_sinh");
+    m_dontMangleMethods.add("java_lang_StrictMath_cosh");
+    m_dontMangleMethods.add("java_lang_StrictMath_tanh");
+    m_dontMangleMethods.add("java_lang_Double_doubleToLongBits");
+    m_dontMangleMethods.add("java_lang_Double_longBitsToDouble");
+    m_dontMangleMethods.add("java_lang_System_arraycopy");
+    m_dontMangleMethods.add("java_lang_Throwable_fillInStackTrace");
+    m_dontMangleMethods.add("java_lang_Throwable_getStackTraceDepth");
+    m_dontMangleMethods.add("java_lang_Throwable_getStackTraceElement");
+    m_dontMangleMethods.add("java_lang_Object_clone");
+    m_dontMangleMethods.add("java_lang_OutOfMemoryError_initab850b60f96d11de8a390800200c9a66");
+    m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu");
+    m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId");
   }
 
+  public String getSignature() {
+    return m_sootMethod.getSignature();
+  }
 
+  private void loadToBody() {
+    FastWholeProgram.v().loadToBodyLater(m_sootMethod.getSignature());
+  }
 }

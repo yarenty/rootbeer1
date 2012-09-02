@@ -307,4 +307,8 @@ public class OpenCLField {
     }
     return ret;
   }
+
+  public boolean isFinal() {
+    return m_SootField.isFinal();
+  }
 }

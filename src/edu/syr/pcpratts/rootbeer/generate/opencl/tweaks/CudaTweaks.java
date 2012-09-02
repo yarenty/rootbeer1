@@ -42,7 +42,14 @@ public class CudaTweaks extends Tweaks {
 
   public List<byte[]> compileProgram(String cuda_code) {
     try {      
-      DeadMethods dead_methods = new DeadMethods("entry") ;
+      
+      File pre_dead = new File("pre_dead.cu");
+      PrintWriter writer = new PrintWriter(pre_dead.getAbsoluteFile());
+      writer.println(cuda_code.toString());
+      writer.flush();
+      writer.close();
+      
+      DeadMethods dead_methods = new DeadMethods("entry");
       cuda_code = dead_methods.filter(cuda_code);
       
       //Compressor compressor = new Compressor();
@@ -50,7 +57,7 @@ public class CudaTweaks extends Tweaks {
       
       //print out code for debugging
       File generated = new File("generated.cu");
-      PrintWriter writer = new PrintWriter(generated.getAbsoluteFile());
+      writer = new PrintWriter(generated.getAbsoluteFile());
       writer.println(cuda_code.toString());
       writer.flush();
       writer.close();

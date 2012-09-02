@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -54,7 +55,7 @@ public class AbstractVisitorGen {
 
   protected SootClass getClassForType(RefType ref_type){   
     SootClass soot_class = ref_type.getSootClass();
-    soot_class = RootbeerScene.v().getClass(soot_class.getName()); 
+    soot_class = Scene.v().getSootClass(soot_class.getName()); 
     return soot_class;
   }
   
@@ -78,7 +79,7 @@ public class AbstractVisitorGen {
   
   protected SootClass getGcVisitorClass(Local visitor){    
     RefType type = (RefType) visitor.getType();
-    SootClass gc_visitor = RootbeerScene.v().getClass(type.getClassName());
+    SootClass gc_visitor = Scene.v().getSootClass(type.getClassName());
     return gc_visitor;    
   }
 
@@ -109,7 +110,7 @@ public class AbstractVisitorGen {
   
   protected void readRefField(OpenCLField ref_field) {
     SootField soot_field = ref_field.getSootField();
-    SootClass soot_class = RootbeerScene.v().getClass(soot_field.getDeclaringClass().getName());
+    SootClass soot_class = Scene.v().getSootClass(soot_field.getDeclaringClass().getName());
 
     BytecodeLanguage bcl = m_Bcl.top();
     Local gc_obj_visit = m_GcObjVisitor.top();
@@ -122,10 +123,10 @@ public class AbstractVisitorGen {
 
     //mBcl.println("reading field: "+ref_field.getName());
     
-    SootClass obj_class = RootbeerScene.v().getClass("java.lang.Object");
-    SootClass string = RootbeerScene.v().getClass("java.lang.String");
+    SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
+    SootClass string = Scene.v().getSootClass("java.lang.String");
     Local original_field_value;
-    if(soot_class.isLibraryClass()){
+    if(FastWholeProgram.v().isApplicationClass(soot_class) == false){
       bcl.pushMethod(gc_obj_visit, "readField", obj_class.getType(), obj_class.getType(), string.getType());       
       original_field_value = bcl.invokeMethodRet(gc_obj_visit, m_ObjSerializing.top(), StringConstant.v(soot_field.getName()));
     } else {
@@ -143,7 +144,7 @@ public class AbstractVisitorGen {
     Type type = soot_field.getType();
     Local ret = bcl.cast(type, ret_obj);
 
-    if(soot_class.isLibraryClass()){
+    if(FastWholeProgram.v().isApplicationClass(soot_class) == false){
       bcl.pushMethod(gc_obj_visit, "writeField", VoidType.v(), obj_class.getType(), string.getType(), obj_class.getType());       
       bcl.invokeMethodNoRet(gc_obj_visit, m_ObjSerializing.top(), StringConstant.v(soot_field.getName()), ret);
     } else {
@@ -165,16 +166,16 @@ public class AbstractVisitorGen {
     bcl.pushMethod(m_CurrMem.top(), function_name, soot_field.getType());
     Local data = bcl.invokeMethodRet(m_CurrMem.top());
 
-    SootClass soot_class = RootbeerScene.v().getClass(soot_field.getDeclaringClass().getName());
-    if(soot_class.isApplicationClass()){
+    SootClass soot_class = Scene.v().getSootClass(soot_field.getDeclaringClass().getName());
+    if(FastWholeProgram.v().isApplicationClass(soot_class)){
       if(field.isInstance()){
         bcl.setInstanceField(soot_field, m_ObjSerializing.top(), data);
       } else {
         bcl.setStaticField(soot_field, data);
       }
     } else {
-      SootClass obj = RootbeerScene.v().getClass("java.lang.Object");
-      SootClass string = RootbeerScene.v().getClass("java.lang.String");
+      SootClass obj = Scene.v().getSootClass("java.lang.Object");
+      SootClass string = Scene.v().getSootClass("java.lang.String");
       String static_str;
       SootClass first_param_type;
       Value first_param;
@@ -184,7 +185,7 @@ public class AbstractVisitorGen {
         first_param = m_ObjSerializing.top();
       } else {
         static_str = "Static";
-        first_param_type = RootbeerScene.v().getClass("java.lang.Class");
+        first_param_type = Scene.v().getSootClass("java.lang.Class");
         first_param = ClassConstant.v(soot_class.getName());
       }
       String private_field_fun_name = "write"+static_str+getTypeString(soot_field);
@@ -192,6 +193,10 @@ public class AbstractVisitorGen {
       bcl.pushMethod(private_fields, private_field_fun_name, VoidType.v(), first_param_type.getType(), string.getType(), soot_field.getType());       
       bcl.invokeMethodNoRet(private_fields, first_param, StringConstant.v(soot_field.getName()), data);
     }
+  }
+  
+  protected String toConstant(String name) {
+    return name.replace(".", "/");
   }
   
 }

@@ -14,14 +14,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import soot.ArrayType;
-import soot.Body;
-import soot.RefType;
-import soot.SootClass;
-import soot.SootMethod;
-import soot.Type;
-import soot.Value;
-import soot.ValueBox;
+import soot.*;
 import soot.jimple.FieldRef;
 import soot.jimple.InvokeExpr;
 
@@ -35,6 +28,7 @@ public class GcHeapReadWriteAdder {
   }
 
   public void add(CodeSegment block){
+    System.out.println("generating serialization bytecode...");
     mTypeHistory = OpenCLScene.v().getTypeHistory();;
     SootClass block_class = block.getRootSootClass();
     mMethodsInspected = new HashSet<SootMethod>();
@@ -53,14 +47,14 @@ public class GcHeapReadWriteAdder {
     mMethodsInspected.add(method);
     
     SootClass soot_class = method.getDeclaringClass();
-    soot_class = RootbeerScene.v().getClass(soot_class.getName());
+    soot_class = Scene.v().getSootClass(soot_class.getName());
     
     while(true){
       mTypeHistory.addType(soot_class.getType());
       if(soot_class.hasSuperclass() == false)
         break;
       soot_class = soot_class.getSuperclass();
-      soot_class = RootbeerScene.v().getClass(soot_class.getName());
+      soot_class = Scene.v().getSootClass(soot_class.getName());
       if(soot_class.getName().equals("java.lang.Object"))
         break;
     }

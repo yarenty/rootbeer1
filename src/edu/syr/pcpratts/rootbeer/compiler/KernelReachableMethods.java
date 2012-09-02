@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.compiler;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import soot.*;
 import soot.jimple.InvokeExpr;
+import soot.util.Chain;
 
 public class KernelReachableMethods {
 
@@ -39,19 +41,19 @@ public class KernelReachableMethods {
   }
 
   private void find(String kernel_class) {
-    SootClass soot_class = RootbeerScene.v().getClass(kernel_class);
+    SootClass soot_class = Scene.v().getSootClass(kernel_class);
     SootMethod gpuMethod = soot_class.getMethodByName("gpuMethod");
     m_visited = new HashSet<String>();
     dfs(gpuMethod);
     
-    List<String> scene_classes = RootbeerScene.v().getApplicationClasses();
+    Chain<SootClass> scene_classes = Scene.v().getApplicationClasses();
     m_intoGpuMethod = new ArrayList<String>();
     addClass(soot_class);
     int prev_size = -1;
     while(prev_size != m_intoGpuMethod.size()){
       prev_size = m_intoGpuMethod.size();
-      for(String cls : scene_classes){
-        search(cls);
+      for(SootClass cls : scene_classes){
+        search(cls.getName());
       }
     }
     for(String method : m_intoGpuMethod){
@@ -73,12 +75,14 @@ public class KernelReachableMethods {
     if(m_ret.contains(signature) == false){
       m_ret.add(signature);
     }    
-    Body body = method.getActiveBody();
+    Body body = method.retrieveActiveBody();
     List<ValueBox> boxes = body.getUseAndDefBoxes();
     for(ValueBox box : boxes){
       Value value = box.getValue();
       if(value instanceof InvokeExpr){
         InvokeExpr expr = (InvokeExpr) value;
+        SootMethodRef ref = expr.getMethodRef();
+        FastWholeProgram.v().loadToBodyLater(ref.getSignature());
         SootMethod method2 = expr.getMethod();
         dfs(method2);
       }
@@ -86,7 +90,7 @@ public class KernelReachableMethods {
   }
 
   private void search(String cls) {
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     List<SootMethod> methods = soot_class.getMethods();
     for(SootMethod method : methods){
       if(reachesIntoGpuMethod(method)){
@@ -100,7 +104,7 @@ public class KernelReachableMethods {
     if(method.isConcrete() == false){
       return false;
     }
-    Body body = RootbeerScene.v().getBody(method);
+    Body body = method.retrieveActiveBody();
     if(body == null){
       return false;
     }
@@ -111,7 +115,7 @@ public class KernelReachableMethods {
         InvokeExpr expr = (InvokeExpr) value;
         SootClass soot_class = expr.getMethodRef().declaringClass();
         try {
-          soot_class = RootbeerScene.v().getClass(soot_class.getName());
+          soot_class = Scene.v().getSootClass(soot_class.getName());
         } catch(RuntimeException ex){
           continue;
         }

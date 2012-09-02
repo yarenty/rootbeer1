@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLMethod;
+import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.jimple.InvokeExpr;
@@ -28,7 +29,7 @@ public class ConstructorStmtSwitch extends MethodStmtSwitch {
     
     m_EmitRetVoid = emit_ret_void;    
     m_SootClass = soot_method.getDeclaringClass();
-    m_SootClass = RootbeerScene.v().getClass(m_SootClass.getName());
+    m_SootClass = Scene.v().getSootClass(m_SootClass.getName());
   }
 
   @Override

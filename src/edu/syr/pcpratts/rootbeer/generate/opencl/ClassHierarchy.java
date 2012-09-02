@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import soot.ArrayType;
+import soot.Scene;
 import soot.SootClass;
 
 public class ClassHierarchy {
@@ -39,7 +41,7 @@ public class ClassHierarchy {
   private void addBuiltIn(String cls){
     mMaxType++;
     List<SootClass> lst = new ArrayList<SootClass>();
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     lst.add(soot_class);
     mMap.put(cls, lst);
   }
@@ -65,7 +67,7 @@ public class ClassHierarchy {
     if(mMap.containsKey(class_name))
       return mMap.get(class_name);
 
-    Iterator<SootClass> iter = RootbeerScene.v().getClasses();
+    Iterator<SootClass> iter = RootbeerScene.v().getAllClasses().iterator();
     List<SootClass> ret = new ArrayList<SootClass>();
     while(iter.hasNext()){
       SootClass next = iter.next();
@@ -77,7 +79,7 @@ public class ClassHierarchy {
           }
           if(curr.hasSuperclass()){
             curr = curr.getSuperclass();
-            curr = RootbeerScene.v().getClass(curr.getName());
+            curr = Scene.v().getSootClass(curr.getName());
           } else {
             break;
           }
@@ -103,7 +105,7 @@ public class ClassHierarchy {
 
     SootClass curr = next;
     while(true){
-      if(curr.isLibraryClass())
+      if(FastWholeProgram.v().isApplicationClass(curr) == false)
         return false;
       if(hasSuperClass(curr) == false)
         return false;

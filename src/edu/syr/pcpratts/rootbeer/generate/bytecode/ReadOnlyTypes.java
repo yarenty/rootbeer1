@@ -52,7 +52,10 @@ public class ReadOnlyTypes {
       return;
     m_Inspected.add(sig);
     
-    Body body = RootbeerScene.v().getBody(method);
+    if(method.isConcrete() == false){
+      return;
+    }
+    Body body = method.retrieveActiveBody();
     if(body == null)
       return;
     inspectBody(body);

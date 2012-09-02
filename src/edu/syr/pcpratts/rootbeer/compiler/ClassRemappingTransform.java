@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.compiler;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,18 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import soot.ArrayType;
-import soot.Body;
-import soot.Local;
-import soot.RefType;
-import soot.SootClass;
-import soot.SootField;
-import soot.SootMethod;
-import soot.SootMethodRef;
-import soot.Type;
-import soot.Unit;
-import soot.Value;
-import soot.ValueBox;
+import soot.*;
 import soot.jimple.CastExpr;
 import soot.jimple.FieldRef;
 import soot.jimple.InvokeExpr;
@@ -60,26 +50,32 @@ public class ClassRemappingTransform {
   }
   
   public void run(List<String> reachable_methods){
+    Set<String> visited = new HashSet<String>();
     SignatureUtil sig_util = new SignatureUtil();
-    for(String method : reachable_methods){
-      String cls_name = sig_util.classFromMethodSig(method);
-      SootClass soot_class = RootbeerScene.v().getClass(cls_name);
-      m_appClass = soot_class.isApplicationClass();
+    for(String method_sig : reachable_methods){
+      if(visited.contains(method_sig)){
+        continue;
+      }
+      visited.add(method_sig);
+      
+      String cls_name = sig_util.classFromMethodSig(method_sig);
+      SootClass soot_class = Scene.v().getSootClass(cls_name);
+      m_appClass = FastWholeProgram.v().isApplicationClass(soot_class);
       m_currClass = cls_name;
-      String sub_sig = sig_util.methodSubSigFromMethodSig(method);
+      String sub_sig = sig_util.methodSubSigFromMethodSig(method_sig);
       SootMethod soot_method = soot_class.getMethod(sub_sig);
       visit(soot_method);
     }
   }
   
   public void run(String cls) {
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
-    run(cls, soot_class.isApplicationClass());
+    SootClass soot_class = Scene.v().getSootClass(cls);
+    run(cls, FastWholeProgram.v().isApplicationClass(soot_class));
   }
   
   private void run(String cls, boolean app_class){
     m_currClass = cls;
-    SootClass soot_class = RootbeerScene.v().getClass(cls);
+    SootClass soot_class = Scene.v().getSootClass(cls);
     m_appClass = app_class;
     List<SootMethod> methods = soot_class.getMethods();
     for(SootMethod method : methods){
@@ -125,6 +121,9 @@ public class ClassRemappingTransform {
         }
       } else if(type instanceof ArrayType){
         ArrayType array_type = (ArrayType) type;
+        if(array_type.baseType instanceof RefType == false){
+          continue;
+        }
         RefType ref_type = (RefType) array_type.baseType;
         if(shouldMap(ref_type.getSootClass())){
           SootClass new_class = getMapping(ref_type.getSootClass());
@@ -144,7 +143,7 @@ public class ClassRemappingTransform {
     if(m_classRemapping.containsKey(soot_class.getName())){
       return;
     }
-    Body body = RootbeerScene.v().getBody(method);
+    Body body = method.retrieveActiveBody();
     if(body == null)
       return;
     fixArguments(method);
@@ -286,7 +285,11 @@ public class ClassRemappingTransform {
   private SootMethodRef remapRef(SootMethodRef ref) {
     Type return_type = fixType(ref.returnType());
     List params = fixParameterList(ref.parameterTypes());
-    SootMethod method = new SootMethod(ref.name(), params, return_type);
+    int modifiers = Modifier.PUBLIC;
+    if(ref.isStatic()){
+      modifiers += Modifier.STATIC;
+    }
+    SootMethod method = new SootMethod(ref.name(), params, return_type, modifiers);
     SootClass decl_class = ref.declaringClass();
     if(shouldMap(decl_class)){
       decl_class = getMapping(decl_class);
@@ -301,7 +304,7 @@ public class ClassRemappingTransform {
 
   private SootClass getMapping(SootClass soot_class) {
     String new_class = m_classRemapping.get(soot_class.getName());
-    return RootbeerScene.v().getClass(new_class);
+    return Scene.v().getSootClass(new_class);
   }
 
   private void addField(SootField field, FieldRef ref) {
@@ -354,5 +357,26 @@ public class ClassRemappingTransform {
   public boolean hasNext() {
     return m_hasNext;
   }
+/*
+  private String remapMethodSig(String method_sig) {
+    SignatureUtil util = new SignatureUtil();
+    String cls = util.classFromMethodSig(method_sig);
+    String method_name = util.methodName(method_sig);
+    String return_type = util.getReturnType(method_sig);
+    List<String> params = util.getMethodParams(method_sig);
+    cls = stringRemap(cls);
+    for(int i = 0; i < params.size(); ++i){
+      params.set(i, stringRemap(params.get(i)));
+    }
+    String new_sig = util.buildSignature(cls, method_name, return_type, params);
+  }
 
+  private String stringRemap(String type){
+    if(m_classRemapping.containsKey(type)){
+      m_hasNext = true;
+      return m_classRemapping.get(type);
+    }
+    return type;
+  }
+  */
 }

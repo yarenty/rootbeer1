@@ -8,7 +8,6 @@
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import edu.syr.pcpratts.rootbeer.compiler.ClassRemapping;
-import edu.syr.pcpratts.rootbeer.compiler.IgnorePackages;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.TreeNode;
 import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
@@ -16,10 +15,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import soot.ArrayType;
-import soot.RefType;
-import soot.SootClass;
-import soot.Type;
+import soot.*;
 
 public class SortedTypeHistory {
 
@@ -61,7 +57,7 @@ public class SortedTypeHistory {
   
   private SootClass getClass(Type type){
     RefType ref_type = (RefType) type;
-    return RootbeerScene.v().getClass(ref_type.getClassName());
+    return Scene.v().getSootClass(ref_type.getClassName());
   }
 
   private void doSort(List<Type> types) {

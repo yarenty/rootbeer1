@@ -38,7 +38,7 @@ public class BclQueueManager {
 
   private void commonCtor(){
     jimple = Jimple.v();
-    mQueueManagerClass = RootbeerScene.v().getClass("edu.syr.pcpratts.javaautogpu.runtime.QueueManager");
+    mQueueManagerClass = Scene.v().getSootClass("edu.syr.pcpratts.javaautogpu.runtime.QueueManager");
   }
 
   //Facade functions to support new style of code
@@ -87,7 +87,7 @@ public class BclQueueManager {
     mBcl = new BytecodeLanguage();
     mBcl.continueMethod(assembler);
 
-    SootClass peek_iterator_soot_class = RootbeerScene.v().getClass("edu.syr.pcpratts.util.PeekIterator");
+    SootClass peek_iterator_soot_class = Scene.v().getSootClass("edu.syr.pcpratts.util.PeekIterator");
     mBcl.pushMethod(mQueueManagerLocal, "iterator", peek_iterator_soot_class.getType());
     Local ret = mBcl.invokeMethodRet(mQueueManagerLocal);
     return ret;
