@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,7 +105,7 @@ public class ClassHierarchy {
 
     SootClass curr = next;
     while(true){
-      if(curr.isLibraryClass())
+      if(FastWholeProgram.v().isApplicationClass(curr) == false)
         return false;
       if(hasSuperClass(curr) == false)
         return false;

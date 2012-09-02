@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.compiler;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public class ClassRemappingTransform {
     for(String method : reachable_methods){
       String cls_name = sig_util.classFromMethodSig(method);
       SootClass soot_class = Scene.v().getSootClass(cls_name);
-      m_appClass = soot_class.isApplicationClass();
+      m_appClass = FastWholeProgram.v().isApplicationClass(soot_class);
       m_currClass = cls_name;
       String sub_sig = sig_util.methodSubSigFromMethodSig(method);
       SootMethod soot_method = soot_class.getMethod(sub_sig);
@@ -63,7 +64,7 @@ public class ClassRemappingTransform {
   
   public void run(String cls) {
     SootClass soot_class = Scene.v().getSootClass(cls);
-    run(cls, soot_class.isApplicationClass());
+    run(cls, FastWholeProgram.v().isApplicationClass(soot_class));
   }
   
   private void run(String cls, boolean app_class){

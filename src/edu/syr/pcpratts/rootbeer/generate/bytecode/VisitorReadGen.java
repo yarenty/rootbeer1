@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
@@ -220,7 +221,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     
     bcl.ifStmt(ctor_used, "==", IntConstant.v(0), label);
     String name = soot_class.getName();
-    if(soot_class.isLibraryClass()){    
+    if(FastWholeProgram.v().isApplicationClass(soot_class) == false){    
       if(soot_class.declaresMethod("void <init>()")){
         Local new_object = bcl.newInstance(name);
         bcl.assign(object_to_write_to, new_object); 
@@ -252,7 +253,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
   }
   
   private void readFields(SootClass curr_class, boolean ref_types){
-    if(curr_class.isApplicationClass()){
+    if(FastWholeProgram.v().isApplicationClass(curr_class)){
       attachReader(curr_class.getName(), ref_types);
       callBaseClassReader(curr_class.getName(), ref_types);
     } else {
@@ -317,7 +318,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
       RefType ref_type = (RefType) type_to_create;
       
       SootClass soot_class = getClassForType(ref_type);
-      if(soot_class.isLibraryClass()){    
+      if(FastWholeProgram.v().isApplicationClass(soot_class) == false){    
         if(soot_class.declaresMethod("void <init>()") == false){
           return;
         }
@@ -339,7 +340,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
       
       SootClass soot_class = getClassForType(ref_type);
       String name = ref_type.getClassName(); 
-      if(soot_class.isLibraryClass()){    
+      if(FastWholeProgram.v().isApplicationClass(soot_class) == false){    
         if(soot_class.declaresMethod("void <init>()")){
           new_object = bcl.newInstance(name);
         }
@@ -397,7 +398,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     SootClass curr_class = Scene.v().getSootClass(class_name);
     SootClass parent = curr_class.getSuperclass();
     parent = Scene.v().getSootClass(parent.getName());
-    if(parent.isApplicationClass()){
+    if(FastWholeProgram.v().isApplicationClass(parent)){
       attachReader(parent.getName(), ref_fields);
     }
     
@@ -414,7 +415,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     doReader(class_name, ref_fields);
     
     if(parent.getName().equals("java.lang.Object") == false){
-      if(parent.isApplicationClass()){
+      if(FastWholeProgram.v().isApplicationClass(parent)){
         callBaseClassReader(parent.getName(), ref_fields);
       } else {
         insertReader(parent.getName(), ref_fields);
@@ -441,7 +442,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     SootClass parent = curr_class.getSuperclass();
     parent = Scene.v().getSootClass(parent.getName());
     if(parent.getName().equals("java.lang.Object") == false){
-      if(parent.isApplicationClass()){
+      if(FastWholeProgram.v().isApplicationClass(parent)){
         attachReader(parent.getName(), ref_fields);
         callBaseClassReader(parent.getName(), ref_fields);
       } else {

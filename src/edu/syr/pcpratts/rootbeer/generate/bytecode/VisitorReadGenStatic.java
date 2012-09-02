@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraph;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraphNode;
@@ -59,7 +60,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     List<PermissionGraphNode> roots = graph.getRoots();
     for(PermissionGraphNode node : roots){
       SootClass soot_class = node.getSootClass();
-      if(soot_class.isApplicationClass()){
+      if(FastWholeProgram.v().isApplicationClass(soot_class)){
         attachAndCallReader(soot_class, node.getChildren());
       } else {
         doReader(soot_class);
@@ -157,7 +158,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
         Local ref = bcl_mem.readRef();
         bcl_mem.useInstancePointer();
         
-        if(soot_class.isApplicationClass()){
+        if(FastWholeProgram.v().isApplicationClass(soot_class)){
           bcl_mem.useStaticPointer();
           bcl_mem.setAddress(LongConstant.v(m_StaticOffsets.getIndex(field)));
           field_value = bcl_mem.readVar(field.getType().getSootType());
@@ -189,7 +190,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
         continue;
       }
       
-      if(soot_class.isApplicationClass()){
+      if(FastWholeProgram.v().isApplicationClass(soot_class)){
         bcl.setStaticField(field.getSootField(), field_value);
       } else {
         SootClass string = Scene.v().getSootClass("java.lang.String");

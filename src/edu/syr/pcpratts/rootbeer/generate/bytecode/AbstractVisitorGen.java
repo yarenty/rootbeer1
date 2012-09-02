@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -125,7 +126,7 @@ public class AbstractVisitorGen {
     SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
     SootClass string = Scene.v().getSootClass("java.lang.String");
     Local original_field_value;
-    if(soot_class.isLibraryClass()){
+    if(FastWholeProgram.v().isApplicationClass(soot_class) == false){
       bcl.pushMethod(gc_obj_visit, "readField", obj_class.getType(), obj_class.getType(), string.getType());       
       original_field_value = bcl.invokeMethodRet(gc_obj_visit, m_ObjSerializing.top(), StringConstant.v(soot_field.getName()));
     } else {
@@ -143,7 +144,7 @@ public class AbstractVisitorGen {
     Type type = soot_field.getType();
     Local ret = bcl.cast(type, ret_obj);
 
-    if(soot_class.isLibraryClass()){
+    if(FastWholeProgram.v().isApplicationClass(soot_class) == false){
       bcl.pushMethod(gc_obj_visit, "writeField", VoidType.v(), obj_class.getType(), string.getType(), obj_class.getType());       
       bcl.invokeMethodNoRet(gc_obj_visit, m_ObjSerializing.top(), StringConstant.v(soot_field.getName()), ret);
     } else {
@@ -166,7 +167,7 @@ public class AbstractVisitorGen {
     Local data = bcl.invokeMethodRet(m_CurrMem.top());
 
     SootClass soot_class = Scene.v().getSootClass(soot_field.getDeclaringClass().getName());
-    if(soot_class.isApplicationClass()){
+    if(FastWholeProgram.v().isApplicationClass(soot_class)){
       if(field.isInstance()){
         bcl.setInstanceField(soot_field, m_ObjSerializing.top(), data);
       } else {

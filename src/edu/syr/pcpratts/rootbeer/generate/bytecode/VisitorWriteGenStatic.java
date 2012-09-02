@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
+import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraph;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraphNode;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -51,7 +52,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     List<PermissionGraphNode> roots = graph.getRoots();
     for(PermissionGraphNode node : roots){
       SootClass soot_class = node.getSootClass();
-      if(soot_class.isApplicationClass()){
+      if(FastWholeProgram.v().isApplicationClass(soot_class)){
         attachAndCallWriter(soot_class, node.getChildren());
       } else {
         doWriter(soot_class);
@@ -141,7 +142,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     SootClass obj = Scene.v().getSootClass("java.lang.Object");
     for(OpenCLField field : static_fields){
       Local field_value;
-      if(soot_class.isApplicationClass()){
+      if(FastWholeProgram.v().isApplicationClass(soot_class)){
         field_value = bcl.refStaticField(soot_class.getType(), field.getName());
       } else {
         SootClass string = Scene.v().getSootClass("java.lang.String");
