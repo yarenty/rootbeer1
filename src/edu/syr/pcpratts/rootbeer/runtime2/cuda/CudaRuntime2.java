@@ -58,6 +58,9 @@ public class CudaRuntime2 implements ParallelRuntime {
   private int m_GridShape;
   private long m_MaxGridDim;
   private long m_NumMultiProcessors;
+  private long m_serializationTime;
+  private long m_executionTime;
+  private long m_deserializationTime;
   
   private List<Kernel> m_JobsToWrite;
   private List<Kernel> m_JobsWritten;
@@ -135,9 +138,10 @@ public class CudaRuntime2 implements ParallelRuntime {
     Stopwatch watch = new Stopwatch();
     watch.start();
     runOnGpu();
-    watch.stopAndPrint("GPU time: ");
-        
-    readBlocks();
+    watch.stop();
+    m_executionTime = watch.elapsedTimeMillis();
+    
+    readBlocks();  
     unload();
         
     runExtraBlocks();
@@ -223,7 +227,8 @@ public class CudaRuntime2 implements ParallelRuntime {
     
     m_Partial.addNotWritten(m_NotWritten);
     
-    watch.stopAndPrint("write time: ");   
+    watch.stop();
+    m_serializationTime = watch.elapsedTimeMillis();
     
     if(Configuration.getRunAllTests() == false){
       BufferPrinter printer = new BufferPrinter();
@@ -346,6 +351,9 @@ public class CudaRuntime2 implements ParallelRuntime {
     for(int i = 0; i < m_NumCores; ++i){
       m_Readers.get(i).join();  
     }
+    
+    watch.stop();
+    m_deserializationTime = watch.elapsedTimeMillis();
   }
   
   private void runExtraBlocks(){
@@ -372,5 +380,17 @@ public class CudaRuntime2 implements ParallelRuntime {
 
   public boolean isGpuPresent() {
     return true;
+  }
+
+  public long getExecutionTime() {
+    return m_executionTime;
+  }
+
+  public long getSerializationTime() {
+    return m_serializationTime;
+  }
+  
+  public long getDeserializationTime() {
+    return m_deserializationTime;
   }
 }

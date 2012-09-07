@@ -26,4 +26,16 @@ public class Rootbeer implements IRootbeer {
   public Iterator<Kernel> run(Iterator<Kernel> jobs) {
     return m_Rootbeer.run(jobs);
   }
+  
+  public long getExecutionTime() {
+    return m_Rootbeer.getExecutionTime();  
+  }
+  
+  public long getSerializationTime() {
+    return m_Rootbeer.getSerializationTime();
+  }
+  
+  public long getDeserializationTime() {
+    return m_Rootbeer.getDeserializationTime();
+  }
 }
