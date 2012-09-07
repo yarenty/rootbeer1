@@ -67,4 +67,16 @@ public class ConcreteRootbeer implements IRootbeer {
     PartiallyCompletedParallelJob partial = NativeCpuRuntime.v().run(jobs);
     return new ResultIterator(partial, NativeCpuRuntime.v());
   }
+
+  public long getExecutionTime() {
+    return CudaRuntime2.v().getExecutionTime();
+  }
+  
+  public long getSerializationTime() {
+    return CudaRuntime2.v().getSerializationTime();
+  }
+  
+  public long getDeserializationTime() {
+    return CudaRuntime2.v().getDeserializationTime();
+  }
 }
