@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.TypeHistory;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
@@ -381,10 +382,8 @@ public class OpenCLScene {
     
     SignatureUtil util = new SignatureUtil();
     
-    Set<String> dfs_methods = FastWholeProgram.v().getDfsMethods(m_codeSegment.getRootMethod());
-    Iterator<String> iter = dfs_methods.iterator();
-    while(iter.hasNext()){
-      String sig = iter.next();
+    List<String> methods = RootbeerScene.v().getForwardReachableMethods();
+    for(String sig : methods){
       SootClass soot_class = Scene.v().getSootClass(util.classFromMethodSig(sig));
       addMethod(soot_class.getMethod(util.methodSubSigFromMethodSig(sig)));
     }

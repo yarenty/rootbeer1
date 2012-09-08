@@ -23,13 +23,14 @@ public class KernelReachableMethods {
   private List<String> m_kernelClasses;
   private List<String> m_intoGpuMethod;
   private Set<String> m_visited;
+  private List<String> m_forwardReachables;
   
-  public List<String> get(List<String> kernel_classes){
+  public List<String> get(String kernel_class){
     m_ret = new ArrayList<String>();
-    m_kernelClasses = kernel_classes;
-    for(String kernel_class : kernel_classes){
-      find(kernel_class);
-    }
+    m_forwardReachables = new ArrayList<String>();
+    m_kernelClasses = new ArrayList<String>();
+    m_kernelClasses.add(kernel_class);
+    find(kernel_class);
     String[] array_ret = new String[m_ret.size()];
     array_ret = m_ret.toArray(array_ret);
     Arrays.sort(array_ret);
@@ -39,20 +40,29 @@ public class KernelReachableMethods {
     }
     return m_ret;
   }
+  
+  public List<String> getForward(){
+    return m_forwardReachables;
+  }
 
   private void find(String kernel_class) {
     SootClass soot_class = Scene.v().getSootClass(kernel_class);
     SootMethod gpuMethod = soot_class.getMethodByName("gpuMethod");
     m_visited = new HashSet<String>();
     dfs(gpuMethod);
+    m_forwardReachables.addAll(m_ret);
     
-    Chain<SootClass> scene_classes = Scene.v().getApplicationClasses();
     m_intoGpuMethod = new ArrayList<String>();
     addClass(soot_class);
     int prev_size = -1;
     while(prev_size != m_intoGpuMethod.size()){
       prev_size = m_intoGpuMethod.size();
+      Chain<SootClass> scene_classes = Scene.v().getApplicationClasses();
+      List<SootClass> scene_list = new ArrayList<SootClass>();
       for(SootClass cls : scene_classes){
+        scene_list.add(cls);
+      }
+      for(SootClass cls : scene_list){
         search(cls.getName());
       }
     }
@@ -104,6 +114,7 @@ public class KernelReachableMethods {
     if(method.isConcrete() == false){
       return false;
     }
+    FastWholeProgram.v().loadToBodyLater(method.getSignature());
     Body body = method.retrieveActiveBody();
     if(body == null){
       return false;

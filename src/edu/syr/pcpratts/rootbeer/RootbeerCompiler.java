@@ -112,6 +112,7 @@ public class RootbeerCompiler {
     }
     
     Map<String, List<String>> reachables = new HashMap<String, List<String>>();
+    Map<String, List<String>> forward_reachables = new HashMap<String, List<String>>();
     List<String> all_reachables = new ArrayList<String>();
     
     for(String kernel : kernel_classes){
@@ -122,10 +123,9 @@ public class RootbeerCompiler {
       System.out.println("finding kernel reachable methods for: "+soot_class.getShortName()+"...");
     
       KernelReachableMethods reachable_finder = new KernelReachableMethods();
-      List<String> one_class = new ArrayList<String>();
-      one_class.add(kernel);
-      List<String> curr_reachables = reachable_finder.get(one_class);
-    
+      List<String> curr_reachables = reachable_finder.get(kernel);
+      forward_reachables.put(kernel, reachable_finder.getForward());
+      
       all_reachables.addAll(curr_reachables);
       reachables.put(kernel, curr_reachables);
     }
@@ -143,6 +143,7 @@ public class RootbeerCompiler {
     for(String cls : kernel_classes){
       List<String> curr_reachables = reachables.get(cls);
       RootbeerScene.v().setReachableMethods(curr_reachables);
+      RootbeerScene.v().setForwardReachables(forward_reachables.get(cls));
       
       SootClass soot_class = Scene.v().getSootClass(cls);
       SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");

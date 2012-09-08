@@ -26,6 +26,7 @@ public class RootbeerScene {
   private List<String> m_addedClasses;
   private List<String> m_reachables;
   private List<SootClass> m_allClasses;
+  private List<String> m_forwardReachables;
   
   public RootbeerScene(){
     m_addedClasses = new ArrayList<String>();
@@ -46,6 +47,10 @@ public class RootbeerScene {
   public void setReachableMethods(List<String> reachables) {
     m_reachables = reachables;
   }
+  
+  public void setForwardReachables(List<String> reachables) {
+    m_forwardReachables = reachables;
+  }
 
   public List<String> getReachableMethods() {
     return m_reachables;
@@ -59,5 +64,9 @@ public class RootbeerScene {
     if(m_allClasses.contains(soot_class) == false){
       m_allClasses.add(soot_class);
     }
+  }
+
+  public List<String> getForwardReachableMethods() {
+    return m_forwardReachables;
   }
 }
