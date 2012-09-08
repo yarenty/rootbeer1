@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer;
 
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
+import java.util.ArrayList;
 import java.util.List;
 import soot.*;
 import soot.jimple.InvokeExpr;
@@ -15,9 +16,40 @@ import soot.jimple.InvokeExpr;
 public class FindKernelForTestCase {
 
   private List<String> m_kernels;
+  private List<String> m_testCasePackages;
+  private String m_provider;
+  
+  public FindKernelForTestCase(){
+    m_testCasePackages = new ArrayList<String>();
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.otherpackage.");
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.otherpackage2.");
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.");
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.arraysum.");
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.baseconversion.");
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.");
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.");
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.ofcoarse.");
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.");
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.");
+  }
+  
+  public String getProvider(){
+    return m_provider;
+  }
   
   public String get(String test_case, List<String> kernels){
     m_kernels = kernels;
+    
+    if(test_case.contains(".") == false){
+      String new_test_case = findTestCaseClass(test_case);
+      if(new_test_case == null){
+        System.out.println("cannot find test case class: "+test_case);
+        System.exit(0);
+      }
+      test_case = new_test_case;
+    }
+    m_provider = test_case;
+    
     SootClass test_class = Scene.v().getSootClass(test_case);
     List<SootMethod> methods = test_class.getMethods();
     for(SootMethod method : methods){
@@ -40,6 +72,16 @@ public class FindKernelForTestCase {
         if(m_kernels.contains(to_call.getName())){
           return to_call.getName();
         }
+      }
+    }
+    return null;
+  }
+
+  private String findTestCaseClass(String test_case) {
+    for(String pkg : m_testCasePackages){
+      String name = pkg + test_case;
+      if(Scene.v().containsClass(name)){
+        return name;
       }
     }
     return null;

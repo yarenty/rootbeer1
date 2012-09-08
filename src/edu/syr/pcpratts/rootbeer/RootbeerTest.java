@@ -27,6 +27,8 @@ public class RootbeerTest {
         compiler.compile(rootbeer_jar, dest_jar, test_case);
       }
       
+      test_case = compiler.getProvider();
+      
       JarClassLoader loader_factory = new JarClassLoader(dest_jar);
       ClassLoader cls_loader = loader_factory.getLoader();
       Thread.currentThread().setContextClassLoader(cls_loader);

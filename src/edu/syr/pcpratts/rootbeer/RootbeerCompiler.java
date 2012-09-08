@@ -35,6 +35,7 @@ public class RootbeerCompiler {
   private String m_classOutputFolder;
   private String m_jimpleOutputFolder;
   private FastWholeProgram m_fastLoader;
+  private String m_provider;
   
   public RootbeerCompiler(){
     clearOutputFolders();
@@ -82,6 +83,7 @@ public class RootbeerCompiler {
     
     FindKernelForTestCase finder = new FindKernelForTestCase();
     String kernel = finder.get(test_case, m_fastLoader.getApplicationClasses());
+    m_provider = finder.getProvider();
     m_fastLoader.findKernelClasses(kernel); 
     
     List<String> kernel_classes = new ArrayList<String>();
@@ -462,5 +464,9 @@ public class RootbeerCompiler {
     deleter.delete(Constants.OUTPUT_JAR_FOLDER);
     deleter.delete(Constants.OUTPUT_CLASS_FOLDER);
     deleter.delete(Constants.OUTPUT_SHIMPLE_FOLDER);
+  }
+
+  public String getProvider() {
+    return m_provider;
   }
 }
