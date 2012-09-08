@@ -136,9 +136,13 @@ public class RootbeerCompiler {
     
     if(!Main.disable_class_remapping()){
       System.out.println("remapping some classes to GPU versions...");
-      transform = new ClassRemappingTransform(false);
-      transform.run(all_reachables);
-      transform.finishClone();
+      Iterator<String> iter = reachables.keySet().iterator();
+      while(iter.hasNext()){
+        List<String> curr_reachables = reachables.get(iter.next());
+        transform = new ClassRemappingTransform(false);
+        transform.run(curr_reachables);
+        transform.finishClone();
+      }
     }
     
     Transform2 transform2 = new Transform2();

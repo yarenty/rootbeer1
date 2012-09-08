@@ -20,7 +20,16 @@ public class Rootbeer implements IRootbeer {
   }
 
   public void runAll(List<Kernel> jobs) {
-    m_Rootbeer.runAll(jobs);
+    if(jobs.isEmpty()){
+      return;
+    }
+    if(jobs.get(0) instanceof CompiledKernel == false){
+      for(Kernel job : jobs){
+        job.gpuMethod();
+      }
+    } else {
+      m_Rootbeer.runAll(jobs);
+    }
   }
 
   public Iterator<Kernel> run(Iterator<Kernel> jobs) {

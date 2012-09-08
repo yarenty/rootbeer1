@@ -106,6 +106,8 @@ public class ClassRemappingTransform {
     Iterator<SootField> iter = m_fieldsToFix.keySet().iterator();
     while(iter.hasNext()){
       SootField curr = iter.next();
+      SootClass soot_class = curr.getDeclaringClass();
+      m_appClass = FastWholeProgram.v().isApplicationClass(soot_class);
       SootField orig = curr;
       SootClass field_cls = curr.getDeclaringClass();
       if(shouldMap(field_cls)){
