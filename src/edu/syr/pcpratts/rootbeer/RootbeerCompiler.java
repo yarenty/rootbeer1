@@ -105,6 +105,12 @@ public class RootbeerCompiler {
   
   private void compileForKernels(String outname, List<String> kernel_classes) throws Exception {
     
+    if(kernel_classes.isEmpty()){
+      System.out.println("There are no kernel classes. Please implement the following interface to use rootbeer:");
+      System.out.println("edu.syr.pcpratts.rootbeer.runtime.Kernel");
+      System.exit(0);
+    }
+    
     String[] sorted = new String[kernel_classes.size()];
     sorted = kernel_classes.toArray(sorted);
     Arrays.sort(sorted);
