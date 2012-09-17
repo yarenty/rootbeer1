@@ -76,6 +76,7 @@ public class RootbeerCompiler {
   public void compile(String jar_filename, String outname, String test_case) throws Exception {
     Options.v().set_allow_phantom_refs(true);
     
+    extractJar(jar_filename);
     m_fastLoader.addPath(jar_filename);
     m_fastLoader.addClassPath(getRuntimeJars());
     m_fastLoader.init();
@@ -95,7 +96,11 @@ public class RootbeerCompiler {
   public void compile(String jar_filename, String outname) throws Exception {
     Options.v().set_allow_phantom_refs(true);
     
+    CurrJarName jar_name = new CurrJarName();
+    
+    extractJar(jar_filename);
     m_fastLoader.addPath(jar_filename);
+    m_fastLoader.addRootbeerPath(jar_name.get());
     m_fastLoader.addClassPath(getRuntimeJars());
     m_fastLoader.init();
     
@@ -498,5 +503,15 @@ public class RootbeerCompiler {
 
   public String getProvider() {
     return m_provider;
+  }
+
+  private void extractJar(String jar_filename) {
+    JarToFolder extractor = new JarToFolder();
+    try {
+      extractor.writeJar(jar_filename, Constants.JAR_CONTENTS_FOLDER);
+    } catch(Exception ex){
+      ex.printStackTrace();
+      System.exit(0);
+    }
   }
 }

@@ -432,8 +432,9 @@ public class OpenCLScene {
     SootMethod ctor_method = string_class.getMethod("void <init>(char[])");
     addMethod(ctor_method);
     
+    FastWholeProgram.v().loadToBodyLater("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadId()>");
     SootClass rootbeer_gpu_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
-    SootMethod getThreadId = rootbeer_gpu_class.getMethodByName("getThreadId");
+    SootMethod getThreadId = rootbeer_gpu_class.getMethod("int getThreadId()");
     addMethod(getThreadId);
     
     ArrayType char_array = ArrayType.v(CharType.v(), 1);

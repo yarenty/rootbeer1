@@ -136,8 +136,8 @@ public class VisitorGen extends AbstractVisitorGen {
         
     if(type instanceof ArrayType){
       ArrayType atype = (ArrayType) type;
-      SootClass constants_soot_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.generate.bytecode.Constants");
-      Local size = m_Bcl.top().refStaticField(constants_soot_class.getType(), "ArrayOffsetSize");
+      Local size = m_Bcl.top().local(IntType.v());
+      m_Bcl.top().assign(size, IntConstant.v(Constants.ArrayOffsetSize));
       Local element_size = m_Bcl.top().local(IntType.v());
       OpenCLType ocl_type = new OpenCLType(atype.baseType);
       if(atype.numDimensions == 1)

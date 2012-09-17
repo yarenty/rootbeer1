@@ -272,7 +272,7 @@ public class FastClassResolver {
   }
 
   private InputStream getInputStream(String className) throws Exception {
-    String filename = m_tempFolder+"/"+className.replace(".", File.separator) +".class";
+    String filename = m_tempFolder+File.separator+className.replace(".", File.separator) +".class";
     File file = new File(filename);
     if(file.exists()){
       return new FileInputStream(filename);
