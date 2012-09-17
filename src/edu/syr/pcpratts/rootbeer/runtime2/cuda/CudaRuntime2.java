@@ -9,7 +9,6 @@ package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
 import edu.syr.pcpratts.rootbeer.Configuration;
 import edu.syr.pcpratts.rootbeer.Constants;
-import edu.syr.pcpratts.rootbeer.Main;
 import edu.syr.pcpratts.rootbeer.runtime.Serializer;
 import edu.syr.pcpratts.rootbeer.runtime.ParallelRuntime;
 import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
@@ -21,10 +20,13 @@ import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
 import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
+import org.xml.sax.InputSource;
 
 public class CudaRuntime2 implements ParallelRuntime {
 
@@ -84,7 +86,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_BlockShaper = new BlockShaper();
     // the 200*1024*1024 factor here is the amount of free memory that should NOT
     // be allocated for transfering data to and from the gpu
-    setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), 200*1024*1024);
+    setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), getReserveMem());
     m_JobsToWrite = new ArrayList<Kernel>();
     m_JobsWritten = new ArrayList<Kernel>();  
     m_NotWritten = new ArrayList<Kernel>();
@@ -109,6 +111,44 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_CpuRunner = new CpuRunner();
     watch.stopAndPrint("CudaRuntime2 ctor: ");
   }
+  
+  private int getReserveMem(){
+    String home = System.getProperty("user.home");
+    File folder = new File(home+File.separator+".rootbeer"+File.separator);
+    File file = new File(folder.getAbsolutePath()+File.separator+"config");
+    if(folder.exists() == false || file.exists() == false){
+      int reserve_mem = findReserveMem(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock());
+      Properties props = new Properties();
+      props.setProperty("reserve_mem", Integer.toString(reserve_mem));
+      folder.mkdirs();
+      try {
+        OutputStream fout = new FileOutputStream(file);
+        OutputStreamWriter writer = new OutputStreamWriter(fout);
+        props.store(writer, "");
+        writer.flush();
+        fout.flush();
+        writer.close();
+        fout.close();
+        return reserve_mem;
+      } catch(Exception ex){
+        ex.printStackTrace();
+        return reserve_mem;
+      }
+    } else {
+      try {
+        InputStream fin = new FileInputStream(file);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
+        Properties props = new Properties();
+        props.load(reader);
+        return Integer.parseInt(props.getProperty("reserve_mem"));
+      } catch(Exception ex){
+        ex.printStackTrace();
+        return findReserveMem(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock());
+      }
+    }
+  }
+  
+  private native int findReserveMem(int max_blocks, int max_threads);
   
   public void memoryTest(){
     MemoryTest test = new MemoryTest();

@@ -134,6 +134,73 @@ void getBestDevice(JNIEnv *env){
 
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
+ * Method:    findReserveMem
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_findReserveMem
+  (JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block)
+{
+  size_t to_space_size;
+  size_t temp_size;
+  int status;
+  int deviceCount = 0;
+  jint i;
+  size_t f_mem;
+  size_t t_mem;
+  jint num_blocks;
+
+  status = cuInit(0);
+  CHECK_STATUS(env,"error in cuInit",status)
+          
+  status = cuDeviceGetCount(&deviceCount);
+  CHECK_STATUS(env,"error in cuDeviceGetCount",status)
+
+  getBestDevice(env);
+
+  status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
+  CHECK_STATUS(env,"error in cuCtxCreate",status)
+  
+  status = cuMemGetInfo (&f_mem, &t_mem);
+  CHECK_STATUS(env,"error in cuMemGetInfo",status)
+          
+  to_space_size = f_mem;
+  
+  num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
+  
+  gc_space_size = 1024;
+  to_space_size -= (num_blocks * sizeof(jlong));
+  to_space_size -= (num_blocks * sizeof(jlong));
+  to_space_size -= gc_space_size;
+
+  printf("automatically determining CUDA reserve space...\n");
+
+  for(i = 1024L*1024L; i < to_space_size; i += 200L*1024L*1024L){
+    temp_size = to_space_size - i;
+  
+    printf("attempting allocation with size: %ld\n", temp_size);
+ 
+    status = cuMemHostAlloc(&toSpace, temp_size, 0);  
+    cuMemFreeHost(toSpace);
+
+    if(status != CUDA_SUCCESS){
+      continue;
+    }
+    
+    status = cuMemAlloc(&gpuToSpace, temp_size);
+    cuMemFree(gpuToSpace);
+
+    if(status != CUDA_SUCCESS){
+      continue;
+    }
+
+    return i;
+  }
+  throw_cuda_errror_exception(env, "unable to find enough space using CUDA", 0); 
+  return 0;
+}
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  * Method:    printDeviceInfo
  * Signature: ()V
  */
@@ -239,9 +306,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   
   status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
   CHECK_STATUS(env,"error in cuCtxCreate",status)
-  
-  // ddb - not using this as this returns the total memory not the free memory
-  //to_space_size = memSize();
   
   status = cuMemGetInfo (&f_mem, &t_mem);
   CHECK_STATUS(env,"error in cuMemGetInfo",status)
