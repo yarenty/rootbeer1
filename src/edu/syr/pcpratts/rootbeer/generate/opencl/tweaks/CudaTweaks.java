@@ -40,7 +40,7 @@ public class CudaTweaks extends Tweaks {
     return "/edu/syr/pcpratts/rootbeer/generate/opencl/CudaKernel.c";
   }
 
-  public List<byte[]> compileProgram(String cuda_code) {
+  public CompileResult compileProgram(String cuda_code) {
     try {      
       
       File pre_dead = new File("pre_dead.cu");
@@ -80,7 +80,10 @@ public class CudaTweaks extends Tweaks {
       }
       
       CompilerRunner runner = new CompilerRunner();
-      runner.run(command);      
+      List<String> errors = runner.run(command);      
+      if(errors.isEmpty() == false){
+        return new CompileResult(null, errors);
+      }
         
       List<byte[]> file_contents = null;
       try {
@@ -89,7 +92,7 @@ public class CudaTweaks extends Tweaks {
         file_contents = new ArrayList<byte[]>();
         ex.printStackTrace();
       }
-      return file_contents;
+      return new CompileResult(file_contents, errors);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }

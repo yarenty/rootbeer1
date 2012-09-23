@@ -49,14 +49,6 @@ This work is supported by the National Science Foundation.
 You need to have the CUDA Toolkit and CUDA Driver installed to use Rootbeer.
 Download it from http://www.nvidia.com/content/cuda/cuda-downloads.html
 
-## Test Servers
-
-We are looking for people to provide test machines accessible over the internet.
-We would like to be able to run all the test cases every time a push is made
-to github on Windows, Linux and Mac on a variety of GPU models. Please email
-pcpratts@chirrup.org if you are have resources and are interested in helping 
-out.
-
 ## Information about Rootbeer
 
 Rootbeer announcements are pushed to @rootbeer_gpu

@@ -94,13 +94,17 @@ public class RootbeerCompiler {
   }
   
   public void compile(String jar_filename, String outname) throws Exception {
+    compile(jar_filename, outname, false);
+  }
+  
+  public void compile(String jar_filename, String outname, boolean run_tests) throws Exception {
     Options.v().set_allow_phantom_refs(true);
     
     CurrJarName jar_name = new CurrJarName();
     
     extractJar(jar_filename);
     m_fastLoader.addPath(jar_filename);
-    m_fastLoader.addRootbeerPath(jar_name.get());
+    m_fastLoader.addRootbeerPath(jar_name.get(), run_tests);
     m_fastLoader.addClassPath(getRuntimeJars());
     m_fastLoader.init();
     

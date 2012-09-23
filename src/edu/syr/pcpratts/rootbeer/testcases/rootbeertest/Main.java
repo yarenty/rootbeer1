@@ -17,24 +17,7 @@ import java.util.List;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer4Test;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.*;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.RemapTest;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteArrays;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CharArrays;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArrays;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.FloatArrays;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.GpuListTest;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.IntArrays;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LongArrays;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.NativeStrictMathTest;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.OuterClassTest;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.OuterClassTest2;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.OuterClassTest3;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.RefTypeArrays;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.SameClassUsedTwiceTest1;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.SameClassUsedTwiceTest2;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ShortArrays;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.SimpleTest;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.StrictMathTest;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.StringTest;
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.*;
 
 public class Main implements TestSerializationFactory {
 
@@ -78,6 +61,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new WhileTrueTest());
     ret.add(new ArraySumTest());
     ret.add(new RemapTest());
+    ret.add(new InstanceofTest());
     return ret;
   }
 }

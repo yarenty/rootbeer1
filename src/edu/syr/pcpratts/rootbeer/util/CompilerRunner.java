@@ -15,21 +15,23 @@ import java.util.List;
 
 public class CompilerRunner {
 
-  public void run(String command) {
+  public List<String> run(String command) {
     try {
       System.out.println("compiling CUDA code...");
+      List<String> ret = new ArrayList<String>();
       Process p = Runtime.getRuntime().exec(command);
       StreamReader reader1 = new StreamReader(p.getInputStream());
       StreamReader reader2 = new StreamReader(p.getErrorStream());
       reader1.join();
       reader2.join();
-      int ret = p.waitFor();
-      if(ret != 0){
-        System.out.println("CUDA Compile failed: "+ret);
+      int error_code = p.waitFor();
+      if(error_code != 0){
         reader1.print();
         reader2.print();
-        System.exit(0);
+        ret.addAll(reader1.m_Lines);
+        ret.addAll(reader2.m_Lines);
       } 
+      return ret;
     } catch (Exception ex) {
       ex.printStackTrace();
       throw new RuntimeException(ex);

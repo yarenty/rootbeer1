@@ -130,9 +130,11 @@ public class FastWholeProgram {
     m_cgWorkQueue = new LinkedList<String>();
   }
 
-  public void addRootbeerPath(String path) {
+  public void addRootbeerPath(String path, boolean run_tests) {
     m_paths.add(path);
-    m_keepPackages.remove("edu.syr.pcpratts.rootbeer.testcases.");
+    if(run_tests == false){
+      m_keepPackages.remove("edu.syr.pcpratts.rootbeer.testcases.");
+    }
   }
 
   /**

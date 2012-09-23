@@ -14,6 +14,7 @@ import edu.syr.pcpratts.rootbeer.generate.codesegment.LoopCodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.MethodCodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.misc.BasicBlock;
+import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CompileResult;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -144,10 +145,16 @@ public class GenerateRuntimeBasicBlock {
   private void makeGpuBody() throws Exception {
     OpenCLScene.v().addCodeSegment(codeSegment);
     if(Configuration.compilerInstance().getMode() == Configuration.MODE_GPU){
-      List<byte[]> bytes = OpenCLScene.v().getCudaCode();
-      writeBytesToFile(bytes, cubinFilename(true));
-      makeGetCodeMethodThatReturnsBytes(cubinFilename(false));
-      makeGetCodeMethodThatReturnsString("");
+      CompileResult result = OpenCLScene.v().getCudaCode();
+      if(result.getBinary() == null){
+        makeGetCodeMethodThatReturnsBytes(cubinFilename(false)+".error");
+        makeGetCodeMethodThatReturnsString("");
+      } else {
+        List<byte[]> bytes = result.getBinary();
+        writeBytesToFile(bytes, cubinFilename(true));
+        makeGetCodeMethodThatReturnsBytes(cubinFilename(false));
+        makeGetCodeMethodThatReturnsString("");
+      }
     } else {
       String code = OpenCLScene.v().getOpenCLCode();
       makeGetCodeMethodThatReturnsString(code);

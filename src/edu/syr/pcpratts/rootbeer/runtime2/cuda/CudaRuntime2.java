@@ -172,6 +172,10 @@ public class CudaRuntime2 implements ParallelRuntime {
     if(any_jobs == false){
       return m_Partial;
     }
+    String filename = m_FirstJob.getCubin();
+    if(filename.endsWith(".error")){
+      return m_Partial;
+    }
     calculateShape();
     compileCode();
     

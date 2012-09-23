@@ -20,6 +20,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.fields.CompositeField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCodeGeneration;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldTypeSwitch;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
+import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CompileResult;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
@@ -280,7 +281,7 @@ public class OpenCLScene {
     return source_code;
   }
 
-  public List<byte[]> getCudaCode() throws Exception {
+  public CompileResult getCudaCode() throws Exception {
     String source_code = makeSourceCode();
     return new CudaTweaks().compileProgram(source_code);
   }
