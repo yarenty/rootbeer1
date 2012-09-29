@@ -453,9 +453,10 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   void * cubin_file;
   int offset;
   CUresult status;
+  char * native_filename;
   heapEndPtr = heap_end_ptr;
   
-  const char * native_filename = (*env)->GetStringUTFChars(env, filename, 0);
+  native_filename = (*env)->GetStringUTFChars(env, filename, 0);
   status = cuModuleLoad(&cuModule, native_filename);
   CHECK_STATUS(env, "error in cuModuleLoad", status);
   (*env)->ReleaseStringUTFChars(env, filename, native_filename);
