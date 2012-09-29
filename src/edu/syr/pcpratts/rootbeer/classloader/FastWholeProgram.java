@@ -10,29 +10,14 @@ package edu.syr.pcpratts.rootbeer.classloader;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
 import edu.syr.pcpratts.rootbeer.util.SystemOutHandler;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
-import soot.Value;
-import soot.ValueBox;
 import soot.jimple.InvokeExpr;
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
-import javax.swing.text.html.HTMLDocument;
 import soot.*;
-import soot.jimple.Stmt;
 import soot.util.Chain;
 
 public class FastWholeProgram {
@@ -436,7 +421,7 @@ public class FastWholeProgram {
         extractPath(root, subfolder + File.separator + child.getName());
       }
     } else {
-      String class_name = filenameToClass(File.separator + subfolder);
+      String class_name = filenameToClass(File.separator + subfolder, File.separator);
       m_applicationClasses.add(class_name);
       FileInputStream fin = new FileInputStream(full_name);
       FileOutputStream fout = new FileOutputStream(m_tempFolder + File.separator + subfolder);
@@ -460,7 +445,7 @@ public class FastWholeProgram {
           if(entry.getName().endsWith(".class") == false){
             continue;
           }
-          String class_name = filenameToClass(entry.getName());
+          String class_name = filenameToClass(entry.getName(), "/");
           if(ignorePackage(class_name) == false){
             m_applicationClasses.add(class_name);
           }
@@ -562,7 +547,7 @@ public class FastWholeProgram {
     File full_temp_folder = new File(m_tempFolder);
     name = name.substring(full_temp_folder.getAbsolutePath().length());
     if (isFilename(name)) {
-      name = filenameToClass(name);
+      name = filenameToClass(name, File.separator);
     }
     if (m_applicationClasses.contains(name) == false) {
       return;
@@ -580,8 +565,7 @@ public class FastWholeProgram {
     return false;
   }
 
-  private String filenameToClass(String name) {
-    String sep = "/";
+  private String filenameToClass(String name, String sep) {
     if (name.startsWith(sep)) {
       name = name.substring(sep.length());
     }

@@ -132,37 +132,26 @@ void getBestDevice(JNIEnv *env){
   numMultiProcessors = max_multiprocessors;
 }
 
-/*
- * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
- * Method:    findReserveMem
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_findReserveMem
-  (JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block)
+size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_block)
 {
   size_t to_space_size;
-  size_t temp_size;
   int status;
   int deviceCount = 0;
-  jint i;
   size_t f_mem;
   size_t t_mem;
   jint num_blocks;
-
-  status = cuInit(0);
-  CHECK_STATUS(env,"error in cuInit",status)
-          
+  
   status = cuDeviceGetCount(&deviceCount);
-  CHECK_STATUS(env,"error in cuDeviceGetCount",status)
+  CHECK_STATUS_RTN(env,"error in cuDeviceGetCount",status, 0);
 
   getBestDevice(env);
 
   status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
-  CHECK_STATUS(env,"error in cuCtxCreate",status)
+  CHECK_STATUS_RTN(env,"error in cuCtxCreate",status, 0)
   
   status = cuMemGetInfo (&f_mem, &t_mem);
-  CHECK_STATUS(env,"error in cuMemGetInfo",status)
-          
+  CHECK_STATUS_RTN(env,"error in cuMemGetInfo",status, 0)
+  
   to_space_size = f_mem;
   
   num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
@@ -171,28 +160,57 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   to_space_size -= (num_blocks * sizeof(jlong));
   to_space_size -= (num_blocks * sizeof(jlong));
   to_space_size -= gc_space_size;
+  
+  return to_space_size;
+}
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
+ * Method:    findReserveMem
+ * Signature: ()I
+ */
+JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_findReserveMem
+  (JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block)
+{
+  size_t to_space_size;
+  size_t temp_size;
+  int status;
+  int deviceCount = 0;
+  jlong prev_i;
+  jlong i;
+  size_t f_mem;
+  size_t t_mem;
+  jint num_blocks;
+
+  status = cuInit(0);
+  CHECK_STATUS(env,"error in cuInit",status)
 
   printf("automatically determining CUDA reserve space...\n");
-
-  for(i = 1024L*1024L; i < to_space_size; i += 200L*1024L*1024L){
+  
+  to_space_size = initContext(env, max_blocks_per_proc, max_threads_per_block);
+  
+  for(i = 1024L*1024L; i < to_space_size; i += 100L*1024L*1024L){
     temp_size = to_space_size - i;
   
-    printf("attempting allocation with size: %ld\n", temp_size);
+    printf("attempting allocation with temp_size: %lu to_space_size: %lu i: %ld\n", temp_size, to_space_size, i);
  
     status = cuMemHostAlloc(&toSpace, temp_size, 0);  
-    cuMemFreeHost(toSpace);
-
     if(status != CUDA_SUCCESS){
+	  cuCtxDestroy(cuContext);
+	  initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
+    } else {
+	  cuMemFreeHost(toSpace);
     }
     
     status = cuMemAlloc(&gpuToSpace, temp_size);
-    cuMemFree(gpuToSpace);
-
     if(status != CUDA_SUCCESS){
+	  cuCtxDestroy(cuContext);
+	  initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
-    }
-
+    } else {
+	  cuMemFree(gpuToSpace);
+	}
+	
     return i;
   }
   throw_cuda_errror_exception(env, "unable to find enough space using CUDA", 0); 
@@ -285,7 +303,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_setup
-  (JNIEnv *env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jint free_space)
+  (JNIEnv *env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
 {
   int status;
   jint num_blocks;

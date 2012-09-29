@@ -113,12 +113,12 @@ public class CudaRuntime2 implements ParallelRuntime {
     watch.stopAndPrint("CudaRuntime2 ctor: ");
   }
   
-  private int getReserveMem(){
+  private long getReserveMem(){
     File file = new File(RootbeerPaths.v().getConfigFile());
     if(file.exists() == false){
-      int reserve_mem = findReserveMem(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock());
+      long reserve_mem = findReserveMem(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock());
       Properties props = new Properties();
-      props.setProperty("reserve_mem", Integer.toString(reserve_mem));
+      props.setProperty("reserve_mem", Long.toString(reserve_mem));
       try {
         OutputStream fout = new FileOutputStream(file);
         OutputStreamWriter writer = new OutputStreamWriter(fout);
@@ -146,14 +146,14 @@ public class CudaRuntime2 implements ParallelRuntime {
     }
   }
   
-  private native int findReserveMem(int max_blocks, int max_threads);
+  private native long findReserveMem(int max_blocks, int max_threads);
   
   public void memoryTest(){
     MemoryTest test = new MemoryTest();
     test.run(m_ToSpace.get(0));
   }
   
-  private native void setup(int max_blocks_per_proc, int max_threads_per_block, int free_memory);
+  private native void setup(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
   
   /**
    * Prints the cuda device details to the screen

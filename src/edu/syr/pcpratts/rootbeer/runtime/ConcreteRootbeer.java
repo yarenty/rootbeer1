@@ -79,4 +79,9 @@ public class ConcreteRootbeer implements IRootbeer {
   public long getDeserializationTime() {
     return CudaRuntime2.v().getDeserializationTime();
   }
+  
+  public static void main(String[] args){
+    ConcreteRootbeer rootbeer = new ConcreteRootbeer();
+    
+  }
 }
