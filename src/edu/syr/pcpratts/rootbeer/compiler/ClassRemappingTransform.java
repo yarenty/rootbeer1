@@ -145,6 +145,9 @@ public class ClassRemappingTransform {
     if(m_classRemapping.containsKey(soot_class.getName())){
       return;
     }
+    if(method.isConcrete() == false){
+      return;
+    } 
     Body body = method.retrieveActiveBody();
     if(body == null)
       return;
