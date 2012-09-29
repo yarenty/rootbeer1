@@ -11,6 +11,7 @@ import edu.syr.pcpratts.rootbeer.Constants;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -54,5 +55,15 @@ public class ResourceReader {
     }
     is.close();
     return ret;
+  }
+
+  public static void writeToFile(String jar_filename, String dest_filename) throws IOException {
+    List<byte[]> bytes = getResourceArray(jar_filename);
+    FileOutputStream fout = new FileOutputStream(dest_filename);
+    for(byte[] byte_array : bytes){
+      fout.write(byte_array); 
+    }
+    fout.flush();
+    fout.close();
   }
 }

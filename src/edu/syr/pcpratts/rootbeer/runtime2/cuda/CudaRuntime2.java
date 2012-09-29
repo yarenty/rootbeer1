@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
 import edu.syr.pcpratts.rootbeer.Configuration;
 import edu.syr.pcpratts.rootbeer.Constants;
+import edu.syr.pcpratts.rootbeer.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.runtime.Serializer;
 import edu.syr.pcpratts.rootbeer.runtime.ParallelRuntime;
 import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
@@ -113,14 +114,11 @@ public class CudaRuntime2 implements ParallelRuntime {
   }
   
   private int getReserveMem(){
-    String home = System.getProperty("user.home");
-    File folder = new File(home+File.separator+".rootbeer"+File.separator);
-    File file = new File(folder.getAbsolutePath()+File.separator+"config");
-    if(folder.exists() == false || file.exists() == false){
+    File file = new File(RootbeerPaths.v().getConfigFile());
+    if(file.exists() == false){
       int reserve_mem = findReserveMem(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock());
       Properties props = new Properties();
       props.setProperty("reserve_mem", Integer.toString(reserve_mem));
-      folder.mkdirs();
       try {
         OutputStream fout = new FileOutputStream(file);
         OutputStreamWriter writer = new OutputStreamWriter(fout);
@@ -185,7 +183,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     watch.stop();
     m_executionTime = watch.elapsedTimeMillis();
     
-    readBlocks();  
+    readBlocks();
     unload();
         
     runExtraBlocks();
@@ -283,30 +281,18 @@ public class CudaRuntime2 implements ParallelRuntime {
   }
 
   private void compileCode() {
-    Stopwatch watch = new Stopwatch();
-    watch.start();
     String filename = m_FirstJob.getCubin();
-    List<byte[]> cubin = readCubin(filename);
-    int total_size = 0;
-    for(byte[] buffer : cubin){
-      total_size += buffer.length;
-    }
-    loadFunction(getHeapEndPtr(), cubin, cubin.size(), total_size, m_NumBlocksRun);
-    watch.stopAndPrint("compile code: ");
-  }
-  
-  private List<byte[]> readCubin(String filename) {
+    File file = new File(filename);
+    String dest_filename = RootbeerPaths.v().getRootbeerHome()+File.separator+file.getName();
     try {
-      return ResourceReader.getResourceArray(filename);
+      ResourceReader.writeToFile(filename, dest_filename);
     } catch(Exception ex){
-      ex.printStackTrace();
-      System.exit(-1);
-      return null;
+      ex.printStackTrace(); 
     }
+    loadFunction(getHeapEndPtr(), dest_filename, m_NumBlocksRun);
   }
   
-  private native void loadFunction(long heap_end_ptr, List<byte[]> cubin, int size, 
-    int total_size, int num_blocks);
+  private native void loadFunction(long heap_end_ptr, String filename, int num_blocks);
   private native int runBlocks(int size, int block_shape, int grid_shape);
   private native void unload();
 
@@ -343,7 +329,7 @@ public class CudaRuntime2 implements ParallelRuntime {
       BufferPrinter printer = new BufferPrinter();
       printer.print(m_ToSpace.get(0), 0, 720);
     }
-
+    
     for(int i = 0; i < m_NumBlocksRun; ++i){
       long ref = m_ExceptionHandles.readLong();
       if(ref != 0){

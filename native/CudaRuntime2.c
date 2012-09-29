@@ -220,7 +220,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  
     for (i = 0; i < num_devices; ++i)
     {
-    	  CUdevice dev;
+        CUdevice dev;
         status = cuDeviceGet(&dev, i);
         CHECK_STATUS(env,"error in cuDeviceGet",status)
 
@@ -448,20 +448,17 @@ void * readCubinFileFromBuffers(JNIEnv *env, jobject buffers, jint size, jint to
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_loadFunction
-  (JNIEnv *env, jobject this_obj, jlong heap_end_ptr, jobject buffers, jint size, 
-   jint total_size, jint num_blocks){
+  (JNIEnv *env, jobject this_obj, jlong heap_end_ptr, jstring filename, jint num_blocks){
 
   void * cubin_file;
   int offset;
   CUresult status;
   heapEndPtr = heap_end_ptr;
   
-  //void * cubin_file = readCubinFile("code_file.cubin");
-  cubin_file = readCubinFileFromBuffers(env, buffers, size, total_size);
-  status = cuModuleLoadData(&cuModule, cubin_file);
-  CHECK_STATUS(env,"error in cuModuleLoad",status)
-  
-  free(cubin_file);
+  const char * native_filename = (*env)->GetStringUTFChars(env, filename, 0);
+  status = cuModuleLoad(&cuModule, native_filename);
+  CHECK_STATUS(env, "error in cuModuleLoad", status);
+  (*env)->ReleaseStringUTFChars(env, filename, native_filename);
 
   status = cuModuleGetFunction(&cuFunction, cuModule, "_Z5entryPcS_PiPxS1_S0_i"); 
   CHECK_STATUS(env,"error in cuModuleGetFunction",status)
@@ -535,7 +532,7 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
 */
 
   status = cuFuncSetBlockShape(cuFunction, block_shape, 1, 1);
-  CHECK_STATUS_RTN(env,"error in cuFuncSetBlockShape",status, (jint)status)
+  CHECK_STATUS_RTN(env,"error in cuFuncSetBlockShape",status, (jint)status);
 
   status = cuLaunchGrid(cuFunction, grid_shape, 1);
   CHECK_STATUS_RTN(env,"error in cuLaunchGrid",status, (jint)status)

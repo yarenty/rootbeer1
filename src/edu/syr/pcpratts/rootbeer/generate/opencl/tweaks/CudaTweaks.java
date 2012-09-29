@@ -62,9 +62,9 @@ public class CudaTweaks extends Tweaks {
       writer.flush();
       writer.close();
 
-      File code_file = new File("code_file.cubin");
+      File code_file = new File("code_file.ptx");
       //String modelString = "-m"+System.getProperty("sun.arch.data.model");
-      String modelString = "";
+      String modelString = "-m64";
 
       String command;
       if(File.separator.equals("/")){
@@ -72,7 +72,7 @@ public class CudaTweaks extends Tweaks {
         if(cuda_path == null){
           cuda_path = "/usr/local/cuda/bin";
         }
-        command = cuda_path + "/nvcc "+modelString+" -arch sm_20 -cubin "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
+        command = cuda_path + "/nvcc "+modelString+" -arch sm_20 -ptx "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
       } else {
         GenerateClScript generate = new GenerateClScript();
         File cl_script = generate.execute(generated, code_file);
