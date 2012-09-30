@@ -33,14 +33,12 @@
     </repository>
   </distributionManagement>
 
-<!--
   <repositories>
     <repository>
       <id>ouroboros-cache</id>
-      <url>http://ouroboros.dyndns-free.com/maven</url>
+      <url>http://ouroboros.dyndns-free.com/artifactory/repo</url>
     </repository>
   </repositories>
--->
 
   <dependencies>
     <!-- need to be installed -->
