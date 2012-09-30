@@ -25,6 +25,7 @@ import soot.jimple.NewExpr;
 import soot.jimple.NewMultiArrayExpr;
 import soot.jimple.ParameterRef;
 import soot.jimple.ThisRef;
+import soot.util.NumberedString;
 
 public class ClassRemappingTransform {
 
@@ -195,15 +196,20 @@ public class ClassRemappingTransform {
       InvokeExpr expr = (InvokeExpr) value;
       SootMethodRef ref = expr.getMethodRef();
       SootClass soot_class = ref.declaringClass();
+      final NumberedString subSignature = ref.getSubSignature();
       if(shouldMap(soot_class)){
-        SootClass new_class = getMapping(soot_class);
-        SootMethod new_method = new_class.getMethod(ref.getSubSignature());
-        fixArguments(new_method);
-        expr.setMethodRef(new_method.makeRef());
+    	  SootClass new_class = getMapping(soot_class);
+    	  if (new_class.declaresMethod(subSignature)) {
+    		  SootMethod new_method = new_class.getMethod(subSignature);
+    		  fixArguments(new_method);
+    		  expr.setMethodRef(new_method.makeRef());
+    	  } else {
+    		  System.err.println("method not found: " + subSignature);
+    	  }
       } else {
-        if(soot_class.declaresMethod(ref.getSubSignature())){
-          SootMethod method = soot_class.getMethod(ref.getSubSignature());
-          fixArguments(method);
+    	  if(soot_class.declaresMethod(ref.getSubSignature())){
+    		  SootMethod method = soot_class.getMethod(ref.getSubSignature());
+    		  fixArguments(method);
         }     
       }
       ref = remapRef(ref);
