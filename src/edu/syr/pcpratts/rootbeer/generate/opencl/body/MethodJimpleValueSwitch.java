@@ -7,12 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
-import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLArrayType;
+import edu.syr.pcpratts.rootbeer.generate.opencl.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
-import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLMethod;
-import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
-import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
-import edu.syr.pcpratts.rootbeer.generate.opencl.UnitsSuitableForGpu;
 import java.util.List;
 import soot.ArrayType;
 import soot.DoubleType;
@@ -318,7 +314,9 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
 
   public void caseInstanceOfExpr(InstanceOfExpr arg0) {
-    mOutput.append("instanceof: <"+arg0.toString()+" >");
+    OpenCLScene.v().addInstanceof(arg0.getCheckType());
+    OpenCLInstanceof instance_of = new OpenCLInstanceof(arg0.getCheckType());
+    mOutput.append(instance_of.invokeExpr(arg0));
   }
 
   public void caseNewArrayExpr(NewArrayExpr arg0) {

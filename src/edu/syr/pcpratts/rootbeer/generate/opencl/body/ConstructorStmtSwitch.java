@@ -49,7 +49,7 @@ public class ConstructorStmtSwitch extends MethodStmtSwitch {
   @Override
   public void caseReturnVoidStmt(ReturnVoidStmt arg0) {
     if(m_EmitRetVoid)
-      m_Output.append("return;\n");
+      m_output.append("return;\n");
   }
   
   @Override
@@ -69,8 +69,8 @@ public class ConstructorStmtSwitch extends MethodStmtSwitch {
     if(soot_class.getName().equals("java.lang.Object"))
       return;
     OpenCLMethod ocl_method = new OpenCLMethod(soot_method, soot_class);
-    m_Output.append(ocl_method.getConstructorBodyInvokeString(sexpr));
-    m_Output.append(";\n");
+    m_output.append(ocl_method.getConstructorBodyInvokeString(sexpr));
+    m_output.append(";\n");
   }
 
   private boolean needsReWriting(SpecialInvokeExpr sexpr) {

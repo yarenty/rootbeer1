@@ -59,6 +59,7 @@ public class OpenCLScene {
   private ReadOnlyTypes m_readOnlyTypes;
   private TypeHistory m_typeHistory;
   private Map<ArrayType, List<Integer>> m_multiArrayDimensions;
+  private Set<OpenCLInstanceof> m_instanceOfs;
   
   static {
     m_curentIdent = 0;
@@ -73,6 +74,7 @@ public class OpenCLScene {
     m_methodHierarchies = new MethodHierarchies();
     m_types = new ArrayList<Type>();
     m_multiArrayDimensions = new HashMap<ArrayType, List<Integer>>();
+    m_instanceOfs = new HashSet<OpenCLInstanceof>();
   }
 
   private OpenCLScene(){
@@ -149,6 +151,13 @@ public class OpenCLScene {
 
   public int getClassType(SootClass soot_class){
     return getClassType(soot_class.getType());
+  }
+  
+  public void addInstanceof(Type type){
+    OpenCLInstanceof to_add = new OpenCLInstanceof(type);
+    if(m_instanceOfs.contains(to_add) == false){
+      m_instanceOfs.add(to_add);
+    }
   }
 
   public void addMethod(SootMethod soot_method){
@@ -318,6 +327,9 @@ public class OpenCLScene {
     for(OpenCLArrayType array_type : m_arrayTypes){
       protos.add(array_type.getPrototypes());
     }
+    for(OpenCLInstanceof type : m_instanceOfs){
+      protos.add(type.getPrototype());
+    }
     Iterator<String> iter = protos.iterator();
     while(iter.hasNext()){
       ret.append(iter.next());
@@ -353,6 +365,9 @@ public class OpenCLScene {
     bodies.add(field_bodies);
     for(OpenCLArrayType array_type : m_arrayTypes){
       bodies.add(array_type.getBodies());
+    }
+    for(OpenCLInstanceof type : m_instanceOfs){
+      bodies.add(type.getBody());
     }
     Iterator<String> iter = bodies.iterator();
     ret.append(type_switch.getFunctions());
