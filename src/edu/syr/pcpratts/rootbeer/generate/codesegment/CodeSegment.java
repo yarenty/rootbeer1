@@ -19,8 +19,6 @@ public interface CodeSegment {
   public List<Local> getInputArguments();
   public List<Local> getOutputArguments();
   public FieldReadWriteInspector getReadWriteFieldInspector();
-  public void findAllUsedMethodsAndFields();
-  public void findAllUsedArrayTypes();
   public SootClass getSootClass();
   public List<Value> getInputValues();
   public List<Type> getParameterTypes();

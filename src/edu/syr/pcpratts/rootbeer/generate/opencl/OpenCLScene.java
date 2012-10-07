@@ -8,13 +8,10 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.Constants;
-import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
-import edu.syr.pcpratts.rootbeer.generate.bytecode.TypeHistory;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.ReadOnlyTypes;
-import edu.syr.pcpratts.rootbeer.generate.bytecode.SortedTypeHistory;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.CompositeField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCodeGeneration;
@@ -57,7 +54,6 @@ public class OpenCLScene {
   private int m_endOfStatics;
   private List<Type> m_types;
   private ReadOnlyTypes m_readOnlyTypes;
-  private TypeHistory m_typeHistory;
   private Map<ArrayType, List<Integer>> m_multiArrayDimensions;
   private Set<OpenCLInstanceof> m_instanceOfs;
   
@@ -198,14 +194,6 @@ public class OpenCLScene {
 
   public void addField(SootField soot_field){
     SootClass soot_class = soot_field.getDeclaringClass();
-
-    List<SootClass> hierarchy = m_classHierarchy.getClassHierarchy(soot_class);
-    for(SootClass curr : hierarchy){
-      OpenCLClass ocl_class = getOpenCLClass(curr);
-      ocl_class.findAllUsedMethodsAndFields();
-      addType(curr.getType());
-    }
-    
     OpenCLClass ocl_class = getOpenCLClass(soot_class);
     ocl_class.addField(new OpenCLField(soot_field, soot_class));
   }
@@ -241,9 +229,23 @@ public class OpenCLScene {
   
   private String makeSourceCode() throws Exception {
     m_usesGarbageCollector = false;
-    findAllUsedClassesMethodsFieldsAndArrayTypes();
+    
+    Set<String> methods = RootbeerScene.v().getDfsInfo().getMethods();
+    SignatureUtil util = new SignatureUtil();
+    for(String method_sig : methods){
+      String cls = util.classFromMethodSig(method_sig);
+      String method_sub_sig = util.methodSubSigFromMethodSig(method_sig);
+      SootClass soot_class = Scene.v().getSootClass(cls);
+      SootMethod method = soot_class.getMethod(method_sub_sig);
+      addMethod(method);
+    }
+    
+    Set<SootField> fields = RootbeerScene.v().getDfsInfo().getFields();
+    for(SootField field : fields){
+      addField(field);
+    }
+    
     StringBuilder ret = new StringBuilder();
-
     ret.append(headerString());
     ret.append(garbageCollectorString());
     ret.append(methodPrototypesString());
@@ -391,45 +393,6 @@ public class OpenCLScene {
     throw new RuntimeException("Cannot find composite field for soot_class");
   }
 
-  private void findAllUsedClassesMethodsFieldsAndArrayTypes() {
-    FindMethodsFieldsAndArrayTypes.reset();
-    
-    addBuiltinRequirements();
-    
-    SignatureUtil util = new SignatureUtil();
-    
-    List<String> methods = RootbeerScene.v().getForwardReachableMethods();
-    for(String sig : methods){
-      SootClass soot_class = Scene.v().getSootClass(util.classFromMethodSig(sig));
-      addMethod(soot_class.getMethod(util.methodSubSigFromMethodSig(sig)));
-    }
-
-    m_codeSegment.findAllUsedMethodsAndFields();
-
-    int prev_size = 0;
-    List<OpenCLMethod> all_methods = m_methodHierarchies.getMethods();
-    while(prev_size != all_methods.size()){
-      prev_size = all_methods.size();
-      all_methods = m_methodHierarchies.getMethods();
-      for(OpenCLMethod method : all_methods){
-        method.findAllUsedMethodsAndFields();
-      }
-    }
-
-    m_codeSegment.findAllUsedArrayTypes();
-    
-    all_methods = m_methodHierarchies.getMethods();
-    for(OpenCLMethod method : all_methods){
-      method.findAllUsedArrayTypes();
-    }
-    
-    m_typeHistory = new TypeHistory(m_codeSegment.getRootSootClass());
-    List<Type> scene_types = OpenCLScene.v().getTypes();
-    for(Type scene_type : scene_types){
-      m_typeHistory.addType(scene_type);
-    }
-  }
-
   public void addCodeSegment(CodeSegment codeSegment){
     resetInstance();
     this.m_codeSegment = codeSegment;
@@ -441,80 +404,13 @@ public class OpenCLScene {
   public boolean isArrayLocalWrittenTo(Local local){
     return m_codeSegment.getReadWriteFieldInspector().localRepresentingArrayIsWrittenOnGpu(local);
   }
-
-  private void addBuiltinRequirements() {
-    FastWholeProgram.v().loadToBodyLater("<java.lang.String: void <init>(char[])>");
-    SootClass string_class = Scene.v().getSootClass("java.lang.String");
-    SootMethod ctor_method = string_class.getMethod("void <init>(char[])");
-    addMethod(ctor_method);
-    
-    FastWholeProgram.v().loadToBodyLater("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadId()>");
-    SootClass rootbeer_gpu_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
-    SootMethod getThreadId = rootbeer_gpu_class.getMethod("int getThreadId()");
-    addMethod(getThreadId);
-    
-    ArrayType char_array = ArrayType.v(CharType.v(), 1);
-    OpenCLArrayType ocl_array = new OpenCLArrayType(char_array);
-    m_arrayTypes.add(ocl_array);
-    
-    SootClass throwable_class = Scene.v().getSootClass("java.lang.Throwable");
-    SootMethod getStackTrace = throwable_class.getMethod("java.lang.StackTraceElement[] getStackTrace()");
-    addMethod(getStackTrace);
-        
-    SootClass stack_trace_elem = Scene.v().getSootClass("java.lang.StackTraceElement");
-    SootMethod stack_ctor = stack_trace_elem.getMethod("void <init>(java.lang.String,java.lang.String,java.lang.String,int)");
-    addMethod(stack_ctor);
-    
-    SootClass out_of_mem = Scene.v().getSootClass("java.lang.OutOfMemoryError");
-    SootMethod out_ctor = out_of_mem.getMethod("void <init>()");
-    addMethod(out_ctor);
-    addType(out_of_mem.getType());
-    addType("java.lang.VirtualMachineError");
-    addType("java.lang.Error");
-  }
-
-  private void addType(String cls){
-    SootClass soot_class = Scene.v().getSootClass(cls);
-    addType(soot_class.getType());
-  }
   
-  public void addType(Type type) {
-    if(m_types.contains(type) == false){
-      m_types.add(type);
-    }
-  }
-  
-  public List<Type> getTypes(){
-    return m_types;
-  }
-
   public ReadOnlyTypes getReadOnlyTypes(){
     return m_readOnlyTypes;
   }
 
   public boolean isRootClass(SootClass soot_class) {
     return soot_class.getName().equals(m_rootSootClass.getName());
-  }
-  
-  public List<Type> getOrderedHistory() {        
-    List<Type> ordered_history = m_typeHistory.getHistory();    
-    SortedTypeHistory sorter = new SortedTypeHistory();
-    List<Type> all_possible_types = sorter.sort(ordered_history);    
-    return all_possible_types;
-  }  
-  
-  public List<RefType> getRefTypeOrderedHistory() {        
-    List<Type> all_possible_types = getOrderedHistory();
-    List<RefType> ret = new ArrayList<RefType>();
-    for(Type type : all_possible_types){
-      if(type instanceof RefType)
-        ret.add((RefType) type);
-    }
-    return ret;
-  }
-
-  public TypeHistory getTypeHistory() {
-    return m_typeHistory;
   }
 
   public Map<String, OpenCLClass> getClassMap(){

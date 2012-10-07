@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import java.util.ArrayList;
 import java.util.List;
 import soot.*;
@@ -15,7 +14,7 @@ import soot.jimple.InvokeExpr;
 
 public class FindKernelForTestCase {
 
-  private List<String> m_kernels;
+  private List<SootClass> m_kernels;
   private List<String> m_testCasePackages;
   private String m_provider;
   
@@ -37,7 +36,7 @@ public class FindKernelForTestCase {
     return m_provider;
   }
   
-  public String get(String test_case, List<String> kernels){
+  public SootClass get(String test_case, List<SootClass> kernels){
     m_kernels = kernels;
     
     if(test_case.contains(".") == false){
@@ -53,7 +52,7 @@ public class FindKernelForTestCase {
     SootClass test_class = Scene.v().getSootClass(test_case);
     List<SootMethod> methods = test_class.getMethods();
     for(SootMethod method : methods){
-      String kernel = searchMethod(method);
+      SootClass kernel = searchMethod(method);
       if(kernel != null){
         return kernel;
       }
@@ -61,7 +60,7 @@ public class FindKernelForTestCase {
     throw new RuntimeException("cannot find kernel for test case: "+test_case);
   }
 
-  private String searchMethod(SootMethod method) {
+  private SootClass searchMethod(SootMethod method) {
     Body body = method.retrieveActiveBody();
     List<ValueBox> boxes = body.getUseAndDefBoxes();
     for(ValueBox box : boxes){
@@ -69,8 +68,8 @@ public class FindKernelForTestCase {
       if(value instanceof InvokeExpr){
         InvokeExpr expr = (InvokeExpr) value;
         SootClass to_call = expr.getMethodRef().declaringClass();
-        if(m_kernels.contains(to_call.getName())){
-          return to_call.getName();
+        if(m_kernels.contains(to_call)){
+          return to_call;
         }
       }
     }

@@ -22,20 +22,20 @@ import soot.jimple.StringConstant;
 
 public class AbstractVisitorGen {
   
-  protected Local m_ThisRef;
+  protected Local m_thisRef;
   private int m_LabelI;
-  protected Stack<BytecodeLanguage> m_Bcl;
-  protected Stack<Local> m_GcObjVisitor;
-  protected Stack<Local> m_CurrMem;
+  protected Stack<BytecodeLanguage> m_bcl;
+  protected Stack<Local> m_gcObjVisitor;
+  protected Stack<Local> m_currMem;
   protected Stack<Local> m_ObjSerializing;
   protected FieldReadWriteInspector m_FieldInspector;
   protected List<String> m_ClassesToIgnore;
   
   public AbstractVisitorGen(FieldReadWriteInspector inspector){
     m_LabelI = 0; 
-    m_Bcl = new Stack<BytecodeLanguage>();
-    m_GcObjVisitor = new Stack<Local>();
-    m_CurrMem = new Stack<Local>();
+    m_bcl = new Stack<BytecodeLanguage>();
+    m_gcObjVisitor = new Stack<Local>();
+    m_currMem = new Stack<Local>();
     m_ObjSerializing = new Stack<Local>();
     m_FieldInspector = inspector;
     m_ClassesToIgnore = new ArrayList<String>();
@@ -43,7 +43,7 @@ public class AbstractVisitorGen {
   }
   
   protected boolean differentPackageAndPrivate(RefType ref_inspecting) {
-    RefType ref_type = (RefType) m_ThisRef.getType();
+    RefType ref_type = (RefType) m_thisRef.getType();
     SootClass this_class = getClassForType(ref_type);
     SootClass class_inspecting = getClassForType(ref_inspecting);
     if(this_class.getPackageName().equals(class_inspecting.getPackageName()))
@@ -112,9 +112,9 @@ public class AbstractVisitorGen {
     SootField soot_field = ref_field.getSootField();
     SootClass soot_class = Scene.v().getSootClass(soot_field.getDeclaringClass().getName());
 
-    BytecodeLanguage bcl = m_Bcl.top();
-    Local gc_obj_visit = m_GcObjVisitor.top();
-    BclMemory bcl_mem = new BclMemory(bcl, m_CurrMem.top());
+    BytecodeLanguage bcl = m_bcl.top();
+    Local gc_obj_visit = m_gcObjVisitor.top();
+    BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top());
 
     Local ref = bcl_mem.readRef();
     bcl_mem.useInstancePointer();
@@ -162,9 +162,9 @@ public class AbstractVisitorGen {
     SootField soot_field = field.getSootField();
     String function_name = "read"+getTypeString(soot_field);
 
-    BytecodeLanguage bcl = m_Bcl.top();
-    bcl.pushMethod(m_CurrMem.top(), function_name, soot_field.getType());
-    Local data = bcl.invokeMethodRet(m_CurrMem.top());
+    BytecodeLanguage bcl = m_bcl.top();
+    bcl.pushMethod(m_currMem.top(), function_name, soot_field.getType());
+    Local data = bcl.invokeMethodRet(m_currMem.top());
 
     SootClass soot_class = Scene.v().getSootClass(soot_field.getDeclaringClass().getName());
     if(FastWholeProgram.v().isApplicationClass(soot_class)){

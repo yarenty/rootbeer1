@@ -8,6 +8,8 @@
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
+import edu.syr.pcpratts.rootbeer.classloader.NumberedType;
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -20,27 +22,27 @@ import soot.jimple.NullConstant;
 
 public class VisitorGen extends AbstractVisitorGen {
 
-  SootClass mRuntimeBasicBlock;
-  private String mClassName;
-  private Set<Type> mGetSizeMethodsMade;
-  private Set<String> mSentinalCtorsCreated;
+  SootClass m_runtimeBasicBlock;
+  private String m_className;
+  private Set<Type> m_getSizeMethodsMade;
+  private Set<String> m_sentinalCtorsCreated;
 
   //Locals from code generation
-  private Local mParam0;
-  private Local mRef;
-  private Local mStartIndex;
-  private Local mEndIndex;
-  private Local mCore;
+  private Local m_param0;
+  private Local m_ref;
+  private Local m_startIndex;
+  private Local m_endIndex;
+  private Local m_core;
 
   public VisitorGen(FieldReadWriteInspector field_inspector, SootClass runtime_basic_block){
     super(field_inspector);
-    mRuntimeBasicBlock = runtime_basic_block;
-    mGetSizeMethodsMade = new HashSet<Type>();
-    mSentinalCtorsCreated = new HashSet<String>();
+    m_runtimeBasicBlock = runtime_basic_block;
+    m_getSizeMethodsMade = new HashSet<Type>();
+    m_sentinalCtorsCreated = new HashSet<String>();
   }
 
   public void generate(){
-    m_Bcl.push(new BytecodeLanguage());
+    m_bcl.push(new BytecodeLanguage());
     makeSentinalCtors();
     makeGcObjectVisitor();
     addGetVisitorMethodToRuntimeBasicBlock();
@@ -62,9 +64,9 @@ public class VisitorGen extends AbstractVisitorGen {
   }
 
   private void makeGcObjectClass() {
-    String base_name = mRuntimeBasicBlock.getName();
-    mClassName = base_name+"GcObjectVisitor";
-    m_Bcl.top().makeClass(mClassName, "edu.syr.pcpratts.rootbeer.runtime.Serializer");
+    String base_name = m_runtimeBasicBlock.getName();
+    m_className = base_name+"GcObjectVisitor";
+    m_bcl.top().makeClass(m_className, "edu.syr.pcpratts.rootbeer.runtime.Serializer");
   }
   /*
   public abstract void doWriteArrayToHeap(Object o, long ref, int start_index, int end_index, int core);
@@ -73,32 +75,32 @@ public class VisitorGen extends AbstractVisitorGen {
     
   private void makeGetLengthMethod(){    
     SootClass object_soot_class = Scene.v().getSootClass("java.lang.Object");
-    m_Bcl.top().startMethod("doGetSize", IntType.v(), object_soot_class.getType());
-    m_ThisRef = m_Bcl.top().refThis();
-    mParam0 = m_Bcl.top().refParameter(0);
+    m_bcl.top().startMethod("doGetSize", IntType.v(), object_soot_class.getType());
+    m_thisRef = m_bcl.top().refThis();
+    m_param0 = m_bcl.top().refParameter(0);
     
-    List<Type> all_possible_types = OpenCLScene.v().getOrderedHistory();
-    for(Type type : all_possible_types){
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    for(Type type : types){
       makeGetSizeMethodForType(type);
     }
 
-    m_Bcl.top().returnValue(IntConstant.v(0));
-    m_Bcl.top().endMethod();
+    m_bcl.top().returnValue(IntConstant.v(0));
+    m_bcl.top().endMethod();
   }
 
   private void makeGetSizeMethod(){
     SootClass object_soot_class = Scene.v().getSootClass("java.lang.Object");
-    m_Bcl.top().startMethod("getArrayLength", IntType.v(), object_soot_class.getType());
-    m_ThisRef = m_Bcl.top().refThis();
-    mParam0 = m_Bcl.top().refParameter(0);
-        
-    List<Type> all_possible_types = OpenCLScene.v().getOrderedHistory();
-    for(Type type : all_possible_types){
+    m_bcl.top().startMethod("getArrayLength", IntType.v(), object_soot_class.getType());
+    m_thisRef = m_bcl.top().refThis();
+    m_param0 = m_bcl.top().refParameter(0);
+    
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    for(Type type : types){
       makeGetLengthMethodForType(type);
     }
 
-    m_Bcl.top().returnValue(IntConstant.v(0));
-    m_Bcl.top().endMethod();
+    m_bcl.top().returnValue(IntConstant.v(0));
+    m_bcl.top().endMethod();
   }
   
   private void makeGetLengthMethodForType(Type type){
@@ -106,17 +108,17 @@ public class VisitorGen extends AbstractVisitorGen {
       return;
     
     String label = getNextLabel();
-    m_Bcl.top().ifInstanceOfStmt(mParam0, type, label);
-    Local object_to_write_from = m_Bcl.top().cast(type, mParam0);
-    Local length = m_Bcl.top().lengthof(object_to_write_from);
-    m_Bcl.top().returnValue(length);
-    m_Bcl.top().label(label);
+    m_bcl.top().ifInstanceOfStmt(m_param0, type, label);
+    Local object_to_write_from = m_bcl.top().cast(type, m_param0);
+    Local length = m_bcl.top().lengthof(object_to_write_from);
+    m_bcl.top().returnValue(length);
+    m_bcl.top().label(label);
   }
 
   private void makeGetSizeMethodForType(Type type) {
-    if(mGetSizeMethodsMade.contains(type))
+    if(m_getSizeMethodsMade.contains(type))
       return;
-    mGetSizeMethodsMade.add(type);
+    m_getSizeMethodsMade.add(type);
     
     if(type instanceof RefType){
       RefType ref_type = (RefType) type;
@@ -132,85 +134,87 @@ public class VisitorGen extends AbstractVisitorGen {
       return;
     
     String label = getNextLabel();
-    m_Bcl.top().ifInstanceOfStmt(mParam0, type, label);
+    m_bcl.top().ifInstanceOfStmt(m_param0, type, label);
         
     if(type instanceof ArrayType){
       ArrayType atype = (ArrayType) type;
-      Local size = m_Bcl.top().local(IntType.v());
-      m_Bcl.top().assign(size, IntConstant.v(Constants.ArrayOffsetSize));
-      Local element_size = m_Bcl.top().local(IntType.v());
+      Local size = m_bcl.top().local(IntType.v());
+      m_bcl.top().assign(size, IntConstant.v(Constants.ArrayOffsetSize));
+      Local element_size = m_bcl.top().local(IntType.v());
       OpenCLType ocl_type = new OpenCLType(atype.baseType);
       if(atype.numDimensions == 1)
-        m_Bcl.top().assign(element_size, IntConstant.v(ocl_type.getSize()));
+        m_bcl.top().assign(element_size, IntConstant.v(ocl_type.getSize()));
       else
-        m_Bcl.top().assign(element_size, IntConstant.v(4));
-      Local object_to_write_from = m_Bcl.top().cast(type, mParam0);
-      Local length = m_Bcl.top().lengthof(object_to_write_from);
-      m_Bcl.top().mult(element_size, length);
-      m_Bcl.top().plus(size, element_size);
-      m_Bcl.top().returnValue(size);
+        m_bcl.top().assign(element_size, IntConstant.v(4));
+      Local object_to_write_from = m_bcl.top().cast(type, m_param0);
+      Local length = m_bcl.top().lengthof(object_to_write_from);
+      m_bcl.top().mult(element_size, length);
+      m_bcl.top().plus(size, element_size);
+      m_bcl.top().returnValue(size);
     }else if(type instanceof RefType) {
       RefType rtype = (RefType) type;
       OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(rtype.getSootClass());
       int size = ocl_class.getSize();
-      m_Bcl.top().returnValue(IntConstant.v(size));
+      m_bcl.top().returnValue(IntConstant.v(size));
     }
-    m_Bcl.top().label(label);
+    m_bcl.top().label(label);
     
   }
   
   private void makeWriteToHeapMethod() {
-    VisitorWriteGen write_gen = new VisitorWriteGen(OpenCLScene.v().getOrderedHistory(), 
-      mClassName, m_Bcl.top(), m_FieldInspector);
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    VisitorWriteGen write_gen = new VisitorWriteGen(types, 
+      m_className, m_bcl.top(), m_FieldInspector);
     write_gen.makeWriteToHeapMethod();
   }
       
   private void makeReadFromHeapMethod() {
-    VisitorReadGen read_gen = new VisitorReadGen(OpenCLScene.v().getOrderedHistory(), 
-      mClassName, m_Bcl.top(), m_FieldInspector);
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    VisitorReadGen read_gen = new VisitorReadGen(types, 
+      m_className, m_bcl.top(), m_FieldInspector);
     read_gen.makeReadFromHeapMethod();
   }
 
   private void makeWriteStaticsToHeapMethod() {
-    VisitorWriteGenStatic static_write_gen = new VisitorWriteGenStatic(m_Bcl.top(), m_FieldInspector);
+    VisitorWriteGenStatic static_write_gen = new VisitorWriteGenStatic(m_bcl.top(), m_FieldInspector);
     static_write_gen.makeMethod();
   }
 
   private void makeReadStaticsFromHeapMethod() {
-    VisitorReadGenStatic static_read_gen = new VisitorReadGenStatic(m_Bcl.top(), m_FieldInspector);
+    VisitorReadGenStatic static_read_gen = new VisitorReadGenStatic(m_bcl.top(), m_FieldInspector);
     static_read_gen.makeMethod();
   }
   
   private void addGetVisitorMethodToRuntimeBasicBlock() {
-    m_Bcl.top().openClass(mRuntimeBasicBlock);
+    m_bcl.top().openClass(m_runtimeBasicBlock);
     SootClass gc_object_visitor_soot_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.Serializer");
     SootClass mem_cls = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
-    m_Bcl.top().startMethod("getSerializer", gc_object_visitor_soot_class.getType(), mem_cls.getType(), mem_cls.getType());
-    Local param0 = m_Bcl.top().refParameter(0);
-    Local param1 = m_Bcl.top().refParameter(1);
-    Local ret = m_Bcl.top().newInstance(mClassName, param0, param1);
-    m_Bcl.top().returnValue(ret);
-    m_Bcl.top().endMethod();
+    m_bcl.top().startMethod("getSerializer", gc_object_visitor_soot_class.getType(), mem_cls.getType(), mem_cls.getType());
+    Local param0 = m_bcl.top().refParameter(0);
+    Local param1 = m_bcl.top().refParameter(1);
+    Local ret = m_bcl.top().newInstance(m_className, param0, param1);
+    m_bcl.top().returnValue(ret);
+    m_bcl.top().endMethod();
   }
 
   private void makeCtor() {
     SootClass mem_cls = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
 
-    m_Bcl.top().startMethod("<init>", VoidType.v(), mem_cls.getType(), mem_cls.getType());
-    Local this_ref = m_Bcl.top().refThis();
-    Local param0 = m_Bcl.top().refParameter(0);
-    Local param1 = m_Bcl.top().refParameter(1);
-    m_Bcl.top().pushMethod("edu.syr.pcpratts.rootbeer.runtime.Serializer", "<init>", VoidType.v(), mem_cls.getType(), mem_cls.getType());
-    m_Bcl.top().invokeMethodNoRet(this_ref, param0, param1);
-    m_Bcl.top().returnVoid();
-    m_Bcl.top().endMethod();
+    m_bcl.top().startMethod("<init>", VoidType.v(), mem_cls.getType(), mem_cls.getType());
+    Local this_ref = m_bcl.top().refThis();
+    Local param0 = m_bcl.top().refParameter(0);
+    Local param1 = m_bcl.top().refParameter(1);
+    m_bcl.top().pushMethod("edu.syr.pcpratts.rootbeer.runtime.Serializer", "<init>", VoidType.v(), mem_cls.getType(), mem_cls.getType());
+    m_bcl.top().invokeMethodNoRet(this_ref, param0, param1);
+    m_bcl.top().returnVoid();
+    m_bcl.top().endMethod();
   }
 
   private void generateSentinalCtor(RefType ref_type) {
     SootClass soot_class = ref_type.getSootClass();
-    if(mSentinalCtorsCreated.contains(soot_class.getName()))
+    if(m_sentinalCtorsCreated.contains(soot_class.getName()))
       return;
-    mSentinalCtorsCreated.add(soot_class.getName());
+    m_sentinalCtorsCreated.add(soot_class.getName());
     
     soot_class = Scene.v().getSootClass(soot_class.getName());
     if(FastWholeProgram.v().isApplicationClass(soot_class) == false)
@@ -246,9 +250,10 @@ public class VisitorGen extends AbstractVisitorGen {
   }
 
   private void makeSentinalCtors() {
-    List<Type> orderedHistory = OpenCLScene.v().getOrderedHistory();
-    for(int i = orderedHistory.size() - 1; i >= 0; --i){
-     Type type = orderedHistory.get(i);
+    List<NumberedType> types = RootbeerScene.v().getDfsInfo().getNumberedTypes();
+    for(int i = types.size() - 1; i >= 0; --i){
+      NumberedType ntype = types.get(i);
+      Type type = ntype.getType();
       if(type instanceof RefType){
         RefType ref_type = (RefType) type;
         AcceptableGpuTypes accept = new AcceptableGpuTypes();
@@ -259,6 +264,6 @@ public class VisitorGen extends AbstractVisitorGen {
   }
 
   String getClassName() {
-    return mClassName;
+    return m_className;
   }  
 }

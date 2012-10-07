@@ -395,53 +395,9 @@ public class OpenCLMethod {
     return getPolymorphicName();
   }
 
-  public void findAllUsedMethodsAndFields() {
-    Body body;
-    try {
-      body = m_sootMethod.getActiveBody();
-      if(body == null)
-        return;
-    } catch(RuntimeException ex){
-      //if there is not body, return.
-      return;
-    }
-    PatchingChain<Unit> units = body.getUnits();
-    Iterator<Unit> iter = units.iterator();
-    while(iter.hasNext()){
-      Unit next = iter.next();
-      List<ValueBox> boxes = next.getUseAndDefBoxes();
-      for(ValueBox box : boxes){
-        Value value = box.getValue();
-        FindMethodsFieldsAndArrayTypes.methods(value);
-        FindMethodsFieldsAndArrayTypes.fields(value);
-      }
-    }
-  }
   public List<SootClass> getHierarchy(){
     SootClass soot_class = m_sootMethod.getDeclaringClass();
     return OpenCLScene.v().getClassHierarchy(soot_class);
-  }
-  
-  public void findAllUsedArrayTypes() {
-    SootClass soot_class = m_sootMethod.getDeclaringClass();
-
-    Body body;
-    try {
-      body = m_sootMethod.getActiveBody();
-    } catch(RuntimeException ex){
-      //if there is no body, return.
-      return;
-    }
-    PatchingChain<Unit> units = body.getUnits();
-    Iterator<Unit> iter = units.iterator();
-    while(iter.hasNext()){
-      Unit next = iter.next();
-      List<ValueBox> boxes = next.getUseAndDefBoxes();
-      for(ValueBox box : boxes){
-        Value value = box.getValue();
-        FindMethodsFieldsAndArrayTypes.arrayTypes(value);
-      }
-    }
   }
 
   private boolean methodIsRuntimeBasicBlockRun() {

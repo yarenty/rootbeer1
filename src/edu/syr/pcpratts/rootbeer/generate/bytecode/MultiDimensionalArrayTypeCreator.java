@@ -7,94 +7,48 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import soot.ArrayType;
 import soot.Type;
 
 public class MultiDimensionalArrayTypeCreator {
 
-  private List<ArrayType> m_ArrayTypes;
-  private List<Type> m_NotArrayTypes;
-  private Map<Type, Set<Integer>> m_Dimensions;
+  private List<ArrayType> m_arrayTypes;
+  private Set<Type> m_allArrayTypes;
+  private Set<Type> m_ret;
 
   public MultiDimensionalArrayTypeCreator(){
-    m_ArrayTypes = new ArrayList<ArrayType>();
-    m_NotArrayTypes = new ArrayList<Type>();
-    m_Dimensions = new HashMap<Type, Set<Integer>>();
+    m_arrayTypes = new ArrayList<ArrayType>();
+    m_allArrayTypes = new HashSet<Type>();
+    m_ret = new HashSet<Type>();
   }
 
-  public List<Type> create(List<Type> types){
+  public Set<Type> create(Set<Type> types){
     segregateTypes(types);
     cloneArrayTypes();
-    return combine();
+    return m_ret;
   }
 
-  private void segregateTypes(List<Type> types) {
+  private void segregateTypes(Set<Type> types) {
     for(Type type : types){
       if(type instanceof ArrayType){
-        m_ArrayTypes.add((ArrayType) type);
-      } else {
-        m_NotArrayTypes.add(type);
-      }
+        m_arrayTypes.add((ArrayType) type);
+        m_allArrayTypes.add((ArrayType) type);
+      } 
     }
   }
 
   private void cloneArrayTypes() {
-    for(ArrayType type : m_ArrayTypes){
-      addDimension(type.baseType, type.numDimensions);
-    }
-    Iterator<Type> iter = m_Dimensions.keySet().iterator();
-    while(iter.hasNext()){
-      Type key = iter.next();
-      Set<Integer> dimensions = m_Dimensions.get(key);
-      doClone(key, dimensions);
-    }
-  }
-
-  private void addDimension(Type base_type, int num_dimensions) {
-    Set<Integer> dim_set;
-    if(m_Dimensions.containsKey(base_type)){
-      dim_set = m_Dimensions.get(base_type);
-    } else {
-      dim_set = new TreeSet<Integer>();
-      m_Dimensions.put(base_type, dim_set);
-    }
-    dim_set.add(num_dimensions);
-  }
-
-  private List<Type> combine() {
-    List<Type> ret = new ArrayList<Type>();
-    ret.addAll(m_ArrayTypes);
-    ret.addAll(m_NotArrayTypes);
-    return ret;
-  }
-
-  private void doClone(Type key, Set<Integer> dimensions) {
-    int max_int = findMax(dimensions);
-    for(int i = 1; i < max_int; ++i){
-      if(dimensions.contains(i))
-        continue;
-      ArrayType curr = ArrayType.v(key, i);
-      m_ArrayTypes.add(curr);
+    for(ArrayType type : m_arrayTypes){
+      Type base_type = type.baseType;
+      int dim = type.numDimensions;
+      for(int i = dim - 1; i > 0; --i){
+        ArrayType curr = ArrayType.v(base_type, i);
+        if(m_allArrayTypes.contains(curr) == false){
+          m_ret.add(curr);
+          m_allArrayTypes.add(curr);
+        }
+      }
     }
   }
-
-  private int findMax(Set<Integer> dimensions) {
-    int ret = 1;
-    Iterator<Integer> iter = dimensions.iterator();
-    while(iter.hasNext()){
-      int value = iter.next();
-      if(value > ret)
-        ret = value;
-    }
-    return ret;
-  }
-
-
 }

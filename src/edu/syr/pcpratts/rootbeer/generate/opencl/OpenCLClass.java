@@ -150,23 +150,6 @@ public class OpenCLClass {
     mAllUsedStaticFields.addAll(mStaticNonRefFields);
   }
   
-  void findAllUsedMethodsAndFields(){
-    if(mFoundAllUsedMethodsAndFields)
-      return;
-    mFoundAllUsedMethodsAndFields = true;
-    List<OpenCLMethod> old_methods = new ArrayList<OpenCLMethod>();
-    old_methods.addAll(m_Methods);
-    for(OpenCLMethod ocl_method : old_methods){
-      ocl_method.findAllUsedMethodsAndFields();
-    }
-  }
-
-  void findAllUsedArrayTypes(){
-    for(OpenCLMethod ocl_method : m_Methods){
-      ocl_method.findAllUsedArrayTypes();
-    }
-  }
-
   public int getRefFieldsSize() {
     determineFieldTypes();
     return mInstanceRefFields.size();

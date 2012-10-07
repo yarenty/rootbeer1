@@ -46,18 +46,6 @@ public class MethodCodeSegment implements CodeSegment {
     return fieldReadWriteInspector;
   }
 
-  public void findAllUsedMethodsAndFields() {
-    OpenCLScene.v().addMethod(existingMethod);
-    
-    OpenCLMethod ocl_method = new OpenCLMethod(existingMethod, existingMethod.getDeclaringClass());
-    ocl_method.findAllUsedMethodsAndFields();
-  }
-
-  public void findAllUsedArrayTypes() {
-    OpenCLMethod ocl_method = new OpenCLMethod(existingMethod, existingMethod.getDeclaringClass());
-    ocl_method.findAllUsedArrayTypes();
-  }
-
   public SootClass getSootClass() {
     return existingMethod.getDeclaringClass();
   }
