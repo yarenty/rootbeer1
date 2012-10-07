@@ -59,25 +59,4 @@ public class TrapItem {
     return m_Exception;
   }
 
-  List<Integer> getTypeList() {
-    List<SootClass> classes = getTrimmedClassHierarchy();
-    List<Integer> ret = new ArrayList<Integer>();
-    for(SootClass soot_class : classes){
-      int num = OpenCLScene.v().getClassType(soot_class);
-      ret.add(num);
-    }
-    return ret;
-  }
-  
-  List<SootClass> getTrimmedClassHierarchy(){
-    List<SootClass> all = OpenCLScene.v().getClassHierarchy(m_Exception);
-    List<SootClass> ret = new ArrayList<SootClass>();
-    for(int i = 0; i < all.size(); ++i){
-      SootClass curr = all.get(i);
-      ret.add(curr);
-      if(curr.equals(m_Exception))
-        break;
-    }
-    return ret;
-  }
 }

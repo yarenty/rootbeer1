@@ -43,35 +43,37 @@ import soot.jimple.TableSwitchStmt;
 import soot.jimple.ThrowStmt;
 
 public class MethodStmtSwitch implements StmtSwitch {
-  protected StringBuilder m_Output;
-  protected MethodJimpleValueSwitch m_ValueSwitch;
-  protected final OpenCLBody m_Parent;
-  protected SootMethod m_SootMethod;
-  private List<TrapItem> m_TrapItems;
-  private int m_VariableNumber;
-  private Stack<String> m_OldValueFromMonitorStack;
+  protected StringBuilder m_output;
+  protected MethodJimpleValueSwitch m_valueSwitch;
+  protected final OpenCLBody m_parent;
+  protected SootMethod m_sootMethod;
+  private List<TrapItem> m_trapItems;
+  private int m_variableNumber;
+  private Stack<String> m_oldValueFromMonitorStack;
+  private ClassTypeList m_classTypeList;
 
   public MethodStmtSwitch(OpenCLBody parent, SootMethod soot_method){
-    m_SootMethod = soot_method;
-    m_Output = new StringBuilder();
-    m_ValueSwitch = new MethodJimpleValueSwitch(m_Output);
-    m_Parent = parent;
-    m_VariableNumber = 1;
-    m_OldValueFromMonitorStack = new Stack<String>();
+    m_sootMethod = soot_method;
+    m_output = new StringBuilder();
+    m_valueSwitch = new MethodJimpleValueSwitch(m_output);
+    m_parent = parent;
+    m_variableNumber = 1;
+    m_oldValueFromMonitorStack = new Stack<String>();
+    m_classTypeList = new ClassTypeList();
   }
   
   private String getVarName(){
-    String ret = "monitor_var"+m_VariableNumber;
-    m_VariableNumber++;
+    String ret = "monitor_var"+m_variableNumber;
+    m_variableNumber++;
     return ret;
   }
   
   public void popMonitor(){
-    m_OldValueFromMonitorStack.pop();
+    m_oldValueFromMonitorStack.pop();
   }
 
   protected boolean methodReturnsAValue(){
-    OpenCLMethod ocl_method = new OpenCLMethod(m_SootMethod, m_SootMethod.getDeclaringClass());
+    OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, m_sootMethod.getDeclaringClass());
     return ocl_method.returnsAValue();
   }
 
@@ -80,10 +82,10 @@ public class MethodStmtSwitch implements StmtSwitch {
   }
 
   public void caseInvokeStmt(InvokeStmt arg0) {
-    arg0.getInvokeExpr().apply(m_ValueSwitch);
+    arg0.getInvokeExpr().apply(m_valueSwitch);
     SootMethod method = arg0.getInvokeExpr().getMethod();
-    m_Output.append(";\n");
-    if(m_ValueSwitch.getCheckException()){
+    m_output.append(";\n");
+    if(m_valueSwitch.getCheckException()){
       checkException();
     }
   }
@@ -96,57 +98,57 @@ public class MethodStmtSwitch implements StmtSwitch {
 
     //if the left op is a field ref or array ref we use the setter
     if(left_op instanceof FieldRef || left_op instanceof ArrayRef){
-      m_ValueSwitch.setLhs();
-      left_op.apply(m_ValueSwitch);
-      m_Output.append(", ");
-      m_ValueSwitch.setRhs();
-      right_op.apply(m_ValueSwitch);
-      m_Output.append(", exception);\n");
-      if(m_ValueSwitch.getCheckException()){
+      m_valueSwitch.setLhs();
+      left_op.apply(m_valueSwitch);
+      m_output.append(", ");
+      m_valueSwitch.setRhs();
+      right_op.apply(m_valueSwitch);
+      m_output.append(", exception);\n");
+      if(m_valueSwitch.getCheckException()){
         checkException();
       }
-      m_ValueSwitch.clearLhsRhs();
+      m_valueSwitch.clearLhsRhs();
     }
     //if the right op is a field ref or array ref we use the getter
     else if(right_op instanceof FieldRef || right_op instanceof FieldRef){
-      m_ValueSwitch.setLhs();
-      left_op.apply(m_ValueSwitch);
-      m_Output.append(" = ");
-      m_ValueSwitch.setRhs();
-      right_op.apply(m_ValueSwitch);
-      m_Output.append(";\n");
-      if(m_ValueSwitch.getCheckException()){
+      m_valueSwitch.setLhs();
+      left_op.apply(m_valueSwitch);
+      m_output.append(" = ");
+      m_valueSwitch.setRhs();
+      right_op.apply(m_valueSwitch);
+      m_output.append(";\n");
+      if(m_valueSwitch.getCheckException()){
         checkException();
       }
-      m_ValueSwitch.clearLhsRhs();
+      m_valueSwitch.clearLhsRhs();
     }
     //if the left op is a ref type we use gc_assign
     else if(ocl_left_op_type.isRefType()){
-      m_ValueSwitch.setLhs();
-      m_ValueSwitch.resetNewCalled();
-      m_Output.append("edu_syr_pcpratts_gc_assign(gc_info, &");
-      arg0.getLeftOp().apply(m_ValueSwitch);
-      m_Output.append(", ");
-      m_ValueSwitch.setRhs();
-      arg0.getRightOp().apply(m_ValueSwitch);
-      m_Output.append(");\n");
-      if(m_ValueSwitch.getCheckException()){
+      m_valueSwitch.setLhs();
+      m_valueSwitch.resetNewCalled();
+      m_output.append("edu_syr_pcpratts_gc_assign(gc_info, &");
+      arg0.getLeftOp().apply(m_valueSwitch);
+      m_output.append(", ");
+      m_valueSwitch.setRhs();
+      arg0.getRightOp().apply(m_valueSwitch);
+      m_output.append(");\n");
+      if(m_valueSwitch.getCheckException()){
         checkException();
       }
-      m_ValueSwitch.clearLhsRhs();
+      m_valueSwitch.clearLhsRhs();
     }
     //otherwise just use normal assignment
     else {
-      m_ValueSwitch.setLhs();
-      arg0.getLeftOp().apply(m_ValueSwitch);
-      m_Output.append(" = ");
-      m_ValueSwitch.setRhs();
-      arg0.getRightOp().apply(m_ValueSwitch);
-      m_Output.append(";\n");
-      if(m_ValueSwitch.getCheckException()){
+      m_valueSwitch.setLhs();
+      arg0.getLeftOp().apply(m_valueSwitch);
+      m_output.append(" = ");
+      m_valueSwitch.setRhs();
+      arg0.getRightOp().apply(m_valueSwitch);
+      m_output.append(";\n");
+      if(m_valueSwitch.getCheckException()){
         checkException();
       }
-      m_ValueSwitch.clearLhsRhs();   
+      m_valueSwitch.clearLhsRhs();   
     }
   }
 
@@ -163,51 +165,51 @@ public class MethodStmtSwitch implements StmtSwitch {
     String mem = getVarName();
     String count = getVarName();
     String old = getVarName();
-    m_OldValueFromMonitorStack.push(old);
+    m_oldValueFromMonitorStack.push(old);
     
-    m_Output.append("int "+id+" = getThreadId();\n");
-    m_Output.append("char * "+mem+" = edu_syr_pcpratts_gc_deref(gc_info, ");
-    arg0.getOp().apply(m_ValueSwitch);
-    m_Output.append(");\n");
-    m_Output.append(mem+" += 12;\n");
-    m_Output.append("int "+count+" = 0;\n");
-    m_Output.append("int "+old+";\n");
-    m_Output.append("while("+count+" < 100){\n");
-    m_Output.append("  "+old+" = atomicCAS((int *) "+mem+", -1, "+id+");\n");
-    m_Output.append("  if("+old+" != -1 && "+old+" != "+id+"){\n");
-    m_Output.append("    "+count+"++;\n");
-    m_Output.append("    if("+count+" >= 99){\n");
-    m_Output.append("      "+count+" = 0;\n");
-    m_Output.append("    }\n");
-    m_Output.append("  } else {\n");
+    m_output.append("int "+id+" = getThreadId();\n");
+    m_output.append("char * "+mem+" = edu_syr_pcpratts_gc_deref(gc_info, ");
+    arg0.getOp().apply(m_valueSwitch);
+    m_output.append(");\n");
+    m_output.append(mem+" += 12;\n");
+    m_output.append("int "+count+" = 0;\n");
+    m_output.append("int "+old+";\n");
+    m_output.append("while("+count+" < 100){\n");
+    m_output.append("  "+old+" = atomicCAS((int *) "+mem+", -1, "+id+");\n");
+    m_output.append("  if("+old+" != -1 && "+old+" != "+id+"){\n");
+    m_output.append("    "+count+"++;\n");
+    m_output.append("    if("+count+" >= 99){\n");
+    m_output.append("      "+count+" = 0;\n");
+    m_output.append("    }\n");
+    m_output.append("  } else {\n");
   }
 
   public void caseExitMonitorStmt(ExitMonitorStmt arg0) {
-    m_Output.append("edu_syr_pcpratts_exitMonitorRef(gc_info, ");
-    arg0.getOp().apply(m_ValueSwitch);
-    m_Output.append(", "+m_OldValueFromMonitorStack.top()+");\n");
+    m_output.append("edu_syr_pcpratts_exitMonitorRef(gc_info, ");
+    arg0.getOp().apply(m_valueSwitch);
+    m_output.append(", "+m_oldValueFromMonitorStack.top()+");\n");
   }
 
   public void caseGotoStmt(GotoStmt arg0) {
     Unit target = arg0.getTarget();
-    int label_num = m_Parent.labelNum(target);
-    m_Output.append("goto label" + Integer.toString(label_num) + ";\n");
+    int label_num = m_parent.labelNum(target);
+    m_output.append("goto label" + Integer.toString(label_num) + ";\n");
   }
 
   public void caseIfStmt(IfStmt arg0) {
-    m_Output.append("if (");
-    arg0.getCondition().apply(m_ValueSwitch);
-    m_Output.append(" ) goto label");
+    m_output.append("if (");
+    arg0.getCondition().apply(m_valueSwitch);
+    m_output.append(" ) goto label");
     Unit target = arg0.getTarget();
-    int label_num = m_Parent.labelNum(target);
-    m_Output.append(Integer.toString(label_num)+";\n");
+    int label_num = m_parent.labelNum(target);
+    m_output.append(Integer.toString(label_num)+";\n");
   }
 
   public void caseLookupSwitchStmt(LookupSwitchStmt arg0) {
     
-    m_Output.append("switch(");
-    arg0.getKey().apply(m_ValueSwitch);
-    m_Output.append("){\n");
+    m_output.append("switch(");
+    arg0.getKey().apply(m_valueSwitch);
+    m_output.append("){\n");
     List<Value> values = arg0.getLookupValues();
     List<Unit> units = arg0.getTargets();
     Unit default_target = arg0.getDefaultTarget();
@@ -215,14 +217,14 @@ public class MethodStmtSwitch implements StmtSwitch {
     int label_num;
     
     for(int i = 0; i < values.size(); ++i){
-      m_Output.append("case ");
-      values.get(i).apply(m_ValueSwitch);
-      label_num = m_Parent.labelNum(units.get(i));
-      m_Output.append(": goto label"+Integer.toString(label_num) + ";\n");
+      m_output.append("case ");
+      values.get(i).apply(m_valueSwitch);
+      label_num = m_parent.labelNum(units.get(i));
+      m_output.append(": goto label"+Integer.toString(label_num) + ";\n");
     }
-    label_num = m_Parent.labelNum(default_target);
-    m_Output.append("default: goto label"+Integer.toString(label_num) + ";\n");
-    m_Output.append("}\n"); 
+    label_num = m_parent.labelNum(default_target);
+    m_output.append("default: goto label"+Integer.toString(label_num) + ";\n");
+    m_output.append("}\n"); 
   }
 
   public void caseNopStmt(NopStmt arg0) {
@@ -234,26 +236,26 @@ public class MethodStmtSwitch implements StmtSwitch {
   }
 
   public void caseReturnStmt(ReturnStmt arg0) {
-    if(m_SootMethod.isSynchronized()){
-      m_Output.append("edu_syr_pcpratts_exitMonitorMem(gc_info, mem, old);\n");
+    if(m_sootMethod.isSynchronized()){
+      m_output.append("edu_syr_pcpratts_exitMonitorMem(gc_info, mem, old);\n");
     }
-    m_Output.append("return ");
-    arg0.getOp().apply(m_ValueSwitch);
-    m_Output.append(";\n");
+    m_output.append("return ");
+    arg0.getOp().apply(m_valueSwitch);
+    m_output.append(";\n");
   }
   
   public void caseReturnVoidStmt(ReturnVoidStmt arg0) {
-    if(m_SootMethod.isSynchronized()){ 
-      m_Output.append("edu_syr_pcpratts_exitMonitorMem(gc_info, mem, old);\n");
+    if(m_sootMethod.isSynchronized()){ 
+      m_output.append("edu_syr_pcpratts_exitMonitorMem(gc_info, mem, old);\n");
     }
-    m_Output.append("return;\n");
+    m_output.append("return;\n");
   }
 
   public void caseTableSwitchStmt(TableSwitchStmt arg0) {
     
-    m_Output.append("switch(");
-    arg0.getKey().apply(m_ValueSwitch);
-    m_Output.append("){\n");
+    m_output.append("switch(");
+    arg0.getKey().apply(m_valueSwitch);
+    m_output.append("){\n");
     List<Value> values = new ArrayList<Value>();
     for(int i = arg0.getLowIndex(); i < arg0.getHighIndex(); ++i){
       values.add(IntConstant.v(i));  
@@ -265,28 +267,28 @@ public class MethodStmtSwitch implements StmtSwitch {
     int label_num;
     
     for(int i = 0; i < values.size(); ++i){
-      m_Output.append("case ");
-      values.get(i).apply(m_ValueSwitch);
-      label_num = m_Parent.labelNum(units.get(i));
-      m_Output.append(": goto label"+Integer.toString(label_num) + ";\n");
+      m_output.append("case ");
+      values.get(i).apply(m_valueSwitch);
+      label_num = m_parent.labelNum(units.get(i));
+      m_output.append(": goto label"+Integer.toString(label_num) + ";\n");
     }
-    m_Output.append("}\n"); 
+    m_output.append("}\n"); 
     
   }
 
   public void caseThrowStmt(ThrowStmt arg0) {
-    m_Output.append(" *exception = ");
+    m_output.append(" *exception = ");
     Value op = arg0.getOp();
-    op.apply(m_ValueSwitch);
-    m_Output.append(";\n");
-    if(m_SootMethod.isSynchronized()){
-      m_Output.append("edu_syr_pcpratts_exitMonitorMem(gc_info, mem, old);\n");
+    op.apply(m_valueSwitch);
+    m_output.append(";\n");
+    if(m_sootMethod.isSynchronized()){
+      m_output.append("edu_syr_pcpratts_exitMonitorMem(gc_info, mem, old);\n");
     }
-    m_Output.append("return");
+    m_output.append("return");
     if(methodReturnsAValue())
-      m_Output.append(" 0;\n");
+      m_output.append(" 0;\n");
     else 
-      m_Output.append(";\n");
+      m_output.append(";\n");
   }
 
   public void defaultCase(Object arg0) {
@@ -294,63 +296,63 @@ public class MethodStmtSwitch implements StmtSwitch {
   }
 
   public void append(String string) {
-    m_Output.append(string);
+    m_output.append(string);
   }
 
   @Override
   public String toString(){
-    return m_Output.toString();
+    return m_output.toString();
   }
 
   void setTrapItems(List<TrapItem> trap_items) {
-    m_TrapItems = trap_items;
+    m_trapItems = trap_items;
   }
 
   void reset() {
-    m_ValueSwitch.reset();
+    m_valueSwitch.reset();
   }
   
   boolean hasCaughtExceptionRef(){
-    return m_ValueSwitch.hasCaughtExceptionRef();
+    return m_valueSwitch.hasCaughtExceptionRef();
   }
 
   public String getThisRef() {
-    return m_ValueSwitch.getThisRef();
+    return m_valueSwitch.getThisRef();
   }
 
   private void checkException() {    
-    m_Output.append("if(*exception != 0) { \n");
-    if(m_TrapItems != null){    
-      m_Output.append("  GC_OBJ_TYPE_TYPE ex_type;\n");
+    m_output.append("if(*exception != 0) { \n");
+    if(m_trapItems != null){    
+      m_output.append("  GC_OBJ_TYPE_TYPE ex_type;\n");
       //if exception is negative, then we didn't allocate memory for it.
-      m_Output.append("  if(*exception < 0){\n");
-      m_Output.append("    ex_type = *exception;\n");
-      m_Output.append("  } else {\n");
-      m_Output.append("    char * ex_deref = edu_syr_pcpratts_gc_deref(gc_info, *exception);\n");
-      m_Output.append("    ex_type = edu_syr_pcpratts_gc_get_type(ex_deref);\n");
-      m_Output.append("  }\n");
-      m_Output.append("if(0){}\n");
-      for(TrapItem item : m_TrapItems){
-        m_Output.append("else if(");
-        List<Integer> types = item.getTypeList();
+      m_output.append("  if(*exception < 0){\n");
+      m_output.append("    ex_type = *exception;\n");
+      m_output.append("  } else {\n");
+      m_output.append("    char * ex_deref = edu_syr_pcpratts_gc_deref(gc_info, *exception);\n");
+      m_output.append("    ex_type = edu_syr_pcpratts_gc_get_type(ex_deref);\n");
+      m_output.append("  }\n");
+      m_output.append("if(0){}\n");
+      for(TrapItem item : m_trapItems){
+        m_output.append("else if(");
+        List<Integer> types = m_classTypeList.getTypeList(item.getException());
         for(int i = 0; i < types.size(); ++i){
-          m_Output.append("ex_type == "+types.get(i));
+          m_output.append("ex_type == "+types.get(i));
           if(i < types.size() - 1){
-            m_Output.append(" || ");
+            m_output.append(" || ");
           }
         }
-        m_Output.append("){\n");
-        m_Output.append("goto trap"+item.getTrapNum()+";\n");
-        m_Output.append("}\n");
+        m_output.append("){\n");
+        m_output.append("goto trap"+item.getTrapNum()+";\n");
+        m_output.append("}\n");
       }
     }
     //mOutput.append("edu_syr_pcpratts_fillInStackTrace(gc_info, *exception, \""+class_name+"\", \""+method_name+"\");\n");
-    if(m_SootMethod.isSynchronized()){
-      m_Output.append("edu_syr_pcpratts_exitMonitorMem(gc_info, mem, old);\n");
+    if(m_sootMethod.isSynchronized()){
+      m_output.append("edu_syr_pcpratts_exitMonitorMem(gc_info, mem, old);\n");
     }
-    m_Output.append("return ");
+    m_output.append("return ");
     if(methodReturnsAValue())
-      m_Output.append("0");
-    m_Output.append("; }\n");
+      m_output.append("0");
+    m_output.append("; }\n");
   }
 }

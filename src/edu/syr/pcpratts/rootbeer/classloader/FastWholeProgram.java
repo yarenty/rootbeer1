@@ -363,7 +363,7 @@ public class FastWholeProgram {
                 try {
                   Body dest_body = dest_method.retrieveActiveBody();
                 } catch(Exception ex){
-                  continue;
+                  //continue;
                 }
 
                 //m_log.log(Level.FINEST, "adding edge: "+curr.getSignature()+" -> "+dest_sig);
