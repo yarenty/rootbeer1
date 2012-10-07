@@ -7,6 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
+import edu.syr.pcpratts.rootbeer.classloader.NumberedType;
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLMethod;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
@@ -50,7 +52,6 @@ public class MethodStmtSwitch implements StmtSwitch {
   private List<TrapItem> m_trapItems;
   private int m_variableNumber;
   private Stack<String> m_oldValueFromMonitorStack;
-  private ClassTypeList m_classTypeList;
 
   public MethodStmtSwitch(OpenCLBody parent, SootMethod soot_method){
     m_sootMethod = soot_method;
@@ -59,7 +60,6 @@ public class MethodStmtSwitch implements StmtSwitch {
     m_parent = parent;
     m_variableNumber = 1;
     m_oldValueFromMonitorStack = new Stack<String>();
-    m_classTypeList = new ClassTypeList();
   }
   
   private String getVarName(){
@@ -334,7 +334,7 @@ public class MethodStmtSwitch implements StmtSwitch {
       m_output.append("if(0){}\n");
       for(TrapItem item : m_trapItems){
         m_output.append("else if(");
-        List<Integer> types = m_classTypeList.getTypeList(item.getException());
+        List<NumberedType> types = RootbeerScene.v().getDfsInfo().getNumberedHierarchyUp(item.getException());
         for(int i = 0; i < types.size(); ++i){
           m_output.append("ex_type == "+types.get(i));
           if(i < types.size() - 1){

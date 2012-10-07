@@ -157,7 +157,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     Local object_to_write_from = bcl.cast(type, m_Param0);
 
     Local length = bcl.lengthof(object_to_write_from);
-    int class_id = OpenCLScene.v().getClassType(type);
+    int class_id = RootbeerScene.v().getDfsInfo().getClassNumber(type);
 
     BclMemory bcl_mem = new BclMemory(bcl, m_CurrentMem.top());
     bcl_mem.writeByte((byte) 0);
@@ -227,7 +227,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   private void makeWriteToHeapBodyForRefType(RefType type){
     BytecodeLanguage bcl = m_bcl.top();
     BclMemory bcl_mem = new BclMemory(bcl, m_CurrentMem.top());
-    int class_id = OpenCLScene.v().getClassType(type);
+    int class_id = RootbeerScene.v().getDfsInfo().getClassNumber(type);
     SootClass soot_class = type.getSootClass();
     
     Local object_to_write_from = bcl.cast(type, m_Param0);

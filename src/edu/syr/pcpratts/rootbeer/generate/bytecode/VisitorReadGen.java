@@ -325,7 +325,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
       }
     }
     
-    int id = OpenCLScene.v().getClassType(type_to_create);
+    int id = RootbeerScene.v().getDfsInfo().getClassNumber(type_to_create);
     String label_after = getNextLabel();
     BytecodeLanguage bcl = m_bcl.top();
     bcl.ifStmt(type_id, "!=", IntConstant.v(id), label_after);

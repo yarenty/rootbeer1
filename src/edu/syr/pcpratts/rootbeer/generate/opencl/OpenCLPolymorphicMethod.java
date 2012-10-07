@@ -7,11 +7,10 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.List;
-import soot.SootClass;
-import soot.SootMethod;
-import soot.VoidType;
+import soot.*;
 
 /**
  * Represents an OpenCL function that dispatches to the real OpenCL function
@@ -19,25 +18,30 @@ import soot.VoidType;
  * @author pcpratts
  */
 public class OpenCLPolymorphicMethod {
-  private final SootMethod mSootMethod;
+  private final SootMethod m_sootMethod;
 
   //for hashcode
-  private List<SootClass> mHierarchy;
+  private List<Type> m_hierarchy;
 
   public OpenCLPolymorphicMethod(SootMethod soot_method){
-    mSootMethod = soot_method;
+    m_sootMethod = soot_method;
   }
 
   public String getMethodPrototype(){
-    if(mSootMethod.getName().equals("<init>"))
+    if(m_sootMethod.getName().equals("<init>"))
       return "";
     return getMethodDecl()+";\n";
   }
 
   private String getMethodDecl(){
-    List<SootClass> hierarchy = getHierarchy();
-    SootClass soot_class = hierarchy.get(0);
-    OpenCLMethod ocl_method = new OpenCLMethod(mSootMethod, soot_class);
+    List<Type> hierarchy = getHierarchy();
+    Type type = hierarchy.get(0);
+    if(type instanceof RefType == false){
+      throw new RuntimeException("please report bug in OpenCLPolymorphicMethod.getMethodDecl"); 
+    }
+    RefType ref_type = (RefType) type;
+    SootClass soot_class = ref_type.getSootClass();
+    OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, soot_class);
 
     StringBuilder ret = new StringBuilder();
     ret.append(Tweaks.v().getDeviceFunctionQualifier()+" ");
@@ -48,10 +52,15 @@ public class OpenCLPolymorphicMethod {
   }
 
   public String getMethodBody(){
-    if(mSootMethod.getName().equals("<init>"))
+    if(m_sootMethod.getName().equals("<init>"))
       return "";
-    List<SootClass> hierarchy = getHierarchy();
-    SootClass first_soot_class = hierarchy.get(0);
+    List<Type> hierarchy = getHierarchy();
+    Type first_type = hierarchy.get(0);
+    if(first_type instanceof RefType == false){
+      throw new RuntimeException("please report bug in OpenCLPolymorphicMethod.getMethodBody"); 
+    }
+    RefType ref_type = (RefType) first_type;
+    SootClass first_soot_class = ref_type.getSootClass();
 
     StringBuilder ret = new StringBuilder();
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
@@ -59,8 +68,8 @@ public class OpenCLPolymorphicMethod {
     ret.append(getMethodDecl());
     ret.append("{\n");
 
-    if(mSootMethod.isStatic()){
-      if(mSootMethod.getReturnType() instanceof VoidType == false){
+    if(m_sootMethod.isStatic()){
+      if(m_sootMethod.getReturnType() instanceof VoidType == false){
         ret.append("return ");
       }
       String invoke_string = getStaticInvokeString(first_soot_class);
@@ -69,7 +78,7 @@ public class OpenCLPolymorphicMethod {
       ret.append("if(thisref == -1){\n");
       ret.append("  *exception = -2;\n");
       ret.append("return ");
-      if(mSootMethod.getReturnType() instanceof VoidType == false)
+      if(m_sootMethod.getReturnType() instanceof VoidType == false)
         ret.append("-1");
       ret.append(";\n");
       ret.append("}\n");
@@ -77,7 +86,7 @@ public class OpenCLPolymorphicMethod {
       if(sizeHierarchy(hierarchy) == 1){
         SootClass sclass = getSingleMethodInHierarchy(hierarchy);
         String invoke_string = getInvokeString(sclass);
-        if(mSootMethod.getReturnType() instanceof VoidType == false){
+        if(m_sootMethod.getReturnType() instanceof VoidType == false){
           ret.append("return ");
         }
         ret.append(invoke_string+"\n");
@@ -85,11 +94,16 @@ public class OpenCLPolymorphicMethod {
         ret.append("GC_OBJ_TYPE_TYPE derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
         ret.append("if(0){}\n");
         int count = 0;
-        for(SootClass sclass : hierarchy){
+        for(Type type : hierarchy){
+          if(type instanceof RefType == false){
+            continue;
+          }
+          RefType curr_ref_type = (RefType) type;
+          SootClass sclass = curr_ref_type.getSootClass();
           if(sootClassHasMethod(sclass) == false)
             continue;
-          ret.append("else if(derived_type == "+OpenCLScene.v().getClassType(sclass)+"){\n");
-          if(mSootMethod.getReturnType() instanceof VoidType == false){
+          ret.append("else if(derived_type == "+RootbeerScene.v().getDfsInfo().getClassNumber(sclass)+"){\n");
+          if(m_sootMethod.getReturnType() instanceof VoidType == false){
             ret.append("return ");
           }
           String invoke_string = getInvokeString(sclass);
@@ -100,7 +114,7 @@ public class OpenCLPolymorphicMethod {
       }
     }
     ret.append("return ");
-    if(mSootMethod.getReturnType() instanceof VoidType == false)
+    if(m_sootMethod.getReturnType() instanceof VoidType == false)
       ret.append("-1");
     ret.append(";\n");
     ret.append("}\n");
@@ -109,14 +123,14 @@ public class OpenCLPolymorphicMethod {
 
   //used to invoke polymorphic method inside this function
   private String getInvokeString(SootClass soot_class){
-    if(mSootMethod.getName().equals("<init>"))
+    if(m_sootMethod.getName().equals("<init>"))
       return "";
-    OpenCLMethod ocl_method = new OpenCLMethod(mSootMethod, soot_class);
+    OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, soot_class);
     String ret = ocl_method.getPolymorphicName() + "(";
 
     //write the gc_info and thisref
     ret += "gc_info, thisref";
-    List args = mSootMethod.getParameterTypes();
+    List args = m_sootMethod.getParameterTypes();
     if(args.size() != 0)
       ret += ", ";
 
@@ -130,14 +144,14 @@ public class OpenCLPolymorphicMethod {
   }
 
   private String getStaticInvokeString(SootClass soot_class) {
-    if(mSootMethod.getName().equals("<init>"))
+    if(m_sootMethod.getName().equals("<init>"))
       return "";
-    OpenCLMethod ocl_method = new OpenCLMethod(mSootMethod, soot_class);
+    OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, soot_class);
     String ret = ocl_method.getPolymorphicName() + "(";
 
     //write the gc_info and thisref
     ret += "gc_info";
-    List args = mSootMethod.getParameterTypes();
+    List args = m_sootMethod.getParameterTypes();
     if(args.size() != 0)
       ret += ", ";
 
@@ -150,9 +164,9 @@ public class OpenCLPolymorphicMethod {
     return ret;
   }
 
-  private List<SootClass> getHierarchy(){
-    SootClass soot_class = mSootMethod.getDeclaringClass();
-    return OpenCLScene.v().getClassHierarchy(soot_class);
+  private List<Type> getHierarchy(){
+    SootClass soot_class = m_sootMethod.getDeclaringClass();
+    return RootbeerScene.v().getDfsInfo().getHierarchy(soot_class);
   }
 
   @Override
@@ -160,7 +174,7 @@ public class OpenCLPolymorphicMethod {
     if(o instanceof OpenCLPolymorphicMethod == false)
       return false;
     OpenCLPolymorphicMethod other = (OpenCLPolymorphicMethod) o;
-    if(mSootMethod.getName().equals(other.mSootMethod.getName()) == false)
+    if(m_sootMethod.getName().equals(other.m_sootMethod.getName()) == false)
       return false;    
     if(getHierarchy().equals(other.getHierarchy()))
       return true;
@@ -169,25 +183,30 @@ public class OpenCLPolymorphicMethod {
 
   @Override
   public int hashCode() {
-    mHierarchy = getHierarchy();
+    m_hierarchy = getHierarchy();
     int hash = 5;
-    hash = 53 * hash + (this.mSootMethod != null ? this.mSootMethod.hashCode() : 0);
-    hash = 53 * hash + (this.mHierarchy != null ? this.mHierarchy.hashCode() : 0);
+    hash = 53 * hash + (this.m_sootMethod != null ? this.m_sootMethod.hashCode() : 0);
+    hash = 53 * hash + (this.m_hierarchy != null ? this.m_hierarchy.hashCode() : 0);
     return hash;
   }
 
   private boolean sootClassHasMethod(SootClass sclass) {
     try {
-      SootMethod soot_method = sclass.getMethod(mSootMethod.getSubSignature());
+      SootMethod soot_method = sclass.getMethod(m_sootMethod.getSubSignature());
       return true;
     } catch(Exception ex){
       return false;
     }
   }
 
-  private int sizeHierarchy(List<SootClass> hierarchy) {
+  private int sizeHierarchy(List<Type> hierarchy) {
     int ret = 0;
-    for(SootClass sclass : hierarchy){
+    for(Type type : hierarchy){
+      if(type instanceof RefType == false){
+        continue;
+      }
+      RefType ref_type = (RefType) type;
+      SootClass sclass = ref_type.getSootClass();
       if(sootClassHasMethod(sclass) == false)
         continue;
       ret++;
@@ -195,11 +214,16 @@ public class OpenCLPolymorphicMethod {
     return ret;
   }
 
-  private SootClass getSingleMethodInHierarchy(List<SootClass> hierarchy) {
-    for(SootClass sclass : hierarchy){
-      if(sootClassHasMethod(sclass) == false)
+  private SootClass getSingleMethodInHierarchy(List<Type> hierarchy) {
+    for(Type type : hierarchy){
+      if(type instanceof RefType == false){
         continue;
-      return sclass;
+      }
+      RefType ref_type = (RefType) type;
+      SootClass soot_class = ref_type.getSootClass();
+      if(sootClassHasMethod(soot_class) == false)
+        continue;
+      return soot_class;
     }
     return null;
   }

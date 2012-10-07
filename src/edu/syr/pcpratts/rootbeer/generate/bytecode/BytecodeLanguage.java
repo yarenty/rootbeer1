@@ -420,8 +420,13 @@ public class BytecodeLanguage {
     }
 
     //couldn't find the field, try searching the class hierarchy
-    List<SootClass> classes = OpenCLScene.v().getClassHierarchy(original_class);
-    for(SootClass soot_class : classes){
+    List<Type> types = RootbeerScene.v().getDfsInfo().getHierarchy(original_class);
+    for(Type type : types){
+      if(type instanceof RefType == false){
+        continue;
+      }
+      RefType ref_type = (RefType) type;
+      SootClass soot_class = ref_type.getSootClass();
       try {
         ret = soot_class.getFieldByName(field_name);
         return ret;

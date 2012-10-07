@@ -43,7 +43,6 @@ import soot.jimple.NewMultiArrayExpr;
 public class OpenCLScene {
   private static OpenCLScene m_instance;
   private static int m_curentIdent;
-  private ClassHierarchy m_classHierarchy;
   private Map<String, OpenCLClass> m_classes;
   private Map<String, String> m_oclToSoot;
   private Set<OpenCLArrayType> m_arrayTypes;
@@ -52,9 +51,7 @@ public class OpenCLScene {
   private boolean m_usesGarbageCollector;
   private SootClass m_rootSootClass;
   private int m_endOfStatics;
-  private List<Type> m_types;
   private ReadOnlyTypes m_readOnlyTypes;
-  private Map<ArrayType, List<Integer>> m_multiArrayDimensions;
   private Set<OpenCLInstanceof> m_instanceOfs;
   
   static {
@@ -63,13 +60,10 @@ public class OpenCLScene {
 
   private void resetInstance(){
     m_codeSegment = null;
-    m_classHierarchy = new ClassHierarchy();
     m_classes = new LinkedHashMap<String, OpenCLClass>();
     m_oclToSoot = new HashMap<String, String>();
     m_arrayTypes = new LinkedHashSet<OpenCLArrayType>();
     m_methodHierarchies = new MethodHierarchies();
-    m_types = new ArrayList<Type>();
-    m_multiArrayDimensions = new HashMap<ArrayType, List<Integer>>();
     m_instanceOfs = new HashSet<OpenCLInstanceof>();
   }
 
@@ -96,57 +90,12 @@ public class OpenCLScene {
     return "ab850b60f96d11de8a390800200c9a66";
   }
 
-  public List<SootClass> getClassHierarchy(SootClass soot_class){
-    return m_classHierarchy.getClassHierarchy(soot_class);
-  }
-
-  public int getClassTypeNonRef(Type type){
-    if(type.equals(ByteType.v())){
-      return 0;
-    } else if(type.equals(CharType.v())){
-      return 1;
-    } else if(type.equals(ShortType.v())){
-      return 2;
-    } else if(type.equals(IntType.v())){
-      return 3;
-    } else if(type.equals(LongType.v())){
-      return 4;
-    } else if(type.equals(FloatType.v())){
-      return 5;
-    } else if(type.equals(DoubleType.v())){
-      return 6;
-    } else if(type.equals(BooleanType.v())){
-      return 7;
-    } else {
-      throw new UnsupportedOperationException("Unknown type");
-    }
-  }
-
-  public int getClassType(Type type){
-    String type_string = type.toString();
-    if(type instanceof ArrayType){
-      ArrayType array_type = (ArrayType) type;
-      return 10 + m_classHierarchy.getClassTypeArray(array_type);
-    } else if(type_string.equals("java.lang.String")){
-      return 8;
-    } else if(type_string.equals("java.lang.OutOfMemoryError")){
-      return 9;
-    } else if(type_string.equals("java.lang.NullPointerException")){
-      return Constants.NullPointerNumber; 
-    } else if(type instanceof RefType){
-      RefType ref_type = (RefType) type;
-      return 10 + m_classHierarchy.getClassType(ref_type.getSootClass());
-    } else {
-      return getClassTypeNonRef(type);
-    }
-  }
-
   public int getEndOfStatics(){
     return m_endOfStatics;
   }
 
   public int getClassType(SootClass soot_class){
-    return getClassType(soot_class.getType());
+    return RootbeerScene.v().getDfsInfo().getClassNumber(soot_class);
   }
   
   public void addInstanceof(Type type){
@@ -164,7 +113,6 @@ public class OpenCLScene {
 
     //add the method 
     m_methodHierarchies.addMethod(soot_method);
-    m_classHierarchy.getClassHierarchy(soot_class);
   }
 
   public void addArrayType(OpenCLArrayType array_type){
@@ -243,6 +191,12 @@ public class OpenCLScene {
     Set<SootField> fields = RootbeerScene.v().getDfsInfo().getFields();
     for(SootField field : fields){
       addField(field);
+    }
+    
+    Set<ArrayType> array_types = RootbeerScene.v().getDfsInfo().getArrayTypes();
+    for(ArrayType array_type : array_types){
+      OpenCLArrayType ocl_array_type = new OpenCLArrayType(array_type);
+      addArrayType(ocl_array_type);
     }
     
     StringBuilder ret = new StringBuilder();
@@ -415,24 +369,5 @@ public class OpenCLScene {
 
   public Map<String, OpenCLClass> getClassMap(){
     return m_classes;
-  }
-
-  public void addNewMultiArray(NewMultiArrayExpr expr) {
-    ArrayType type = expr.getBaseType();
-    List<Integer> dimensions;
-    if(m_multiArrayDimensions.containsKey(type)){
-      dimensions = m_multiArrayDimensions.get(type);
-    } else {
-      dimensions = new ArrayList<Integer>();
-      m_multiArrayDimensions.put(type, dimensions);
-    }
-    int dim = expr.getSizeCount();
-    if(dimensions.contains(dim))
-      return;
-    dimensions.add(dim);
-  }
-  
-  public List<Integer> getMultiArrayDimensions(ArrayType type){
-    return m_multiArrayDimensions.get(type);
   }
 }

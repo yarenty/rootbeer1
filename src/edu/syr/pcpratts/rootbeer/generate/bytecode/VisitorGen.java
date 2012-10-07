@@ -59,10 +59,6 @@ public class VisitorGen extends AbstractVisitorGen {
     makeReadFromHeapMethod();
   }
 
-  public int getId(SootClass soot_class){
-    return OpenCLScene.v().getClassType(soot_class);
-  }
-
   private void makeGcObjectClass() {
     String base_name = m_runtimeBasicBlock.getName();
     m_className = base_name+"GcObjectVisitor";
@@ -162,14 +158,14 @@ public class VisitorGen extends AbstractVisitorGen {
   }
   
   private void makeWriteToHeapMethod() {
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
     VisitorWriteGen write_gen = new VisitorWriteGen(types, 
       m_className, m_bcl.top(), m_FieldInspector);
     write_gen.makeWriteToHeapMethod();
   }
       
   private void makeReadFromHeapMethod() {
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
     VisitorReadGen read_gen = new VisitorReadGen(types, 
       m_className, m_bcl.top(), m_FieldInspector);
     read_gen.makeReadFromHeapMethod();

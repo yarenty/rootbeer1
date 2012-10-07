@@ -7,7 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
-import edu.syr.pcpratts.rootbeer.generate.opencl.body.ClassTypeList;
+import edu.syr.pcpratts.rootbeer.classloader.NumberedType;
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.List;
 import soot.RefType;
@@ -18,12 +19,10 @@ public class OpenCLInstanceof {
 
   private Type m_type;
   private OpenCLType m_oclType;
-  private ClassTypeList m_typeList;
   
   public OpenCLInstanceof(Type type) {
     m_type = type;
     m_oclType = new OpenCLType(m_type);
-    m_typeList = new ClassTypeList();
   }
 
   public String getPrototype() {
@@ -48,7 +47,7 @@ public class OpenCLInstanceof {
       throw new RuntimeException("not supported yet");
     }
     RefType ref_type = (RefType) m_type;
-    List<Integer> type_list = m_typeList.getTypeList(ref_type.getSootClass());
+    List<NumberedType> type_list = RootbeerScene.v().getDfsInfo().getNumberedHierarchyDown(ref_type.getSootClass());
     
     String ret = getDecl();
     ret += "{\n";
@@ -58,8 +57,8 @@ public class OpenCLInstanceof {
     ret += "  char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n";
     ret += "  GC_OBJ_TYPE_TYPE type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n";
     ret += "  switch(type){\n";
-    for(Integer type : type_list){
-      ret += "    case "+type+":\n";
+    for(NumberedType ntype : type_list){
+      ret += "    case "+ntype.getNumber()+":\n";
     }
     ret += "      return 1;\n";
     ret += "  }\n";

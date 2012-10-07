@@ -7,16 +7,14 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.Constants;
-import edu.syr.pcpratts.rootbeer.generate.bytecode.FieldReadWriteInspector;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.ArrayList;
 import java.util.List;
 import soot.ArrayType;
-import soot.IntType;
 import soot.Local;
-import soot.RefLikeType;
 import soot.RefType;
 import soot.Type;
 import soot.Value;
@@ -26,14 +24,14 @@ import soot.jimple.NewMultiArrayExpr;
 
 public class OpenCLArrayType {
 
-  private ArrayType m_ArrayType;
+  private ArrayType m_arrayType;
   
   public OpenCLArrayType(ArrayType type){
-    m_ArrayType = (ArrayType) type;
+    m_arrayType = (ArrayType) type;
   }
   
   public ArrayType getArrayType(){
-    return m_ArrayType;  
+    return m_arrayType;  
   }
   
   public String getArrayRefGetter(ArrayRef arg0){
@@ -57,13 +55,13 @@ public class OpenCLArrayType {
   }
   
   public String getDerefTypeString(){
-    OpenCLType type = new OpenCLType(m_ArrayType);
+    OpenCLType type = new OpenCLType(m_arrayType);
     String ret = type.getDerefString();
     return ret;
   }
   
   private String getMultiDeref(int dimensions){
-    Type base_type = m_ArrayType.baseType;  
+    Type base_type = m_arrayType.baseType;  
     ArrayType array_type = ArrayType.v(base_type,  dimensions);
     OpenCLType type = new OpenCLType(array_type);
     String ret = type.getDerefString();
@@ -71,7 +69,7 @@ public class OpenCLArrayType {
   }
 
   private String getRefTypeString(){
-    OpenCLType type = new OpenCLType(m_ArrayType);
+    OpenCLType type = new OpenCLType(m_arrayType);
     return type.getRefString();
   }
 
@@ -82,30 +80,9 @@ public class OpenCLArrayType {
     ret.add(function_qual+" "+getAssignType()+" "+getDerefTypeString()+"_get("+address_qual+" char * gc_info, int thisref, int parameter0, int * exception)");
     ret.add(function_qual+" void "+getDerefTypeString()+"_set("+address_qual+" char * gc_info, int thisref, int parameter0, "+getAssignType()+" parameter1, int * exception)");
     ret.add(function_qual+" int "+getDerefTypeString()+"_new("+address_qual+" char * gc_info, int size, int * exception)");
-    ret.addAll(getMultiArrayDecls());
     return ret;
   }
   
-  private List<String> getMultiArrayDecls(){
-    List<String> ret = new ArrayList<String>();
-    List<Integer> dims = OpenCLScene.v().getMultiArrayDimensions(m_ArrayType);
-    if(dims == null)
-      return ret;    
-    String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
-    String function_qual = Tweaks.v().getDeviceFunctionQualifier();
-    String multi_array_begin = function_qual+" int "+getDerefTypeString()+"_new_multi_array_";
-    String multi_array_end = "("+address_qual+" char * gc_info, ";
-    for(Integer dim : dims){
-      String decl = multi_array_begin+dim+multi_array_end;
-      for(int i = 0; i < dim; ++i){
-        decl += "int dim"+i+", ";
-      }
-      decl += "int * exception)";
-      ret.add(decl);
-    }
-    return ret;
-  }
-
   public String getPrototypes(){
     StringBuilder ret = new StringBuilder();
     List<String> decls = getDecls();
@@ -136,7 +113,7 @@ public class OpenCLArrayType {
   }
 
   private String getAssignType(){
-    ArrayType array_type = m_ArrayType;
+    ArrayType array_type = m_arrayType;
     if(array_type.numDimensions != 1)
       return "int";
     OpenCLType type = new OpenCLType(array_type.baseType);
@@ -185,7 +162,7 @@ public class OpenCLArrayType {
     ret.append("}\n");
     
     //new
-    int derived_type = OpenCLScene.v().getClassType(m_ArrayType);
+    int derived_type = RootbeerScene.v().getDfsInfo().getClassNumber(m_arrayType);
     ret.append(decls.get(2)+"{\n");
     ret.append("int i;\n");
     ret.append("int total_size = (size * "+element_size+")+ "+offset_size+";\n");
@@ -209,41 +186,7 @@ public class OpenCLArrayType {
     ret.append("  "+getDerefTypeString()+"_set(gc_info, thisref, i, "+initValue()+", exception);\n");
     ret.append("}\n");
     ret.append("return thisref;\n");
-    ret.append("}\n");
-
-    List<String> multi_decls = getMultiArrayDecls();
-    List<Integer> dims = OpenCLScene.v().getMultiArrayDimensions(m_ArrayType);
-    int index = 0;
-    for(String multi_decl : multi_decls){
-      int dim = dims.get(index); 
-      //new multi-dimensional
-      ret.append(multi_decl+"{\n");
-      ret.append("int total_size = (dim0 * 8) + "+offset_size+";\n"); 
-      for(int i = 0; i < dim; ++i){
-        ret.append("int index"+i+";\n");
-      }
-      ret.append("int mod = total_size % 8;\n");
-      ret.append("if(mod != 0)\n");
-      ret.append("  total_size += (8 - mod);\n");
-      ret.append("int thisref = edu_syr_pcpratts_gc_malloc(gc_info, total_size);\n");
-      ret.append("if(thisref == -1){\n");
-      ret.append("  return -1;\n");
-      ret.append("}\n");
-      ret.append(address_qual+" char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
-      ret.append("\n//class info\n");
-      ret.append("edu_syr_pcpratts_gc_set_count(thisref_deref, 0);\n");
-      ret.append("edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY);\n");
-      ret.append("edu_syr_pcpratts_gc_set_type(thisref_deref, "+Integer.toString(derived_type)+");\n");
-      ret.append("edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1);\n");
-      ret.append("edu_syr_pcpratts_gc_set_size(thisref_deref, total_size);\n");
-      ret.append("edu_syr_pcpratts_setint(thisref_deref, 8, dim0);\n");
-      ret.append(multiInitString(dim));
-      ret.append("return thisref;\n");
-      ret.append("}\n");
-      
-      index++;
-    }
-    
+    ret.append("}\n");   
     return ret.toString();
   }
 
@@ -284,7 +227,7 @@ public class OpenCLArrayType {
   
   private Type getBaseType(){
     Type base_type = null;
-    ArrayType array_type = (ArrayType) m_ArrayType;
+    ArrayType array_type = (ArrayType) m_arrayType;
     base_type = array_type.baseType;
     return base_type;
   }
@@ -294,7 +237,7 @@ public class OpenCLArrayType {
     if(o instanceof OpenCLArrayType == false)
       return false;
     OpenCLArrayType other = (OpenCLArrayType) o;
-    if(this.m_ArrayType.equals(other.m_ArrayType))
+    if(this.m_arrayType.equals(other.m_arrayType))
       return true;
     return false;
   }
@@ -302,20 +245,20 @@ public class OpenCLArrayType {
   @Override
   public int hashCode() {
     int hash = 5;
-    hash = 79 * hash + (this.m_ArrayType != null ? this.m_ArrayType.hashCode() : 0);
+    hash = 79 * hash + (this.m_arrayType != null ? this.m_arrayType.hashCode() : 0);
     return hash;
   }
 
   public int getElementSize() {
-    if(m_ArrayType.numDimensions != 1)
+    if(m_arrayType.numDimensions != 1)
       return 4;
-    Type base_type = m_ArrayType.baseType;
+    Type base_type = m_arrayType.baseType;
     OpenCLType ocl_type = new OpenCLType(base_type);
     return ocl_type.getSize();
   }
 
   int getTypeInteger() {
-    return OpenCLScene.v().getClassType(m_ArrayType);
+    return RootbeerScene.v().getDfsInfo().getClassNumber(m_arrayType);
   }
 
   private boolean isCharArray() {

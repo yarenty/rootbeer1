@@ -624,6 +624,7 @@ public class FastWholeProgram {
     doDfs(kernel_method);
     m_currDfsInfo.expandArrayTypes();
     m_currDfsInfo.orderTypes();
+    m_currDfsInfo.createClassHierarchy();
   }
   
   private void doDfs(SootMethod method){
