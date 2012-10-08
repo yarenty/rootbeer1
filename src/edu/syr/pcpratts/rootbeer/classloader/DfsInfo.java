@@ -132,7 +132,41 @@ public class DfsInfo {
       m_childrenToParents.put(type, parents);
     }
     
-    throw new RuntimeException("do dfs walk down m_parentsToChildren with stack of current types");
+    m_hierarchyDown = new HashMap<Type, List<NumberedType>>();
+    SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
+    Type root = obj_cls.getType();
+    List<Type> stack = new ArrayList<Type>();
+    stack.add(root);
+    hierarchyDfs(root, stack);
+  }
+  
+  private void hierarchyDfs(Type curr, List<Type> stack){ 
+    List<Type> children = m_parentsToChildren.get(curr);
+    if(children == null){
+      children = new ArrayList<Type>(); 
+    }
+    for(Type child : children){
+      stack.add(child);
+      hierarchyDfs(child, stack);
+      stack.remove(stack.size()-1);
+    }
+    for(int i = 0; i < stack.size(); ++i){
+      Type stack_value = stack.get(i);
+      List<NumberedType> curr_parents = null;
+      if(m_hierarchyDown.containsKey(stack_value)){
+        curr_parents = m_hierarchyDown.get(stack_value);
+      } else {
+        curr_parents = new ArrayList<NumberedType>();
+        m_hierarchyDown.put(stack_value, curr_parents);
+      }
+      for(int j = i; j < stack.size(); ++j){
+        Type child = stack.get(j); 
+        NumberedType ntype = m_numberedTypeMap.get(child);
+        if(curr_parents.contains(ntype) == false){
+          curr_parents.add(ntype);
+        }
+      }
+    }    
   }
   
   public List<NumberedType> getNumberedTypes(){
