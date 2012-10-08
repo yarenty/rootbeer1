@@ -35,8 +35,9 @@ public class DfsInfo {
   private Set<Type> m_instanceOfs;
   private List<String> m_reachableMethodSigs;
   private OpenCLScene m_oclScene;
+  private SootMethod m_rootMethod;
   
-  public DfsInfo() {
+  public DfsInfo(SootMethod soot_method) {
     m_dfsMethods = new HashSet<String>();
     m_dfsTypes = new HashSet<Type>();
     m_dfsFields = new HashSet<SootField>();
@@ -46,6 +47,7 @@ public class DfsInfo {
     m_reachableMethodSigs = new ArrayList<String>();
     m_parentsToChildren = new HashMap<String, List<Type>>();
     m_oclScene = new OpenCLScene();
+    m_rootMethod = soot_method;
     addBuiltInTypes();
   }
   
@@ -214,6 +216,7 @@ public class DfsInfo {
     if(m_dfsMethods.contains(signature) == false){
       m_dfsMethods.add(signature);
     }
+    addReachableMethodSig(signature);
   }
 
   public boolean containsMethod(String signature) {
@@ -280,17 +283,18 @@ public class DfsInfo {
 
   private void addBuiltInTypes() {
     addRefType("java.lang.Object");                                 //type 0
-    addRefType("java.lang.String");                                 //type 1
-    addRefType("java.lang.AbstractStringBuilder");                  //type 2
-    addRefType("java.lang.StringBuilder");                          //type 3
-    addRefType("java.lang.StackTraceElement");                      //type 4
-    addRefType("java.lang.Throwable");                              //type 5
-    addRefType("java.lang.Exception");                              //type 6
-    addRefType("java.lang.RuntimeException");                       //type 7
-    addRefType("java.lang.NullPointerException");                   //type 8. this maps to 8 in edu.syr.pcpratts.rootbeer.Contants.NullPointerNumber
-    addRefType("java.lang.Error");                                  //type 9.
-    addRefType("java.lang.VirtualMachineError");                    //type 10.
-    addRefType("java.lang.OutOfMemoryError");                       //type 11. this maps to 11 in edu.syr.pcpratts.rootbeer.Contants.OutOfMemoryNumber
+    addRefType("java.lang.System");                                 //type 1
+    addRefType("java.lang.String");                                 //type 2
+    addRefType("java.lang.AbstractStringBuilder");                  //type 3
+    addRefType("java.lang.StringBuilder");                          //type 4
+    addRefType("java.lang.StackTraceElement");                      //type 5
+    addRefType("java.lang.Throwable");                              //type 6
+    addRefType("java.lang.Exception");                              //type 7
+    addRefType("java.lang.RuntimeException");                       //type 8
+    addRefType("java.lang.NullPointerException");                   //type 9. this maps to 9 in edu.syr.pcpratts.rootbeer.Contants.NullPointerNumber
+    addRefType("java.lang.Error");                                  //type 10.
+    addRefType("java.lang.VirtualMachineError");                    //type 11.
+    addRefType("java.lang.OutOfMemoryError");                       //type 12. this maps to 12 in edu.syr.pcpratts.rootbeer.Contants.OutOfMemoryNumber
     addRefType("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
     m_builtInTypes.add(ByteType.v());
     m_builtInTypes.add(CharType.v());
@@ -369,11 +373,13 @@ public class DfsInfo {
   }
   
   public void addReachableMethodSig(String signature){
-    m_reachableMethodSigs.add(signature);
+    if(m_reachableMethodSigs.contains(signature) == false){
+      m_reachableMethodSigs.add(signature);
+    }
   }
   
-  public void removeTypes(List<Type> types) {
-    for(Type type : types){
+  public void removeTypes(List<Type> removed_types, List<Type> added_types) {
+    for(Type type : removed_types){
       if(type instanceof RefType){
         RefType ref_type = (RefType) type;
         SootClass soot_class = ref_type.getSootClass();
@@ -384,6 +390,8 @@ public class DfsInfo {
       }
       m_dfsTypes.remove(type);
     }
+    
+    m_dfsTypes.addAll(added_types);
     
     m_parentsToChildren = new HashMap<String, List<Type>>();
     Set<Type> to_process = new HashSet<Type>();
@@ -420,5 +428,52 @@ public class DfsInfo {
     }
       
     return m_oclScene;
+  }
+
+  public void findReachableMethods() {
+    
+    Iterator<Edge> edges = m_callGraph.edgesInto(m_rootMethod);
+    List<SootMethod> queue = new LinkedList<SootMethod>();
+    Set<SootMethod> visited = new HashSet<SootMethod>();
+    
+    addToQueue(edges, queue, visited);
+    
+    while(queue.isEmpty() == false){
+      SootMethod curr = queue.get(0);
+      queue.remove(0);
+      
+      addReachableMethodSig(curr.getSignature());
+      
+      Iterator<Edge> curr_into = m_callGraph.edgesInto(curr);
+      Iterator<Edge> curr_outof = m_callGraph.edgesOutOf(curr);
+      
+      addToQueue(curr_into, queue, visited);
+      addToQueue(curr_outof, queue, visited);
+    }
+  }
+  
+  private void addToQueue(Iterator<Edge> edges, List<SootMethod> queue, Set<SootMethod> visited){
+    while(edges.hasNext()){
+      Edge edge = edges.next();
+      
+      SootMethod src = edge.src();
+      if(visited.contains(src) == false){
+        queue.add(src);
+        visited.add(src);
+      }
+      
+      SootMethod dest = edge.src();
+      if(visited.contains(dest) == false){
+        queue.add(dest);
+        visited.add(dest);
+      }
+    }
+  }
+
+  public Set<String> getAllMethods() {
+    Set<String> ret = new HashSet<String>();
+    ret.addAll(m_dfsMethods);
+    ret.addAll(m_reachableMethodSigs);
+    return ret;
   }
 }

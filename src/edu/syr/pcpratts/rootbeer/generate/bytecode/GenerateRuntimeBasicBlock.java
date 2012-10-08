@@ -131,7 +131,7 @@ public class GenerateRuntimeBasicBlock {
 
     //$r5 = virtualinvoke r2.<java.lang.StringBuilder: java.lang.String toString()>();
     Local r5 = jimple.newLocal("r5", string_class.getType());
-    SootMethod to_string = string_builder_soot_class.getMethod("toString", new ArrayList(), string_class.getType());
+    SootMethod to_string = string_builder_soot_class.getMethod("java.lang.String toString()");
     Value r5_rhs = jimple.newVirtualInvokeExpr(r2, to_string.makeRef());
     Unit r5_assign = jimple.newAssignStmt(r5, r5_rhs);
     assembler.add(r5_assign);

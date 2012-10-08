@@ -82,11 +82,13 @@ public class RootbeerCompiler {
     m_fastLoader.addPath(jar_filename);
     m_fastLoader.addClassPath(getRuntimeJars());
     m_fastLoader.init();
-    m_fastLoader.singleKernel();
     
     FindKernelForTestCase finder = new FindKernelForTestCase();
     SootClass kernel = finder.get(test_case, m_fastLoader.getKernelClasses());
     m_provider = finder.getProvider();
+    
+    SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
+    m_fastLoader.singleKernel(kernel_method);
     
     List<SootClass> kernel_classes = new ArrayList<SootClass>();
     kernel_classes.add(kernel);
@@ -153,7 +155,7 @@ public class RootbeerCompiler {
         transform.run(sigs);
         transform.finishClone();
         
-        info.removeTypes(transform.getErasedTypes());
+        info.removeTypes(transform.getErasedTypes(), transform.getAddedTypes());
       }
     }
     

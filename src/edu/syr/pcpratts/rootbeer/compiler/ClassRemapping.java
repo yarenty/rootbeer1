@@ -43,11 +43,10 @@ public class ClassRemapping {
   }
   
   public void cloneClass(String class_name){
-    if(m_map.containsKey(class_name)){
+    if(m_clonedMap.containsKey(class_name)){
       return;
-    }
+    } 
     String new_name = "edu.syr.pcpratts.rootbeer.runtime.remap."+class_name;
-    put(class_name, new_name);
     m_clonedMap.put(class_name, new_name);
     
     SootClass soot_class = Scene.v().getSootClass(class_name);
@@ -170,6 +169,15 @@ public class ClassRemapping {
   public List<Type> getErasedTypes() {
     List<Type> ret = new ArrayList<Type>();
     for(String cls : m_map.keySet()){
+      SootClass soot_class = Scene.v().getSootClass(cls);
+      ret.add(soot_class.getType());
+    }
+    return ret;
+  }
+
+  public List<Type> getAddedTypes() {
+    List<Type> ret = new ArrayList<Type>();
+    for(String cls : m_map.values()){
       SootClass soot_class = Scene.v().getSootClass(cls);
       ret.add(soot_class.getType());
     }

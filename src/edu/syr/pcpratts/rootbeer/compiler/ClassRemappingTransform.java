@@ -32,9 +32,6 @@ public class ClassRemappingTransform {
   private ClassRemapping m_classRemapping;
   private Map<SootField, List<FieldRef>> m_fieldsToFix; 
   private Set<String> m_modified;
-  private String m_currClass;
-  private boolean m_hasNext;
-  private boolean m_appClass;
   
   public ClassRemappingTransform(boolean map_runtime){
     m_classRemapping = new ClassRemapping();
@@ -43,17 +40,16 @@ public class ClassRemappingTransform {
     }
     m_fieldsToFix = new HashMap<SootField, List<FieldRef>>();
     m_modified = new HashSet<String>();
-    m_hasNext = true;
   }
-  
-  public void reset(){
-    m_hasNext = false;
-  }
-  
+    
   public void run(List<String> reachable_methods){
     Set<String> visited = new HashSet<String>();
     SignatureUtil sig_util = new SignatureUtil();
-    for(String method_sig : reachable_methods){
+    
+    List<String> curr_reachables = new ArrayList<String>();
+    curr_reachables.addAll(reachable_methods);
+    
+    for(String method_sig : curr_reachables){
       if(visited.contains(method_sig)){
         continue;
       }
@@ -61,8 +57,6 @@ public class ClassRemappingTransform {
       
       String cls_name = sig_util.classFromMethodSig(method_sig);
       SootClass soot_class = Scene.v().getSootClass(cls_name);
-      m_appClass = FastWholeProgram.v().isApplicationClass(soot_class);
-      m_currClass = cls_name;
       String sub_sig = sig_util.methodSubSigFromMethodSig(method_sig);
       SootMethod soot_method = soot_class.getMethod(sub_sig);
       visit(soot_method);
@@ -75,9 +69,7 @@ public class ClassRemappingTransform {
   }
   
   private void run(String cls, boolean app_class){
-    m_currClass = cls;
     SootClass soot_class = Scene.v().getSootClass(cls);
-    m_appClass = app_class;
     List<SootMethod> methods = soot_class.getMethods();
     for(SootMethod method : methods){
       visit(method);
@@ -99,16 +91,11 @@ public class ClassRemappingTransform {
     return ret;
   }
   
-  public void setModified(){
-    m_modified.add(m_currClass);
-  }
-  
   public void fixFields(){
     Iterator<SootField> iter = m_fieldsToFix.keySet().iterator();
     while(iter.hasNext()){
       SootField curr = iter.next();
       SootClass soot_class = curr.getDeclaringClass();
-      m_appClass = FastWholeProgram.v().isApplicationClass(soot_class);
       SootField orig = curr;
       SootClass field_cls = curr.getDeclaringClass();
       if(shouldMap(field_cls)){
@@ -200,11 +187,10 @@ public class ClassRemappingTransform {
       if(shouldMap(soot_class)){
     	  SootClass new_class = getMapping(soot_class);
     	  if (new_class.declaresMethod(subSignature)) {
-    		  SootMethod new_method = new_class.getMethod(subSignature);
+    		  SootMethod new_method = RootbeerScene.v().getMethod(new_class, subSignature.getString());
     		  fixArguments(new_method);
+          RootbeerScene.v().getDfsInfo().addReachableMethodSig(new_method.getSignature());
     		  expr.setMethodRef(new_method.makeRef());
-    	  } else {
-    		  System.err.println("method not found: " + subSignature);
     	  }
       } else {
     	  if(soot_class.declaresMethod(ref.getSubSignature())){
@@ -218,6 +204,7 @@ public class ClassRemappingTransform {
           soot_class = getMapping(soot_class);
         }
         SootMethod method = soot_class.getMethod(ref.getSubSignature());
+        RootbeerScene.v().getDfsInfo().addReachableMethodSig(method.getSignature());
         expr.setMethodRef(method.makeRef());
       } catch(Exception ex){
         //ex.printStackTrace();
@@ -277,18 +264,9 @@ public class ClassRemappingTransform {
   }
 
   private boolean shouldMap(SootClass soot_class) {
-    if(m_appClass){
-      if(m_classRemapping.containsKey(soot_class.getName())){
-        setModified();
-        return true;
-      } else {
-        return false;
-      }
+    if(m_classRemapping.containsKey(soot_class.getName())){
+      return true;
     } else {
-      if(m_classRemapping.containsKey(soot_class.getName()) && !m_classRemapping.cloned(m_currClass)){
-        m_hasNext = true;
-        m_classRemapping.cloneClass(m_currClass);
-      }
       return false;
     }
   }
@@ -365,11 +343,11 @@ public class ClassRemappingTransform {
     }
   }
 
-  public boolean hasNext() {
-    return m_hasNext;
-  }
-  
   public List<Type> getErasedTypes(){
     return m_classRemapping.getErasedTypes();
+  }
+
+  public List<Type> getAddedTypes() {
+    return m_classRemapping.getAddedTypes();
   }
 }

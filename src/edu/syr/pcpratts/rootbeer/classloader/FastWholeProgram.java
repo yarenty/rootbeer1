@@ -609,8 +609,8 @@ public class FastWholeProgram {
     }
   }
 
-  public void singleKernel() {
-    m_currDfsInfo = new DfsInfo();
+  public void singleKernel(SootMethod kernel_method) {
+    m_currDfsInfo = new DfsInfo(kernel_method);
     m_singleKernel = true;
   }
 
@@ -620,7 +620,7 @@ public class FastWholeProgram {
 
   public void execDFS(SootMethod kernel_method) {
     System.out.println("running dfs on: "+kernel_method.getDeclaringClass().getName()+"...");
-    m_currDfsInfo = new DfsInfo();    
+    m_currDfsInfo = new DfsInfo(kernel_method);    
     m_dfsInfos.put(kernel_method, m_currDfsInfo);
     
     doDfs(kernel_method);
@@ -751,6 +751,7 @@ public class FastWholeProgram {
         m_currDfsInfo.addCallGraphEdge(method, dfs_ref.getStmt(), dfs_ref.getSootMethodRef().resolve());
       }
     }
+    m_currDfsInfo.findReachableMethods();
   }
   
   public void buildHierarchy(){   
