@@ -672,6 +672,8 @@ public class FastWholeProgram {
       if(m_currDfsInfo.containsType(curr)){
         continue;
       }
+        
+      m_currDfsInfo.addType(curr);
       
       SootClass type_class = findTypeClass(curr);
       if(type_class == null){
@@ -679,8 +681,6 @@ public class FastWholeProgram {
       }
       
       type_class = m_resolver.resolveClass(type_class.getName(), SootClass.SIGNATURES);
-      
-      m_currDfsInfo.addType(curr);
       
       if(type_class.hasSuperclass()){
         queue.add(type_class.getSuperclass().getType());

@@ -212,11 +212,11 @@ public class DfsValueSwitch implements JimpleValueSwitch {
   }
 
   public void caseNewArrayExpr(NewArrayExpr nae) {
-    addType(nae.getType());
+    addType(nae.getBaseType());
   }
 
   public void caseNewMultiArrayExpr(NewMultiArrayExpr nmae) {
-    addType(nmae.getType());
+    addType(nmae.getBaseType());
   }
 
   public void caseNewExpr(NewExpr ne) {
