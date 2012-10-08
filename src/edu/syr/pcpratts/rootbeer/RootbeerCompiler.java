@@ -135,9 +135,7 @@ public class RootbeerCompiler {
     
     for(SootClass kernel : kernel_classes){
       SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
-      FastWholeProgram.v().execDFS(kernel_method);
-      FastWholeProgram.v().buildFullCallGraph(kernel_method);
-      FastWholeProgram.v().buildHierarchy();
+      FastWholeProgram.v().fullyLoad(kernel_method);
     }
       
     ClassRemappingTransform transform = null;
@@ -153,9 +151,10 @@ public class RootbeerCompiler {
         List<String> sigs = info.getReachableMethodSigs();
         transform = new ClassRemappingTransform(false);
         transform.run(sigs);
-        transform.finishClone();
+        transform.finishClone();        
+        info.setClassRemapping(transform.getClassRemapping());
         
-        info.removeTypes(transform.getErasedTypes(), transform.getAddedTypes());
+        FastWholeProgram.v().reLoad(kernel_method, sigs);
       }
     }
     

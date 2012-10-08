@@ -20,7 +20,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CompileResult;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
-import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
+import edu.syr.pcpratts.rootbeer.util.MethodSignatureUtil;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -122,6 +122,9 @@ public class OpenCLScene {
   public void addField(SootField soot_field){
     SootClass soot_class = soot_field.getDeclaringClass();
     OpenCLClass ocl_class = getOpenCLClass(soot_class);
+    if(ocl_class == null){
+      System.out.println("hello");
+    }
     ocl_class.addField(new OpenCLField(soot_field, soot_class));
   }
 
@@ -170,10 +173,10 @@ public class OpenCLScene {
     m_usesGarbageCollector = false;
     
     Set<String> methods = RootbeerScene.v().getDfsInfo().getAllMethods();
-    SignatureUtil util = new SignatureUtil();
+    MethodSignatureUtil util = new MethodSignatureUtil();
     for(String method_sig : methods){
-      String cls = util.classFromMethodSig(method_sig);
-      String method_sub_sig = util.methodSubSigFromMethodSig(method_sig);
+      String cls = util.classFromSig(method_sig);
+      String method_sub_sig = util.methodSubSig(method_sig);
       SootClass soot_class = Scene.v().getSootClass(cls);
       OpenCLScene.v().addClass(soot_class);
       SootMethod method = RootbeerScene.v().getMethod(soot_class, method_sub_sig);

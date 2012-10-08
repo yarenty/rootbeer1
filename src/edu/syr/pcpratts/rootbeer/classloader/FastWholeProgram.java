@@ -7,7 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.classloader;
 
-import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
+import edu.syr.pcpratts.rootbeer.util.MethodSignatureUtil;
 import edu.syr.pcpratts.rootbeer.util.SystemOutHandler;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -86,8 +86,7 @@ public class FastWholeProgram {
     m_ignorePackages.add("ppg.");
     m_ignorePackages.add("antlr.");
     m_ignorePackages.add("jas.");
-    m_ignorePackages.add("scm.");  
-    m_ignorePackages.add("java.");
+    m_ignorePackages.add("scm.");
     m_ignorePackages.add("org.xmlpull.v1.");
     m_ignorePackages.add("android.util.");
     m_ignorePackages.add("android.content.res.");
@@ -258,8 +257,8 @@ public class FastWholeProgram {
   }
 
   private SootMethod fullyResolveMethod(String method_signature, boolean force_resolve){
-    SignatureUtil util = new SignatureUtil();
-    final String soot_class_str = util.classFromMethodSig(method_signature);
+    MethodSignatureUtil util = new MethodSignatureUtil();
+    final String soot_class_str = util.classFromSig(method_signature);
     if(m_resolvedMethods.contains(method_signature)){
       return m_resolver.resolveMethod(method_signature);
     }
@@ -593,6 +592,15 @@ public class FastWholeProgram {
     }
     return false;
   }
+  
+  public boolean shouldDfsMethod(SootMethod method){
+    SootClass soot_class = method.getDeclaringClass();
+    String pkg = soot_class.getPackageName();
+    if(ignorePackage(pkg)){
+      return false;
+    } 
+    return true;
+  }
 
   private String classToFilename(String name) {
     name = name.replace(".", "/");
@@ -624,12 +632,33 @@ public class FastWholeProgram {
     return m_kernelClasses;
   }
 
-  public void execDFS(SootMethod kernel_method) {
+  public void fullyLoad(SootMethod kernel_method) {
     System.out.println("running dfs on: "+kernel_method.getDeclaringClass().getName()+"...");
     m_currDfsInfo = new DfsInfo(kernel_method);    
     m_dfsInfos.put(kernel_method, m_currDfsInfo);
     
     doDfs(kernel_method);
+    
+    buildFullCallGraph(kernel_method);
+    buildHierarchy();
+  }
+  
+  public void reLoad(SootMethod kernel_method, List<String> method_sigs){
+    System.out.println("reloading dfs_info on: "+kernel_method.getDeclaringClass().getName()+"...");
+    m_currDfsInfo = new DfsInfo(kernel_method);    
+    m_dfsInfos.put(kernel_method, m_currDfsInfo);
+    
+    MethodSignatureUtil util = new MethodSignatureUtil();
+    for(String sig : method_sigs){
+      String class_name = util.classFromSig(sig);
+      String method_sub_sig = util.methodSubSig(sig);
+      
+      SootClass soot_class = Scene.v().getSootClass(class_name);
+      SootMethod method = soot_class.getMethod(method_sub_sig);
+      
+      doDfs(method);
+    }
+    buildHierarchy();
   }
   
   private void doDfs(SootMethod method){
@@ -739,11 +768,11 @@ public class FastWholeProgram {
       }
     }
     
-    SignatureUtil util = new SignatureUtil();
+    MethodSignatureUtil util = new MethodSignatureUtil();
     for(int i = 0; i < methods.size(); ++i){
       String method_sig = methods.get(i);
-      SootClass soot_class = Scene.v().getSootClass(util.classFromMethodSig(method_sig));
-      SootMethod method = soot_class.getMethod(util.methodSubSigFromMethodSig(method_sig));
+      SootClass soot_class = Scene.v().getSootClass(util.classFromSig(method_sig));
+      SootMethod method = soot_class.getMethod(util.methodSubSig(method_sig));
       
       if(method.isConcrete() == false){
         continue;

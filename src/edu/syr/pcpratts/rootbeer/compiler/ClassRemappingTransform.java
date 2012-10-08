@@ -8,7 +8,7 @@
 package edu.syr.pcpratts.rootbeer.compiler;
 
 import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
-import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
+import edu.syr.pcpratts.rootbeer.util.MethodSignatureUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +32,7 @@ public class ClassRemappingTransform {
   private ClassRemapping m_classRemapping;
   private Map<SootField, List<FieldRef>> m_fieldsToFix; 
   private Set<String> m_modified;
+  private List<SootMethod> m_addedMethods;
   
   public ClassRemappingTransform(boolean map_runtime){
     m_classRemapping = new ClassRemapping();
@@ -40,26 +41,30 @@ public class ClassRemappingTransform {
     }
     m_fieldsToFix = new HashMap<SootField, List<FieldRef>>();
     m_modified = new HashSet<String>();
+    m_addedMethods = new ArrayList<SootMethod>();
   }
     
   public void run(List<String> reachable_methods){
-    Set<String> visited = new HashSet<String>();
-    SignatureUtil sig_util = new SignatureUtil();
+    System.out.println("reachable methods: ");
+    for(String method : reachable_methods){
+      System.out.println("  "+method);
+    }
     
-    List<String> curr_reachables = new ArrayList<String>();
-    curr_reachables.addAll(reachable_methods);
-    
-    for(String method_sig : curr_reachables){
-      if(visited.contains(method_sig)){
-        continue;
-      }
-      visited.add(method_sig);
-      
-      String cls_name = sig_util.classFromMethodSig(method_sig);
+    Set<SootClass> reachable_classes = new HashSet<SootClass>();
+    for(String method : reachable_methods){
+      MethodSignatureUtil sig_util = new MethodSignatureUtil();
+      String cls_name = sig_util.classFromSig(method);
       SootClass soot_class = Scene.v().getSootClass(cls_name);
-      String sub_sig = sig_util.methodSubSigFromMethodSig(method_sig);
-      SootMethod soot_method = soot_class.getMethod(sub_sig);
-      visit(soot_method);
+      if(reachable_classes.contains(soot_class) == false){
+        reachable_classes.add(soot_class);
+      }
+    }
+    
+    for(SootClass curr : reachable_classes){
+      List<SootMethod> methods = curr.getMethods();
+      for(SootMethod method : methods){
+        visit(method);
+      }
     }
   }
   
@@ -188,6 +193,7 @@ public class ClassRemappingTransform {
     	  SootClass new_class = getMapping(soot_class);
     	  if (new_class.declaresMethod(subSignature)) {
     		  SootMethod new_method = RootbeerScene.v().getMethod(new_class, subSignature.getString());
+          addAddedMethod(new_method);
     		  fixArguments(new_method);
           RootbeerScene.v().getDfsInfo().addReachableMethodSig(new_method.getSignature());
     		  expr.setMethodRef(new_method.makeRef());
@@ -349,5 +355,15 @@ public class ClassRemappingTransform {
 
   public List<Type> getAddedTypes() {
     return m_classRemapping.getAddedTypes();
+  }
+
+  public List<SootMethod> getAddedMethods() {
+    return m_addedMethods;
+  }
+
+  private void addAddedMethod(SootMethod new_method) {
+    if(m_addedMethods.contains(new_method) == false){
+      m_addedMethods.add(new_method);
+    }
   }
 }

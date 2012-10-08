@@ -7,7 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.classloader;
 
-import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
+import edu.syr.pcpratts.rootbeer.util.MethodSignatureUtil;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import soot.Scene;
@@ -19,9 +19,9 @@ public class MethodFinder {
   private final Logger m_log = Logger.getLogger(this.getClass().getName()); 
   
   public SootMethod find(String method_sig){
-    SignatureUtil util = new SignatureUtil();
-    String class_name = util.classFromMethodSig(method_sig);
-    String method_subsig = util.methodSubSigFromMethodSig(method_sig);
+    MethodSignatureUtil util = new MethodSignatureUtil();
+    String class_name = util.classFromSig(method_sig);
+    String method_subsig = util.methodSubSig(method_sig);
     SootClass soot_class = Scene.v().getSootClass(class_name);
     if(soot_class.isPhantom()){
       return null;

@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.classloader;
 
+import edu.syr.pcpratts.rootbeer.compiler.ClassRemapping;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.MultiDimensionalArrayTypeCreator;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.*;
@@ -36,6 +37,7 @@ public class DfsInfo {
   private List<String> m_reachableMethodSigs;
   private OpenCLScene m_oclScene;
   private SootMethod m_rootMethod;
+  private ClassRemapping m_classRemapping;
   
   public DfsInfo(SootMethod soot_method) {
     m_dfsMethods = new HashSet<String>();
@@ -274,6 +276,9 @@ public class DfsInfo {
 
   public List<Type> getHierarchy(SootClass input_class) {
     List<NumberedType> nret = m_childrenToParents.get(input_class.getType().toString());
+    if(nret == null){
+      System.out.println("hello");
+    }
     List<Type> ret = new ArrayList<Type>();
     for(NumberedType ntype : nret){
       ret.add(ntype.getType());
@@ -378,42 +383,6 @@ public class DfsInfo {
     }
   }
   
-  public void removeTypes(List<Type> removed_types, List<Type> added_types) {
-    for(Type type : removed_types){
-      if(type instanceof RefType){
-        RefType ref_type = (RefType) type;
-        SootClass soot_class = ref_type.getSootClass();
-        for(SootMethod soot_method : soot_class.getMethods()){
-          m_dfsMethods.remove(soot_method.getSignature());
-          m_reachableMethodSigs.remove(soot_method.getSignature());
-        }
-      }
-      m_dfsTypes.remove(type);
-    }
-    
-    m_dfsTypes.addAll(added_types);
-    
-    m_parentsToChildren = new HashMap<String, List<Type>>();
-    Set<Type> to_process = new HashSet<Type>();
-    to_process.addAll(m_dfsTypes);
-    to_process.addAll(m_builtInTypes);
-    for(Type type : to_process){
-      if(type instanceof RefType){
-        RefType ref_type = (RefType) type;
-        SootClass child = ref_type.getSootClass();
-        if(child.hasSuperclass()){
-          addSuperClass(type, child.getSuperclass().getType());
-        }
-      } else if(type instanceof ArrayType){
-        SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
-        addSuperClass(type, obj_class.getType());
-      }
-    }
-    
-    orderTypes();
-    createClassHierarchy(); 
-  }
-
   public OpenCLScene getOpenCLScene() {
     Set<Type> to_process = new HashSet<Type>();
     to_process.addAll(m_dfsTypes);
@@ -432,11 +401,15 @@ public class DfsInfo {
 
   public void findReachableMethods() {
     
-    Iterator<Edge> edges = m_callGraph.edgesInto(m_rootMethod);
     List<SootMethod> queue = new LinkedList<SootMethod>();
     Set<SootMethod> visited = new HashSet<SootMethod>();
     
-    addToQueue(edges, queue, visited);
+    SootClass soot_class = m_rootMethod.getDeclaringClass();
+    
+    for(SootMethod method : soot_class.getMethods()){
+      Iterator<Edge> into = m_callGraph.edgesInto(method);
+      addToQueue(into, queue, visited);
+    }
     
     while(queue.isEmpty() == false){
       SootMethod curr = queue.get(0);
@@ -445,10 +418,8 @@ public class DfsInfo {
       addReachableMethodSig(curr.getSignature());
       
       Iterator<Edge> curr_into = m_callGraph.edgesInto(curr);
-      Iterator<Edge> curr_outof = m_callGraph.edgesOutOf(curr);
       
       addToQueue(curr_into, queue, visited);
-      addToQueue(curr_outof, queue, visited);
     }
   }
   
@@ -457,13 +428,15 @@ public class DfsInfo {
       Edge edge = edges.next();
       
       SootMethod src = edge.src();
-      if(visited.contains(src) == false){
+      System.out.println("src: "+src);
+      if(visited.contains(src) == false && FastWholeProgram.v().shouldDfsMethod(src)){
         queue.add(src);
         visited.add(src);
       }
       
-      SootMethod dest = edge.src();
-      if(visited.contains(dest) == false){
+      SootMethod dest = edge.tgt();
+      System.out.println("dest: "+dest);
+      if(visited.contains(dest) == false && FastWholeProgram.v().shouldDfsMethod(dest)){
         queue.add(dest);
         visited.add(dest);
       }
@@ -475,5 +448,9 @@ public class DfsInfo {
     ret.addAll(m_dfsMethods);
     ret.addAll(m_reachableMethodSigs);
     return ret;
+  }
+
+  public void setClassRemapping(ClassRemapping class_remapping) {
+    m_classRemapping = class_remapping;
   }
 }

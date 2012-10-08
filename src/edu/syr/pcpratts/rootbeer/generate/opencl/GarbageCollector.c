@@ -137,6 +137,11 @@ boolean edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu($$__global$$ char 
   return 1;
 }
 
+$$__device__$$
+long long java_lang_System_nanoTime($$__global$$ char * gc_info, int * exception){
+  return (long long) clock64();
+}
+
 $$__device__$$ 
 int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId($$__global$$ char * gc_info, int * exception){
   return getThreadId();
