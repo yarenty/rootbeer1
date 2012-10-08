@@ -368,26 +368,8 @@ public class ClassRemappingTransform {
   public boolean hasNext() {
     return m_hasNext;
   }
-/*
-  private String remapMethodSig(String method_sig) {
-    SignatureUtil util = new SignatureUtil();
-    String cls = util.classFromMethodSig(method_sig);
-    String method_name = util.methodName(method_sig);
-    String return_type = util.getReturnType(method_sig);
-    List<String> params = util.getMethodParams(method_sig);
-    cls = stringRemap(cls);
-    for(int i = 0; i < params.size(); ++i){
-      params.set(i, stringRemap(params.get(i)));
-    }
-    String new_sig = util.buildSignature(cls, method_name, return_type, params);
+  
+  public List<Type> getErasedTypes(){
+    return m_classRemapping.getErasedTypes();
   }
-
-  private String stringRemap(String type){
-    if(m_classRemapping.containsKey(type)){
-      m_hasNext = true;
-      return m_classRemapping.get(type);
-    }
-    return type;
-  }
-  */
 }

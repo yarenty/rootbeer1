@@ -98,13 +98,6 @@ public class OpenCLScene {
     return RootbeerScene.v().getDfsInfo().getClassNumber(soot_class);
   }
   
-  public void addInstanceof(Type type){
-    OpenCLInstanceof to_add = new OpenCLInstanceof(type);
-    if(m_instanceOfs.contains(to_add) == false){
-      m_instanceOfs.add(to_add);
-    }
-  }
-
   public void addMethod(SootMethod soot_method){
     SootClass soot_class = soot_method.getDeclaringClass();
 
@@ -119,6 +112,13 @@ public class OpenCLScene {
     if(m_arrayTypes.contains(array_type))
       return;
     m_arrayTypes.add(array_type);
+  }  
+  
+  public void addInstanceof(Type type){
+    OpenCLInstanceof to_add = new OpenCLInstanceof(type);
+    if(m_instanceOfs.contains(to_add) == false){
+      m_instanceOfs.add(to_add);
+    }
   }
 
   public OpenCLClass getOpenCLClass(SootClass soot_class){
@@ -190,25 +190,16 @@ public class OpenCLScene {
       addArrayType(ocl_array_type);
     }
     
+    Set<Type> instanceofs = RootbeerScene.v().getDfsInfo().getInstanceOfs();
+    for(Type type : instanceofs){
+      addInstanceof(type);
+    }
+    
     StringBuilder ret = new StringBuilder();
     ret.append(headerString());
     ret.append(garbageCollectorString());
     ret.append(methodPrototypesString());
     ret.append(methodBodiesString());
-    String prev_hash = "";
-    String curr_hash = DigestUtils.md5Hex(ret.toString());
-    
-    while(prev_hash.equals(curr_hash) == false){
-      ret = new StringBuilder();
-      
-      ret.append(headerString());
-      ret.append(garbageCollectorString());
-      ret.append(methodPrototypesString());
-      ret.append(methodBodiesString());
-      
-      prev_hash = curr_hash;
-      curr_hash = DigestUtils.md5Hex(ret.toString());
-    }
 
     String cuda_code;
     //for debugging you can read the cuda code from a generated.cu

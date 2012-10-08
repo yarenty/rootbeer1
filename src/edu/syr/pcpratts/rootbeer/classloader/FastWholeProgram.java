@@ -17,6 +17,7 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.*;
 import soot.*;
+import soot.jimple.Stmt;
 
 public class FastWholeProgram {
   private static FastWholeProgram m_instance;
@@ -618,13 +619,11 @@ public class FastWholeProgram {
   }
 
   public void execDFS(SootMethod kernel_method) {
+    System.out.println("running dfs on: "+kernel_method.getDeclaringClass().getName()+"...");
     m_currDfsInfo = new DfsInfo();    
     m_dfsInfos.put(kernel_method, m_currDfsInfo);
     
     doDfs(kernel_method);
-    m_currDfsInfo.expandArrayTypes();
-    m_currDfsInfo.orderTypes();
-    m_currDfsInfo.createClassHierarchy();
   }
   
   private void doDfs(SootMethod method){
@@ -633,7 +632,7 @@ public class FastWholeProgram {
       return;
     }
     m_currDfsInfo.addMethod(signature);
-    
+        
     SootClass soot_class = method.getDeclaringClass();
     addType(soot_class.getType());
     
@@ -645,12 +644,20 @@ public class FastWholeProgram {
       addType(type);
     }
     
-    Set<SootMethodRef> methods = value_switch.getMethodRefs();
-    for(SootMethodRef ref : methods){
-      SootClass method_class = ref.declaringClass();
+    Set<DfsMethodRef> methods = value_switch.getMethodRefs();
+    for(DfsMethodRef ref : methods){
+      SootMethodRef mref = ref.getSootMethodRef();
+      SootMethod dest = mref.resolve();
+      
+      if(dest.isConcrete() == false){
+        continue;
+      } 
+      
+      SootClass method_class = mref.declaringClass();
       addType(method_class.getType());
       
-      doDfs(ref.resolve());
+      m_currDfsInfo.addCallGraphEdge(method, ref.getStmt(), dest);
+      doDfs(dest);
     }
     
     Set<SootFieldRef> fields = value_switch.getFieldRefs();
@@ -659,6 +666,11 @@ public class FastWholeProgram {
       
       SootField field = ref.resolve();
       m_currDfsInfo.addField(field);
+    }
+    
+    Set<Type> instance_ofs = value_switch.getInstanceOfs();
+    for(Type type : instance_ofs){
+      m_currDfsInfo.addInstanceOf(type);
     }
   }
 
@@ -709,5 +721,42 @@ public class FastWholeProgram {
 
   public FastClassResolver getResolver() {
     return m_resolver;
+  }
+
+  public void buildFullCallGraph(SootMethod kernel_method) {
+    System.out.println("building full call graph for: "+kernel_method.getDeclaringClass().getName()+"...");
+    List<String> methods = new ArrayList<String>();
+    for(String cls : m_applicationClasses){
+      SootClass soot_class = m_resolver.resolveClass(cls, SootClass.BODIES);
+      for(SootMethod method : soot_class.getMethods()){
+        methods.add(method.getSignature());
+      }
+    }
+    
+    SignatureUtil util = new SignatureUtil();
+    for(int i = 0; i < methods.size(); ++i){
+      String method_sig = methods.get(i);
+      SootClass soot_class = Scene.v().getSootClass(util.classFromMethodSig(method_sig));
+      SootMethod method = soot_class.getMethod(util.methodSubSigFromMethodSig(method_sig));
+      
+      if(method.isConcrete() == false){
+        continue;
+      }
+        
+      DfsValueSwitch value_switch = new DfsValueSwitch();
+      value_switch.run(method);
+        
+      Set<DfsMethodRef> method_refs = value_switch.getMethodRefs();
+      for(DfsMethodRef dfs_ref : method_refs){
+        m_currDfsInfo.addCallGraphEdge(method, dfs_ref.getStmt(), dfs_ref.getSootMethodRef().resolve());
+      }
+    }
+  }
+  
+  public void buildHierarchy(){   
+    System.out.println("building class hierarchy...");
+    m_currDfsInfo.expandArrayTypes();
+    m_currDfsInfo.orderTypes();
+    m_currDfsInfo.createClassHierarchy(); 
   }
 }

@@ -10,7 +10,9 @@ package edu.syr.pcpratts.rootbeer.classloader;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.MultiDimensionalArrayTypeCreator;
 import java.util.*;
 import soot.*;
+import soot.jimple.Stmt;
 import soot.jimple.toolkits.callgraph.CallGraph;
+import soot.jimple.toolkits.callgraph.Edge;
 
 public class DfsInfo {
 
@@ -29,17 +31,18 @@ public class DfsInfo {
   private Set<ArrayType> m_arrayTypes;
   private List<Type> m_builtInTypes;
   private Map<SootClass, Integer> m_classToNumber;
+  private Set<Type> m_instanceOfs;
+  private List<String> m_reachableMethodSigs;
   
   public DfsInfo() {
     m_dfsMethods = new HashSet<String>();
     m_dfsTypes = new HashSet<Type>();
     m_dfsFields = new HashSet<SootField>();
     m_callGraph = new CallGraph();
-    m_parentsToChildren = new HashMap<String, List<Type>>();
-    m_childrenToParents = new HashMap<String, List<NumberedType>>();
-    m_classToNumber = new HashMap<SootClass, Integer>();
     m_builtInTypes = new ArrayList<Type>();
-    m_numberedTypeMap = new HashMap<String, NumberedType>();
+    m_instanceOfs = new HashSet<Type>();
+    m_reachableMethodSigs = new ArrayList<String>();
+    m_parentsToChildren = new HashMap<String, List<Type>>();
     addBuiltInTypes();
   }
   
@@ -63,6 +66,9 @@ public class DfsInfo {
   }
   
   public void orderTypes(){
+    m_numberedTypeMap = new HashMap<String, NumberedType>();
+    m_classToNumber = new HashMap<SootClass, Integer>();
+    
     List<NumberedType> numbered_types = new ArrayList<NumberedType>();
     int number = 1;
     List<Type> queue = new LinkedList<Type>();
@@ -111,6 +117,7 @@ public class DfsInfo {
   }
   
   public void createClassHierarchy(){
+    m_childrenToParents = new HashMap<String, List<NumberedType>>();
     for(Type type : m_dfsTypes){
       List<NumberedType> parents = new ArrayList<NumberedType>();
       NumberedType curr_type = m_numberedTypeMap.get(type.toString());
@@ -260,7 +267,11 @@ public class DfsInfo {
     List<NumberedType> nret = m_childrenToParents.get(input_class.getType().toString());
     List<Type> ret = new ArrayList<Type>();
     for(NumberedType ntype : nret){
+      try {
       ret.add(ntype.getType());
+      } catch(Exception ex){
+        ex.printStackTrace();
+      }
     }
     return ret;
   }
@@ -317,6 +328,64 @@ public class DfsInfo {
 
   public List<NumberedType> getNumberedHierarchyDown(SootClass sootClass) {
     return m_hierarchyDown.get(sootClass.getType().toString());
+  }
+
+  public void addCallGraphEdge(SootMethod src, Stmt stmt, SootMethod dest) {
+    Edge e = new Edge(src, stmt, dest);
+    m_callGraph.addEdge(e);
+  }
+
+  public int getCallGraphEdges() {
+    return m_callGraph.size();
+  }
+
+  public Set<Type> getInstanceOfs() {
+    return m_instanceOfs;
+  }
+
+  public void addInstanceOf(Type type) {
+    if(m_instanceOfs.contains(type) == false){
+      m_instanceOfs.add(type);
+    }
+  }
+  
+  public List<String> getReachableMethodSigs(){
+    return m_reachableMethodSigs;
+  }
+  
+  public void addReachableMethodSig(String signature){
+    m_reachableMethodSigs.add(signature);
+  }
+  
+  public void removeTypes(List<Type> types) {
+    for(Type type : types){
+      if(type instanceof RefType){
+        RefType ref_type = (RefType) type;
+        SootClass soot_class = ref_type.getSootClass();
+        for(SootMethod soot_method : soot_class.getMethods()){
+          m_dfsMethods.remove(soot_method.getSignature());
+          m_reachableMethodSigs.remove(soot_method.getSignature());
+        }
+      }
+      m_dfsTypes.remove(type);
+    }
+    
+    m_parentsToChildren = new HashMap<String, List<Type>>();
+    for(Type type : m_dfsTypes){
+      if(type instanceof RefType){
+        RefType ref_type = (RefType) type;
+        SootClass child = ref_type.getSootClass();
+        if(child.hasSuperclass()){
+          addSuperClass(type, child.getSuperclass().getType());
+        }
+      } else if(type instanceof ArrayType){
+        SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
+        addSuperClass(type, obj_class.getType());
+      }
+    }
+    
+    orderTypes();
+    createClassHierarchy(); 
   }
 }
 

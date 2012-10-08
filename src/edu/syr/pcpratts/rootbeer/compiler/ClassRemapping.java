@@ -9,26 +9,26 @@ package edu.syr.pcpratts.rootbeer.compiler;
 
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.*;
 import soot.Scene;
 import soot.SootClass;
+import soot.Type;
 
 public class ClassRemapping {
 
-  private Map<String, String> m_Map;
-  private Map<String, String> m_ClonedMap;
-  private List<String> m_RuntimeClasses;
-  private List<String> m_RuntimeClassesJar;
+  private Map<String, String> m_map;
+  private Map<String, String> m_clonedMap;
+  private List<String> m_runtimeClasses;
+  private List<String> m_runtimeClassesJar;
   
   public ClassRemapping(){
-    m_Map = new HashMap<String, String>();
-    m_ClonedMap = new HashMap<String, String>();
-    m_RuntimeClasses = new ArrayList<String>();
-    m_RuntimeClassesJar = new ArrayList<String>();
+    m_map = new HashMap<String, String>();
+    m_clonedMap = new HashMap<String, String>();
+    m_runtimeClasses = new ArrayList<String>();
+    m_runtimeClassesJar = new ArrayList<String>();
     put("java.util.concurrent.atomic.AtomicLong", "edu.syr.pcpratts.rootbeer.runtime.remap.GpuAtomicLong");
     put("java.util.Random", "edu.syr.pcpratts.rootbeer.runtime.remap.Random");
     put("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.CallsPrivateMethod", "edu.syr.pcpratts.rootbeer.runtime.remap.DoesntCallPrivateMethod");
@@ -36,19 +36,19 @@ public class ClassRemapping {
   }
 
   private void put(String key, String value) {
-    m_Map.put(key, value);
-    m_RuntimeClasses.add(value);
+    m_map.put(key, value);
+    m_runtimeClasses.add(value);
     value = "/" + value.replace(".", "/") + ".class";
-    m_RuntimeClassesJar.add(value);
+    m_runtimeClassesJar.add(value);
   }
   
   public void cloneClass(String class_name){
-    if(m_Map.containsKey(class_name)){
+    if(m_map.containsKey(class_name)){
       return;
     }
     String new_name = "edu.syr.pcpratts.rootbeer.runtime.remap."+class_name;
     put(class_name, new_name);
-    m_ClonedMap.put(class_name, new_name);
+    m_clonedMap.put(class_name, new_name);
     
     SootClass soot_class = Scene.v().getSootClass(class_name);
     CloneClass cloner = new CloneClass();
@@ -59,28 +59,28 @@ public class ClassRemapping {
   
   
   public List<String> getRuntimeClasses(){
-    return m_RuntimeClasses;
+    return m_runtimeClasses;
   }
   
   public List<String> getRuntimeClassesJar(){
-    return m_RuntimeClassesJar;
+    return m_runtimeClassesJar;
   }
 
   public boolean containsKey(String cls_name) {
-    return m_Map.containsKey(cls_name);
+    return m_map.containsKey(cls_name);
   }
 
   public String get(String cls_name) {
-    return m_Map.get(cls_name);
+    return m_map.get(cls_name);
   }
 
   public boolean cloned(String cls) {
-    return m_ClonedMap.containsKey(cls);
+    return m_clonedMap.containsKey(cls);
   }
 
   public List<String> getCloned() {
     List<String> ret = new ArrayList<String>();
-    ret.addAll(m_ClonedMap.values());
+    ret.addAll(m_clonedMap.values());
     return ret;
   }
 
@@ -103,10 +103,10 @@ public class ClassRemapping {
     String filename = "src"+mapFilename();
     try {
       PrintWriter writer = new PrintWriter(filename);
-      Iterator<String> iter = m_ClonedMap.keySet().iterator();
+      Iterator<String> iter = m_clonedMap.keySet().iterator();
       while(iter.hasNext()){
         String key = iter.next();
-        String value = m_ClonedMap.get(key);
+        String value = m_clonedMap.get(key);
         writer.println(key+" => "+value);
       }
       writer.flush();
@@ -147,7 +147,7 @@ public class ClassRemapping {
         if(tokens.length != 2){
           continue;
         }
-        m_ClonedMap.put(tokens[0].trim(), tokens[1].trim()); 
+        m_clonedMap.put(tokens[0].trim(), tokens[1].trim()); 
         put(tokens[0].trim(), tokens[1].trim()); 
       }      
     } catch(Exception ex){
@@ -158,12 +158,21 @@ public class ClassRemapping {
   public List<String> getUsed() {
     loadMap();
     List<String> ret = new ArrayList<String>();
-    ret.addAll(m_RuntimeClasses);
-    ret.addAll(m_ClonedMap.values());
+    ret.addAll(m_runtimeClasses);
+    ret.addAll(m_clonedMap.values());
     return ret;
   }
 
   public Collection<String> getValues() {
-    return m_Map.values();
+    return m_map.values();
+  }
+
+  public List<Type> getErasedTypes() {
+    List<Type> ret = new ArrayList<Type>();
+    for(String cls : m_map.keySet()){
+      SootClass soot_class = Scene.v().getSootClass(cls);
+      ret.add(soot_class.getType());
+    }
+    return ret;
   }
 }

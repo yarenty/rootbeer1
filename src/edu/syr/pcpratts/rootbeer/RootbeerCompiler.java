@@ -28,6 +28,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import pack.Pack;
 import soot.*;
+import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.options.Options;
 import soot.util.JasminOutputStream;
 
@@ -120,82 +121,57 @@ public class RootbeerCompiler {
       System.exit(0);
     }
     
-    SootClass[] sorted = new SootClass[kernel_classes.size()];
-    sorted = kernel_classes.toArray(sorted);
+    String[] sorted = new String[kernel_classes.size()];
+    for(int i = 0; i < kernel_classes.size(); ++i){
+      sorted[i] = kernel_classes.get(i).getName();
+    }
     Arrays.sort(sorted);
     kernel_classes.clear();
-    for(SootClass cls : sorted){
-      kernel_classes.add(cls);
+    for(String cls : sorted){
+      kernel_classes.add(Scene.v().getSootClass(cls));
     }
     
     for(SootClass kernel : kernel_classes){
       SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
       FastWholeProgram.v().execDFS(kernel_method);
-      FastWholeProgram.v().getDfsInfo(kernel_method);
+      FastWholeProgram.v().buildFullCallGraph(kernel_method);
+      FastWholeProgram.v().buildHierarchy();
     }
       
-    /*
     ClassRemappingTransform transform = null;
     
     if(!Main.disable_class_remapping()){
       System.out.println("remapping some classes to GPU versions...");
-      Iterator<String> iter = reachables.keySet().iterator();
-      while(iter.hasNext()){
-        List<String> curr_reachables = reachables.get(iter.next());
+      
+      for(SootClass kernel : kernel_classes){
+        SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
+        DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
+        RootbeerScene.v().setDfsInfo(info);
+        
+        List<String> sigs = info.getReachableMethodSigs();
         transform = new ClassRemappingTransform(false);
-        transform.run(curr_reachables);
+        transform.run(sigs);
         transform.finishClone();
+        
+        info.removeTypes(transform.getErasedTypes());
       }
     }
     
-    //re-run finding kernel reachables with remap in
-    reachables = new HashMap<String, List<String>>();
-    forward_reachables = new HashMap<String, List<String>>();
-    all_reachables = new ArrayList<String>();
-    
-    for(String kernel : kernel_classes){
-      SootClass soot_class = Scene.v().getSootClass(kernel);
-      SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
-      FastWholeProgram.v().getDfsMethods(kernel_method);
-      
-      System.out.println("finding kernel reachable methods for: "+soot_class.getShortName()+"...");
-    
-      KernelReachableMethods reachable_finder = new KernelReachableMethods();
-      List<String> curr_reachables = reachable_finder.get(kernel);
-      forward_reachables.put(kernel, reachable_finder.getForward());
-      
-      all_reachables.addAll(curr_reachables);
-      reachables.put(kernel, curr_reachables);
-    }
-    */
-    
     Transform2 transform2 = new Transform2();
-    for(SootClass soot_class : kernel_classes){
-      //List<String> curr_reachables = reachables.get(cls);
-      //RootbeerScene.v().setReachableMethods(curr_reachables);
-      //RootbeerScene.v().setForwardReachables(forward_reachables.get(cls));
-      
+    for(SootClass soot_class : kernel_classes){      
       SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
       DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
       RootbeerScene.v().setDfsInfo(info);
       transform2.run(soot_class.getName());
     }
     
-    /*
-    Set<String> app_classes = new HashSet<String>();
-    
     if(!Main.disable_class_remapping()){
-      app_classes.addAll(transform.getModifiedClasses());
+      for(String cls : transform.getModifiedClasses()){
+        loadAllMethods(cls);
+        writeClassFile(cls);
+        writeJimpleFile(cls);
+      }    
     }
-    * 
-    SignatureUtil util = new SignatureUtil();
-    for(String method_sig : all_reachables){
-      String class_name = util.classFromMethodSig(method_sig);
-      if(app_classes.contains(class_name) == false){
-        app_classes.add(class_name);
-      }
-    }
-    */
     
     for(SootClass soot_class : kernel_classes){
       SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
