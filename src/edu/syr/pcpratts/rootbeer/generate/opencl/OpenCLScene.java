@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
-import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
@@ -27,7 +26,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,9 +34,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.codec.digest.DigestUtils;
 import soot.*;
-import soot.jimple.NewMultiArrayExpr;
 
 public class OpenCLScene {
   private static OpenCLScene m_instance;
@@ -58,7 +54,7 @@ public class OpenCLScene {
     m_curentIdent = 0;
   }
 
-  private void resetInstance(){
+  public OpenCLScene(){
     m_codeSegment = null;
     m_classes = new LinkedHashMap<String, OpenCLClass>();
     m_oclToSoot = new HashMap<String, String>();
@@ -67,14 +63,12 @@ public class OpenCLScene {
     m_instanceOfs = new HashSet<OpenCLInstanceof>();
   }
 
-  private OpenCLScene(){
-    resetInstance();
-  }
-
   public static OpenCLScene v(){
-    if(m_instance == null)
-      m_instance = new OpenCLScene();
     return m_instance;
+  }
+  
+  public static void setInstance(OpenCLScene scene){
+    m_instance = scene;
   }
 
   public static void releaseV(){
@@ -122,13 +116,7 @@ public class OpenCLScene {
   }
 
   public OpenCLClass getOpenCLClass(SootClass soot_class){
-    //add the class to the scene if it is not there allready
-    OpenCLClass ocl_class = new OpenCLClass(soot_class);
-    if(m_classes.containsKey(ocl_class.getName()))
-      ocl_class = m_classes.get(ocl_class.getName());
-    m_classes.put(ocl_class.getName(), ocl_class);
-    m_oclToSoot.put(ocl_class.getName(), soot_class.getName());
-    return ocl_class;
+    return m_classes.get(soot_class.getName());
   }
 
   public void addField(SootField soot_field){
@@ -164,6 +152,18 @@ public class OpenCLScene {
 
   public boolean getUsingGarbageCollector(){
     return m_usesGarbageCollector;
+  }
+  
+  public void addClass(SootClass soot_class){
+    OpenCLClass ocl_class = new OpenCLClass(soot_class);
+    
+    if(m_classes.containsKey(soot_class.getName()) == false){
+      m_classes.put(soot_class.getName(), ocl_class);
+    }
+    
+    if(m_oclToSoot.containsKey(ocl_class.getName()) == false){
+      m_oclToSoot.put(ocl_class.getName(), soot_class.getName());
+    }
   }
   
   private String makeSourceCode() throws Exception {
@@ -334,7 +334,6 @@ public class OpenCLScene {
   }
 
   public void addCodeSegment(CodeSegment codeSegment){
-    resetInstance();
     this.m_codeSegment = codeSegment;
     m_rootSootClass = codeSegment.getRootSootClass();    
     m_readOnlyTypes = new ReadOnlyTypes(codeSegment.getRootMethod());

@@ -35,7 +35,7 @@ public class OpenCLPolymorphicMethod {
 
   private String getMethodDecl(){
     List<Type> hierarchy = getHierarchy();
-    Type type = hierarchy.get(1);
+    Type type = hierarchy.get(0);
     if(type instanceof RefType == false){
       throw new RuntimeException("please report bug in OpenCLPolymorphicMethod.getMethodDecl"); 
     }
@@ -55,7 +55,7 @@ public class OpenCLPolymorphicMethod {
     if(m_sootMethod.getName().equals("<init>"))
       return "";
     List<Type> hierarchy = getHierarchy();
-    Type first_type = hierarchy.get(1);
+    Type first_type = hierarchy.get(0);
     if(first_type instanceof RefType == false){
       throw new RuntimeException("please report bug in OpenCLPolymorphicMethod.getMethodBody"); 
     }

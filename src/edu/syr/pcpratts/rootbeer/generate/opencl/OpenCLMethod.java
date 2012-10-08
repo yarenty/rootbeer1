@@ -271,7 +271,7 @@ public class OpenCLMethod {
       System.out.println("size = 0");
       return null;
     } else {
-      return writeInstanceInvoke(arg0, "invoke_", hierarchy.get(hierarchy.size()-1));
+      return writeInstanceInvoke(arg0, "invoke_", hierarchy.get(0));
     } 
   }
 

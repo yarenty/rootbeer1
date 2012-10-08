@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.classloader;
 
 import edu.syr.pcpratts.rootbeer.generate.bytecode.MultiDimensionalArrayTypeCreator;
+import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.*;
 import soot.*;
 import soot.jimple.Stmt;
@@ -33,6 +34,7 @@ public class DfsInfo {
   private Map<SootClass, Integer> m_classToNumber;
   private Set<Type> m_instanceOfs;
   private List<String> m_reachableMethodSigs;
+  private OpenCLScene m_oclScene;
   
   public DfsInfo() {
     m_dfsMethods = new HashSet<String>();
@@ -43,6 +45,7 @@ public class DfsInfo {
     m_instanceOfs = new HashSet<Type>();
     m_reachableMethodSigs = new ArrayList<String>();
     m_parentsToChildren = new HashMap<String, List<Type>>();
+    m_oclScene = new OpenCLScene();
     addBuiltInTypes();
   }
   
@@ -401,5 +404,21 @@ public class DfsInfo {
     
     orderTypes();
     createClassHierarchy(); 
+  }
+
+  public OpenCLScene getOpenCLScene() {
+    Set<Type> to_process = new HashSet<Type>();
+    to_process.addAll(m_dfsTypes);
+    to_process.addAll(m_builtInTypes);
+    
+    for(Type type : to_process){
+      if(type instanceof RefType == false){
+        continue;
+      }
+      RefType ref_type = (RefType) type;
+      m_oclScene.addClass(ref_type.getSootClass());
+    }
+      
+    return m_oclScene;
   }
 }

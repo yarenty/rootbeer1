@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.compiler;
 
+import edu.syr.pcpratts.rootbeer.classloader.DfsInfo;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.GenerateRuntimeBasicBlock;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import soot.Scene;
@@ -21,8 +22,9 @@ public class Transform2 {
     m_Uuid = 1;
   }
 
-  public void run(String cls){     
-    OpenCLScene.v();
+  public void run(String cls){    
+    DfsInfo dfs_info = RootbeerScene.v().getDfsInfo();
+    OpenCLScene.setInstance(dfs_info.getOpenCLScene());
     
     System.out.println("running Transform2 on: "+cls);
     
