@@ -7,12 +7,15 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import soot.RefType;
 import soot.SootClass;
 import soot.SootMethod;
+import soot.Type;
 
 /**
  * Represents all the versions of methods in a class Hierarchy
@@ -60,7 +63,7 @@ public class MethodHierarchies {
     
     private String m_methodSubsignature;
     private SootMethod m_sootMethod;
-    private List<SootClass> m_hierarchy;
+    private List<Type> m_hierarchy;
     
     public MethodHierarchy(SootMethod method){
       m_methodSubsignature = method.getSubSignature();
@@ -69,8 +72,13 @@ public class MethodHierarchies {
     
     public List<OpenCLMethod> getMethods(){
       List<OpenCLMethod> ret = new ArrayList<OpenCLMethod>();
-      List<SootClass> class_hierarchy = OpenCLScene.v().getClassHierarchy(m_sootMethod.getDeclaringClass());
-      for(SootClass soot_class : class_hierarchy){
+      List<Type> class_hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
+      for(Type type : class_hierarchy){
+        if(type instanceof RefType == false){
+          continue;
+        }
+        RefType ref_type = (RefType) type;
+        SootClass soot_class = ref_type.getSootClass();
         SootMethod soot_method = null;
         try {
           soot_method = soot_class.getMethod(m_methodSubsignature);
@@ -84,15 +92,20 @@ public class MethodHierarchies {
     }
         
     public boolean isPolyMorphic(){
-      List<SootClass> class_hierarchy = OpenCLScene.v().getClassHierarchy(m_sootMethod.getDeclaringClass());
+      List<Type> class_hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
       if(class_hierarchy.size() > 1)
         return true;
       return false;
     }
     
     public OpenCLPolymorphicMethod getOpenCLPolyMorphicMethod(){
-      List<SootClass> class_hierarchy = OpenCLScene.v().getClassHierarchy(m_sootMethod.getDeclaringClass());
-      for(SootClass soot_class : class_hierarchy){
+      List<Type> class_hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
+      for(Type type : class_hierarchy){
+        if(type instanceof RefType == false){
+          continue;
+        }
+        RefType ref_type = (RefType) type;
+        SootClass soot_class = ref_type.getSootClass();
         try {
           SootMethod soot_method = soot_class.getMethod(m_methodSubsignature);
           return new OpenCLPolymorphicMethod(soot_method);
@@ -127,7 +140,7 @@ public class MethodHierarchies {
     }
 
     private void saveHierarchy() {
-      m_hierarchy = OpenCLScene.v().getClassHierarchy(m_sootMethod.getDeclaringClass());
+      m_hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
     }
   }
 }

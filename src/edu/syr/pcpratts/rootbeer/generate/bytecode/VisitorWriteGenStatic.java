@@ -31,19 +31,19 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
   public VisitorWriteGenStatic(BytecodeLanguage bcl, FieldReadWriteInspector inspector){
     super(inspector);
     
-    m_Bcl.push(bcl);
+    m_bcl.push(bcl);
     m_StaticOffsets = new StaticOffsets();
     m_AttachedWriters = new HashSet<String>();
   }
   
   public void makeMethod(){
-    BytecodeLanguage bcl = m_Bcl.top();    
+    BytecodeLanguage bcl = m_bcl.top();    
     bcl.startMethod("doWriteStaticsToHeap", VoidType.v());
     
-    m_ThisRef = bcl.refThis();
-    m_GcObjVisitor.push(m_ThisRef);
-    m_Mem = bcl.refInstanceField(m_ThisRef, "mMem");  
-    m_CurrMem.push(m_Mem);
+    m_thisRef = bcl.refThis();
+    m_gcObjVisitor.push(m_thisRef);
+    m_Mem = bcl.refInstanceField(m_thisRef, "mMem");  
+    m_currMem.push(m_Mem);
     
     BclMemory bcl_mem = new BclMemory(bcl, m_Mem);
     bcl_mem.useInstancePointer();
@@ -75,7 +75,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     bcl.returnVoid();    
     bcl.endMethod();
     
-    m_GcObjVisitor.pop();
+    m_gcObjVisitor.pop();
   }
   
   private void attachAndCallWriter(SootClass soot_class, List<SootClass> children){    
@@ -88,11 +88,11 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
   }
   
   private void callWriter(SootClass soot_class){    
-    BytecodeLanguage bcl = m_Bcl.top();
+    BytecodeLanguage bcl = m_bcl.top();
     String method_name = getWriterName(soot_class);
     SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
-    bcl.pushMethod(soot_class, method_name, VoidType.v(), mem.getType(), m_GcObjVisitor.top().getType());
-    bcl.invokeStaticMethodNoRet(m_CurrMem.top(), m_GcObjVisitor.top());
+    bcl.pushMethod(soot_class, method_name, VoidType.v(), mem.getType(), m_gcObjVisitor.top().getType());
+    bcl.invokeStaticMethodNoRet(m_currMem.top(), m_gcObjVisitor.top());
   }
   
   private String getWriterName(SootClass soot_class){
@@ -107,15 +107,15 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     m_AttachedWriters.add(method_name);
         
     BytecodeLanguage bcl = new BytecodeLanguage();
-    m_Bcl.push(bcl);
+    m_bcl.push(bcl);
     bcl.openClass(soot_class);
     SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
-    bcl.startStaticMethod(method_name, VoidType.v(), mem.getType(), m_GcObjVisitor.top().getType());
+    bcl.startStaticMethod(method_name, VoidType.v(), mem.getType(), m_gcObjVisitor.top().getType());
     
     Local memory = bcl.refParameter(0);
     Local gc_visit = bcl.refParameter(1);
-    m_CurrMem.push(memory);
-    m_GcObjVisitor.push(gc_visit);
+    m_currMem.push(memory);
+    m_gcObjVisitor.push(gc_visit);
     
     doWriter(soot_class);
     
@@ -126,15 +126,15 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     bcl.returnVoid();
     bcl.endMethod();
     
-    m_Bcl.pop();
-    m_GcObjVisitor.pop();
-    m_CurrMem.pop();
+    m_bcl.pop();
+    m_gcObjVisitor.pop();
+    m_currMem.pop();
   }
   
   private void doWriter(SootClass soot_class){  
-    BytecodeLanguage bcl = m_Bcl.top();
-    Local memory = m_CurrMem.top();
-    Local gc_visit = m_GcObjVisitor.top();
+    BytecodeLanguage bcl = m_bcl.top();
+    Local memory = m_currMem.top();
+    Local gc_visit = m_gcObjVisitor.top();
     
     List<OpenCLField> static_fields = m_StaticOffsets.getStaticFields(soot_class);
     

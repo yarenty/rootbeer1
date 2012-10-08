@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer;
 
+import edu.syr.pcpratts.rootbeer.classloader.DfsInfo;
 import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
@@ -83,11 +84,10 @@ public class RootbeerCompiler {
     m_fastLoader.singleKernel();
     
     FindKernelForTestCase finder = new FindKernelForTestCase();
-    String kernel = finder.get(test_case, m_fastLoader.getApplicationClasses());
+    SootClass kernel = finder.get(test_case, m_fastLoader.getKernelClasses());
     m_provider = finder.getProvider();
-    m_fastLoader.findKernelClasses(kernel); 
     
-    List<String> kernel_classes = new ArrayList<String>();
+    List<SootClass> kernel_classes = new ArrayList<SootClass>();
     kernel_classes.add(kernel);
     
     compileForKernels(outname, kernel_classes);
@@ -108,11 +108,11 @@ public class RootbeerCompiler {
     m_fastLoader.addClassPath(getRuntimeJars());
     m_fastLoader.init();
     
-    List<String> kernel_classes = m_fastLoader.findKernelClasses();    
+    List<SootClass> kernel_classes = m_fastLoader.getKernelClasses();
     compileForKernels(outname, kernel_classes);
   }
   
-  private void compileForKernels(String outname, List<String> kernel_classes) throws Exception {
+  private void compileForKernels(String outname, List<SootClass> kernel_classes) throws Exception {
     
     if(kernel_classes.isEmpty()){
       System.out.println("There are no kernel classes. Please implement the following interface to use rootbeer:");
@@ -120,33 +120,22 @@ public class RootbeerCompiler {
       System.exit(0);
     }
     
-    String[] sorted = new String[kernel_classes.size()];
+    SootClass[] sorted = new SootClass[kernel_classes.size()];
     sorted = kernel_classes.toArray(sorted);
     Arrays.sort(sorted);
     kernel_classes.clear();
-    for(String cls : sorted){
+    for(SootClass cls : sorted){
       kernel_classes.add(cls);
     }
     
-    Map<String, List<String>> reachables = new HashMap<String, List<String>>();
-    Map<String, List<String>> forward_reachables = new HashMap<String, List<String>>();
-    List<String> all_reachables = new ArrayList<String>();
-    
-    for(String kernel : kernel_classes){
-      SootClass soot_class = Scene.v().getSootClass(kernel);
-      SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
-      FastWholeProgram.v().getDfsMethods(kernel_method);
-      
-      System.out.println("finding kernel reachable methods for: "+soot_class.getShortName()+"...");
-    
-      KernelReachableMethods reachable_finder = new KernelReachableMethods();
-      List<String> curr_reachables = reachable_finder.get(kernel);
-      forward_reachables.put(kernel, reachable_finder.getForward());
-      
-      all_reachables.addAll(curr_reachables);
-      reachables.put(kernel, curr_reachables);
+    for(SootClass kernel : kernel_classes){
+      SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
+      FastWholeProgram.v().execDFS(kernel_method);
+      DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
+      info.print();
     }
       
+    /*
     ClassRemappingTransform transform = null;
     
     if(!Main.disable_class_remapping()){
@@ -179,26 +168,27 @@ public class RootbeerCompiler {
       all_reachables.addAll(curr_reachables);
       reachables.put(kernel, curr_reachables);
     }
+    */
     
     Transform2 transform2 = new Transform2();
-    for(String cls : kernel_classes){
-      List<String> curr_reachables = reachables.get(cls);
-      RootbeerScene.v().setReachableMethods(curr_reachables);
-      RootbeerScene.v().setForwardReachables(forward_reachables.get(cls));
+    for(SootClass soot_class : kernel_classes){
+      //List<String> curr_reachables = reachables.get(cls);
+      //RootbeerScene.v().setReachableMethods(curr_reachables);
+      //RootbeerScene.v().setForwardReachables(forward_reachables.get(cls));
       
-      SootClass soot_class = Scene.v().getSootClass(cls);
       SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
-      FastWholeProgram.v().getDfsMethods(kernel_method);
-      
-      transform2.run(cls);
+      DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
+      RootbeerScene.v().setDfsInfo(info);
+      transform2.run(soot_class.getName());
     }
     
+    /*
     Set<String> app_classes = new HashSet<String>();
     
     if(!Main.disable_class_remapping()){
       app_classes.addAll(transform.getModifiedClasses());
     }
-    
+    * 
     SignatureUtil util = new SignatureUtil();
     for(String method_sig : all_reachables){
       String class_name = util.classFromMethodSig(method_sig);
@@ -222,6 +212,7 @@ public class RootbeerCompiler {
     
     makeOutJar();
     pack(outname);
+    */
   }
   
   public void pack(String outjar_name) throws Exception {

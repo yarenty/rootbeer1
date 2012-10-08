@@ -7,11 +7,13 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph;
 
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.ArrayList;
 import java.util.List;
 import soot.RefType;
 import soot.SootClass;
+import soot.Type;
 
 public class PermissionGraph {
 
@@ -19,7 +21,7 @@ public class PermissionGraph {
   
   public PermissionGraph(){
     m_Roots = new ArrayList<PermissionGraphNode>();
-    build(OpenCLScene.v().getRefTypeOrderedHistory());
+    build(RootbeerScene.v().getDfsInfo().getOrderedRefTypes());
   }
 
   private void build(List<RefType> history) {

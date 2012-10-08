@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.misc;
 
-import edu.syr.pcpratts.rootbeer.generate.opencl.FindMethodsFieldsAndArrayTypes;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.FieldReadWriteInspector;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.UnitAssembler;
 import java.util.ArrayList;
@@ -109,20 +108,6 @@ public class BasicBlock {
     return ret;
   }
 
-  public void findAllUsedMethodsAndFields(){
-    PatchingChain<Unit> units = getBody().getUnits();
-    Iterator<Unit> iter = units.iterator();
-    while(iter.hasNext()){
-      Unit next = iter.next();
-      List<ValueBox> boxes = next.getUseAndDefBoxes();
-      for(ValueBox box : boxes){
-        Value value = box.getValue();
-        FindMethodsFieldsAndArrayTypes.methods(value);
-        FindMethodsFieldsAndArrayTypes.fields(value);
-      }
-    }
-  }
-
   public Body getBody(){
     List<Unit> units = new ArrayList<Unit>();
     Local base = Jimple.v().newLocal("base", mRuntimeBasicBlockClass.getType());
@@ -146,19 +131,6 @@ public class BasicBlock {
   public void addClass(SootClass soot_class) {
     mRuntimeBasicBlockClass = soot_class;    
     mReadWriteInspector = new FieldReadWriteInspector(mRuntimeBasicBlockClass);
-  }
-
-  public void findAllUsedArrayTypes() {
-    PatchingChain<Unit> units = getBody().getUnits();
-    Iterator<Unit> iter = units.iterator();
-    while(iter.hasNext()){
-      Unit next = iter.next();
-      List<ValueBox> boxes = next.getUseAndDefBoxes();
-      for(ValueBox box : boxes){
-        Value value = box.getValue();
-        FindMethodsFieldsAndArrayTypes.arrayTypes(value);
-      }
-    }
   }
 
   public FieldReadWriteInspector getReadWriteFieldInspector() {

@@ -14,6 +14,6 @@ public class Constants {
   public static final String OUTPUT_CLASS_FOLDER = "output-class";
   public static final String OUTPUT_SHIMPLE_FOLDER = "output-shimple";
   
-  public static final int OutOfMemoryNumber = -1;
-  public static final int NullPointerNumber = -2;
+  public static final int OutOfMemoryNumber = 11;
+  public static final int NullPointerNumber = 8;
 }

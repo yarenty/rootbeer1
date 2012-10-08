@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.compiler;
 
+import edu.syr.pcpratts.rootbeer.classloader.DfsInfo;
 import java.util.ArrayList;
 import java.util.List;
 import soot.Scene;
@@ -27,6 +28,7 @@ public class RootbeerScene {
   private List<String> m_reachables;
   private List<SootClass> m_allClasses;
   private List<String> m_forwardReachables;
+  private DfsInfo m_dfsInfo;
   
   public RootbeerScene(){
     m_addedClasses = new ArrayList<String>();
@@ -68,5 +70,13 @@ public class RootbeerScene {
 
   public List<String> getForwardReachableMethods() {
     return m_forwardReachables;
+  }
+
+  public void setDfsInfo(DfsInfo info) {
+    m_dfsInfo = info;
+  }
+  
+  public DfsInfo getDfsInfo(){
+    return m_dfsInfo;
   }
 }

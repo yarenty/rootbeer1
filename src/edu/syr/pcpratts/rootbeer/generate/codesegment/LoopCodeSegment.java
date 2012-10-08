@@ -45,14 +45,6 @@ public class LoopCodeSegment implements CodeSegment {
     return block.getReadWriteFieldInspector();
   }
 
-  public void findAllUsedMethodsAndFields() {
-    block.findAllUsedMethodsAndFields();
-  }
-
-  public void findAllUsedArrayTypes() {
-    block.findAllUsedArrayTypes();
-  }
-
   public SootClass getSootClass() {
     return block.getSootClass();
   }

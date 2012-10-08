@@ -119,9 +119,14 @@ public class FieldReadWriteInspector {
       return false;
     mWritenOnGpuFieldsClassesChecked.add(soot_type.toString());
 
-    List<SootClass> soot_classes = OpenCLScene.v().getClassHierarchy(soot_class);
-    for(SootClass curr : soot_classes){
-      Chain<SootField> fields = curr.getFields();
+    List<Type> hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(soot_class);
+    for(Type curr_type : hierarchy){
+      if(curr_type instanceof RefType == false){
+        continue;
+      }
+      RefType ref_type = (RefType) curr_type;
+      SootClass curr_class = ref_type.getSootClass();
+      Chain<SootField> fields = curr_class.getFields();
       for(SootField field : fields){
         if(fieldIsWrittenOnGpu(field))
           return true;

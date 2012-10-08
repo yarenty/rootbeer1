@@ -10,8 +10,9 @@ package edu.syr.pcpratts.rootbeer.classloader;
 import java.util.Collection;
 
 import soot.SootMethod;
+import soot.jimple.toolkits.callgraph.CallGraph;
 
 public interface FastSceneTransformer {
   
-  void internalTransform(String phaseName, Collection<SootMethod> entries, FastCallGraph cg);
+  void internalTransform(String phaseName, Collection<SootMethod> entries, CallGraph cg);
 }

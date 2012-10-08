@@ -252,20 +252,20 @@ public class OpenCLMethod {
   public String getInstanceInvokeString(InstanceInvokeExpr arg0){
     Value base = arg0.getBase();
     Type base_type = base.getType();
-    List<SootClass> hierarchy;
+    List<Type> hierarchy;
     if(base_type instanceof ArrayType){
-      hierarchy = new ArrayList<SootClass>();
+      hierarchy = new ArrayList<Type>();
       SootClass obj = Scene.v().getSootClass("java.lang.Object");
-      hierarchy.add(obj);
+      hierarchy.add(obj.getType());
     } else if (base_type instanceof RefType){
       RefType ref_type = (RefType) base_type;
-      hierarchy = OpenCLScene.v().getClassHierarchy(ref_type.getSootClass());
+      hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(ref_type.getSootClass());
     } else {
       throw new UnsupportedOperationException("how do we handle this case?");
     }
 
     if(hierarchy.size() == 1 || isConstructor() || arg0 instanceof SpecialInvokeExpr){
-      return writeInstanceInvoke(arg0, "", m_sootClass);
+      return writeInstanceInvoke(arg0, "", m_sootClass.getType());
     } else if(hierarchy.size() == 0){
       System.out.println("size = 0");
       return null;
@@ -303,8 +303,12 @@ public class OpenCLMethod {
     return ret.toString();
   }
 
-  private String writeInstanceInvoke(InstanceInvokeExpr arg0, String method_prefix, SootClass soot_class){
-    OpenCLMethod corrected_this = new OpenCLMethod(m_sootMethod, soot_class);
+  private String writeInstanceInvoke(InstanceInvokeExpr arg0, String method_prefix, Type type){
+    if(type instanceof RefType == false){
+      throw new RuntimeException("please report bug in OpenCLMethod.writeInstanceInvoke");
+    }
+    RefType ref_type = (RefType) type;
+    OpenCLMethod corrected_this = new OpenCLMethod(m_sootMethod, ref_type.getSootClass());
     StringBuilder ret = new StringBuilder();
     Value base = arg0.getBase();
     if(base instanceof Local == false)
@@ -393,55 +397,6 @@ public class OpenCLMethod {
   @Override
   public String toString(){
     return getPolymorphicName();
-  }
-
-  public void findAllUsedMethodsAndFields() {
-    Body body;
-    try {
-      body = m_sootMethod.getActiveBody();
-      if(body == null)
-        return;
-    } catch(RuntimeException ex){
-      //if there is not body, return.
-      return;
-    }
-    PatchingChain<Unit> units = body.getUnits();
-    Iterator<Unit> iter = units.iterator();
-    while(iter.hasNext()){
-      Unit next = iter.next();
-      List<ValueBox> boxes = next.getUseAndDefBoxes();
-      for(ValueBox box : boxes){
-        Value value = box.getValue();
-        FindMethodsFieldsAndArrayTypes.methods(value);
-        FindMethodsFieldsAndArrayTypes.fields(value);
-      }
-    }
-  }
-  public List<SootClass> getHierarchy(){
-    SootClass soot_class = m_sootMethod.getDeclaringClass();
-    return OpenCLScene.v().getClassHierarchy(soot_class);
-  }
-  
-  public void findAllUsedArrayTypes() {
-    SootClass soot_class = m_sootMethod.getDeclaringClass();
-
-    Body body;
-    try {
-      body = m_sootMethod.getActiveBody();
-    } catch(RuntimeException ex){
-      //if there is no body, return.
-      return;
-    }
-    PatchingChain<Unit> units = body.getUnits();
-    Iterator<Unit> iter = units.iterator();
-    while(iter.hasNext()){
-      Unit next = iter.next();
-      List<ValueBox> boxes = next.getUseAndDefBoxes();
-      for(ValueBox box : boxes){
-        Value value = box.getValue();
-        FindMethodsFieldsAndArrayTypes.arrayTypes(value);
-      }
-    }
   }
 
   private boolean methodIsRuntimeBasicBlockRun() {
