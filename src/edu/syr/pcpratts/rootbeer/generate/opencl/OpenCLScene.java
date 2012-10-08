@@ -252,6 +252,10 @@ public class OpenCLScene {
     //using a set so duplicates get filtered out.
     Set<String> protos = new HashSet<String>();
     StringBuilder ret = new StringBuilder();
+    
+    ArrayCopyGenerate arr_generate = new ArrayCopyGenerate();
+    protos.add(arr_generate.getProto());
+    
     List<OpenCLMethod> methods = m_methodHierarchies.getMethods();
     for(OpenCLMethod method : methods){ 
       protos.add(method.getMethodPrototype());

@@ -118,7 +118,10 @@ public class DfsInfo {
   
   public void createClassHierarchy(){
     m_childrenToParents = new HashMap<String, List<NumberedType>>();
-    for(Type type : m_dfsTypes){
+    Set<Type> to_process = new HashSet<Type>();
+    to_process.addAll(m_dfsTypes);
+    to_process.addAll(m_builtInTypes);
+    for(Type type : to_process){
       List<NumberedType> parents = new ArrayList<NumberedType>();
       NumberedType curr_type = m_numberedTypeMap.get(type.toString());
       parents.add(curr_type);
@@ -126,8 +129,8 @@ public class DfsInfo {
         RefType ref_type = (RefType) type;
         SootClass curr_class = ref_type.getSootClass();
         while(curr_class.hasSuperclass()){
-          parents.add(m_numberedTypeMap.get(curr_class.getType().toString()));
           curr_class = curr_class.getSuperclass();
+          parents.add(m_numberedTypeMap.get(curr_class.getType().toString()));
         }
       } else if(type instanceof ArrayType){
         SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
@@ -267,11 +270,7 @@ public class DfsInfo {
     List<NumberedType> nret = m_childrenToParents.get(input_class.getType().toString());
     List<Type> ret = new ArrayList<Type>();
     for(NumberedType ntype : nret){
-      try {
       ret.add(ntype.getType());
-      } catch(Exception ex){
-        ex.printStackTrace();
-      }
     }
     return ret;
   }
@@ -298,6 +297,19 @@ public class DfsInfo {
     m_builtInTypes.add(FloatType.v());
     m_builtInTypes.add(DoubleType.v());
     m_builtInTypes.add(BooleanType.v());
+    
+    ArrayType char_arr = ArrayType.v(CharType.v(), 1);
+    m_builtInTypes.add(char_arr);
+    
+    addBuiltInMethod("<java.lang.String: void <init>(char[])>");
+    addBuiltInMethod("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadId()>");
+    addBuiltInMethod("<java.lang.Throwable: java.lang.StackTraceElement[] getStackTrace()>");
+    addBuiltInMethod("<java.lang.StackTraceElement: void <init>(java.lang.String,java.lang.String,java.lang.String,int)>");
+    addBuiltInMethod("<java.lang.OutOfMemoryError: void <init>()>");
+  }
+  
+  private void addBuiltInMethod(String signature){
+    m_dfsMethods.add(signature);
   }
 
   private void addRefType(String class_name) {
@@ -371,7 +383,10 @@ public class DfsInfo {
     }
     
     m_parentsToChildren = new HashMap<String, List<Type>>();
-    for(Type type : m_dfsTypes){
+    Set<Type> to_process = new HashSet<Type>();
+    to_process.addAll(m_dfsTypes);
+    to_process.addAll(m_builtInTypes);
+    for(Type type : to_process){
       if(type instanceof RefType){
         RefType ref_type = (RefType) type;
         SootClass child = ref_type.getSootClass();
@@ -388,34 +403,3 @@ public class DfsInfo {
     createClassHierarchy(); 
   }
 }
-
-/*
- *    FastWholeProgram.v().loadToBodyLater("<java.lang.String: void <init>(char[])>");
-    SootClass string_class = Scene.v().getSootClass("java.lang.String");
-    SootMethod ctor_method = string_class.getMethod("void <init>(char[])");
-    addMethod(ctor_method);
-    
-    FastWholeProgram.v().loadToBodyLater("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadId()>");
-    SootClass rootbeer_gpu_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
-    SootMethod getThreadId = rootbeer_gpu_class.getMethod("int getThreadId()");
-    addMethod(getThreadId);
-    
-    ArrayType char_array = ArrayType.v(CharType.v(), 1);
-    OpenCLArrayType ocl_array = new OpenCLArrayType(char_array);
-    m_arrayTypes.add(ocl_array);
-    
-    SootClass throwable_class = Scene.v().getSootClass("java.lang.Throwable");
-    SootMethod getStackTrace = throwable_class.getMethod("java.lang.StackTraceElement[] getStackTrace()");
-    addMethod(getStackTrace);
-        
-    SootClass stack_trace_elem = Scene.v().getSootClass("java.lang.StackTraceElement");
-    SootMethod stack_ctor = stack_trace_elem.getMethod("void <init>(java.lang.String,java.lang.String,java.lang.String,int)");
-    addMethod(stack_ctor);
-    
-    SootClass out_of_mem = Scene.v().getSootClass("java.lang.OutOfMemoryError");
-    SootMethod out_ctor = out_of_mem.getMethod("void <init>()");
-    addMethod(out_ctor);
-    addType(out_of_mem.getType());
-    addType("java.lang.VirtualMachineError");
-    addType("java.lang.Error");
- */

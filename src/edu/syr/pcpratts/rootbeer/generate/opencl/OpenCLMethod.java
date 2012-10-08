@@ -263,14 +263,15 @@ public class OpenCLMethod {
     } else {
       throw new UnsupportedOperationException("how do we handle this case?");
     }
-
-    if(hierarchy.size() == 1 || isConstructor() || arg0 instanceof SpecialInvokeExpr){
+    
+    IsPolyMorphic poly_checker = new IsPolyMorphic();    
+    if(poly_checker.isPoly(m_sootMethod, hierarchy) == false || isConstructor() || arg0 instanceof SpecialInvokeExpr){
       return writeInstanceInvoke(arg0, "", m_sootClass.getType());
     } else if(hierarchy.size() == 0){
       System.out.println("size = 0");
       return null;
     } else {
-      return writeInstanceInvoke(arg0, "invoke_", hierarchy.get(0));
+      return writeInstanceInvoke(arg0, "invoke_", hierarchy.get(hierarchy.size()-1));
     } 
   }
 
