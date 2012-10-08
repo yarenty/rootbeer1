@@ -75,7 +75,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_thisRef = m_bcl.top().refThis();
     m_param0 = m_bcl.top().refParameter(0);
     
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
     for(Type type : types){
       makeGetSizeMethodForType(type);
     }
@@ -90,7 +90,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_thisRef = m_bcl.top().refThis();
     m_param0 = m_bcl.top().refParameter(0);
     
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
     for(Type type : types){
       makeGetLengthMethodForType(type);
     }

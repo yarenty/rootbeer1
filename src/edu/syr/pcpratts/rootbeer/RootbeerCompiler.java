@@ -131,8 +131,7 @@ public class RootbeerCompiler {
     for(SootClass kernel : kernel_classes){
       SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
       FastWholeProgram.v().execDFS(kernel_method);
-      DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
-      info.print();
+      FastWholeProgram.v().getDfsInfo(kernel_method);
     }
       
     /*
@@ -196,11 +195,18 @@ public class RootbeerCompiler {
         app_classes.add(class_name);
       }
     }
+    */
     
-    for(String cls : app_classes){
-      loadAllMethods(cls);
-      writeClassFile(cls);
-      writeJimpleFile(cls);
+    for(SootClass soot_class : kernel_classes){
+      SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
+      DfsInfo dfs_info = FastWholeProgram.v().getDfsInfo(kernel_method);
+      
+      List<RefType> ref_types = dfs_info.getOrderedRefTypes();
+      for(RefType cls : ref_types){
+        loadAllMethods(cls.getClassName());
+        writeClassFile(cls.getClassName());
+        writeJimpleFile(cls.getClassName());
+      }
     }
     
     List<String> added_classes = RootbeerScene.v().getAddedClasses();
@@ -212,7 +218,6 @@ public class RootbeerCompiler {
     
     makeOutJar();
     pack(outname);
-    */
   }
   
   public void pack(String outjar_name) throws Exception {

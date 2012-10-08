@@ -75,7 +75,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     m_Core = m_bcl.top().refParameter(4);
     
     
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
     for(Type type : types){
       if(type instanceof ArrayType)
       makeWriteToHeapBodyForArrayType((ArrayType) type);
