@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.classloader;
 
+import edu.syr.pcpratts.rootbeer.compiler.ClassRemapping;
 import edu.syr.pcpratts.rootbeer.util.MethodSignatureUtil;
 import edu.syr.pcpratts.rootbeer.util.SystemOutHandler;
 import java.util.jar.JarEntry;
@@ -257,8 +258,8 @@ public class FastWholeProgram {
   }
 
   private SootMethod fullyResolveMethod(String method_signature, boolean force_resolve){
-    MethodSignatureUtil util = new MethodSignatureUtil();
-    final String soot_class_str = util.classFromSig(method_signature);
+    MethodSignatureUtil util = new MethodSignatureUtil(method_signature);
+    final String soot_class_str = util.getClassName();
     if(m_resolvedMethods.contains(method_signature)){
       return m_resolver.resolveMethod(method_signature);
     }
@@ -643,24 +644,6 @@ public class FastWholeProgram {
     buildHierarchy();
   }
   
-  public void reLoad(SootMethod kernel_method, List<String> method_sigs){
-    System.out.println("reloading dfs_info on: "+kernel_method.getDeclaringClass().getName()+"...");
-    m_currDfsInfo = new DfsInfo(kernel_method);    
-    m_dfsInfos.put(kernel_method, m_currDfsInfo);
-    
-    MethodSignatureUtil util = new MethodSignatureUtil();
-    for(String sig : method_sigs){
-      String class_name = util.classFromSig(sig);
-      String method_sub_sig = util.methodSubSig(sig);
-      
-      SootClass soot_class = Scene.v().getSootClass(class_name);
-      SootMethod method = soot_class.getMethod(method_sub_sig);
-      
-      doDfs(method);
-    }
-    buildHierarchy();
-  }
-  
   private void doDfs(SootMethod method){
     String signature = method.getSignature();
     if(m_currDfsInfo.containsMethod(signature)){
@@ -771,8 +754,9 @@ public class FastWholeProgram {
     MethodSignatureUtil util = new MethodSignatureUtil();
     for(int i = 0; i < methods.size(); ++i){
       String method_sig = methods.get(i);
-      SootClass soot_class = Scene.v().getSootClass(util.classFromSig(method_sig));
-      SootMethod method = soot_class.getMethod(util.methodSubSig(method_sig));
+      util.parse(method_sig);
+      SootClass soot_class = Scene.v().getSootClass(util.getClassName());
+      SootMethod method = soot_class.getMethod(util.getMethodSubSignature());
       
       if(method.isConcrete() == false){
         continue;
@@ -794,5 +778,17 @@ public class FastWholeProgram {
     m_currDfsInfo.expandArrayTypes();
     m_currDfsInfo.orderTypes();
     m_currDfsInfo.createClassHierarchy(); 
+  }
+
+  private void remap(MethodSignatureUtil util, ClassRemapping remapping) {
+    util.setReturnType(remapping.remap(util.getReturnType()));
+    List<String> params = util.getParameterTypes();
+    for(int i = 0; i < params.size(); ++i){
+      String param = params.get(i);
+      param = remapping.remap(param);
+      params.set(i, param);
+    }
+    util.setParameterTypes(params);
+    util.setClassName(remapping.remap(util.getClassName()));
   }
 }
