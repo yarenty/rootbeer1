@@ -16,6 +16,13 @@ public class MethodSignatureUtil {
   private String m_returnType;
   private String m_methodName;
   private List<String> m_params;
+
+  public MethodSignatureUtil(){  
+  }
+  
+  public MethodSignatureUtil(String method_signature) {
+    parse(method_signature);
+  }
   
   public void parse(String signature){
     String[] tokens0 = signature.split(":");
@@ -38,7 +45,10 @@ public class MethodSignatureUtil {
     m_params = new ArrayList<String>();
     
     for(String param : param_tokens){
-      m_params.add(param.trim()); 
+      String curr = param.trim();
+      if(curr.equals("") == false){
+        m_params.add(curr); 
+      }
     }
   }
   
@@ -85,6 +95,22 @@ public class MethodSignatureUtil {
     m_params = params; 
   }
   
+  public String getMethodSubSignature(){
+    StringBuilder ret = new StringBuilder();
+    ret.append(m_returnType);
+    ret.append(" ");
+    ret.append(m_methodName);
+    ret.append("(");
+    for(int i = 0; i < m_params.size(); ++i){
+      ret.append(m_params.get(i));
+      if(i < m_params.size() - 1){
+        ret.append(","); 
+      }
+    }
+    ret.append(")");
+    return ret.toString();
+  }
+  
   @Override
   public String toString(){
     StringBuilder ret = new StringBuilder();
@@ -98,7 +124,7 @@ public class MethodSignatureUtil {
     for(int i = 0; i < m_params.size(); ++i){
       ret.append(m_params.get(i));
       if(i < m_params.size() - 1){
-        ret.append(", "); 
+        ret.append(","); 
       }
     }
     ret.append(")>");
@@ -106,7 +132,7 @@ public class MethodSignatureUtil {
   }
   
   public static void main(String[] args){
-    String sig = "<rootbeertest.GpuWorkItem: void <init>(java.lang.String, java.util.Random)>";
+    String sig = "<rootbeertest.GpuWorkItem: void <init>()>";
     MethodSignatureUtil util = new MethodSignatureUtil();
     util.parse(sig);
     util.print();

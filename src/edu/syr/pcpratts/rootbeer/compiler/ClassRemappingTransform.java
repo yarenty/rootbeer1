@@ -52,8 +52,8 @@ public class ClassRemappingTransform {
     
     Set<SootClass> reachable_classes = new HashSet<SootClass>();
     for(String method : reachable_methods){
-      MethodSignatureUtil sig_util = new MethodSignatureUtil();
-      String cls_name = sig_util.classFromSig(method);
+      MethodSignatureUtil sig_util = new MethodSignatureUtil(method);
+      String cls_name = sig_util.getClassName();
       SootClass soot_class = Scene.v().getSootClass(cls_name);
       if(reachable_classes.contains(soot_class) == false){
         reachable_classes.add(soot_class);

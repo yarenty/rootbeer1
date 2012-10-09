@@ -152,9 +152,8 @@ public class RootbeerCompiler {
         transform = new ClassRemappingTransform(false);
         transform.run(sigs);
         transform.finishClone();        
-        info.setClassRemapping(transform.getClassRemapping());
         
-        FastWholeProgram.v().reLoad(kernel_method, sigs);
+        FastWholeProgram.v().reLoad(kernel_method, sigs, transform.getClassRemapping());
       }
     }
     

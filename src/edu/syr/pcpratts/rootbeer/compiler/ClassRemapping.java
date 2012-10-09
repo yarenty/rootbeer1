@@ -73,6 +73,13 @@ public class ClassRemapping {
     return m_map.get(cls_name);
   }
 
+  public String remap(String cls_name){
+    if(m_map.containsKey(cls_name)){
+      return m_map.get(cls_name);
+    }
+    return cls_name;
+  }
+  
   public boolean cloned(String cls) {
     return m_clonedMap.containsKey(cls);
   }

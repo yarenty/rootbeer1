@@ -19,9 +19,9 @@ public class MethodFinder {
   private final Logger m_log = Logger.getLogger(this.getClass().getName()); 
   
   public SootMethod find(String method_sig){
-    MethodSignatureUtil util = new MethodSignatureUtil();
-    String class_name = util.classFromSig(method_sig);
-    String method_subsig = util.methodSubSig(method_sig);
+    MethodSignatureUtil util = new MethodSignatureUtil(method_sig);
+    String class_name = util.getClassName();
+    String method_subsig = util.getMethodSubSignature();
     SootClass soot_class = Scene.v().getSootClass(class_name);
     if(soot_class.isPhantom()){
       return null;
