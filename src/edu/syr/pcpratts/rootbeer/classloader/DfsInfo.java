@@ -398,51 +398,7 @@ public class DfsInfo {
       
     return m_oclScene;
   }
-
-  public void findReachableMethods() {
-    
-    List<SootMethod> queue = new LinkedList<SootMethod>();
-    Set<SootMethod> visited = new HashSet<SootMethod>();
-    
-    SootClass soot_class = m_rootMethod.getDeclaringClass();
-    
-    for(SootMethod method : soot_class.getMethods()){
-      Iterator<Edge> into = m_callGraph.edgesInto(method);
-      addToQueue(into, queue, visited);
-    }
-    
-    while(queue.isEmpty() == false){
-      SootMethod curr = queue.get(0);
-      queue.remove(0);
-      
-      addReachableMethodSig(curr.getSignature());
-      
-      Iterator<Edge> curr_into = m_callGraph.edgesInto(curr);
-      
-      addToQueue(curr_into, queue, visited);
-    }
-  }
   
-  private void addToQueue(Iterator<Edge> edges, List<SootMethod> queue, Set<SootMethod> visited){
-    while(edges.hasNext()){
-      Edge edge = edges.next();
-      
-      SootMethod src = edge.src();
-      System.out.println("src: "+src);
-      if(visited.contains(src) == false && FastWholeProgram.v().shouldDfsMethod(src)){
-        queue.add(src);
-        visited.add(src);
-      }
-      
-      SootMethod dest = edge.tgt();
-      System.out.println("dest: "+dest);
-      if(visited.contains(dest) == false && FastWholeProgram.v().shouldDfsMethod(dest)){
-        queue.add(dest);
-        visited.add(dest);
-      }
-    }
-  }
-
   public Set<String> getAllMethods() {
     Set<String> ret = new HashSet<String>();
     ret.addAll(m_dfsMethods);
@@ -452,5 +408,13 @@ public class DfsInfo {
 
   public void setClassRemapping(ClassRemapping class_remapping) {
     m_classRemapping = class_remapping;
+  }
+
+  public SootMethod getRootMethod() {
+    return m_rootMethod;
+  }
+
+  public CallGraph getCallGraph() {
+    return m_callGraph;
   }
 }

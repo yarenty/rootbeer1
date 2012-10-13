@@ -135,7 +135,7 @@ public class RootbeerCompiler {
     
     for(SootClass kernel : kernel_classes){
       SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
-      FastWholeProgram.v().fullyLoad(kernel_method);
+      FastWholeProgram.v().fullyLoad(kernel_method, true);
     }
       
     ClassRemappingTransform transform = null;
@@ -153,7 +153,7 @@ public class RootbeerCompiler {
         transform.run(sigs);
         transform.finishClone();        
         
-        FastWholeProgram.v().fullyLoad(kernel_method);
+        FastWholeProgram.v().fullyLoad(kernel_method, false);
       }
     }
     
@@ -333,7 +333,7 @@ public class RootbeerCompiler {
     return ret;
   }
 
-  private void writeJimpleFile(String cls){    
+  private void writeJimpleFile(String cls){  
     if(cls.equals("java.lang.Object"))
       return;
     try {

@@ -19,6 +19,8 @@ import java.util.*;
 import java.util.logging.*;
 import soot.*;
 import soot.jimple.Stmt;
+import soot.jimple.toolkits.callgraph.CallGraph;
+import soot.jimple.toolkits.callgraph.Edge;
 
 public class FastWholeProgram {
   private static FastWholeProgram m_instance;
@@ -633,14 +635,16 @@ public class FastWholeProgram {
     return m_kernelClasses;
   }
 
-  public void fullyLoad(SootMethod kernel_method) {
+  public void fullyLoad(SootMethod kernel_method, boolean find_reachables) {
     System.out.println("running dfs on: "+kernel_method.getDeclaringClass().getName()+"...");
     m_currDfsInfo = new DfsInfo(kernel_method);    
     m_dfsInfos.put(kernel_method, m_currDfsInfo);
     
     doDfs(kernel_method);
-    
     buildFullCallGraph(kernel_method);
+    if(find_reachables){
+      findReachableMethods();
+    }
     buildHierarchy();
   }
   
@@ -770,25 +774,57 @@ public class FastWholeProgram {
         m_currDfsInfo.addCallGraphEdge(method, dfs_ref.getStmt(), dfs_ref.getSootMethodRef().resolve());
       }
     }
-    m_currDfsInfo.findReachableMethods();
+  }
+
+  public void findReachableMethods() {
+    
+    List<SootMethod> queue = new LinkedList<SootMethod>();
+    Set<SootMethod> visited = new HashSet<SootMethod>();
+    
+    SootMethod root_method = m_currDfsInfo.getRootMethod();
+    CallGraph call_graph = m_currDfsInfo.getCallGraph();
+            
+    SootClass soot_class = root_method.getDeclaringClass();
+    
+    for(SootMethod method : soot_class.getMethods()){
+      Iterator<Edge> into = call_graph.edgesInto(method);
+      addToQueue(into, queue, visited);
+    }
+    
+    while(queue.isEmpty() == false){
+      SootMethod curr = queue.get(0);
+      queue.remove(0);
+      
+      doDfs(curr);
+      
+      Iterator<Edge> curr_into = call_graph.edgesInto(curr);
+      
+      addToQueue(curr_into, queue, visited);
+    }
   }
   
+  private void addToQueue(Iterator<Edge> edges, List<SootMethod> queue, Set<SootMethod> visited){
+    while(edges.hasNext()){
+      Edge edge = edges.next();
+      
+      SootMethod src = edge.src();
+      if(visited.contains(src) == false && FastWholeProgram.v().shouldDfsMethod(src)){
+        queue.add(src);
+        visited.add(src);
+      }
+      
+      SootMethod dest = edge.tgt();
+      if(visited.contains(dest) == false && FastWholeProgram.v().shouldDfsMethod(dest)){
+        queue.add(dest);
+        visited.add(dest);
+      }
+    }
+  }
+
   public void buildHierarchy(){   
     System.out.println("building class hierarchy...");
     m_currDfsInfo.expandArrayTypes();
     m_currDfsInfo.orderTypes();
     m_currDfsInfo.createClassHierarchy(); 
-  }
-
-  private void remap(MethodSignatureUtil util, ClassRemapping remapping) {
-    util.setReturnType(remapping.remap(util.getReturnType()));
-    List<String> params = util.getParameterTypes();
-    for(int i = 0; i < params.size(); ++i){
-      String param = params.get(i);
-      param = remapping.remap(param);
-      params.set(i, param);
-    }
-    util.setParameterTypes(params);
-    util.setClassName(remapping.remap(util.getClassName()));
   }
 }

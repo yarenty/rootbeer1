@@ -33,6 +33,7 @@ public class ClassRemappingTransform {
   private Map<SootField, List<FieldRef>> m_fieldsToFix; 
   private Set<String> m_modified;
   private List<SootMethod> m_addedMethods;
+  private SootMethod m_currMethod;
   
   public ClassRemappingTransform(boolean map_runtime){
     m_classRemapping = new ClassRemapping();
@@ -45,11 +46,6 @@ public class ClassRemappingTransform {
   }
     
   public void run(List<String> reachable_methods){
-    System.out.println("reachable methods: ");
-    for(String method : reachable_methods){
-      System.out.println("  "+method);
-    }
-    
     Set<SootClass> reachable_classes = new HashSet<SootClass>();
     for(String method : reachable_methods){
       MethodSignatureUtil sig_util = new MethodSignatureUtil(method);
@@ -144,6 +140,7 @@ public class ClassRemappingTransform {
     Body body = method.retrieveActiveBody();
     if(body == null)
       return;
+    m_currMethod = method;
     fixArguments(method);
     Iterator<Unit> iter = body.getUnits().iterator();
     while(iter.hasNext()){
@@ -271,6 +268,10 @@ public class ClassRemappingTransform {
 
   private boolean shouldMap(SootClass soot_class) {
     if(m_classRemapping.containsKey(soot_class.getName())){
+      String curr_class = m_currMethod.getDeclaringClass().toString();
+      if(m_modified.contains(curr_class) == false){
+        m_modified.add(curr_class);
+      }
       return true;
     } else {
       return false;
