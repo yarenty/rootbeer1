@@ -79,10 +79,16 @@ public class DfsInfo {
     List<NumberedType> numbered_types = new ArrayList<NumberedType>();
     int number = 1;
     List<Type> queue = new LinkedList<Type>();
+    Set<Type> visited = new HashSet<Type>();
     queue.addAll(m_builtInTypes);
     while(queue.isEmpty() == false){
       Type curr = queue.get(0);
       queue.remove(0);
+      
+      if(visited.contains(curr)){
+        continue;
+      }
+      visited.add(curr);
       
       NumberedType numbered_type = new NumberedType(curr, number);
       numbered_types.add(numbered_type);
@@ -287,19 +293,19 @@ public class DfsInfo {
   }
 
   private void addBuiltInTypes() {
-    addRefType("java.lang.Object");                                 //type 0
-    addRefType("java.lang.System");                                 //type 1
-    addRefType("java.lang.String");                                 //type 2
-    addRefType("java.lang.AbstractStringBuilder");                  //type 3
-    addRefType("java.lang.StringBuilder");                          //type 4
-    addRefType("java.lang.StackTraceElement");                      //type 5
-    addRefType("java.lang.Throwable");                              //type 6
-    addRefType("java.lang.Exception");                              //type 7
-    addRefType("java.lang.RuntimeException");                       //type 8
-    addRefType("java.lang.NullPointerException");                   //type 9. this maps to 9 in edu.syr.pcpratts.rootbeer.Contants.NullPointerNumber
-    addRefType("java.lang.Error");                                  //type 10.
-    addRefType("java.lang.VirtualMachineError");                    //type 11.
-    addRefType("java.lang.OutOfMemoryError");                       //type 12. this maps to 12 in edu.syr.pcpratts.rootbeer.Contants.OutOfMemoryNumber
+    addRefType("java.lang.Object");                                 //type 1
+    addRefType("java.lang.System");                                 //type 2
+    addRefType("java.lang.String");                                 //type 3
+    addRefType("java.lang.AbstractStringBuilder");                  //type 4
+    addRefType("java.lang.StringBuilder");                          //type 5
+    addRefType("java.lang.StackTraceElement");                      //type 6
+    addRefType("java.lang.Throwable");                              //type 7
+    addRefType("java.lang.Exception");                              //type 8
+    addRefType("java.lang.RuntimeException");                       //type 9
+    addRefType("java.lang.NullPointerException");                   //type 10. this maps to 10 in edu.syr.pcpratts.rootbeer.Contants.NullPointerNumber
+    addRefType("java.lang.Error");                                  //type 11.
+    addRefType("java.lang.VirtualMachineError");                    //type 12.
+    addRefType("java.lang.OutOfMemoryError");                       //type 13. this maps to 13 in edu.syr.pcpratts.rootbeer.Contants.OutOfMemoryNumber
     addRefType("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
     m_builtInTypes.add(ByteType.v());
     m_builtInTypes.add(CharType.v());

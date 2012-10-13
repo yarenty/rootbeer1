@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
@@ -134,6 +135,17 @@ public class OpenCLMethod {
   
   private String synchronizedEnter(){
     String ret = "";
+    
+    if(m_sootMethod.isStatic() == false){
+      ret += "if(thisref == -1){\n";
+      ret += "  *exception = "+Constants.NullPointerNumber+";\n";
+      if(returnsAValue()){
+        ret += "  return 0;\n";
+      } else {
+        ret += "  return;\n";
+      }
+      ret += "}\n";
+    }
     ret += "int id = getThreadId();\n";
     StaticOffsets static_offsets = new StaticOffsets();
     int junk_index = static_offsets.getEndIndex() - 4;

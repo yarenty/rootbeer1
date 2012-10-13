@@ -26,11 +26,11 @@ public class SynchronizedMethod3RunOnGpu implements Kernel {
     } catch(NullPointerException ex){
       m_Result2 = 10;
     }
-    try {
-      m_Object.increment2();
-    } catch(NullPointerException ex){
-      m_Result2 += 10;
-    }
+    //try {
+    //  m_Object.increment2();
+    //} catch(NullPointerException ex){
+    //  m_Result2 += 10;
+    //}
   }
 
   boolean compare(SynchronizedMethod3RunOnGpu rhs) {
