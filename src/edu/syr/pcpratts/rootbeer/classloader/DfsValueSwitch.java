@@ -34,6 +34,10 @@ public class DfsValueSwitch implements JimpleValueSwitch {
     SootClass soot_class = method.getDeclaringClass();
     FastWholeProgram.v().getResolver().resolveClass(soot_class.getName(), SootClass.BODIES);
     
+    if(method.isConcrete() == false){
+      return;
+    }
+    
     Body body = method.retrieveActiveBody();
     Iterator<Unit> iter = body.getUnits().iterator();
     while(iter.hasNext()){
