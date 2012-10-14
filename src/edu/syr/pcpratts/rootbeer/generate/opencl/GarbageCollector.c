@@ -343,6 +343,7 @@ edu_syr_pcpratts_strlen(char * str_constant){
   }
 }
 
+
 $$__device__$$ int 
 char__array_new($$__global$$ char * gc_info, int size, int * exception);
 
@@ -442,4 +443,10 @@ java_lang_VirtualMachineError_initab850b60f96d11de8a390800200c9a66_body0_(gc_inf
  thisref, exception);
 //return
 return thisref;
+}
+
+
+$$__device__$$ int
+java_lang_Object_hashCode($$__global$$ char * gc_info, int thisref, int * exception){
+  return thisref;
 }

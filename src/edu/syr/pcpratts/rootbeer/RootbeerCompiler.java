@@ -334,8 +334,6 @@ public class RootbeerCompiler {
   }
 
   private void writeJimpleFile(String cls){  
-    if(cls.equals("java.lang.Object"))
-      return;
     try {
       SootClass c = Scene.v().getSootClass(cls);
       JimpleWriter writer = new JimpleWriter();
