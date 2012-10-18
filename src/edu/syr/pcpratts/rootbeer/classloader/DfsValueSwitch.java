@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.classloader;
 
+import edu.syr.pcpratts.rootbeer.util.ClassConstantReader;
 import java.util.*;
 import soot.*;
 import soot.jimple.*;
@@ -18,12 +19,14 @@ public class DfsValueSwitch implements JimpleValueSwitch {
   private Set<DfsMethodRef> m_methods;
   private Set<SootFieldRef> m_fields;
   private Stmt m_currStmt;
+  private ClassConstantReader m_classConstantReader;
   
   public void run(SootMethod method) {
     m_types = new HashSet<Type>();
     m_methods = new HashSet<DfsMethodRef>();
     m_fields = new HashSet<SootFieldRef>();   
     m_instanceOfs = new HashSet<Type>();
+    m_classConstantReader = new ClassConstantReader();
     
     addType(method.getReturnType());
     List<Type> param_types = method.getParameterTypes();
@@ -120,7 +123,9 @@ public class DfsValueSwitch implements JimpleValueSwitch {
   }
 
   public void caseClassConstant(ClassConstant cc) {
-    addType(cc.getType());
+    String value = cc.getValue();
+    Type type = m_classConstantReader.stringToType(value);
+    addType(type);
   }
 
   public void defaultCase(Object o) {
