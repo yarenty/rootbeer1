@@ -62,6 +62,8 @@ public class Main implements TestSerializationFactory {
     ret.add(new ArraySumTest());
     ret.add(new RemapTest());
     ret.add(new InstanceofTest());
+    ret.add(new DotClassTest());
+    
     return ret;
   }
 }

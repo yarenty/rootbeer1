@@ -7,20 +7,11 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import java.util.List;
-import soot.ArrayType;
-import soot.DoubleType;
-import soot.FloatType;
-import soot.Local;
-import soot.RefType;
-import soot.SootClass;
-import soot.SootField;
-import soot.SootMethod;
-import soot.Type;
-import soot.Unit;
-import soot.Value;
+import soot.*;
 import soot.jimple.AddExpr;
 import soot.jimple.AndExpr;
 import soot.jimple.ArrayRef;
@@ -395,9 +386,27 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
 
   public void caseClassConstant(ClassConstant arg0) {
-    mOutput.append("$$CLASS_CONSTANT$$");
+    String value = arg0.getValue();
+    Type type = classConstantToType(value);
+    int num = RootbeerScene.v().getDfsInfo().getClassNumber(type);
+    mOutput.append("m_Local[2]["+num+"]");
   }
 
+  private Type classConstantToType(String constant){
+    int dims = 0;
+    while(constant.charAt(0) == '['){
+      dims++;
+      constant = constant.substring(1);
+    }
+    constant = constant.replace("/", ".");
+    Type base_type = RootbeerScene.v().getType(constant);
+    if(dims != 0){
+      return ArrayType.v(base_type, dims);
+    } else {
+      return base_type;
+    }
+  }
+  
   public void caseArrayRef(ArrayRef arg0) {
     OpenCLArrayType array = new OpenCLArrayType((ArrayType) arg0.getBase().getType());
     if(isLhs()){

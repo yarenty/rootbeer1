@@ -650,9 +650,6 @@ public class FastWholeProgram {
   
   private void doDfs(SootMethod method){
     String signature = method.getSignature();
-    if(signature.equals("<java.lang.Object: java.lang.String toString()>")){
-      System.out.println("toString");
-    }
     if(m_currDfsInfo.containsMethod(signature)){
       return;
     }
@@ -675,11 +672,7 @@ public class FastWholeProgram {
       SootClass method_class = mref.declaringClass();
       m_resolver.resolveClass(method_class.getName(), SootClass.BODIES);
       SootMethod dest = mref.resolve();
-      
-      if(dest.getName().equals("hashCode")){
-        System.out.println("hello");
-      }
-      
+
       if(dest.isConcrete() == false){
         continue;
       } 

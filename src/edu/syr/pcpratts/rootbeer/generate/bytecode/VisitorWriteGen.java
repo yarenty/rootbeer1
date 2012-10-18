@@ -57,7 +57,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     m_ClassName = class_name;
     m_ValuesWritten = new ArrayList<Value>();
     m_bcl.push(bcl);
-    m_FieldInspector = inspector;
+    m_fieldInspector = inspector;
     
     m_CurrentMem = new Stack<Local>();
     m_gcObjVisitor = new Stack<Local>();
@@ -132,7 +132,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
       if(differentPackageAndPrivate(ref_type)){
         return;  
       }
-      if(m_ClassesToIgnore.contains(ref_type.getSootClass().getName())){
+      if(m_classesToIgnore.contains(ref_type.getSootClass().getName())){
         return; 
       }              
     }
@@ -441,7 +441,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
       int count = 0;
       for(OpenCLField ref_field : ref_fields){
         int constant;
-        if(m_FieldInspector.fieldIsReadOnGpu(ref_field)) {
+        if(m_fieldInspector.fieldIsReadOnGpu(ref_field)) {
           constant = 1;
         } else {
           constant = 0;

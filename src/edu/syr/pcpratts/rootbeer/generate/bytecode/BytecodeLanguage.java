@@ -26,10 +26,7 @@ import soot.Type;
 import soot.Unit;
 import soot.Value;
 import soot.VoidType;
-import soot.jimple.IntConstant;
-import soot.jimple.Jimple;
-import soot.jimple.JimpleBody;
-import soot.jimple.StringConstant;
+import soot.jimple.*;
 
 public class BytecodeLanguage {
 
@@ -588,5 +585,17 @@ public class BytecodeLanguage {
     return mCurrClass;
   }
 
+  Local classConstant(Type type) {
+    String class_name = convertToConstant(type.toString());
+    Value curr = ClassConstant.v(class_name);
+    Local ret = jimple.newLocal(getLocalName(), curr.getType());
+    Unit u = jimple.newAssignStmt(ret, curr);
+    mAssembler.add(u);
+    return ret;
+  }
 
+  private String convertToConstant(String name) {
+    name = name.replace(".", "/");
+    return name;
+  }
 }

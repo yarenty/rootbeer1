@@ -20,6 +20,7 @@ public abstract class Serializer {
 
   private static final Map<Object, Long> mWriteToGpuCache;
   private static final Map<Long, Object> mReadFromGpuCache;
+  private Map<Long, Integer> m_classRefToTypeNumber;
   
   private ReadOnlyAnalyzer m_Analyzer;
   
@@ -33,6 +34,7 @@ public abstract class Serializer {
     mTextureMem = texture_mem;
     mReadFromGpuCache.clear();
     mWriteToGpuCache.clear();
+    m_classRefToTypeNumber = new HashMap<Long, Integer>();
   }
   
   public void setAnalyzer(ReadOnlyAnalyzer analyzer){
@@ -54,6 +56,10 @@ public abstract class Serializer {
       m_Ref = ref;
       m_NeedToWrite = need_to_write;
     }
+  }
+  
+  public void addClassRef(long ref, int class_number){
+    m_classRefToTypeNumber.put(ref, class_number);
   }
   
   private WriteCacheResult checkWriteCache(Object o, int size, boolean read_only){

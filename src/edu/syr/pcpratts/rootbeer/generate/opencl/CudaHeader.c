@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-__shared__ size_t m_Local[2];
+__shared__ size_t m_Local[3];
 texture<int> m_Cache;
 __shared__ int m_ScratchPad;
 

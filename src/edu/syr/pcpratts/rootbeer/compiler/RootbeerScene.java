@@ -10,9 +10,7 @@ package edu.syr.pcpratts.rootbeer.compiler;
 import edu.syr.pcpratts.rootbeer.classloader.DfsInfo;
 import java.util.ArrayList;
 import java.util.List;
-import soot.Scene;
-import soot.SootClass;
-import soot.SootMethod;
+import soot.*;
 import soot.util.NumberedString;
 
 public class RootbeerScene {
@@ -96,5 +94,27 @@ public class RootbeerScene {
       }
     }
     throw new RuntimeException("cannot find method: "+subSignature+" in class: "+soot_class);
+  }
+
+  public Type getType(String constant) {
+    if(constant.equals("Z")){
+      return BooleanType.v();
+    } else if(constant.equals("B")){
+      return ByteType.v();
+    } else if(constant.equals("S")){
+      return ShortType.v();
+    } else if(constant.equals("C")){
+      return CharType.v();
+    } else if(constant.equals("I")){
+      return IntType.v();
+    } else if(constant.equals("J")){
+      return LongType.v();
+    } else if(constant.equals("F")){
+      return FloatType.v();
+    } else if(constant.equals("D")){
+      return DoubleType.v();
+    } else {
+      return RefType.v(constant);
+    }
   }
 }

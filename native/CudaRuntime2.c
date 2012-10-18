@@ -27,12 +27,14 @@ static void * toSpace;
 static void * textureMemory;
 static void * handlesMemory;
 static void * exceptionsMemory;
+static void * classMemory;
 
 static CUdeviceptr gcInfoSpace;
 static CUdeviceptr gpuToSpace;
 static CUdeviceptr gpuTexture;
 static CUdeviceptr gpuHandlesMemory;
 static CUdeviceptr gpuExceptionsMemory;
+static CUdeviceptr gpuClassMemory;
 static CUdeviceptr gpuHeapEndPtr;
 static CUdeviceptr gpuBufferSize;
 static CUtexref    cache;
@@ -41,6 +43,7 @@ static jclass thisRefClass;
 
 static jlong heapEndPtr;
 static jlong bufferSize;
+static jlong classMemSize;
 static int maxGridDim;
 static int numMultiProcessors;
 
@@ -130,6 +133,7 @@ void getBestDevice(JNIEnv *env){
   CHECK_STATUS(env,"error in cuDeviceGetAttribute",status)
           
   numMultiProcessors = max_multiprocessors;
+
 }
 
 size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_block)
@@ -153,6 +157,9 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
   CHECK_STATUS_RTN(env,"error in cuMemGetInfo",status, 0)
   
   to_space_size = f_mem;
+
+  //space for 100 types in the scene
+  classMemSize = sizeof(jint)*100;
   
   num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
@@ -160,6 +167,7 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
   to_space_size -= (num_blocks * sizeof(jlong));
   to_space_size -= (num_blocks * sizeof(jlong));
   to_space_size -= gc_space_size;
+  to_space_size -= classMemSize;
   
   return to_space_size;
 }
@@ -342,12 +350,17 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   printf("max_blocks_per_proc = %i\n",max_blocks_per_proc);
   fflush(stdout);
 #endif
+
+  //space for 100 types in the scene
+  classMemSize = sizeof(jint)*100;
   
   gc_space_size = 1024;
   to_space_size -= (num_blocks * sizeof(jlong));
   to_space_size -= (num_blocks * sizeof(jlong));
   to_space_size -= gc_space_size;
   to_space_size -= free_space;
+  to_space_size -= classMemSize;
+
   //to_space_size -= textureMemSize;
   bufferSize = to_space_size;
 
@@ -356,6 +369,12 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
     
   status = cuMemAlloc(&gpuToSpace, to_space_size);
   CHECK_STATUS(env,"gpuToSpace memory allocation failed",status)
+
+  status = cuMemHostAlloc(&classMemory, classMemSize, 0);
+  CHECK_STATUS(env,"classMemory memory allocation failed",status)
+    
+  status = cuMemAlloc(&gpuClassMemory, classMemSize);
+  CHECK_STATUS(env,"gpuClassMemory memory allocation failed",status)
   
 /*
   status = cuMemHostAlloc(&textureMemory, textureMemSize, 0);  
@@ -387,6 +406,9 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
 
   status = cuMemAlloc(&gpuHeapEndPtr, 8);
   CHECK_STATUS(env,"gpuHeapEndPtr memory allocation failed",status)
+
+  status = cuMemAlloc(&gpuBufferSize, 8);
+  CHECK_STATUS(env,"gpuBufferSize memory allocation failed",status)
 
   status = cuMemAlloc(&gpuBufferSize, 8);
   CHECK_STATUS(env,"gpuBufferSize memory allocation failed",status)
@@ -479,13 +501,13 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   CHECK_STATUS(env, "error in cuModuleLoad", status);
   (*env)->ReleaseStringUTFChars(env, filename, native_filename);
 
-  status = cuModuleGetFunction(&cuFunction, cuModule, "_Z5entryPcS_PiPxS1_S0_i"); 
+  status = cuModuleGetFunction(&cuFunction, cuModule, "_Z5entryPcS_PiPxS1_S0_S0_i"); 
   CHECK_STATUS(env,"error in cuModuleGetFunction",status)
 
   status = cuFuncSetCacheConfig(cuFunction, CU_FUNC_CACHE_PREFER_L1);
   CHECK_STATUS(env,"error in cuFuncSetCacheConfig",status)
 
-  status = cuParamSetSize(cuFunction, (6 * sizeof(CUdeviceptr) + sizeof(int))); 
+  status = cuParamSetSize(cuFunction, (7 * sizeof(CUdeviceptr) + sizeof(int))); 
   CHECK_STATUS(env,"error in cuParamSetSize",status)
 
   offset = 0;
@@ -513,6 +535,10 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   CHECK_STATUS(env,"error in cuParamSetv gpuExceptionsMemory",status)
   offset += sizeof(CUdeviceptr);
 
+  status = cuParamSetv(cuFunction, offset, (void *) &gpuClassMemory, sizeof(CUdeviceptr)); 
+  CHECK_STATUS(env,"error in cuParamSetv gpuClassMemory",status)
+  offset += sizeof(CUdeviceptr);
+
   status = cuParamSeti(cuFunction, offset, num_blocks); 
   CHECK_STATUS(env,"error in cuParamSetv num_blocks",status)
   offset += sizeof(int);
@@ -534,6 +560,7 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   //cuMemcpyHtoD(gpuTexture, textureMemory, textureMemSize);
   cuMemcpyHtoD(gpuHandlesMemory, handlesMemory, num_blocks * sizeof(jlong));
   cuMemcpyHtoD(gpuHeapEndPtr, &heapEndPtr, sizeof(jlong));
+  cuMemcpyHtoD(gpuClassMemory, &classMemory, classMemSize);
   cuMemcpyHtoD(gpuBufferSize, &bufferSize, sizeof(jlong));
   
 /*

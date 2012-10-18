@@ -23,23 +23,25 @@ import soot.jimple.StringConstant;
 public class AbstractVisitorGen {
   
   protected Local m_thisRef;
-  private int m_LabelI;
+  protected Stack<Local> m_currThisRef;
+  private int m_labelI;
   protected Stack<BytecodeLanguage> m_bcl;
   protected Stack<Local> m_gcObjVisitor;
   protected Stack<Local> m_currMem;
-  protected Stack<Local> m_ObjSerializing;
-  protected FieldReadWriteInspector m_FieldInspector;
-  protected List<String> m_ClassesToIgnore;
+  protected Stack<Local> m_objSerializing;
+  protected FieldReadWriteInspector m_fieldInspector;
+  protected List<String> m_classesToIgnore;
   
   public AbstractVisitorGen(FieldReadWriteInspector inspector){
-    m_LabelI = 0; 
+    m_labelI = 0; 
     m_bcl = new Stack<BytecodeLanguage>();
     m_gcObjVisitor = new Stack<Local>();
     m_currMem = new Stack<Local>();
-    m_ObjSerializing = new Stack<Local>();
-    m_FieldInspector = inspector;
-    m_ClassesToIgnore = new ArrayList<String>();
-    m_ClassesToIgnore.add("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
+    m_currThisRef = new Stack<Local>();
+    m_objSerializing = new Stack<Local>();
+    m_fieldInspector = inspector;
+    m_classesToIgnore = new ArrayList<String>();
+    m_classesToIgnore.add("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
   }
   
   protected boolean differentPackageAndPrivate(RefType ref_inspecting) {
@@ -84,8 +86,8 @@ public class AbstractVisitorGen {
   }
 
   protected String getNextLabel(){
-    String ret = "phillabel"+Integer.toString(m_LabelI);
-    m_LabelI++;
+    String ret = "phillabel"+Integer.toString(m_labelI);
+    m_labelI++;
     return ret;
   }
   
@@ -128,16 +130,16 @@ public class AbstractVisitorGen {
     Local original_field_value;
     if(FastWholeProgram.v().isApplicationClass(soot_class) == false){
       bcl.pushMethod(gc_obj_visit, "readField", obj_class.getType(), obj_class.getType(), string.getType());       
-      original_field_value = bcl.invokeMethodRet(gc_obj_visit, m_ObjSerializing.top(), StringConstant.v(soot_field.getName()));
+      original_field_value = bcl.invokeMethodRet(gc_obj_visit, m_objSerializing.top(), StringConstant.v(soot_field.getName()));
     } else {
       if(ref_field.isInstance())
-        original_field_value = bcl.refInstanceField(m_ObjSerializing.top(), ref_field.getName());
+        original_field_value = bcl.refInstanceField(m_objSerializing.top(), ref_field.getName());
       else
         original_field_value = bcl.refStaticField(soot_class.getType(), ref_field.getName());
     }
     bcl.pushMethod(gc_obj_visit, "readFromHeap", obj_class.getType(), obj_class.getType(), BooleanType.v(), LongType.v());
     int should_read = 0;
-    if(m_FieldInspector.fieldIsWrittenOnGpu(ref_field))
+    if(m_fieldInspector.fieldIsWrittenOnGpu(ref_field))
       should_read = 1;
     Local ret_obj = bcl.invokeMethodRet(gc_obj_visit, original_field_value, IntConstant.v(should_read), ref);
     
@@ -146,10 +148,10 @@ public class AbstractVisitorGen {
 
     if(FastWholeProgram.v().isApplicationClass(soot_class) == false){
       bcl.pushMethod(gc_obj_visit, "writeField", VoidType.v(), obj_class.getType(), string.getType(), obj_class.getType());       
-      bcl.invokeMethodNoRet(gc_obj_visit, m_ObjSerializing.top(), StringConstant.v(soot_field.getName()), ret);
+      bcl.invokeMethodNoRet(gc_obj_visit, m_objSerializing.top(), StringConstant.v(soot_field.getName()), ret);
     } else {
       if(ref_field.isInstance()){
-        bcl.setInstanceField(soot_field, m_ObjSerializing.top(), ret);
+        bcl.setInstanceField(soot_field, m_objSerializing.top(), ret);
       } else {
         bcl.setStaticField(soot_field, ret);
       }
@@ -169,7 +171,7 @@ public class AbstractVisitorGen {
     SootClass soot_class = Scene.v().getSootClass(soot_field.getDeclaringClass().getName());
     if(FastWholeProgram.v().isApplicationClass(soot_class)){
       if(field.isInstance()){
-        bcl.setInstanceField(soot_field, m_ObjSerializing.top(), data);
+        bcl.setInstanceField(soot_field, m_objSerializing.top(), data);
       } else {
         bcl.setStaticField(soot_field, data);
       }
@@ -182,7 +184,7 @@ public class AbstractVisitorGen {
       if(field.isInstance()){
         static_str = "";
         first_param_type = obj;
-        first_param = m_ObjSerializing.top();
+        first_param = m_objSerializing.top();
       } else {
         static_str = "Static";
         first_param_type = Scene.v().getSootClass("java.lang.Class");
