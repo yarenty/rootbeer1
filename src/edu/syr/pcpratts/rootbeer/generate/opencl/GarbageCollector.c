@@ -450,3 +450,13 @@ $$__device__$$ int
 java_lang_Object_hashCode($$__global$$ char * gc_info, int thisref, int * exception){
   return thisref;
 }
+
+$$__device__$$ int
+java_lang_Class_getName( char * gc_info , int thisref , int * exception ) { 
+  int $r1 =-1 ; 
+  $r1 = instance_getter_java_lang_Class_name ( gc_info , thisref , exception ) ; 
+  if ( * exception != 0 ) { 
+    return 0 ; 
+  } 
+  return $r1;
+}

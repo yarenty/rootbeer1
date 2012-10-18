@@ -211,7 +211,6 @@ public class OpenCLMethod {
           }
         }
       } catch(RuntimeException ex){
-        ex.printStackTrace();
         System.out.println("error creating method body: "+m_sootMethod.getSignature());
         OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, m_sootClass);
         if(ocl_method.returnsAValue())
@@ -467,6 +466,7 @@ public class OpenCLMethod {
     m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu");
     m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId");
     m_dontMangleMethods.add("java_lang_System_nanoTime");
+    m_dontMangleMethods.add("java_lang_Class_getName");
   }
 
   public String getSignature() {
