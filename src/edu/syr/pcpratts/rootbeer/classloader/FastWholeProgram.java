@@ -654,6 +654,7 @@ public class FastWholeProgram {
       return;
     }
     m_currDfsInfo.addMethod(signature);
+    System.out.println("searching method: "+signature);
         
     SootClass soot_class = method.getDeclaringClass();
     addType(soot_class.getType());

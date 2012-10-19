@@ -1,4 +1,10 @@
 
+$$__device__$$ int
+edu_syr_pcpratts_classConstant(int type_num){
+  int * temp = (int *) m_Local[2];   
+  return temp[type_num];
+}
+
 __device__  char *
 edu_syr_pcpratts_gc_deref(char * gc_info, int handle){
 

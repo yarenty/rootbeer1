@@ -4,6 +4,15 @@
 
 pthread_key_t threadIdKey = 0;
 
+char * global_gc_info;
+long long * global_handles;
+int thread_id;
+int global_num_threads;
+long long * global_exceptions;
+int * global_class_refs;
+
+pthread_mutex_t thread_id_mutex;
+
 int getThreadId(){
   return (int) pthread_getspecific(threadIdKey);
 }
@@ -46,6 +55,11 @@ edu_syr_pcpratts_gc_malloc(char * gc_info, long long size){
   }
 }
 
+int
+edu_syr_pcpratts_classConstant(int type_num){
+  return global_class_refs[type_num];
+}
+
 char *
 edu_syr_pcpratts_gc_init(char * gc_info_space,
                          long long * to_space,
@@ -58,14 +72,6 @@ edu_syr_pcpratts_gc_init(char * gc_info_space,
     
   return (char *) gc_info_space;
 }
-
-char * global_gc_info;
-long long * global_handles;
-int thread_id;
-int global_num_threads;
-long long * global_exceptions;
-
-pthread_mutex_t thread_id_mutex;
 
 static void * run(void * data){
 
@@ -95,6 +101,7 @@ void entry(char * gc_info_space,
            long long * handles,
            long long * to_space_free_ptr,
            long long * exceptions,
+           int * java_lang_class_refs,
            long long space_size,
            int num_threads){
   
@@ -108,6 +115,7 @@ void entry(char * gc_info_space,
   global_gc_info = gc_info;
   global_handles = handles;
   global_exceptions = exceptions;
+  global_class_refs = java_lang_class_refs;
   
   pthread_mutex_init(&thread_id_mutex, NULL);
   pthread_mutex_init(&atom_add_mutex, NULL);

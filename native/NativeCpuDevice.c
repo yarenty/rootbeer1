@@ -21,7 +21,7 @@ jbyteArray array_get(JNIEnv * env, jobject array, int index){
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCpuDevice_runOnCpu
   (JNIEnv * env, jobject this_ptr, jobject to_space_array, jint to_space_count, 
-   jbyteArray handles, jbyteArray heap_end_ptr, jbyteArray gc_info, jbyteArray exceptions, 
+   jbyteArray handles, jbyteArray heap_end_ptr, jbyteArray gc_info, jbyteArray exceptions, jintArray java_lang_class_refs, 
    jint num_threads, jstring lib_name){
 
   int i;
@@ -29,6 +29,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   jbyte * nheap_end_ptr = (*env)->GetByteArrayElements(env, heap_end_ptr, JNI_FALSE);
   jbyte * ngc_info = (*env)->GetByteArrayElements(env, gc_info, JNI_FALSE);
   jbyte * nexceptions = (*env)->GetByteArrayElements(env, exceptions, JNI_FALSE);
+  jint * nclass_refs = (*env)->GetIntArrayElements(env, java_lang_class_refs, JNI_FALSE);
 
   const char *str = (*env)->GetStringUTFChars(env, lib_name, NULL);
   void * lib_handle = dlopen(str, RTLD_LAZY);
@@ -41,10 +42,10 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   }
 
   void (*entry)(char * gc_info_space, jlong * to_space, jlong * handles, 
-    jlong * to_space_free_ptr, jlong * exceptions, jlong space_size, int num_threads);
+    jlong * to_space_free_ptr, jlong * exceptions, jint * class_refs, jlong space_size, int num_threads);
 
   entry = dlsym(lib_handle, "entry");
-  (*entry)((char *) ngc_info, to_space, (jlong *) nhandles, (jlong *) nheap_end_ptr, (jlong *) nexceptions, 100*1024*1024, num_threads);  
+  (*entry)((char *) ngc_info, to_space, (jlong *) nhandles, (jlong *) nheap_end_ptr, (jlong *) nexceptions, (jint *) nclass_refs, 100*1024*1024, num_threads);  
 
   dlclose(lib_handle);
 
@@ -57,6 +58,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   (*env)->ReleaseByteArrayElements(env, heap_end_ptr, nheap_end_ptr, 0);
   (*env)->ReleaseByteArrayElements(env, gc_info, ngc_info, 0);
   (*env)->ReleaseByteArrayElements(env, exceptions, nexceptions, 0);
+  (*env)->ReleaseIntArrayElements(env, java_lang_class_refs, nclass_refs, 0);
 
   free(to_space);
 }

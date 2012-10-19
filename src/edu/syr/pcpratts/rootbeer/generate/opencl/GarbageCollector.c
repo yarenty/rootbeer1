@@ -16,6 +16,7 @@ $$__device__$$ void edu_syr_pcpratts_gc_assign($$__global$$ char * gc_info, int 
 $$__device__$$ $$__global$$ char * edu_syr_pcpratts_gc_deref($$__global$$ char * gc_info, int handle);
 $$__device__$$ int edu_syr_pcpratts_gc_malloc($$__global$$ char * gc_info, long long size);
 $$__device__$$ long long edu_syr_pcpratts_gc_malloc_no_fail($$__global$$ char * gc_info, long long size);
+$$__device__$$ int edu_syr_pcpratts_classConstant(int type_num);
 
 #define CACHE_SIZE_BYTES 32
 #define CACHE_SIZE_INTS (CACHE_SIZE_BYTES / sizeof(int))
@@ -464,10 +465,4 @@ java_lang_Class_getName( char * gc_info , int thisref , int * exception ) {
     return 0 ; 
   } 
   return $r1;
-}
-
-$$__device__$$ int
-edu_syr_pcpratts_classConstant(int type_num){
-  int * temp = (int *) m_Local[2];   
-  return temp[type_num];
 }

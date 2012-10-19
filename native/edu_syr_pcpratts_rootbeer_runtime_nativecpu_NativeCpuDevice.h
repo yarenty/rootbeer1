@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCpuDevice
  * Method:    runOnCpu
- * Signature: (Ljava/util/List;I[B[B[B[BILjava/lang/String;)V
+ * Signature: (Ljava/util/List;I[B[B[B[B[IILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCpuDevice_runOnCpu
-  (JNIEnv *, jobject, jobject, jint, jbyteArray, jbyteArray, jbyteArray, jbyteArray, jint, jstring);
+  (JNIEnv *, jobject, jobject, jint, jbyteArray, jbyteArray, jbyteArray, jbyteArray, jintArray, jint, jstring);
 
 #ifdef __cplusplus
 }

@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.runtime.nativecpu;
 
+import edu.syr.pcpratts.rootbeer.runtime.Serializer;
 import edu.syr.pcpratts.rootbeer.runtime.gpu.GcHeap;
 import edu.syr.pcpratts.rootbeer.runtime.gpu.GpuDevice;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BasicMemory;
@@ -47,5 +48,9 @@ public class NativeCpuGcHeap extends GcHeap {
     ret.add(mGcInfoSpaceMemory);
     ret.add(mExceptionsMemory);
     return ret;
+  }
+
+  public Serializer getSerializer() {
+    return mGcObjectVisitor;
   }
 }
