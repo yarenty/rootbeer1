@@ -16,7 +16,7 @@ public class DotClassTest implements TestSerialization {
 
   public List<Kernel> create() {
     List<Kernel> ret = new ArrayList<Kernel>();
-    for(int i = 0; i < 5; ++i){
+    for(int i = 0; i < 1; ++i){
       ret.add(new DotClassRunOnGpu());
     }
     return ret;

@@ -136,6 +136,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     
     m_gcObjVisitor.pop();
     m_currMem.pop();
+    m_bcl.pop();
   }
   
   private void doWriter(SootClass soot_class){  

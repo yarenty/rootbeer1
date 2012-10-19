@@ -7,6 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.classloader.DfsInfo;
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.Constants;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
@@ -29,7 +31,6 @@ public class OpenCLClass {
   private List<OpenCLField> mStaticNonRefFields;
   private List<OpenCLField> mAllUsedStaticFields;
   
-  private boolean mFoundAllUsedMethodsAndFields;
   private int mStaticFieldSize;
 
   public OpenCLClass(SootClass soot_class){
@@ -42,7 +43,10 @@ public class OpenCLClass {
     mStaticRefFields = null;
     mStaticNonRefFields = null;
     mAllUsedStaticFields = null;
-    mFoundAllUsedMethodsAndFields = false;
+  }
+  
+  public void addField(SootField soot_field){
+    
   }
   
   public SootClass getSootClass(){

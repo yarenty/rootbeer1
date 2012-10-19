@@ -120,11 +120,9 @@ public class OpenCLScene {
   }
 
   public void addField(SootField soot_field){
+    System.out.println("addingField: "+soot_field.toString());
     SootClass soot_class = soot_field.getDeclaringClass();
     OpenCLClass ocl_class = getOpenCLClass(soot_class);
-    if(ocl_class == null){
-      System.out.println("hello");
-    }
     ocl_class.addField(new OpenCLField(soot_field, soot_class));
   }
 
@@ -157,16 +155,20 @@ public class OpenCLScene {
     return m_usesGarbageCollector;
   }
   
-  public void addClass(SootClass soot_class){
+  public OpenCLClass addClass(SootClass soot_class){
     OpenCLClass ocl_class = new OpenCLClass(soot_class);
     
     if(m_classes.containsKey(soot_class.getName()) == false){
       m_classes.put(soot_class.getName(), ocl_class);
+    } else {
+      ocl_class = m_classes.get(soot_class.getName());
     }
     
     if(m_oclToSoot.containsKey(ocl_class.getName()) == false){
       m_oclToSoot.put(ocl_class.getName(), soot_class.getName());
     }
+  
+    return ocl_class;
   }
   
   private String makeSourceCode() throws Exception {
@@ -202,8 +204,8 @@ public class OpenCLScene {
     
     StringBuilder ret = new StringBuilder();
     ret.append(headerString());
-    ret.append(garbageCollectorString());
     ret.append(methodPrototypesString());
+    ret.append(garbageCollectorString());
     ret.append(methodBodiesString());
 
     String cuda_code;

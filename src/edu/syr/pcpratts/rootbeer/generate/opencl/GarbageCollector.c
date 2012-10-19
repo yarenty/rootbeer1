@@ -147,6 +147,11 @@ int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId($$__global$$ char 
   return getThreadId();
 }
 
+$$__device__$$ 
+long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef($$__global$$ char * gc_info, int ref, int * exception){
+  return ref;
+}
+
 $$__device__$$ char
 edu_syr_pcpratts_cmp(long long lhs, long long rhs){
   if(lhs > rhs)
@@ -459,4 +464,10 @@ java_lang_Class_getName( char * gc_info , int thisref , int * exception ) {
     return 0 ; 
   } 
   return $r1;
+}
+
+$$__device__$$ int
+edu_syr_pcpratts_classConstant(int type_num){
+  int * temp = (int *) m_Local[2];   
+  return temp[type_num];
 }

@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.classloader;
 
 import edu.syr.pcpratts.rootbeer.compiler.ClassRemapping;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.MultiDimensionalArrayTypeCreator;
+import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.*;
 import soot.*;
@@ -400,7 +401,7 @@ public class DfsInfo {
         continue;
       }
       RefType ref_type = (RefType) type;
-      m_oclScene.addClass(ref_type.getSootClass());
+      OpenCLClass ocl_class = m_oclScene.addClass(ref_type.getSootClass());
     }
       
     return m_oclScene;

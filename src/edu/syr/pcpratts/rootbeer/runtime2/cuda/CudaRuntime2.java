@@ -268,6 +268,8 @@ public class CudaRuntime2 implements ParallelRuntime {
     }
     
     m_Partial.addNotWritten(m_NotWritten);
+
+    writeClassTypeRef(visitors.get(0).getClassRefArray());
     
     watch.stop();
     m_serializationTime = watch.elapsedTimeMillis();
@@ -293,6 +295,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   }
   
   private native void loadFunction(long heap_end_ptr, String filename, int num_blocks);
+  private native void writeClassTypeRef(int[] refs);
   private native int runBlocks(int size, int block_shape, int grid_shape);
   private native void unload();
 

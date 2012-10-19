@@ -27,7 +27,6 @@ static void * toSpace;
 static void * textureMemory;
 static void * handlesMemory;
 static void * exceptionsMemory;
-static void * classMemory;
 
 static CUdeviceptr gcInfoSpace;
 static CUdeviceptr gpuToSpace;
@@ -369,9 +368,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
     
   status = cuMemAlloc(&gpuToSpace, to_space_size);
   CHECK_STATUS(env,"gpuToSpace memory allocation failed",status)
-
-  status = cuMemHostAlloc(&classMemory, classMemSize, 0);
-  CHECK_STATUS(env,"classMemory memory allocation failed",status)
     
   status = cuMemAlloc(&gpuClassMemory, classMemSize);
   CHECK_STATUS(env,"gpuClassMemory memory allocation failed",status)
@@ -484,6 +480,23 @@ void * readCubinFileFromBuffers(JNIEnv *env, jobject buffers, jint size, jint to
 
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
+ * Method:    writeClassTypeRef
+ * Signature: ([I)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_writeClassTypeRef
+  (JNIEnv *env, jobject this_ref, jintArray jarray)
+{
+  int i;
+  jint * native_array = (*env)->GetIntArrayElements(env, jarray, 0);
+  cuMemcpyHtoD(gpuClassMemory, native_array, classMemSize);
+  for(i = 0; i < 26; ++i){
+    printf("i: %d value: %d\n", i, native_array[i]);
+  }
+  (*env)->ReleaseIntArrayElements(env, jarray, native_array, 0);
+}
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  * Method:    loadFunction
  * Signature: ()V
  */
@@ -560,7 +573,6 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   //cuMemcpyHtoD(gpuTexture, textureMemory, textureMemSize);
   cuMemcpyHtoD(gpuHandlesMemory, handlesMemory, num_blocks * sizeof(jlong));
   cuMemcpyHtoD(gpuHeapEndPtr, &heapEndPtr, sizeof(jlong));
-  cuMemcpyHtoD(gpuClassMemory, &classMemory, classMemSize);
   cuMemcpyHtoD(gpuBufferSize, &bufferSize, sizeof(jlong));
   
 /*

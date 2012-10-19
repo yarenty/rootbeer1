@@ -12,20 +12,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import soot.ArrayType;
-import soot.BooleanType;
-import soot.IntType;
-import soot.Local;
-import soot.Modifier;
-import soot.RefType;
-import soot.Scene;
-import soot.SootClass;
-import soot.SootField;
-import soot.SootMethod;
-import soot.Type;
-import soot.Unit;
-import soot.Value;
-import soot.VoidType;
+import soot.*;
 import soot.jimple.*;
 
 public class BytecodeLanguage {
@@ -586,7 +573,7 @@ public class BytecodeLanguage {
   }
 
   Local classConstant(Type type) {
-    String class_name = convertToConstant(type.toString());
+    String class_name = convertToConstant(type);
     Value curr = ClassConstant.v(class_name);
     Local ret = jimple.newLocal(getLocalName(), curr.getType());
     Unit u = jimple.newAssignStmt(ret, curr);
@@ -594,8 +581,38 @@ public class BytecodeLanguage {
     return ret;
   }
 
-  private String convertToConstant(String name) {
-    name = name.replace(".", "/");
-    return name;
+  private String convertToConstant(Type type) {
+    if(type instanceof ArrayType){
+      ArrayType array_type = (ArrayType) type;
+      String prefix = "";
+      int dims = array_type.numDimensions;
+      for(int i = 0; i < dims; ++i){
+        prefix += "[";
+      }
+      return prefix + convertToConstant(array_type.baseType);
+    } else if(type instanceof RefType){
+      RefType ref_type = (RefType) type;
+      return ref_type.getSootClass().getName().replace(".", "/");
+    } else if(type instanceof PrimType){
+      if(type.equals(BooleanType.v())){
+        return "Z";
+      } else if(type.equals(ByteType.v())){
+        return "B";
+      } else if(type.equals(ShortType.v())){
+        return "S";
+      } else if(type.equals(CharType.v())){
+        return "C";
+      } else if(type.equals(IntType.v())){
+        return "I";
+      } else if(type.equals(LongType.v())){
+        return "J";
+      } else if(type.equals(FloatType.v())){
+        return "F";
+      } else if(type.equals(DoubleType.v())){
+        return "D";
+      }
+    }
+    
+    throw new RuntimeException("please report bug in BytecodeLanguage.convertToConstant");
   }
 }

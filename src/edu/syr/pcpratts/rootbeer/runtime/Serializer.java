@@ -20,13 +20,14 @@ public abstract class Serializer {
 
   private static final Map<Object, Long> mWriteToGpuCache;
   private static final Map<Long, Object> mReadFromGpuCache;
-  private Map<Long, Integer> m_classRefToTypeNumber;
+  private static Map<Long, Integer> m_classRefToTypeNumber;
   
   private ReadOnlyAnalyzer m_Analyzer;
   
   static {
     mWriteToGpuCache = new IdentityHashMap<Object, Long>();
     mReadFromGpuCache = new HashMap<Long, Object>();
+    m_classRefToTypeNumber = new HashMap<Long, Integer>();
   }
   
   public Serializer(Memory mem, Memory texture_mem){
@@ -34,7 +35,7 @@ public abstract class Serializer {
     mTextureMem = texture_mem;
     mReadFromGpuCache.clear();
     mWriteToGpuCache.clear();
-    m_classRefToTypeNumber = new HashMap<Long, Integer>();
+    m_classRefToTypeNumber.clear();
   }
   
   public void setAnalyzer(ReadOnlyAnalyzer analyzer){
@@ -59,7 +60,23 @@ public abstract class Serializer {
   }
   
   public void addClassRef(long ref, int class_number){
+    System.out.println("addingClassRef: "+ref+" cls_#: "+class_number+" obj: "+mWriteToGpuCache.get(ref));
     m_classRefToTypeNumber.put(ref, class_number);
+  }
+  
+  public int[] getClassRefArray(){
+    int max_type = 0;
+    for(int num : m_classRefToTypeNumber.values()){
+      if(num > max_type){
+        max_type = num;
+      }
+    }
+    int[] ret = new int[max_type+1];
+    for(long value : m_classRefToTypeNumber.keySet()){
+      int pos = m_classRefToTypeNumber.get(value);
+      ret[pos] = (int) (value >> 4);
+    }
+    return ret;
   }
   
   private WriteCacheResult checkWriteCache(Object o, int size, boolean read_only){
@@ -89,6 +106,11 @@ public abstract class Serializer {
     result = checkWriteCache(o, size, read_only);
     if(result.m_NeedToWrite == false)
       return result.m_Ref;
+    if(o == null){
+      System.out.println("doWriteToHeap: "+result.m_Ref+" null");
+    } else {
+      System.out.println("doWriteToHeap: "+result.m_Ref+" "+o.toString());
+    }
     doWriteToHeap(o, write_data, result.m_Ref, read_only);
     return result.m_Ref;
   }
