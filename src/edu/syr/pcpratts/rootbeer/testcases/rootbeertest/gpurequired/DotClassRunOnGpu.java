@@ -19,20 +19,31 @@ public class DotClassRunOnGpu implements Kernel {
  
   public void gpuMethod() {
     m_name = DotClassRunOnGpu.class.getName();
-    //m_name2 = int[][].class.getName();
+    m_name2 = int[][].class.getName();
     m_ref = RootbeerGpu.getRef(m_name);
     m_ref2 = RootbeerGpu.getRef(DotClassRunOnGpu.class);
   }
   
-  public boolean compare(DotClassRunOnGpu rhs){    
-    System.out.println("m_ref: "+rhs.m_ref); 
-    System.out.println("m_ref2: "+rhs.m_ref2);
+  public boolean compare(DotClassRunOnGpu rhs){ 
+    
+    if(m_name == null || rhs.m_name == null){
+      System.out.println("m_name: "+m_name);
+      System.out.println("rhs.m_name: "+rhs.m_name);
+      return false;
+    }
     
     if(m_name.equals(rhs.m_name) == false){
       System.out.println("m_name: "+m_name);
       System.out.println("rhs.m_name: "+rhs.m_name);
       return false;
     }
+    
+    if(m_name2 == null || rhs.m_name2 == null){
+      System.out.println("m_name2: "+m_name2);
+      System.out.println("rhs.m_name2: "+rhs.m_name2);
+      return false;
+    }
+    
     if(m_name2.equals(rhs.m_name2) == false){
       System.out.println("m_name2: "+m_name2);
       System.out.println("rhs.m_name2: "+rhs.m_name2);

@@ -71,6 +71,15 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl.returnValue(NullConstant.v());
     bcl.label(dont_return_null_label);    
     
+    String dont_fetch_obj = getNextLabel();
+    bcl.ifStmt(m_Param0, "==", NullConstant.v(), dont_fetch_obj);
+    
+    //public Object writeCacheFetch(long ref){
+    bcl.pushMethod(m_thisRef, "writeCacheFetch", obj_cls.getType(), LongType.v());
+    Local written_to = bcl.invokeMethodRet(m_thisRef, m_RefParam);
+    bcl.assign(m_Param0, written_to);
+    bcl.label(dont_fetch_obj);
+    
     Local mem = bcl.local(m_Mem.getType());
     
     bcl.assign(mem, m_Mem);      

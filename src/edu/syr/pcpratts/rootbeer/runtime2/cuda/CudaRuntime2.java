@@ -75,6 +75,8 @@ public class CudaRuntime2 implements ParallelRuntime {
   private List<ToSpaceReader> m_Readers;
   private List<ToSpaceWriter> m_Writers;
   
+  private List<Serializer> m_serializers;
+  
   private CpuRunner m_CpuRunner;
   private BlockShaper m_BlockShaper;
   
@@ -97,6 +99,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_Readers = new ArrayList<ToSpaceReader>();
     m_Writers = new ArrayList<ToSpaceWriter>();    
     m_NumCores = Runtime.getRuntime().availableProcessors();
+    m_serializers = new ArrayList<Serializer>();
     AtomicLong to_space_inst_ptr = new AtomicLong(0);
     AtomicLong to_space_static_ptr = new AtomicLong(0);
     AtomicLong texture_inst_ptr = new AtomicLong(0);
@@ -161,6 +164,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   public static native void printDeviceInfo();
   
   public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs){
+    
     Stopwatch watch2 = new Stopwatch();
     watch2.start();
     RootbeerGpu.setIsOnGpu(true);
@@ -206,6 +210,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_JobsWritten.clear();
     m_HandlesCache.clear();
     m_NotWritten.clear();
+    m_serializers.clear();
     
     ReadOnlyAnalyzer analyzer = null;
     
@@ -227,7 +232,6 @@ public class CudaRuntime2 implements ParallelRuntime {
       return false;
     }
     
-    List<Serializer> visitors = new ArrayList<Serializer>();
     for(int i = 0; i < m_NumCores; ++i){
       Memory mem = m_ToSpace.get(i);
       Memory texture_mem = m_Texture.get(i);
@@ -235,15 +239,15 @@ public class CudaRuntime2 implements ParallelRuntime {
       texture_mem.clearHeapEndPtr();
       Serializer visitor = m_FirstJob.getSerializer(mem, texture_mem);
       visitor.setAnalyzer(analyzer);
-      visitors.add(visitor);
+      m_serializers.add(visitor);
     }
     
     //write the statics to the heap
-    visitors.get(0).writeStaticsToHeap();
+    m_serializers.get(0).writeStaticsToHeap();
     
     int items_per = m_JobsToWrite.size() / m_NumCores;
     for(int i = 0; i < m_NumCores; ++i){
-      Serializer visitor = visitors.get(i);
+      Serializer visitor = m_serializers.get(i);
       int end_index;
       if(i == m_NumCores - 1){
         end_index = m_JobsToWrite.size();
@@ -269,7 +273,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     
     m_Partial.addNotWritten(m_NotWritten);
 
-    writeClassTypeRef(visitors.get(0).getClassRefArray());
+    writeClassTypeRef(m_serializers.get(0).getClassRefArray());
     
     watch.stop();
     m_serializationTime = watch.elapsedTimeMillis();
@@ -344,7 +348,7 @@ public class CudaRuntime2 implements ParallelRuntime {
         }
         Memory mem = m_ToSpace.get(0);
         Memory texture_mem = m_Texture.get(0);
-        Serializer visitor = m_FirstJob.getSerializer(mem, texture_mem);
+        Serializer visitor = m_serializers.get(0);
         mem.setAddress(ref);           
         Object except = visitor.readFromHeap(null, true, ref);
         if(except instanceof Error){
@@ -356,20 +360,12 @@ public class CudaRuntime2 implements ParallelRuntime {
       }
     }    
     
-    List<Serializer> visitors = new ArrayList<Serializer>();
-    for(int i = 0; i < m_NumCores; ++i){      
-      Memory mem = m_ToSpace.get(i);
-      Memory texture_mem = m_Texture.get(i);
-      Serializer visitor = m_FirstJob.getSerializer(mem, texture_mem);
-      visitors.add(visitor);
-    }
-    
     //read the statics from the heap
-    visitors.get(0).readStaticsFromHeap();
+    m_serializers.get(0).readStaticsFromHeap();
     
     int items_per = m_NumBlocksRun / m_NumCores;
     for(int i = 0; i < m_NumCores; ++i){
-      Serializer visitor = visitors.get(i);
+      Serializer visitor = m_serializers.get(i);
       int end_index;
       if(i == m_NumCores - 1){
         end_index = m_NumBlocksRun;

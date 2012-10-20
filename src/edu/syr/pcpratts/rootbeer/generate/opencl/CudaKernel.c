@@ -1,5 +1,5 @@
 
-$$__device__$$ int
+__device__ int
 edu_syr_pcpratts_classConstant(int type_num){
   int * temp = (int *) m_Local[2];   
   return temp[type_num];

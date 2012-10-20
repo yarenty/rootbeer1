@@ -19,6 +19,7 @@ public abstract class Serializer {
   public Memory mTextureMem;
 
   private static final Map<Object, Long> mWriteToGpuCache;
+  private static final Map<Long, Object> mReverseWriteToGpuCache;
   private static final Map<Long, Object> mReadFromGpuCache;
   private static Map<Long, Integer> m_classRefToTypeNumber;
   
@@ -26,6 +27,7 @@ public abstract class Serializer {
   
   static {
     mWriteToGpuCache = new IdentityHashMap<Object, Long>();
+    mReverseWriteToGpuCache = new HashMap<Long, Object>();
     mReadFromGpuCache = new HashMap<Long, Object>();
     m_classRefToTypeNumber = new HashMap<Long, Integer>();
   }
@@ -35,6 +37,7 @@ public abstract class Serializer {
     mTextureMem = texture_mem;
     mReadFromGpuCache.clear();
     mWriteToGpuCache.clear();
+    mReverseWriteToGpuCache.clear();
     m_classRefToTypeNumber.clear();
   }
   
@@ -93,7 +96,17 @@ public abstract class Serializer {
       }
       long ref = mem.mallocWithSize(size);
       mWriteToGpuCache.put(o, ref);
+      mReverseWriteToGpuCache.put(ref, o);
       return new WriteCacheResult(ref, true);
+    }
+  }
+  
+  public Object writeCacheFetch(long ref){
+    synchronized(mWriteToGpuCache){
+      if(mReverseWriteToGpuCache.containsKey(ref)){
+        return mReverseWriteToGpuCache.get(ref);
+      }
+      return null;
     }
   }
   
