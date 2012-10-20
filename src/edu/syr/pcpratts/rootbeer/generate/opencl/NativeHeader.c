@@ -46,3 +46,6 @@ void __threadfence(){ }
 
 long long m_Local[2];
 int * m_Cache;
+
+typedef int boolean;
+typedef int byte;

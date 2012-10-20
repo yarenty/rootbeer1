@@ -4,9 +4,6 @@
 #define GC_OBJ_TYPE_CTOR_USED char
 #define GC_OBJ_TYPE_SIZE int
 
-typedef int boolean;
-typedef int byte;
-
 #define COLOR_GREY 0
 #define COLOR_BLACK 1
 #define COLOR_WHITE 2

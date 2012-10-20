@@ -18,3 +18,6 @@ __device__
 int getThreadId(){
   return blockIdx.x * blockDim.x + threadIdx.x;
 }
+
+typedef int boolean;
+typedef int byte;

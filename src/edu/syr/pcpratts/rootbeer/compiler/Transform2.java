@@ -38,6 +38,8 @@ public class Transform2 {
       generate.makeClass();
     } catch(Exception ex){
       ex.printStackTrace();
+      OpenCLScene.releaseV();
+      return;
     }
 
     //add an interface to the class
