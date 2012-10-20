@@ -45,6 +45,7 @@ public class ClassConstantReader {
     } else if(constant.equals("D")){
       return DoubleType.v();
     } else {
+      constant = constant.substring(1, constant.length()-2);
       return RefType.v(constant);
     }
   }

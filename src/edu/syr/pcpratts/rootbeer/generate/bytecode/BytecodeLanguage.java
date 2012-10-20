@@ -589,7 +589,12 @@ public class BytecodeLanguage {
       for(int i = 0; i < dims; ++i){
         prefix += "[";
       }
-      return prefix + convertToConstant(array_type.baseType);
+      String base_string = convertToConstant(array_type.baseType);
+      if(array_type.baseType instanceof RefType){
+        return prefix + "L" + base_string + ";";
+      } else {
+        return prefix + base_string;
+      }
     } else if(type instanceof RefType){
       RefType ref_type = (RefType) type;
       return ref_type.getSootClass().getName().replace(".", "/");
