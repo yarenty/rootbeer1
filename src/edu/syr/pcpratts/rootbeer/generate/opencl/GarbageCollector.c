@@ -466,3 +466,10 @@ java_lang_Class_getName( char * gc_info , int thisref , int * exception ) {
   } 
   return $r1;
 }
+
+$$__device__$$ int
+java_lang_Object_getClass( char * gc_info , int thisref, int * exception ) { 
+  char * mem_loc = edu_syr_pcpratts_gc_deref(gc_info, thisref);
+  int type = edu_syr_pcpratts_gc_get_type(mem_loc);
+  return edu_syr_pcpratts_classConstant(type);
+}

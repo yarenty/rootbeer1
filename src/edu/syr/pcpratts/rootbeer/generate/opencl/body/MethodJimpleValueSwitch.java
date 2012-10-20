@@ -265,7 +265,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
     SootMethod soot_method = arg0.getMethod();
     SootClass soot_class = soot_method.getDeclaringClass();
     OpenCLMethod ocl_method = new OpenCLMethod(soot_method, soot_class);
-    
+
     m_output.append(ocl_method.getInstanceInvokeString(arg0));
     setCheckException();
   }

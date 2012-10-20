@@ -489,9 +489,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   int i;
   jint * native_array = (*env)->GetIntArrayElements(env, jarray, 0);
   cuMemcpyHtoD(gpuClassMemory, native_array, classMemSize);
-  for(i = 0; i < 26; ++i){
-    printf("i: %d value: %d\n", i, native_array[i]);
-  }
   (*env)->ReleaseIntArrayElements(env, jarray, native_array, 0);
 }
 

@@ -8,10 +8,7 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import java.util.List;
-import soot.Scene;
-import soot.SootClass;
-import soot.SootMethod;
-import soot.Type;
+import soot.*;
 
 public class IsPolyMorphic {
 
@@ -23,8 +20,18 @@ public class IsPolyMorphic {
       return false;
     }
     String sub_sig = soot_method.getSubSignature();
-    SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
-    if(obj_class.declaresMethod(sub_sig)){
+    int count = 0;
+    for(Type type : hierarchy){
+      if(type instanceof RefType == false){
+        continue;
+      }
+      RefType ref_type = (RefType) type;
+      SootClass curr = ref_type.getSootClass();
+      if(curr.declaresMethod(sub_sig)){
+        count++;
+      }
+    }
+    if(count >= 2){
       return true;
     }
     return false;

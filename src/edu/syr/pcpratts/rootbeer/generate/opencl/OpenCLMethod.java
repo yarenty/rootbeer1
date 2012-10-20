@@ -468,6 +468,7 @@ public class OpenCLMethod {
     m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef");
     m_dontMangleMethods.add("java_lang_System_nanoTime");
     m_dontMangleMethods.add("java_lang_Class_getName");
+    m_dontMangleMethods.add("java_lang_Object_getClass");
   }
 
   public String getSignature() {
