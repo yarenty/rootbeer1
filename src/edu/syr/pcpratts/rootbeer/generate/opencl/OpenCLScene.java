@@ -120,7 +120,6 @@ public class OpenCLScene {
   }
 
   public void addField(SootField soot_field){
-    System.out.println("addingField: "+soot_field.toString());
     SootClass soot_class = soot_field.getDeclaringClass();
     OpenCLClass ocl_class = getOpenCLClass(soot_class);
     ocl_class.addField(new OpenCLField(soot_field, soot_class));

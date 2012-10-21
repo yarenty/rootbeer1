@@ -63,7 +63,6 @@ public abstract class Serializer {
   }
   
   public void addClassRef(long ref, int class_number){
-    System.out.println("addingClassRef: "+ref+" cls_#: "+class_number+" obj: "+mWriteToGpuCache.get(ref));
     m_classRefToTypeNumber.put(ref, class_number);
   }
   
@@ -119,11 +118,6 @@ public abstract class Serializer {
     result = checkWriteCache(o, size, read_only);
     if(result.m_NeedToWrite == false)
       return result.m_Ref;
-    if(o == null){
-      System.out.println("doWriteToHeap: "+result.m_Ref+" null");
-    } else {
-      System.out.println("doWriteToHeap: "+result.m_Ref+" "+o.toString());
-    }
     doWriteToHeap(o, write_data, result.m_Ref, read_only);
     return result.m_Ref;
   }

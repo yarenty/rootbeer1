@@ -21,6 +21,7 @@ public class Main {
   private String m_testCase;
   private boolean m_simpleCompile;
   private static boolean m_printDeviceInfo = false;
+  private static boolean m_largeMemTests = false;
   private String m_mainJar;
   private List<String> m_libJars;
   private List<String> m_directories;
@@ -35,6 +36,10 @@ public class Main {
 
   public static boolean disable_class_remapping(){
     return m_disable_class_remapping;
+  }
+  
+  public static boolean largeMemTests(){
+    return m_largeMemTests;
   }
   
   private void parseArgs(String[] args) {
@@ -71,6 +76,8 @@ public class Main {
         m_printDeviceInfo = true;
       } else if(arg.equals("-disable-class-remapping")){
         m_disable_class_remapping = true;
+      } else if(arg.equals("-large-mem-tests")){
+        m_largeMemTests = true;
       } else {      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);

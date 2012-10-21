@@ -470,3 +470,20 @@ java_lang_Object_getClass( char * gc_info , int thisref, int * exception ) {
   int type = edu_syr_pcpratts_gc_get_type(mem_loc);
   return edu_syr_pcpratts_classConstant(type);
 }
+
+$$__device__$$ int
+java_lang_StringValue_from( char * gc_info , int thisref, int * exception ) { 
+  int i, size, new_ref;
+  char * mem_loc, * new_mem_loc;
+  
+  mem_loc = edu_syr_pcpratts_gc_deref(gc_info, thisref);
+  size = edu_syr_pcpratts_gc_get_size(mem_loc);
+  new_ref = edu_syr_pcpratts_gc_malloc(gc_info, size);
+  new_mem_loc = edu_syr_pcpratts_gc_deref(gc_info, new_ref);
+  
+  for(i = 0; i < size; ++i){
+    new_mem_loc[i] = mem_loc[i];  
+  }
+  
+  return new_ref;
+}
