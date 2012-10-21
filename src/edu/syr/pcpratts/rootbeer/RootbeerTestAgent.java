@@ -139,6 +139,7 @@ public class RootbeerTestAgent {
         }
       }
     } catch(Throwable ex){
+      ex.printStackTrace();
       m_message = "Exception thrown at index: "+i+"\n";
       ByteArrayOutputStream os = new ByteArrayOutputStream();
       PrintWriter writer = new PrintWriter(os);

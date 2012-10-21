@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <math.h>
+#include <sys/time.h>
 
 pthread_mutex_t atom_add_mutex;
 

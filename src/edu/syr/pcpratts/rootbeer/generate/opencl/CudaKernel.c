@@ -46,7 +46,12 @@ edu_syr_pcpratts_gc_init(char * to_space, size_t space_size, int * java_lang_cla
   m_Local[1] = (size_t) space_size;
   m_Local[2] = (size_t) java_lang_class_refs;
 }
-  
+
+__device__
+long long java_lang_System_nanoTime(char * gc_info, int * exception){
+  return (long long) clock64();
+}
+
 __global__ void entry(char * gc_info, char * to_space, int * handles, 
   long long * to_space_free_ptr, long long * space_size, int * exceptions,
   int * java_lang_class_refs, int num_blocks){

@@ -98,7 +98,12 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_Texture = new ArrayList<Memory>();
     m_Readers = new ArrayList<ToSpaceReader>();
     m_Writers = new ArrayList<ToSpaceWriter>();    
-    m_NumCores = Runtime.getRuntime().availableProcessors();
+   
+    //there is a bug in the concurrent serializer. setting num_cores to 1 right now.
+    //next version of rootbeer should have a faster concurrent serializer anyway
+    m_NumCores = 1;
+    //m_NumCores = Runtime.getRuntime().availableProcessors();
+    
     m_serializers = new ArrayList<Serializer>();
     AtomicLong to_space_inst_ptr = new AtomicLong(0);
     AtomicLong to_space_static_ptr = new AtomicLong(0);

@@ -17,6 +17,12 @@ int getThreadId(){
   return (int) pthread_getspecific(threadIdKey);
 }
 
+long long java_lang_System_nanoTime(char * gc_info, int * exception){
+  struct timeval tm;
+  gettimeofday(&tm, 0);
+  return tm.tv_sec * 1000000 + tm.tv_usec;
+}
+
 char *
 edu_syr_pcpratts_gc_deref(char * gc_info, int handle){
   long long lhandle = handle;

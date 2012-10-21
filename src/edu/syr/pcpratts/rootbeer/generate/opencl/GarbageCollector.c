@@ -14,6 +14,7 @@ $$__device__$$ $$__global$$ char * edu_syr_pcpratts_gc_deref($$__global$$ char *
 $$__device__$$ int edu_syr_pcpratts_gc_malloc($$__global$$ char * gc_info, long long size);
 $$__device__$$ long long edu_syr_pcpratts_gc_malloc_no_fail($$__global$$ char * gc_info, long long size);
 $$__device__$$ int edu_syr_pcpratts_classConstant(int type_num);
+$$__device__$$ long long java_lang_System_nanoTime($$__global$$ char * gc_info, int * exception);
 
 #define CACHE_SIZE_BYTES 32
 #define CACHE_SIZE_INTS (CACHE_SIZE_BYTES / sizeof(int))
@@ -133,11 +134,6 @@ $$__device__$$ double java_lang_StrictMath_tanh( char * gc_info , double paramet
 $$__device__$$ 
 boolean edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu($$__global$$ char * gc_info, int * exception){
   return 1;
-}
-
-$$__device__$$
-long long java_lang_System_nanoTime($$__global$$ char * gc_info, int * exception){
-  return (long long) clock64();
 }
 
 $$__device__$$ 

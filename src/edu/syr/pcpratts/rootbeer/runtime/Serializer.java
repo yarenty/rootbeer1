@@ -7,11 +7,15 @@
 
 package edu.syr.pcpratts.rootbeer.runtime;
 
+import com.sun.java.swing.plaf.windows.WindowsTreeUI;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
+import edu.syr.pcpratts.rootbeer.runtime.remap.GpuAtomicLong;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public abstract class Serializer {
 
@@ -53,7 +57,7 @@ public abstract class Serializer {
     return writeToHeap(o, true);
   }
   
-  private class WriteCacheResult {
+  private static class WriteCacheResult {
     public long m_Ref;
     public boolean m_NeedToWrite;
     public WriteCacheResult(long ref, boolean need_to_write){
@@ -81,23 +85,15 @@ public abstract class Serializer {
     return ret;
   }
   
-  private WriteCacheResult checkWriteCache(Object o, int size, boolean read_only){
-    synchronized(mWriteToGpuCache){
-      if(mWriteToGpuCache.containsKey(o)){
-        long ref = mWriteToGpuCache.get(o);
-        return new WriteCacheResult(ref, false);
-      }
-      Memory mem;
-      if(read_only){
-        mem = mTextureMem;
-      } else {
-        mem = mMem;
-      }
-      long ref = mem.mallocWithSize(size);
-      mWriteToGpuCache.put(o, ref);
-      mReverseWriteToGpuCache.put(ref, o);
-      return new WriteCacheResult(ref, true);
+  private static synchronized WriteCacheResult checkWriteCache(Object o, int size, boolean read_only, Memory mem){
+    if(mWriteToGpuCache.containsKey(o)){
+      long ref = mWriteToGpuCache.get(o);
+      return new WriteCacheResult(ref, false);
     }
+    long ref = mem.mallocWithSize(size);
+    mWriteToGpuCache.put(o, ref);
+    mReverseWriteToGpuCache.put(ref, o);
+    return new WriteCacheResult(ref, true);
   }
   
   public Object writeCacheFetch(long ref){
@@ -115,7 +111,8 @@ public abstract class Serializer {
     int size = doGetSize(o);
     boolean read_only = false;
     WriteCacheResult result;
-    result = checkWriteCache(o, size, read_only);
+    result = checkWriteCache(o, size, read_only, mMem);
+    System.out.println("writeToHeap: "+o.getClass().getName()+" "+result.m_Ref+" o: "+o.toString());
     if(result.m_NeedToWrite == false)
       return result.m_Ref;
     doWriteToHeap(o, write_data, result.m_Ref, read_only);
