@@ -156,6 +156,7 @@ public class RootbeerCompiler {
         FastWholeProgram.v().fullyLoad(kernel_method, false);
         info = FastWholeProgram.v().getDfsInfo(kernel_method);
         info.setModifiedClasses(transform.getModifiedClasses());
+        info.outputClassTypes();
       }
     }
       

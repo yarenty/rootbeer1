@@ -337,7 +337,7 @@ public class MethodStmtSwitch implements StmtSwitch {
       m_output.append("if(0){}\n");
       for(TrapItem item : m_trapItems){
         m_output.append("else if(");
-        List<NumberedType> types = RootbeerScene.v().getDfsInfo().getNumberedHierarchyUp(item.getException());
+        List<NumberedType> types = RootbeerScene.v().getDfsInfo().getNumberedHierarchyDown(item.getException());
         for(int i = 0; i < types.size(); ++i){
           m_output.append("ex_type == "+types.get(i).getNumber());
           if(i < types.size() - 1){

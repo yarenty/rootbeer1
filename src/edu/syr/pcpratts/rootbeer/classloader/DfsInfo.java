@@ -431,4 +431,11 @@ public class DfsInfo {
   public Set<String> getModifiedClasses(){
     return m_modifiedClasses;
   }
+
+  public void outputClassTypes() {
+    for(String cls : m_numberedTypeMap.keySet()){
+      NumberedType ntype = m_numberedTypeMap.get(cls);
+      System.out.println("num: "+ntype.getNumber()+" "+cls);
+    }
+  }
 }

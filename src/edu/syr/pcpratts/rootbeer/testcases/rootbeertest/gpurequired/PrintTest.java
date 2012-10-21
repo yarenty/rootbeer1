@@ -16,7 +16,7 @@ public class PrintTest implements TestSerialization {
 
   public List<Kernel> create() {
     List<Kernel> ret = new ArrayList<Kernel>();
-    //System.out.println("hello world");
+    System.out.println("hello world");
     for(int i = 0; i < 3; ++i){
       ret.add(new PrintRunOnGpu());
     }
