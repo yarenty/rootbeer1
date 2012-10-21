@@ -39,6 +39,7 @@ public class DfsInfo {
   private OpenCLScene m_oclScene;
   private SootMethod m_rootMethod;
   private ClassRemapping m_classRemapping;
+  private Set<String> m_modifiedClasses;
   
   public DfsInfo(SootMethod soot_method) {
     m_dfsMethods = new HashSet<String>();
@@ -421,5 +422,13 @@ public class DfsInfo {
 
   public CallGraph getCallGraph() {
     return m_callGraph;
+  }
+
+  public void setModifiedClasses(Set<String> modified_classes) {
+    m_modifiedClasses = modified_classes;
+  }
+  
+  public Set<String> getModifiedClasses(){
+    return m_modifiedClasses;
   }
 }

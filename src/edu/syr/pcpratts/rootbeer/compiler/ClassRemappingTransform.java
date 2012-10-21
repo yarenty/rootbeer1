@@ -140,7 +140,9 @@ public class ClassRemappingTransform {
     Body body = method.retrieveActiveBody();
     if(body == null)
       return;
+    
     m_currMethod = method;
+    
     fixArguments(method);
     Iterator<Unit> iter = body.getUnits().iterator();
     while(iter.hasNext()){

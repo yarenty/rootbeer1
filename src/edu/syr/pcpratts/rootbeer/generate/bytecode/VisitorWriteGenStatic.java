@@ -196,6 +196,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
       class_obj = m_bcl.top().classConstant(type);   
     }
     
+    //getName has to be called to load the name variable
     SootClass str_cls = Scene.v().getSootClass("java.lang.String");
     m_bcl.top().pushMethod(class_obj, "getName", str_cls.getType());
     m_bcl.top().invokeMethodRet(class_obj);

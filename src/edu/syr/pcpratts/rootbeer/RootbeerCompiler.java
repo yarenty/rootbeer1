@@ -151,12 +151,14 @@ public class RootbeerCompiler {
         List<String> sigs = info.getReachableMethodSigs();
         transform = new ClassRemappingTransform(false);
         transform.run(sigs);
-        transform.finishClone();        
+        transform.finishClone();  
         
         FastWholeProgram.v().fullyLoad(kernel_method, false);
+        info = FastWholeProgram.v().getDfsInfo(kernel_method);
+        info.setModifiedClasses(transform.getModifiedClasses());
       }
     }
-    
+      
     Transform2 transform2 = new Transform2();
     for(SootClass soot_class : kernel_classes){      
       SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
@@ -167,11 +169,23 @@ public class RootbeerCompiler {
     
     System.out.println("writing classes out...");
     if(!Main.disable_class_remapping()){
-      for(String cls : transform.getModifiedClasses()){
-        loadAllMethods(cls);
-        writeClassFile(cls);
-        writeJimpleFile(cls);
-      }    
+      
+      for(SootClass kernel : kernel_classes){
+        SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
+        DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
+        
+        Set<String> modified = info.getModifiedClasses();
+        if(modified == null){
+          continue;
+        }
+        
+        for(String cls : modified){
+          loadAllMethods(cls);
+          writeClassFile(cls);
+          writeJimpleFile(cls);
+        }    
+      }
+      
     }
     
     for(SootClass soot_class : kernel_classes){
