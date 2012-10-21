@@ -158,7 +158,8 @@ public abstract class Serializer {
       try {
         Field f = cls.getDeclaredField(name);
         f.setAccessible(true);
-        return f.get(base);      
+        Object ret = f.get(base);      
+        return ret;
       } catch(Exception ex){
         cls = cls.getSuperclass();
       }
