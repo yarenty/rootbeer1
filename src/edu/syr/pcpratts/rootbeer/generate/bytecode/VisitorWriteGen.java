@@ -57,7 +57,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     m_ClassName = class_name;
     m_ValuesWritten = new ArrayList<Value>();
     m_bcl.push(bcl);
-    m_FieldInspector = inspector;
+    m_fieldInspector = inspector;
     
     m_CurrentMem = new Stack<Local>();
     m_gcObjVisitor = new Stack<Local>();
@@ -75,7 +75,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     m_Core = m_bcl.top().refParameter(4);
     
     
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
     for(Type type : types){
       if(type instanceof ArrayType)
       makeWriteToHeapBodyForArrayType((ArrayType) type);
@@ -132,7 +132,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
       if(differentPackageAndPrivate(ref_type)){
         return;  
       }
-      if(m_ClassesToIgnore.contains(ref_type.getSootClass().getName())){
+      if(m_classesToIgnore.contains(ref_type.getSootClass().getName())){
         return; 
       }              
     }
@@ -441,7 +441,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
       int count = 0;
       for(OpenCLField ref_field : ref_fields){
         int constant;
-        if(m_FieldInspector.fieldIsReadOnGpu(ref_field)) {
+        if(m_fieldInspector.fieldIsReadOnGpu(ref_field)) {
           constant = 1;
         } else {
           constant = 0;

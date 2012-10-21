@@ -75,6 +75,8 @@ public class CudaRuntime2 implements ParallelRuntime {
   private List<ToSpaceReader> m_Readers;
   private List<ToSpaceWriter> m_Writers;
   
+  private List<Serializer> m_serializers;
+  
   private CpuRunner m_CpuRunner;
   private BlockShaper m_BlockShaper;
   
@@ -96,7 +98,13 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_Texture = new ArrayList<Memory>();
     m_Readers = new ArrayList<ToSpaceReader>();
     m_Writers = new ArrayList<ToSpaceWriter>();    
-    m_NumCores = Runtime.getRuntime().availableProcessors();
+   
+    //there is a bug in the concurrent serializer. setting num_cores to 1 right now.
+    //next version of rootbeer should have a faster concurrent serializer anyway
+    m_NumCores = 1;
+    //m_NumCores = Runtime.getRuntime().availableProcessors();
+    
+    m_serializers = new ArrayList<Serializer>();
     AtomicLong to_space_inst_ptr = new AtomicLong(0);
     AtomicLong to_space_static_ptr = new AtomicLong(0);
     AtomicLong texture_inst_ptr = new AtomicLong(0);
@@ -146,21 +154,13 @@ public class CudaRuntime2 implements ParallelRuntime {
     }
   }
   
-  private native long findReserveMem(int max_blocks, int max_threads);
-  
   public void memoryTest(){
     MemoryTest test = new MemoryTest();
     test.run(m_ToSpace.get(0));
   }
   
-  private native void setup(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
-  
-  /**
-   * Prints the cuda device details to the screen
-   */
-  public static native void printDeviceInfo();
-  
   public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs){
+    
     Stopwatch watch2 = new Stopwatch();
     watch2.start();
     RootbeerGpu.setIsOnGpu(true);
@@ -206,6 +206,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_JobsWritten.clear();
     m_HandlesCache.clear();
     m_NotWritten.clear();
+    m_serializers.clear();
     
     ReadOnlyAnalyzer analyzer = null;
     
@@ -227,7 +228,6 @@ public class CudaRuntime2 implements ParallelRuntime {
       return false;
     }
     
-    List<Serializer> visitors = new ArrayList<Serializer>();
     for(int i = 0; i < m_NumCores; ++i){
       Memory mem = m_ToSpace.get(i);
       Memory texture_mem = m_Texture.get(i);
@@ -235,15 +235,15 @@ public class CudaRuntime2 implements ParallelRuntime {
       texture_mem.clearHeapEndPtr();
       Serializer visitor = m_FirstJob.getSerializer(mem, texture_mem);
       visitor.setAnalyzer(analyzer);
-      visitors.add(visitor);
+      m_serializers.add(visitor);
     }
     
     //write the statics to the heap
-    visitors.get(0).writeStaticsToHeap();
+    m_serializers.get(0).writeStaticsToHeap();
     
     int items_per = m_JobsToWrite.size() / m_NumCores;
     for(int i = 0; i < m_NumCores; ++i){
-      Serializer visitor = visitors.get(i);
+      Serializer visitor = m_serializers.get(i);
       int end_index;
       if(i == m_NumCores - 1){
         end_index = m_JobsToWrite.size();
@@ -268,6 +268,8 @@ public class CudaRuntime2 implements ParallelRuntime {
     }
     
     m_Partial.addNotWritten(m_NotWritten);
+
+    writeClassTypeRef(m_serializers.get(0).getClassRefArray());
     
     watch.stop();
     m_serializationTime = watch.elapsedTimeMillis();
@@ -292,18 +294,15 @@ public class CudaRuntime2 implements ParallelRuntime {
     loadFunction(getHeapEndPtr(), dest_filename, m_NumBlocksRun);
   }
   
-  private native void loadFunction(long heap_end_ptr, String filename, int num_blocks);
-  private native int runBlocks(int size, int block_shape, int grid_shape);
-  private native void unload();
-
   private void runOnGpu(){
     System.out.println("Running "+m_NumBlocksRun+" blocks.");
     System.out.println("BlockShape: "+m_BlockShape+" GridShape: "+m_GridShape);    
     
-    int status = runBlocks(m_NumBlocksRun, m_BlockShape, m_GridShape); 
-    if(status != 0){
-      System.out.println("Error running blocks: "+status);
-      System.exit(-1);
+    try {
+      runBlocks(m_NumBlocksRun, m_BlockShape, m_GridShape);
+    } catch(RuntimeException ex){
+      reinit(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), getReserveMem()); 
+      throw ex;
     }
   }  
     
@@ -341,7 +340,7 @@ public class CudaRuntime2 implements ParallelRuntime {
         }
         Memory mem = m_ToSpace.get(0);
         Memory texture_mem = m_Texture.get(0);
-        Serializer visitor = m_FirstJob.getSerializer(mem, texture_mem);
+        Serializer visitor = m_serializers.get(0);
         mem.setAddress(ref);           
         Object except = visitor.readFromHeap(null, true, ref);
         if(except instanceof Error){
@@ -353,20 +352,12 @@ public class CudaRuntime2 implements ParallelRuntime {
       }
     }    
     
-    List<Serializer> visitors = new ArrayList<Serializer>();
-    for(int i = 0; i < m_NumCores; ++i){      
-      Memory mem = m_ToSpace.get(i);
-      Memory texture_mem = m_Texture.get(i);
-      Serializer visitor = m_FirstJob.getSerializer(mem, texture_mem);
-      visitors.add(visitor);
-    }
-    
     //read the statics from the heap
-    visitors.get(0).readStaticsFromHeap();
+    m_serializers.get(0).readStaticsFromHeap();
     
     int items_per = m_NumBlocksRun / m_NumCores;
     for(int i = 0; i < m_NumCores; ++i){
-      Serializer visitor = visitors.get(i);
+      Serializer visitor = m_serializers.get(i);
       int end_index;
       if(i == m_NumCores - 1){
         end_index = m_NumBlocksRun;
@@ -423,4 +414,14 @@ public class CudaRuntime2 implements ParallelRuntime {
   public long getDeserializationTime() {
     return m_deserializationTime;
   }
+  
+  private native long findReserveMem(int max_blocks, int max_threads);
+  private native void setup(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
+  public static native void printDeviceInfo();
+  private native void loadFunction(long heap_end_ptr, String filename, int num_blocks);
+  private native void writeClassTypeRef(int[] refs);
+  private native int runBlocks(int size, int block_shape, int grid_shape);
+  private native void unload();
+  private native void reinit(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
+  
 }

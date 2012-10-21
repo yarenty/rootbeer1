@@ -20,11 +20,8 @@ public class ArrayCopyGenerate {
   public String get(Set<OpenCLArrayType> array_types_set){
     createSet(array_types_set);
     StringBuilder ret = new StringBuilder();
-    String device_function_qual = Tweaks.v().getDeviceFunctionQualifier();
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
-    ret.append(device_function_qual+" void \n");
-    ret.append("java_lang_System_arraycopy("+address_qual+" char * gc_info, ");
-    ret.append("int src_handle, int srcPos, int dest_handle, int destPos, int length, int * exception){\n");
+    ret.append(getDecl()+"{\n");
     ret.append("  int i;\n");
     ret.append("  int src_index;\n");
     ret.append("  int dest_index;\n");
@@ -70,5 +67,19 @@ public class ArrayCopyGenerate {
     while(iter.hasNext()){
       m_ArrayTypes.add(iter.next());
     }
+  }
+  
+  private String getDecl(){
+    String device_function_qual = Tweaks.v().getDeviceFunctionQualifier();
+    String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
+    StringBuilder ret = new StringBuilder();
+    ret.append(device_function_qual+" void \n");
+    ret.append("java_lang_System_arraycopy("+address_qual+" char * gc_info, ");
+    ret.append("int src_handle, int srcPos, int dest_handle, int destPos, int length, int * exception)"); 
+    return ret.toString();
+  }
+
+  public String getProto() {
+    return getDecl()+";\n";
   }
 }

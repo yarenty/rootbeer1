@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.classloader;
 
+import edu.syr.pcpratts.rootbeer.util.ClassConstantReader;
 import java.util.*;
 import soot.*;
 import soot.jimple.*;
@@ -14,13 +15,18 @@ import soot.jimple.*;
 public class DfsValueSwitch implements JimpleValueSwitch {
 
   private Set<Type> m_types;
-  private Set<SootMethodRef> m_methods;
+  private Set<Type> m_instanceOfs;
+  private Set<DfsMethodRef> m_methods;
   private Set<SootFieldRef> m_fields;
+  private Stmt m_currStmt;
+  private ClassConstantReader m_classConstantReader;
   
   public void run(SootMethod method) {
     m_types = new HashSet<Type>();
-    m_methods = new HashSet<SootMethodRef>();
-    m_fields = new HashSet<SootFieldRef>();    
+    m_methods = new HashSet<DfsMethodRef>();
+    m_fields = new HashSet<SootFieldRef>();   
+    m_instanceOfs = new HashSet<Type>();
+    m_classConstantReader = new ClassConstantReader();
     
     addType(method.getReturnType());
     List<Type> param_types = method.getParameterTypes();
@@ -31,11 +37,19 @@ public class DfsValueSwitch implements JimpleValueSwitch {
     SootClass soot_class = method.getDeclaringClass();
     FastWholeProgram.v().getResolver().resolveClass(soot_class.getName(), SootClass.BODIES);
     
+    if(method.isConcrete() == false){
+      return;
+    }
+    
     Body body = method.retrieveActiveBody();
-    List<ValueBox> boxes = body.getUseAndDefBoxes();
-    for(ValueBox box : boxes){
-      Value value = box.getValue();
-      value.apply(this);
+    Iterator<Unit> iter = body.getUnits().iterator();
+    while(iter.hasNext()){
+      m_currStmt = (Stmt) iter.next();
+      List<ValueBox> boxes = m_currStmt.getUseAndDefBoxes();
+      for(ValueBox box : boxes){
+        Value value = box.getValue();
+        value.apply(this);
+      }
     }
   }
   
@@ -43,12 +57,16 @@ public class DfsValueSwitch implements JimpleValueSwitch {
     return m_types;
   }
   
-  public Set<SootMethodRef> getMethodRefs(){
+  public Set<DfsMethodRef> getMethodRefs(){
     return m_methods;
   }
   
   public Set<SootFieldRef> getFieldRefs(){
     return m_fields;
+  }
+  
+  public Set<Type> getInstanceOfs(){
+    return m_instanceOfs;
   }
   
   public void addType(Type type){
@@ -58,14 +76,21 @@ public class DfsValueSwitch implements JimpleValueSwitch {
   }
   
   public void addMethodRef(SootMethodRef ref){
-    if(m_methods.contains(ref) == false){
-      m_methods.add(ref);
+    DfsMethodRef dfs_ref = new DfsMethodRef(ref, m_currStmt);
+    if(m_methods.contains(dfs_ref) == false){
+      m_methods.add(dfs_ref);
     }
   }
   
   public void addFieldRef(SootFieldRef ref){
     if(m_fields.contains(ref) == false){
       m_fields.add(ref);
+    }
+  }
+
+  private void addInstanceOfType(Type type) {
+    if(m_instanceOfs.contains(type) == false){
+      m_instanceOfs.add(type);
     }
   }
   
@@ -98,7 +123,9 @@ public class DfsValueSwitch implements JimpleValueSwitch {
   }
 
   public void caseClassConstant(ClassConstant cc) {
-    addType(cc.getType());
+    String value = cc.getValue();
+    Type type = m_classConstantReader.stringToType(value);
+    addType(type);
   }
 
   public void defaultCase(Object o) {
@@ -209,14 +236,15 @@ public class DfsValueSwitch implements JimpleValueSwitch {
 
   public void caseInstanceOfExpr(InstanceOfExpr ioe) {
     addType(ioe.getCheckType());
+    addInstanceOfType(ioe.getCheckType());
   }
 
   public void caseNewArrayExpr(NewArrayExpr nae) {
-    addType(nae.getType());
+    addType(nae.getBaseType());
   }
 
   public void caseNewMultiArrayExpr(NewMultiArrayExpr nmae) {
-    addType(nmae.getType());
+    addType(nmae.getBaseType());
   }
 
   public void caseNewExpr(NewExpr ne) {

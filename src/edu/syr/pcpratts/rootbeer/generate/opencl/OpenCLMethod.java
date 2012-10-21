@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
@@ -134,6 +135,17 @@ public class OpenCLMethod {
   
   private String synchronizedEnter(){
     String ret = "";
+    
+    if(m_sootMethod.isStatic() == false){
+      ret += "if(thisref == -1){\n";
+      ret += "  *exception = "+Constants.NullPointerNumber+";\n";
+      if(returnsAValue()){
+        ret += "  return 0;\n";
+      } else {
+        ret += "  return;\n";
+      }
+      ret += "}\n";
+    }
     ret += "int id = getThreadId();\n";
     StaticOffsets static_offsets = new StaticOffsets();
     int junk_index = static_offsets.getEndIndex() - 4;
@@ -263,8 +275,9 @@ public class OpenCLMethod {
     } else {
       throw new UnsupportedOperationException("how do we handle this case?");
     }
-
-    if(hierarchy.size() == 1 || isConstructor() || arg0 instanceof SpecialInvokeExpr){
+    
+    IsPolyMorphic poly_checker = new IsPolyMorphic();    
+    if(poly_checker.isPoly(m_sootMethod, hierarchy) == false || isConstructor() || arg0 instanceof SpecialInvokeExpr){
       return writeInstanceInvoke(arg0, "", m_sootClass.getType());
     } else if(hierarchy.size() == 0){
       System.out.println("size = 0");
@@ -448,9 +461,15 @@ public class OpenCLMethod {
     m_dontMangleMethods.add("java_lang_Throwable_getStackTraceDepth");
     m_dontMangleMethods.add("java_lang_Throwable_getStackTraceElement");
     m_dontMangleMethods.add("java_lang_Object_clone");
+    m_dontMangleMethods.add("java_lang_Object_hashCode");
     m_dontMangleMethods.add("java_lang_OutOfMemoryError_initab850b60f96d11de8a390800200c9a66");
     m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu");
     m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId");
+    m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef");
+    m_dontMangleMethods.add("java_lang_System_nanoTime");
+    m_dontMangleMethods.add("java_lang_Class_getName");
+    m_dontMangleMethods.add("java_lang_Object_getClass");
+    m_dontMangleMethods.add("java_lang_StringValue_from");
   }
 
   public String getSignature() {

@@ -75,7 +75,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_thisRef = m_bcl.top().refThis();
     m_param0 = m_bcl.top().refParameter(0);
     
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
     for(Type type : types){
       makeGetSizeMethodForType(type);
     }
@@ -90,7 +90,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_thisRef = m_bcl.top().refThis();
     m_param0 = m_bcl.top().refParameter(0);
     
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedTypes();
+    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
     for(Type type : types){
       makeGetLengthMethodForType(type);
     }
@@ -160,24 +160,24 @@ public class VisitorGen extends AbstractVisitorGen {
   private void makeWriteToHeapMethod() {
     List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
     VisitorWriteGen write_gen = new VisitorWriteGen(types, 
-      m_className, m_bcl.top(), m_FieldInspector);
+      m_className, m_bcl.top(), m_fieldInspector);
     write_gen.makeWriteToHeapMethod();
   }
       
   private void makeReadFromHeapMethod() {
     List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
     VisitorReadGen read_gen = new VisitorReadGen(types, 
-      m_className, m_bcl.top(), m_FieldInspector);
+      m_className, m_bcl.top(), m_fieldInspector);
     read_gen.makeReadFromHeapMethod();
   }
 
   private void makeWriteStaticsToHeapMethod() {
-    VisitorWriteGenStatic static_write_gen = new VisitorWriteGenStatic(m_bcl.top(), m_FieldInspector);
+    VisitorWriteGenStatic static_write_gen = new VisitorWriteGenStatic(m_bcl.top(), m_fieldInspector);
     static_write_gen.makeMethod();
   }
 
   private void makeReadStaticsFromHeapMethod() {
-    VisitorReadGenStatic static_read_gen = new VisitorReadGenStatic(m_bcl.top(), m_FieldInspector);
+    VisitorReadGenStatic static_read_gen = new VisitorReadGenStatic(m_bcl.top(), m_fieldInspector);
     static_read_gen.makeMethod();
   }
   
@@ -261,5 +261,5 @@ public class VisitorGen extends AbstractVisitorGen {
 
   String getClassName() {
     return m_className;
-  }  
+  }
 }

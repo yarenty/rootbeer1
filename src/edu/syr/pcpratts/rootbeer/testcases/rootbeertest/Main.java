@@ -36,7 +36,6 @@ public class Main implements TestSerializationFactory {
     ret.add(new StaticsTest1());
     ret.add(new StaticsTest2());
     ret.add(new StaticsTest3());
-    ret.add(new LargeMemTest());
     ret.add(new NullPointer4Test());
     ret.add(new MultiArrayTest());
     ret.add(new OuterClassTest());
@@ -62,6 +61,13 @@ public class Main implements TestSerializationFactory {
     ret.add(new ArraySumTest());
     ret.add(new RemapTest());
     ret.add(new InstanceofTest());
+    ret.add(new DotClassTest());
+    ret.add(new PrintTest());
+    
+    if(edu.syr.pcpratts.rootbeer.Main.largeMemTests()){
+      ret.add(new LargeMemTest());
+    }
+    
     return ret;
   }
 }

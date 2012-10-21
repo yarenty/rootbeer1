@@ -1,4 +1,10 @@
 
+__device__ int
+edu_syr_pcpratts_classConstant(int type_num){
+  int * temp = (int *) m_Local[2];   
+  return temp[type_num];
+}
+
 __device__  char *
 edu_syr_pcpratts_gc_deref(char * gc_info, int handle){
 
@@ -35,19 +41,25 @@ edu_syr_pcpratts_gc_malloc_no_fail(char * gc_info, long long size){
 }
 
 __device__  void
-edu_syr_pcpratts_gc_init(char * to_space, size_t space_size){
+edu_syr_pcpratts_gc_init(char * to_space, size_t space_size, int * java_lang_class_refs){
   m_Local[0] = (size_t) to_space;
   m_Local[1] = (size_t) space_size;
+  m_Local[2] = (size_t) java_lang_class_refs;
 }
-  
+
+__device__
+long long java_lang_System_nanoTime(char * gc_info, int * exception){
+  return (long long) clock64();
+}
+
 __global__ void entry(char * gc_info, char * to_space, int * handles, 
   long long * to_space_free_ptr, long long * space_size, int * exceptions,
-  int num_blocks){
+  int * java_lang_class_refs, int num_blocks){
 
   unsigned long long * addr = ( unsigned long long * ) ( gc_info + TO_SPACE_FREE_POINTER_OFFSET );
   *addr = *to_space_free_ptr;
   
-  edu_syr_pcpratts_gc_init(to_space, *space_size);
+  edu_syr_pcpratts_gc_init(to_space, *space_size, java_lang_class_refs);
   __syncthreads();
 
   int loop_control = blockIdx.x * blockDim.x + threadIdx.x;

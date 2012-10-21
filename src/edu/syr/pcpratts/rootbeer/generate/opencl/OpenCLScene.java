@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
-import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
@@ -21,13 +20,12 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CompileResult;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
-import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
+import edu.syr.pcpratts.rootbeer.util.MethodSignatureUtil;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,9 +34,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.codec.digest.DigestUtils;
 import soot.*;
-import soot.jimple.NewMultiArrayExpr;
 
 public class OpenCLScene {
   private static OpenCLScene m_instance;
@@ -58,7 +54,7 @@ public class OpenCLScene {
     m_curentIdent = 0;
   }
 
-  private void resetInstance(){
+  public OpenCLScene(){
     m_codeSegment = null;
     m_classes = new LinkedHashMap<String, OpenCLClass>();
     m_oclToSoot = new HashMap<String, String>();
@@ -67,14 +63,12 @@ public class OpenCLScene {
     m_instanceOfs = new HashSet<OpenCLInstanceof>();
   }
 
-  private OpenCLScene(){
-    resetInstance();
-  }
-
   public static OpenCLScene v(){
-    if(m_instance == null)
-      m_instance = new OpenCLScene();
     return m_instance;
+  }
+  
+  public static void setInstance(OpenCLScene scene){
+    m_instance = scene;
   }
 
   public static void releaseV(){
@@ -98,13 +92,6 @@ public class OpenCLScene {
     return RootbeerScene.v().getDfsInfo().getClassNumber(soot_class);
   }
   
-  public void addInstanceof(Type type){
-    OpenCLInstanceof to_add = new OpenCLInstanceof(type);
-    if(m_instanceOfs.contains(to_add) == false){
-      m_instanceOfs.add(to_add);
-    }
-  }
-
   public void addMethod(SootMethod soot_method){
     SootClass soot_class = soot_method.getDeclaringClass();
 
@@ -119,25 +106,17 @@ public class OpenCLScene {
     if(m_arrayTypes.contains(array_type))
       return;
     m_arrayTypes.add(array_type);
-    
-    ArrayType soot_type = array_type.getArrayType();
-    for(int i = 1; i < soot_type.numDimensions; ++i){
-      ArrayType new_type = ArrayType.v(soot_type.baseType, i);
-      OpenCLArrayType new_ocl_type = new OpenCLArrayType(new_type);
-      if(m_arrayTypes.contains(new_ocl_type))
-        continue;
-      m_arrayTypes.add(new_ocl_type);                
+  }  
+  
+  public void addInstanceof(Type type){
+    OpenCLInstanceof to_add = new OpenCLInstanceof(type);
+    if(m_instanceOfs.contains(to_add) == false){
+      m_instanceOfs.add(to_add);
     }
   }
 
   public OpenCLClass getOpenCLClass(SootClass soot_class){
-    //add the class to the scene if it is not there allready
-    OpenCLClass ocl_class = new OpenCLClass(soot_class);
-    if(m_classes.containsKey(ocl_class.getName()))
-      ocl_class = m_classes.get(ocl_class.getName());
-    m_classes.put(ocl_class.getName(), ocl_class);
-    m_oclToSoot.put(ocl_class.getName(), soot_class.getName());
-    return ocl_class;
+    return m_classes.get(soot_class.getName());
   }
 
   public void addField(SootField soot_field){
@@ -175,16 +154,34 @@ public class OpenCLScene {
     return m_usesGarbageCollector;
   }
   
+  public OpenCLClass addClass(SootClass soot_class){
+    OpenCLClass ocl_class = new OpenCLClass(soot_class);
+    
+    if(m_classes.containsKey(soot_class.getName()) == false){
+      m_classes.put(soot_class.getName(), ocl_class);
+    } else {
+      ocl_class = m_classes.get(soot_class.getName());
+    }
+    
+    if(m_oclToSoot.containsKey(ocl_class.getName()) == false){
+      m_oclToSoot.put(ocl_class.getName(), soot_class.getName());
+    }
+  
+    return ocl_class;
+  }
+  
   private String makeSourceCode() throws Exception {
     m_usesGarbageCollector = false;
     
-    Set<String> methods = RootbeerScene.v().getDfsInfo().getMethods();
-    SignatureUtil util = new SignatureUtil();
+    Set<String> methods = RootbeerScene.v().getDfsInfo().getAllMethods();
+    MethodSignatureUtil util = new MethodSignatureUtil();
     for(String method_sig : methods){
-      String cls = util.classFromMethodSig(method_sig);
-      String method_sub_sig = util.methodSubSigFromMethodSig(method_sig);
+      util.parse(method_sig);
+      String cls = util.getClassName();
+      String method_sub_sig = util.getMethodSubSignature();
       SootClass soot_class = Scene.v().getSootClass(cls);
-      SootMethod method = soot_class.getMethod(method_sub_sig);
+      OpenCLScene.v().addClass(soot_class);
+      SootMethod method = RootbeerScene.v().getMethod(soot_class, method_sub_sig);
       addMethod(method);
     }
     
@@ -199,25 +196,16 @@ public class OpenCLScene {
       addArrayType(ocl_array_type);
     }
     
+    Set<Type> instanceofs = RootbeerScene.v().getDfsInfo().getInstanceOfs();
+    for(Type type : instanceofs){
+      addInstanceof(type);
+    }
+    
     StringBuilder ret = new StringBuilder();
     ret.append(headerString());
-    ret.append(garbageCollectorString());
     ret.append(methodPrototypesString());
+    ret.append(garbageCollectorString());
     ret.append(methodBodiesString());
-    String prev_hash = "";
-    String curr_hash = DigestUtils.md5Hex(ret.toString());
-    
-    while(prev_hash.equals(curr_hash) == false){
-      ret = new StringBuilder();
-      
-      ret.append(headerString());
-      ret.append(garbageCollectorString());
-      ret.append(methodPrototypesString());
-      ret.append(methodBodiesString());
-      
-      prev_hash = curr_hash;
-      curr_hash = DigestUtils.md5Hex(ret.toString());
-    }
 
     String cuda_code;
     //for debugging you can read the cuda code from a generated.cu
@@ -270,6 +258,10 @@ public class OpenCLScene {
     //using a set so duplicates get filtered out.
     Set<String> protos = new HashSet<String>();
     StringBuilder ret = new StringBuilder();
+    
+    ArrayCopyGenerate arr_generate = new ArrayCopyGenerate();
+    protos.add(arr_generate.getProto());
+    
     List<OpenCLMethod> methods = m_methodHierarchies.getMethods();
     for(OpenCLMethod method : methods){ 
       protos.add(method.getMethodPrototype());
@@ -348,7 +340,6 @@ public class OpenCLScene {
   }
 
   public void addCodeSegment(CodeSegment codeSegment){
-    resetInstance();
     this.m_codeSegment = codeSegment;
     m_rootSootClass = codeSegment.getRootSootClass();    
     m_readOnlyTypes = new ReadOnlyTypes(codeSegment.getRootMethod());

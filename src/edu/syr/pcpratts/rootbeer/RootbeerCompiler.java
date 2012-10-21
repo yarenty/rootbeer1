@@ -28,6 +28,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import pack.Pack;
 import soot.*;
+import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.options.Options;
 import soot.util.JasminOutputStream;
 
@@ -81,11 +82,13 @@ public class RootbeerCompiler {
     m_fastLoader.addPath(jar_filename);
     m_fastLoader.addClassPath(getRuntimeJars());
     m_fastLoader.init();
-    m_fastLoader.singleKernel();
     
     FindKernelForTestCase finder = new FindKernelForTestCase();
     SootClass kernel = finder.get(test_case, m_fastLoader.getKernelClasses());
     m_provider = finder.getProvider();
+    
+    SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
+    m_fastLoader.singleKernel(kernel_method);
     
     List<SootClass> kernel_classes = new ArrayList<SootClass>();
     kernel_classes.add(kernel);
@@ -120,87 +123,82 @@ public class RootbeerCompiler {
       System.exit(0);
     }
     
-    SootClass[] sorted = new SootClass[kernel_classes.size()];
-    sorted = kernel_classes.toArray(sorted);
+    String[] sorted = new String[kernel_classes.size()];
+    for(int i = 0; i < kernel_classes.size(); ++i){
+      sorted[i] = kernel_classes.get(i).getName();
+    }
     Arrays.sort(sorted);
     kernel_classes.clear();
-    for(SootClass cls : sorted){
-      kernel_classes.add(cls);
+    for(String cls : sorted){
+      kernel_classes.add(Scene.v().getSootClass(cls));
     }
     
     for(SootClass kernel : kernel_classes){
       SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
-      FastWholeProgram.v().execDFS(kernel_method);
-      DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
-      info.print();
+      FastWholeProgram.v().fullyLoad(kernel_method, true);
     }
       
-    /*
     ClassRemappingTransform transform = null;
     
     if(!Main.disable_class_remapping()){
       System.out.println("remapping some classes to GPU versions...");
-      Iterator<String> iter = reachables.keySet().iterator();
-      while(iter.hasNext()){
-        List<String> curr_reachables = reachables.get(iter.next());
+      
+      for(SootClass kernel : kernel_classes){
+        SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
+        DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
+        RootbeerScene.v().setDfsInfo(info);
+        
+        List<String> sigs = info.getReachableMethodSigs();
         transform = new ClassRemappingTransform(false);
-        transform.run(curr_reachables);
-        transform.finishClone();
+        transform.run(sigs);
+        transform.finishClone();  
+        
+        FastWholeProgram.v().fullyLoad(kernel_method, false);
+        info = FastWholeProgram.v().getDfsInfo(kernel_method);
+        info.setModifiedClasses(transform.getModifiedClasses());
+        //info.outputClassTypes();
       }
     }
-    
-    //re-run finding kernel reachables with remap in
-    reachables = new HashMap<String, List<String>>();
-    forward_reachables = new HashMap<String, List<String>>();
-    all_reachables = new ArrayList<String>();
-    
-    for(String kernel : kernel_classes){
-      SootClass soot_class = Scene.v().getSootClass(kernel);
-      SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
-      FastWholeProgram.v().getDfsMethods(kernel_method);
       
-      System.out.println("finding kernel reachable methods for: "+soot_class.getShortName()+"...");
-    
-      KernelReachableMethods reachable_finder = new KernelReachableMethods();
-      List<String> curr_reachables = reachable_finder.get(kernel);
-      forward_reachables.put(kernel, reachable_finder.getForward());
-      
-      all_reachables.addAll(curr_reachables);
-      reachables.put(kernel, curr_reachables);
-    }
-    */
-    
     Transform2 transform2 = new Transform2();
-    for(SootClass soot_class : kernel_classes){
-      //List<String> curr_reachables = reachables.get(cls);
-      //RootbeerScene.v().setReachableMethods(curr_reachables);
-      //RootbeerScene.v().setForwardReachables(forward_reachables.get(cls));
-      
+    for(SootClass soot_class : kernel_classes){      
       SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
       DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
       RootbeerScene.v().setDfsInfo(info);
       transform2.run(soot_class.getName());
     }
     
-    /*
-    Set<String> app_classes = new HashSet<String>();
-    
+    System.out.println("writing classes out...");
     if(!Main.disable_class_remapping()){
-      app_classes.addAll(transform.getModifiedClasses());
-    }
-    * 
-    SignatureUtil util = new SignatureUtil();
-    for(String method_sig : all_reachables){
-      String class_name = util.classFromMethodSig(method_sig);
-      if(app_classes.contains(class_name) == false){
-        app_classes.add(class_name);
+      
+      for(SootClass kernel : kernel_classes){
+        SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
+        DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
+        
+        Set<String> modified = info.getModifiedClasses();
+        if(modified == null){
+          continue;
+        }
+        
+        for(String cls : modified){
+          loadAllMethods(cls);
+          writeClassFile(cls);
+          writeJimpleFile(cls);
+        }    
       }
+      
     }
     
-    for(String cls : app_classes){
-      loadAllMethods(cls);
-      writeClassFile(cls);
-      writeJimpleFile(cls);
+    for(SootClass soot_class : kernel_classes){
+      SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
+      DfsInfo dfs_info = FastWholeProgram.v().getDfsInfo(kernel_method);
+      
+      List<RefType> ref_types = dfs_info.getOrderedRefTypes();
+      for(RefType cls : ref_types){
+        loadAllMethods(cls.getClassName());
+        writeClassFile(cls.getClassName());
+        writeJimpleFile(cls.getClassName());
+      }
     }
     
     List<String> added_classes = RootbeerScene.v().getAddedClasses();
@@ -212,7 +210,6 @@ public class RootbeerCompiler {
     
     makeOutJar();
     pack(outname);
-    */
   }
   
   public void pack(String outjar_name) throws Exception {
@@ -352,9 +349,7 @@ public class RootbeerCompiler {
     return ret;
   }
 
-  private void writeJimpleFile(String cls){    
-    if(cls.equals("java.lang.Object"))
-      return;
+  private void writeJimpleFile(String cls){  
     try {
       SootClass c = Scene.v().getSootClass(cls);
       JimpleWriter writer = new JimpleWriter();

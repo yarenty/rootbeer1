@@ -7,20 +7,12 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
+import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
+import edu.syr.pcpratts.rootbeer.util.ClassConstantReader;
 import java.util.List;
-import soot.ArrayType;
-import soot.DoubleType;
-import soot.FloatType;
-import soot.Local;
-import soot.RefType;
-import soot.SootClass;
-import soot.SootField;
-import soot.SootMethod;
-import soot.Type;
-import soot.Unit;
-import soot.Value;
+import soot.*;
 import soot.jimple.AddExpr;
 import soot.jimple.AndExpr;
 import soot.jimple.ArrayRef;
@@ -71,81 +63,83 @@ import soot.jimple.VirtualInvokeExpr;
 import soot.jimple.XorExpr;
 
 public class MethodJimpleValueSwitch implements JimpleValueSwitch {
-  protected final StringBuilder mOutput;
-  private boolean mLhs;
-  private boolean mRhs;
-  private boolean mNewCalled;
-  private boolean mCaughtExceptionRef;
-  private String m_ThisRef;
-  private String m_PreviousLocal;
-  private boolean m_CheckException;
+  protected final StringBuilder m_output;
+  private boolean m_lhs;
+  private boolean m_rhs;
+  private boolean m_newCalled;
+  private boolean m_caughtExceptionRef;
+  private String m_thisRef;
+  private String m_previousLocal;
+  private boolean m_checkException;
+  private ClassConstantReader m_classConstantReader;
 
   public MethodJimpleValueSwitch(StringBuilder output) {
-    mOutput = output;
-    mNewCalled = false;
+    m_output = output;
+    m_newCalled = false;
+    m_classConstantReader = new ClassConstantReader();
     clearLhsRhs();
   }
   
   public boolean newHasBeenCalled(){
-    return mNewCalled;
+    return m_newCalled;
   }
 
   public void resetNewCalled(){
-    mNewCalled = false;
+    m_newCalled = false;
   }
   
   void setLhs(){
-    mLhs = true;
-    mRhs = false;
+    m_lhs = true;
+    m_rhs = false;
   }
 
   void setRhs(){
-    mRhs = true;
-    mLhs = false;
+    m_rhs = true;
+    m_lhs = false;
   }
 
   void clearLhsRhs(){
-    mLhs = false;
-    mRhs = false;
+    m_lhs = false;
+    m_rhs = false;
   }
 
   boolean isLhs(){
-    if(mLhs == false && mRhs == false)
+    if(m_lhs == false && m_rhs == false)
       throw new IllegalStateException("Lhs/Rhs in invalid state");
-    return mLhs;
+    return m_lhs;
   }
 
   private void writeBinOpExpr(BinopExpr arg0){
     String symbol = arg0.getSymbol().trim();
     if(needDoubleMod(arg0, symbol)){
-      mOutput.append("edu_syr_pcpratts_modulus(");      
+      m_output.append("edu_syr_pcpratts_modulus(");      
       arg0.getOp1().apply(this);
-      mOutput.append(", ");
+      m_output.append(", ");
       arg0.getOp2().apply(this);
-      mOutput.append(")");
+      m_output.append(")");
     } else if(symbol.equals("cmp")){
-      mOutput.append("edu_syr_pcpratts_cmp(");      
+      m_output.append("edu_syr_pcpratts_cmp(");      
       arg0.getOp1().apply(this);
-      mOutput.append(", ");
+      m_output.append(", ");
       arg0.getOp2().apply(this);
-      mOutput.append(")");
+      m_output.append(")");
     } else if(symbol.equals("cmpl")){    
-      mOutput.append("edu_syr_pcpratts_cmpl((double)");      
+      m_output.append("edu_syr_pcpratts_cmpl((double)");      
       arg0.getOp1().apply(this);
-      mOutput.append(", (double)");
+      m_output.append(", (double)");
       arg0.getOp2().apply(this);
-      mOutput.append(")");
+      m_output.append(")");
     } else if(symbol.equals("cmpg")){
-      mOutput.append("edu_syr_pcpratts_cmpg((double)");      
+      m_output.append("edu_syr_pcpratts_cmpg((double)");      
       arg0.getOp1().apply(this);
-      mOutput.append(", (double)");
+      m_output.append(", (double)");
       arg0.getOp2().apply(this);
-      mOutput.append(")");    
+      m_output.append(")");    
     } else {
       arg0.getOp1().apply(this);
-      mOutput.append(" "+symbol+" ");
+      m_output.append(" "+symbol+" ");
       arg0.getOp2().apply(this);
-      mOutput.append(" ");
+      m_output.append(" ");
     }
   }
    
@@ -228,11 +222,11 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
 
   public void caseUshrExpr(UshrExpr arg0) {
-    mOutput.append("(");
+    m_output.append("(");
     arg0.getOp1().apply(this);
-    mOutput.append(" >> ");
+    m_output.append(" >> ");
     arg0.getOp2().apply(this);
-    mOutput.append(" ) & ");
+    m_output.append(" ) & ");
 
     OpenCLType lhs_ocl_type = new OpenCLType(arg0.getOp1().getType());
     OpenCLType rhs_ocl_type = new OpenCLType(arg0.getOp2().getType());
@@ -256,7 +250,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
         mask = "0x7fffffffffffffffL";
         break;
     }
-    mOutput.append(mask);
+    m_output.append(mask);
   }
 
   public void caseSubExpr(SubExpr arg0) {
@@ -271,8 +265,8 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
     SootMethod soot_method = arg0.getMethod();
     SootClass soot_class = soot_method.getDeclaringClass();
     OpenCLMethod ocl_method = new OpenCLMethod(soot_method, soot_class);
-    
-    mOutput.append(ocl_method.getInstanceInvokeString(arg0));
+
+    m_output.append(ocl_method.getInstanceInvokeString(arg0));
     setCheckException();
   }
 
@@ -287,7 +281,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
     if(soot_class.getName().equals("java.lang.Object"))
       return;
     OpenCLMethod ocl_method = new OpenCLMethod(soot_method, soot_class);
-    mOutput.append(ocl_method.getInstanceInvokeString(arg0));
+    m_output.append(ocl_method.getInstanceInvokeString(arg0));
     setCheckException();
   }
 
@@ -297,7 +291,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
     if(soot_class.getName().equals("java.lang.Object"))
       return;
     OpenCLMethod ocl_method = new OpenCLMethod(soot_method, soot_class);
-    mOutput.append(ocl_method.getStaticInvokeString(arg0));
+    m_output.append(ocl_method.getStaticInvokeString(arg0));
     setCheckException();
   }
 
@@ -308,7 +302,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   public void caseCastExpr(CastExpr arg0) {
     Type cast_type = arg0.getCastType();
     OpenCLType ocl_type = new OpenCLType(cast_type);
-    mOutput.append("("+ocl_type.getRefString()+") ");
+    m_output.append("("+ocl_type.getRefString()+") ");
     Value rhs = arg0.getOp();
     rhs.apply(this);
   }
@@ -316,38 +310,38 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   public void caseInstanceOfExpr(InstanceOfExpr arg0) {
     OpenCLScene.v().addInstanceof(arg0.getCheckType());
     OpenCLInstanceof instance_of = new OpenCLInstanceof(arg0.getCheckType());
-    mOutput.append(instance_of.invokeExpr(arg0));
+    m_output.append(instance_of.invokeExpr(arg0));
   }
 
   public void caseNewArrayExpr(NewArrayExpr arg0) {
     OpenCLScene.v().setUsingGarbageCollector();
     OpenCLArrayType array_type = new OpenCLArrayType((ArrayType) arg0.getType());
-    mOutput.append(array_type.invokeNewArrayExpr(arg0));
-    mNewCalled = true;
+    m_output.append(array_type.invokeNewArrayExpr(arg0));
+    m_newCalled = true;
   }
 
   public void caseNewMultiArrayExpr(NewMultiArrayExpr arg0) {
     OpenCLScene.v().setUsingGarbageCollector();
     OpenCLArrayType array_type = new OpenCLArrayType((ArrayType) arg0.getType());
-    mOutput.append(array_type.invokeNewMultiArrayExpr(arg0));  
-    mNewCalled = true;  
+    m_output.append(array_type.invokeNewMultiArrayExpr(arg0));  
+    m_newCalled = true;  
   }
 
   public void caseNewExpr(NewExpr arg0) {
     OpenCLScene.v().setUsingGarbageCollector();
-    mOutput.append(" -1 ");
+    m_output.append(" -1 ");
   }
 
   public void caseLengthExpr(LengthExpr arg0) {
     Value op = arg0.getOp();
-    mOutput.append("edu_syr_pcpratts_array_length(gc_info, ");
+    m_output.append("edu_syr_pcpratts_array_length(gc_info, ");
     op.apply(this);
-    mOutput.append(")");
+    m_output.append(")");
   }
 
   public void caseNegExpr(NegExpr arg0) {
     Value op = arg0.getOp();
-    mOutput.append("! ");
+    m_output.append("! ");
     op.apply(this);
   }
 
@@ -356,28 +350,28 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
 
   public void caseLocal(Local arg0) {
-    mOutput.append(" "+arg0.getName()+" ");
-    m_PreviousLocal = arg0.getName();
+    m_output.append(" "+arg0.getName()+" ");
+    m_previousLocal = arg0.getName();
   }
 
   public void caseDoubleConstant(DoubleConstant arg0) {
-    mOutput.append(" "+replaceNumber(arg0.toString())+" ");
+    m_output.append(" "+replaceNumber(arg0.toString())+" ");
   }
 
   public void caseFloatConstant(FloatConstant arg0) {
-    mOutput.append(" "+replaceNumber(arg0.toString())+" ");
+    m_output.append(" "+replaceNumber(arg0.toString())+" ");
   }
 
   public void caseIntConstant(IntConstant arg0) {
-    mOutput.append(" "+replaceNumber(arg0.toString())+" ");
+    m_output.append(" "+replaceNumber(arg0.toString())+" ");
   }
 
   public void caseLongConstant(LongConstant arg0) {
-    mOutput.append(" "+replaceNumber(arg0.toString())+" ");
+    m_output.append(" "+replaceNumber(arg0.toString())+" ");
   }
 
   public void caseNullConstant(NullConstant arg0) {
-    mOutput.append(" -1 ");
+    m_output.append(" -1 ");
   }
 
   private String replaceNumber(String number){
@@ -391,20 +385,23 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
   
   public void caseStringConstant(StringConstant arg0) {
-    mOutput.append(" edu_syr_pcpratts_string_constant(gc_info, (char *) "+arg0.toString()+", exception) ");
+    m_output.append(" edu_syr_pcpratts_string_constant(gc_info, (char *) "+arg0.toString()+", exception) ");
   }
 
   public void caseClassConstant(ClassConstant arg0) {
-    mOutput.append("$$CLASS_CONSTANT$$");
+    String value = arg0.getValue();
+    Type type = m_classConstantReader.stringToType(value);
+    int num = RootbeerScene.v().getDfsInfo().getClassNumber(type);
+    m_output.append("edu_syr_pcpratts_classConstant("+num+")");
   }
-
+ 
   public void caseArrayRef(ArrayRef arg0) {
     OpenCLArrayType array = new OpenCLArrayType((ArrayType) arg0.getBase().getType());
     if(isLhs()){
-      mOutput.append(array.getArrayRefSetter(arg0));
+      m_output.append(array.getArrayRefSetter(arg0));
       setCheckException();
     } else {
-      mOutput.append(array.getArrayRefGetter(arg0));
+      m_output.append(array.getArrayRefGetter(arg0));
       setCheckException();
     }
   }
@@ -413,9 +410,9 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
     SootField field = arg0.getField();
     OpenCLField ocl_field = new OpenCLField(arg0.getField(), field.getDeclaringClass());
     if(isLhs()){
-      mOutput.append(ocl_field.getStaticSetterInvoke());
+      m_output.append(ocl_field.getStaticSetterInvoke());
     } else {
-      mOutput.append(ocl_field.getStaticGetterInvoke());
+      m_output.append(ocl_field.getStaticGetterInvoke());
     }
   }
 
@@ -430,25 +427,25 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
     RefType ref = (RefType) type;
     OpenCLField ocl_field = new OpenCLField(arg0.getField(), ref.getSootClass());
     if(isLhs()){
-      mOutput.append(ocl_field.getInstanceSetterInvoke(arg0.getBase()));
+      m_output.append(ocl_field.getInstanceSetterInvoke(arg0.getBase()));
     } else {
-      mOutput.append(ocl_field.getInstanceGetterInvoke(arg0.getBase()));
+      m_output.append(ocl_field.getInstanceGetterInvoke(arg0.getBase()));
     }
     setCheckException();
   }
 
   public void caseParameterRef(ParameterRef arg0) {
-    mOutput.append(" parameter"+Integer.toString(arg0.getIndex())+" ");
+    m_output.append(" parameter"+Integer.toString(arg0.getIndex())+" ");
   }
 
   public void caseCaughtExceptionRef(CaughtExceptionRef arg0) {
-    mOutput.append(" *exception ");
-    mCaughtExceptionRef = true;
+    m_output.append(" *exception ");
+    m_caughtExceptionRef = true;
   }
 
   public void caseThisRef(ThisRef arg0) {
-    mOutput.append(" thisref ");
-    m_ThisRef = m_PreviousLocal;
+    m_output.append(" thisref ");
+    m_thisRef = m_previousLocal;
   }
 
   public void caseDynamicInvokeExpr(DynamicInvokeExpr die) {
@@ -456,23 +453,23 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
 
   void reset() {
-    mCaughtExceptionRef = false;
-    m_CheckException = false;
+    m_caughtExceptionRef = false;
+    m_checkException = false;
   }
 
   boolean hasCaughtExceptionRef() {
-    return mCaughtExceptionRef;
+    return m_caughtExceptionRef;
   }
 
   public String getThisRef() {
-    return m_ThisRef;
+    return m_thisRef;
   }
 
   private void setCheckException() {
-    m_CheckException = true;
+    m_checkException = true;
   }
   
   public boolean getCheckException(){
-    return m_CheckException;
+    return m_checkException;
   }
 }

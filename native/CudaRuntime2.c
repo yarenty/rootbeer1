@@ -33,6 +33,7 @@ static CUdeviceptr gpuToSpace;
 static CUdeviceptr gpuTexture;
 static CUdeviceptr gpuHandlesMemory;
 static CUdeviceptr gpuExceptionsMemory;
+static CUdeviceptr gpuClassMemory;
 static CUdeviceptr gpuHeapEndPtr;
 static CUdeviceptr gpuBufferSize;
 static CUtexref    cache;
@@ -41,6 +42,7 @@ static jclass thisRefClass;
 
 static jlong heapEndPtr;
 static jlong bufferSize;
+static jlong classMemSize;
 static int maxGridDim;
 static int numMultiProcessors;
 
@@ -77,16 +79,6 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error) {
 
     (*env)->ThrowNew(env,exp,msg);
 }
-//
-//size_t memSize(JNIEnv *env){
-//  size_t ret;
-//  int status;
-//  
-//  status = cuDeviceTotalMem(&ret, cuDevice);  
-//  CHECK_STATUS(env,"error in cuDeviceTotalMem",status)
-//
-//  return ret;
-//}
 
 void setLongField(JNIEnv *env, jobject obj, const char * name, jlong value){
 
@@ -130,6 +122,139 @@ void getBestDevice(JNIEnv *env){
   CHECK_STATUS(env,"error in cuDeviceGetAttribute",status)
           
   numMultiProcessors = max_multiprocessors;
+
+}
+
+void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
+{          
+  int status;
+  jint num_blocks;
+  int deviceCount = 0;
+  size_t f_mem;
+  size_t t_mem;
+  size_t to_space_size;
+  textureMemSize = 1;
+
+  status = cuDeviceGetCount(&deviceCount);
+  CHECK_STATUS(env,"error in cuDeviceGetCount",status)
+
+  getBestDevice(env);
+  
+  status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
+  CHECK_STATUS(env,"error in cuCtxCreate",status)
+  
+  status = cuMemGetInfo (&f_mem, &t_mem);
+  CHECK_STATUS(env,"error in cuMemGetInfo",status)
+          
+  to_space_size = f_mem;
+  
+  num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
+  
+#if DEBUG
+
+  printf("Memory: %i(MB)/%i(MB) (Free/Total)\n",f_mem/1024/1024, t_mem/1024/1024);
+  
+  printf("num_blocks = %i\n",num_blocks);
+  printf("numMultiProcessors = %i\n",numMultiProcessors);
+  printf("max_threads_per_block = %i\n",max_threads_per_block);
+  printf("max_blocks_per_proc = %i\n",max_blocks_per_proc);
+  fflush(stdout);
+#endif
+
+  //space for 100 types in the scene
+  classMemSize = sizeof(jint)*100;
+  
+  gc_space_size = 1024;
+  to_space_size -= (num_blocks * sizeof(jlong));
+  to_space_size -= (num_blocks * sizeof(jlong));
+  to_space_size -= gc_space_size;
+  to_space_size -= free_space;
+  to_space_size -= classMemSize;
+
+  //to_space_size -= textureMemSize;
+  bufferSize = to_space_size;
+
+  status = cuMemHostAlloc(&toSpace, to_space_size, 0);  
+  CHECK_STATUS(env,"toSpace memory allocation failed",status)
+    
+  status = cuMemAlloc(&gpuToSpace, to_space_size);
+  CHECK_STATUS(env,"gpuToSpace memory allocation failed",status)
+    
+  status = cuMemAlloc(&gpuClassMemory, classMemSize);
+  CHECK_STATUS(env,"gpuClassMemory memory allocation failed",status)
+  
+/*
+  status = cuMemHostAlloc(&textureMemory, textureMemSize, 0);  
+  if (CUDA_SUCCESS != status) 
+  {
+    printf("error in cuMemHostAlloc textureMemory %d\n", status);
+  }
+
+  status = cuMemAlloc(&gpuTexture, textureMemSize);
+  if (CUDA_SUCCESS != status) 
+  {
+    printf("error in cuMemAlloc gpuTexture %d\n", status);
+  }
+*/
+
+  status = cuMemHostAlloc(&handlesMemory, num_blocks * sizeof(jlong), CU_MEMHOSTALLOC_WRITECOMBINED); 
+  CHECK_STATUS(env,"handlesMemory memory allocation failed",status)
+
+  status = cuMemAlloc(&gpuHandlesMemory, num_blocks * sizeof(jlong)); 
+  CHECK_STATUS(env,"gpuHandlesMemory memory allocation failed",status)
+
+  status = cuMemHostAlloc(&exceptionsMemory, num_blocks * sizeof(jlong), 0); 
+  CHECK_STATUS(env,"exceptionsMemory memory allocation failed",status)
+
+  status = cuMemAlloc(&gpuExceptionsMemory, num_blocks * sizeof(jlong)); 
+  CHECK_STATUS(env,"gpuExceptionsMemory memory allocation failed",status)
+
+  status = cuMemAlloc(&gcInfoSpace, gc_space_size);  
+  CHECK_STATUS(env,"gcInfoSpace memory allocation failed",status)
+
+  status = cuMemAlloc(&gpuHeapEndPtr, 8);
+  CHECK_STATUS(env,"gpuHeapEndPtr memory allocation failed",status)
+
+  status = cuMemAlloc(&gpuBufferSize, 8);
+  CHECK_STATUS(env,"gpuBufferSize memory allocation failed",status)
+
+  status = cuMemAlloc(&gpuBufferSize, 8);
+  CHECK_STATUS(env,"gpuBufferSize memory allocation failed",status)
+
+  thisRefClass = (*env)->GetObjectClass(env, this_ref);
+  setLongField(env, this_ref, "m_ToSpaceAddr", (jlong) toSpace);
+  setLongField(env, this_ref, "m_GpuToSpaceAddr", (jlong) gpuToSpace);
+  setLongField(env, this_ref, "m_TextureAddr", (jlong) textureMemory);
+  setLongField(env, this_ref, "m_GpuTextureAddr", (jlong) gpuTexture);
+  setLongField(env, this_ref, "m_HandlesAddr", (jlong) handlesMemory);
+  setLongField(env, this_ref, "m_GpuHandlesAddr", (jlong) gpuHandlesMemory);
+  setLongField(env, this_ref, "m_ExceptionsHandlesAddr", (jlong) exceptionsMemory);
+  setLongField(env, this_ref, "m_GpuExceptionsHandlesAddr", (jlong) gpuExceptionsMemory);
+  setLongField(env, this_ref, "m_ToSpaceSize", (jlong) bufferSize);
+  setLongField(env, this_ref, "m_MaxGridDim", (jlong) maxGridDim);
+  setLongField(env, this_ref, "m_NumMultiProcessors", (jlong) numMultiProcessors);
+}
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
+ * Method:    reinit
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_reinit
+  (JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
+{
+  cuMemFreeHost(toSpace);
+  cuMemFree(gpuToSpace);
+  cuMemFree(gpuClassMemory);
+  cuMemFreeHost(handlesMemory);
+  cuMemFree(gpuHandlesMemory);
+  cuMemFreeHost(exceptionsMemory);
+  cuMemFree(gpuExceptionsMemory);
+  cuMemFree(gcInfoSpace);
+  cuMemFree(gpuHeapEndPtr);
+  cuMemFree(gpuBufferSize);
+  cuCtxDestroy(cuContext);
+  initDevice(env, this_ref, max_blocks_per_proc, max_threads_per_block, free_space);
 }
 
 size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_block)
@@ -153,6 +278,9 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
   CHECK_STATUS_RTN(env,"error in cuMemGetInfo",status, 0)
   
   to_space_size = f_mem;
+
+  //space for 100 types in the scene
+  classMemSize = sizeof(jint)*100;
   
   num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
@@ -160,6 +288,7 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
   to_space_size -= (num_blocks * sizeof(jlong));
   to_space_size -= (num_blocks * sizeof(jlong));
   to_space_size -= gc_space_size;
+  to_space_size -= classMemSize;
   
   return to_space_size;
 }
@@ -316,93 +445,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   
   status = cuInit(0);
   CHECK_STATUS(env,"error in cuInit",status)
-          
-  status = cuDeviceGetCount(&deviceCount);
-  CHECK_STATUS(env,"error in cuDeviceGetCount",status)
 
-  getBestDevice(env);
-  
-  status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
-  CHECK_STATUS(env,"error in cuCtxCreate",status)
-  
-  status = cuMemGetInfo (&f_mem, &t_mem);
-  CHECK_STATUS(env,"error in cuMemGetInfo",status)
-          
-  to_space_size = f_mem;
-  
-  num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
-  
-#if DEBUG
-
-  printf("Memory: %i(MB)/%i(MB) (Free/Total)\n",f_mem/1024/1024, t_mem/1024/1024);
-  
-  printf("num_blocks = %i\n",num_blocks);
-  printf("numMultiProcessors = %i\n",numMultiProcessors);
-  printf("max_threads_per_block = %i\n",max_threads_per_block);
-  printf("max_blocks_per_proc = %i\n",max_blocks_per_proc);
-  fflush(stdout);
-#endif
-  
-  gc_space_size = 1024;
-  to_space_size -= (num_blocks * sizeof(jlong));
-  to_space_size -= (num_blocks * sizeof(jlong));
-  to_space_size -= gc_space_size;
-  to_space_size -= free_space;
-  //to_space_size -= textureMemSize;
-  bufferSize = to_space_size;
-
-  status = cuMemHostAlloc(&toSpace, to_space_size, 0);  
-  CHECK_STATUS(env,"toSpace memory allocation failed",status)
-    
-  status = cuMemAlloc(&gpuToSpace, to_space_size);
-  CHECK_STATUS(env,"gpuToSpace memory allocation failed",status)
-  
-/*
-  status = cuMemHostAlloc(&textureMemory, textureMemSize, 0);  
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemHostAlloc textureMemory %d\n", status);
-  }
-
-  status = cuMemAlloc(&gpuTexture, textureMemSize);
-  if (CUDA_SUCCESS != status) 
-  {
-    printf("error in cuMemAlloc gpuTexture %d\n", status);
-  }
-*/
-  status = cuMemHostAlloc(&handlesMemory, num_blocks * sizeof(jlong), CU_MEMHOSTALLOC_WRITECOMBINED); 
-  CHECK_STATUS(env,"handlesMemory memory allocation failed",status)
-
-  status = cuMemAlloc(&gpuHandlesMemory, num_blocks * sizeof(jlong)); 
-  CHECK_STATUS(env,"gpuHandlesMemory memory allocation failed",status)
-
-  status = cuMemHostAlloc(&exceptionsMemory, num_blocks * sizeof(jlong), 0); 
-  CHECK_STATUS(env,"exceptionsMemory memory allocation failed",status)
-
-  status = cuMemAlloc(&gpuExceptionsMemory, num_blocks * sizeof(jlong)); 
-  CHECK_STATUS(env,"gpuExceptionsMemory memory allocation failed",status)
-
-  status = cuMemAlloc(&gcInfoSpace, gc_space_size);  
-  CHECK_STATUS(env,"gcInfoSpace memory allocation failed",status)
-
-  status = cuMemAlloc(&gpuHeapEndPtr, 8);
-  CHECK_STATUS(env,"gpuHeapEndPtr memory allocation failed",status)
-
-  status = cuMemAlloc(&gpuBufferSize, 8);
-  CHECK_STATUS(env,"gpuBufferSize memory allocation failed",status)
-
-  thisRefClass = (*env)->GetObjectClass(env, this_ref);
-  setLongField(env, this_ref, "m_ToSpaceAddr", (jlong) toSpace);
-  setLongField(env, this_ref, "m_GpuToSpaceAddr", (jlong) gpuToSpace);
-  setLongField(env, this_ref, "m_TextureAddr", (jlong) textureMemory);
-  setLongField(env, this_ref, "m_GpuTextureAddr", (jlong) gpuTexture);
-  setLongField(env, this_ref, "m_HandlesAddr", (jlong) handlesMemory);
-  setLongField(env, this_ref, "m_GpuHandlesAddr", (jlong) gpuHandlesMemory);
-  setLongField(env, this_ref, "m_ExceptionsHandlesAddr", (jlong) exceptionsMemory);
-  setLongField(env, this_ref, "m_GpuExceptionsHandlesAddr", (jlong) gpuExceptionsMemory);
-  setLongField(env, this_ref, "m_ToSpaceSize", (jlong) bufferSize);
-  setLongField(env, this_ref, "m_MaxGridDim", (jlong) maxGridDim);
-  setLongField(env, this_ref, "m_NumMultiProcessors", (jlong) numMultiProcessors);
+  initDevice(env, this_ref, max_blocks_per_proc, max_threads_per_block, free_space);
 }
 
 void * readCubinFile(const char * filename){
@@ -462,6 +506,20 @@ void * readCubinFileFromBuffers(JNIEnv *env, jobject buffers, jint size, jint to
 
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
+ * Method:    writeClassTypeRef
+ * Signature: ([I)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_writeClassTypeRef
+  (JNIEnv *env, jobject this_ref, jintArray jarray)
+{
+  int i;
+  jint * native_array = (*env)->GetIntArrayElements(env, jarray, 0);
+  cuMemcpyHtoD(gpuClassMemory, native_array, classMemSize);
+  (*env)->ReleaseIntArrayElements(env, jarray, native_array, 0);
+}
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  * Method:    loadFunction
  * Signature: ()V
  */
@@ -479,13 +537,13 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   CHECK_STATUS(env, "error in cuModuleLoad", status);
   (*env)->ReleaseStringUTFChars(env, filename, native_filename);
 
-  status = cuModuleGetFunction(&cuFunction, cuModule, "_Z5entryPcS_PiPxS1_S0_i"); 
+  status = cuModuleGetFunction(&cuFunction, cuModule, "_Z5entryPcS_PiPxS1_S0_S0_i"); 
   CHECK_STATUS(env,"error in cuModuleGetFunction",status)
 
   status = cuFuncSetCacheConfig(cuFunction, CU_FUNC_CACHE_PREFER_L1);
   CHECK_STATUS(env,"error in cuFuncSetCacheConfig",status)
 
-  status = cuParamSetSize(cuFunction, (6 * sizeof(CUdeviceptr) + sizeof(int))); 
+  status = cuParamSetSize(cuFunction, (7 * sizeof(CUdeviceptr) + sizeof(int))); 
   CHECK_STATUS(env,"error in cuParamSetSize",status)
 
   offset = 0;
@@ -511,6 +569,10 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
 
   status = cuParamSetv(cuFunction, offset, (void *) &gpuExceptionsMemory, sizeof(CUdeviceptr)); 
   CHECK_STATUS(env,"error in cuParamSetv gpuExceptionsMemory",status)
+  offset += sizeof(CUdeviceptr);
+
+  status = cuParamSetv(cuFunction, offset, (void *) &gpuClassMemory, sizeof(CUdeviceptr)); 
+  CHECK_STATUS(env,"error in cuParamSetv gpuClassMemory",status)
   offset += sizeof(CUdeviceptr);
 
   status = cuParamSeti(cuFunction, offset, num_blocks); 

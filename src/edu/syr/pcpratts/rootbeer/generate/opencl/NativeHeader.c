@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <math.h>
+#include <sys/time.h>
 
 pthread_mutex_t atom_add_mutex;
 
@@ -46,3 +47,6 @@ void __threadfence(){ }
 
 long long m_Local[2];
 int * m_Cache;
+
+typedef int boolean;
+typedef int byte;

@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
+import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.classloader.NumberedType;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLMethod;
@@ -321,11 +322,13 @@ public class MethodStmtSwitch implements StmtSwitch {
   }
 
   private void checkException() {    
+    int oom_num = Constants.OutOfMemoryNumber;
+    int null_num = Constants.NullPointerNumber;
     m_output.append("if(*exception != 0) { \n");
     if(m_trapItems != null){    
       m_output.append("  GC_OBJ_TYPE_TYPE ex_type;\n");
       //if exception is negative, then we didn't allocate memory for it.
-      m_output.append("  if(*exception < 0){\n");
+      m_output.append("  if(*exception == "+oom_num+" || *exception == "+null_num+"){\n");
       m_output.append("    ex_type = *exception;\n");
       m_output.append("  } else {\n");
       m_output.append("    char * ex_deref = edu_syr_pcpratts_gc_deref(gc_info, *exception);\n");
@@ -334,9 +337,9 @@ public class MethodStmtSwitch implements StmtSwitch {
       m_output.append("if(0){}\n");
       for(TrapItem item : m_trapItems){
         m_output.append("else if(");
-        List<NumberedType> types = RootbeerScene.v().getDfsInfo().getNumberedHierarchyUp(item.getException());
+        List<NumberedType> types = RootbeerScene.v().getDfsInfo().getNumberedHierarchyDown(item.getException());
         for(int i = 0; i < types.size(); ++i){
-          m_output.append("ex_type == "+types.get(i));
+          m_output.append("ex_type == "+types.get(i).getNumber());
           if(i < types.size() - 1){
             m_output.append(" || ");
           }

@@ -46,8 +46,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     m_bcl = new Stack<BytecodeLanguage>();
     m_bcl.push(bcl);
     m_gcObjVisitor = new Stack<Local>();
-    m_FieldInspector = inspector;
-    m_ObjSerializing = new Stack<Local>();
+    m_fieldInspector = inspector;
+    m_objSerializing = new Stack<Local>();
     m_currMem = new Stack<Local>();
     m_CurrObj = new Stack<Local>();
   }
@@ -59,7 +59,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     m_thisRef = bcl.refThis();
     m_gcObjVisitor.push(m_thisRef);
     m_Param0 = bcl.refParameter(0);
-    m_ObjSerializing.push(m_Param0);
+    m_objSerializing.push(m_Param0);
     m_Param1 = bcl.refParameter(1);
     m_RefParam = bcl.refParameter(2);
     m_Mem = bcl.refInstanceField(m_thisRef, "mMem");
@@ -70,6 +70,14 @@ public class VisitorReadGen extends AbstractVisitorGen {
     //mBcl.println("returning null");
     bcl.returnValue(NullConstant.v());
     bcl.label(dont_return_null_label);    
+    
+    String dont_fetch_obj = getNextLabel();
+    
+    bcl.ifStmt(m_Param0, "!=", NullConstant.v(), dont_fetch_obj);
+    bcl.pushMethod(m_thisRef, "writeCacheFetch", obj_cls.getType(), LongType.v());
+    Local written_to = bcl.invokeMethodRet(m_thisRef, m_RefParam);
+    bcl.assign(m_Param0, written_to);
+    bcl.label(dont_fetch_obj);
     
     Local mem = bcl.local(m_Mem.getType());
     
@@ -241,11 +249,11 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl_mem.incrementAddress(12);       
     
     m_CurrObj.push(object_to_write_to);
-    m_ObjSerializing.push(object_to_write_to);
+    m_objSerializing.push(object_to_write_to);
     readFields(soot_class, true);
     readFields(soot_class, false);
     m_CurrObj.pop();
-    m_ObjSerializing.pop();
+    m_objSerializing.pop();
    
     bcl_mem.finishReading();
 
@@ -408,7 +416,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl.openClass(class_name);
     SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
     bcl.startMethod("edu_syr_pcpratts_readFromHeap"+specialization, VoidType.v(), mem.getType(), gc_obj_visit.getType());
-    m_ObjSerializing.push(bcl.refThis());
+    m_objSerializing.push(bcl.refThis());
     m_currMem.push(bcl.refParameter(0));
     m_gcObjVisitor.push(bcl.refParameter(1));
     
@@ -425,7 +433,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl.returnVoid();
     bcl.endMethod();
     
-    m_ObjSerializing.pop();
+    m_objSerializing.pop();
     m_currMem.pop();
     m_gcObjVisitor.pop();
     m_bcl.pop();
@@ -461,7 +469,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     if(do_ref_fields){
       List<OpenCLField> ref_fields = getRefFields(soot_class);
       for(OpenCLField ref_field : ref_fields){
-        if(m_FieldInspector.fieldIsWrittenOnGpu(ref_field)){
+        if(m_fieldInspector.fieldIsWrittenOnGpu(ref_field)){
           //increment the address to get to this location
           bcl_mem.incrementAddress(inc_size);
           inc_size = 0;
@@ -479,7 +487,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     } else {
       List<OpenCLField> non_ref_fields = getNonRefFields(soot_class);
       for(OpenCLField non_ref_field : non_ref_fields){
-        if(m_FieldInspector.fieldIsWrittenOnGpu(non_ref_field)){
+        if(m_fieldInspector.fieldIsWrittenOnGpu(non_ref_field)){
           //increment the address to get to this location
           if(inc_size > 0){
             bcl_mem.incrementAddress(inc_size);
@@ -510,7 +518,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     BytecodeLanguage bcl = m_bcl.top();
     Local gc_obj_visit = m_gcObjVisitor.top();
     bcl.pushMethod(class_name, "edu_syr_pcpratts_readFromHeap"+specialization, VoidType.v(), mem.getType(), gc_obj_visit.getType());
-    bcl.invokeMethodNoRet(m_ObjSerializing.top(), m_currMem.top(), gc_obj_visit); 
+    bcl.invokeMethodNoRet(m_objSerializing.top(), m_currMem.top(), gc_obj_visit); 
   }
 
 }

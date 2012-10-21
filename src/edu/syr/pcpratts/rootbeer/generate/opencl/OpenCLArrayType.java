@@ -80,6 +80,16 @@ public class OpenCLArrayType {
     ret.add(function_qual+" "+getAssignType()+" "+getDerefTypeString()+"_get("+address_qual+" char * gc_info, int thisref, int parameter0, int * exception)");
     ret.add(function_qual+" void "+getDerefTypeString()+"_set("+address_qual+" char * gc_info, int thisref, int parameter0, "+getAssignType()+" parameter1, int * exception)");
     ret.add(function_qual+" int "+getDerefTypeString()+"_new("+address_qual+" char * gc_info, int size, int * exception)");
+    
+    String multi_dim_decl = "";
+    multi_dim_decl += function_qual+" int "+getDerefTypeString()+"_new_multi_array";
+    multi_dim_decl += "("+address_qual+" char * gc_info, ";
+    for(int i = 0; i < m_arrayType.numDimensions; ++i){
+      multi_dim_decl += "int dim"+i+", ";
+    }
+    multi_dim_decl += "int * exception)";
+    ret.add(multi_dim_decl);
+    
     return ret;
   }
   
@@ -102,7 +112,7 @@ public class OpenCLArrayType {
   
   public String invokeNewMultiArrayExpr(NewMultiArrayExpr arg0){
     StringBuilder ret = new StringBuilder();
-    ret.append(getDerefTypeString()+"_new_multi_array_"+arg0.getSizeCount()+"(gc_info, ");
+    ret.append(getDerefTypeString()+"_new_multi_array(gc_info, ");
     MethodJimpleValueSwitch quick_value_switch = new MethodJimpleValueSwitch(ret);
     for(int i = 0; i < arg0.getSizeCount(); ++i){
       arg0.getSize(i).apply(quick_value_switch);
@@ -187,6 +197,34 @@ public class OpenCLArrayType {
     ret.append("}\n");
     ret.append("return thisref;\n");
     ret.append("}\n");   
+    
+    String multi_decl = decls.get(3);
+    int dim = m_arrayType.numDimensions; 
+    //new multi-dimensional
+    ret.append(multi_decl+"{\n");
+    ret.append("int total_size = (dim0 * 8) + "+offset_size+";\n"); 
+    for(int i = 0; i < dim; ++i){
+      ret.append("int index"+i+";\n");
+    }
+    ret.append("int mod = total_size % 8;\n");
+    ret.append("if(mod != 0)\n");
+    ret.append("  total_size += (8 - mod);\n");
+    ret.append("int thisref = edu_syr_pcpratts_gc_malloc(gc_info, total_size);\n");
+    ret.append("if(thisref == -1){\n");
+    ret.append("  return -1;\n");
+    ret.append("}\n");
+    ret.append(address_qual+" char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
+    ret.append("\n//class info\n");
+    ret.append("edu_syr_pcpratts_gc_set_count(thisref_deref, 0);\n");
+    ret.append("edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY);\n");
+    ret.append("edu_syr_pcpratts_gc_set_type(thisref_deref, "+Integer.toString(derived_type)+");\n");
+    ret.append("edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1);\n");
+    ret.append("edu_syr_pcpratts_gc_set_size(thisref_deref, total_size);\n");
+    ret.append("edu_syr_pcpratts_setint(thisref_deref, 8, dim0);\n");
+    ret.append(multiInitString(dim));
+    ret.append("return thisref;\n");
+    ret.append("}\n");
+    
     return ret.toString();
   }
 

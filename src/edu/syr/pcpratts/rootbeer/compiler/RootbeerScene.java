@@ -10,8 +10,8 @@ package edu.syr.pcpratts.rootbeer.compiler;
 import edu.syr.pcpratts.rootbeer.classloader.DfsInfo;
 import java.util.ArrayList;
 import java.util.List;
-import soot.Scene;
-import soot.SootClass;
+import soot.*;
+import soot.util.NumberedString;
 
 public class RootbeerScene {
 
@@ -78,5 +78,21 @@ public class RootbeerScene {
   
   public DfsInfo getDfsInfo(){
     return m_dfsInfo;
+  }
+
+  public SootMethod getMethod(SootClass soot_class, String subSignature) {
+    SootClass curr_class = soot_class;
+    while(true){
+      try { 
+        SootMethod ret = curr_class.getMethod(subSignature);
+        return ret;
+      } catch(Exception ex){
+        if(curr_class.hasSuperclass() == false){
+          break;
+        }
+        curr_class = curr_class.getSuperclass();
+      }
+    }
+    throw new RuntimeException("cannot find method: "+subSignature+" in class: "+soot_class);
   }
 }

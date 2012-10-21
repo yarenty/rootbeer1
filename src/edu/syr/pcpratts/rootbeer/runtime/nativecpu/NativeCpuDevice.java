@@ -10,6 +10,7 @@ package edu.syr.pcpratts.rootbeer.runtime.nativecpu;
 import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 import edu.syr.pcpratts.rootbeer.runtime.CompiledKernel;
+import edu.syr.pcpratts.rootbeer.runtime.Serializer;
 import edu.syr.pcpratts.rootbeer.runtime.gpu.GcHeap;
 import edu.syr.pcpratts.rootbeer.runtime.gpu.GpuDevice;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BasicMemory;
@@ -50,8 +51,9 @@ public class NativeCpuDevice implements GpuDevice {
     BasicMemory gc_info = (BasicMemory) mems.get(3);
     BasicMemory exceptions = (BasicMemory) mems.get(4);
     
+    Serializer serializer = heap.getSerializer();
     runOnCpu(to_space.getBuffer(), to_space.getBuffer().size(), handles.getBuffer().get(0), heap_end_ptr.getBuffer().get(0),
-      gc_info.getBuffer().get(0), exceptions.getBuffer().get(0), size, lib_name);
+      gc_info.getBuffer().get(0), exceptions.getBuffer().get(0), serializer.getClassRefArray(), size, lib_name);
     
     PartiallyCompletedParallelJob ret = heap.readRuntimeBasicBlocks();    
     return ret;
@@ -59,7 +61,7 @@ public class NativeCpuDevice implements GpuDevice {
   
   private native void runOnCpu(List<byte[]> to_space, int to_space_size, 
     byte[] handles, byte[] heap_end_ptr, byte[] gc_info, byte[] exceptions, 
-    int num_threads, String library_name);
+    int[] java_lang_class_refs, int num_threads, String library_name);
 
   public long getMaxMemoryAllocSize() {
     return 1024*1024*1024;

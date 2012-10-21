@@ -7,7 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.classloader;
 
-import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
+import edu.syr.pcpratts.rootbeer.compiler.ClassRemapping;
+import edu.syr.pcpratts.rootbeer.util.MethodSignatureUtil;
 import edu.syr.pcpratts.rootbeer.util.SystemOutHandler;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -17,6 +18,9 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.*;
 import soot.*;
+import soot.jimple.Stmt;
+import soot.jimple.toolkits.callgraph.CallGraph;
+import soot.jimple.toolkits.callgraph.Edge;
 
 public class FastWholeProgram {
   private static FastWholeProgram m_instance;
@@ -85,8 +89,7 @@ public class FastWholeProgram {
     m_ignorePackages.add("ppg.");
     m_ignorePackages.add("antlr.");
     m_ignorePackages.add("jas.");
-    m_ignorePackages.add("scm.");  
-    m_ignorePackages.add("java.");
+    m_ignorePackages.add("scm.");
     m_ignorePackages.add("org.xmlpull.v1.");
     m_ignorePackages.add("android.util.");
     m_ignorePackages.add("android.content.res.");
@@ -231,16 +234,22 @@ public class FastWholeProgram {
       while(iter.hasNext()){
         SootClass curr = iter.next();
         if(curr.getName().equals("edu.syr.pcpratts.rootbeer.runtime.Kernel")){
-          m_kernelClasses.add(soot_class);
-          m_resolver.resolveClass(soot_class.getName(), SootClass.BODIES);
+          if(m_kernelClasses.contains(soot_class) == false){
+            m_kernelClasses.add(soot_class);
+            m_resolver.resolveClass(soot_class.getName(), SootClass.BODIES);
+          }
         }
         if(curr.getName().equals("edu.syr.pcpratts.rootbeer.test.TestException")){
-          m_testFactoryClasses.add(soot_class);
-          m_resolver.resolveClass(soot_class.getName(), SootClass.BODIES);
+          if(m_testFactoryClasses.contains(curr) == false){
+            m_testFactoryClasses.add(soot_class);
+            m_resolver.resolveClass(soot_class.getName(), SootClass.BODIES);
+          }
         } 
         if(curr.getName().equals("edu.syr.pcpratts.rootbeer.test.TestSerialization")){
-          m_testFactoryClasses.add(soot_class);
-          m_resolver.resolveClass(soot_class.getName(), SootClass.BODIES);
+          if(m_testFactoryClasses.contains(curr) == false){
+            m_testFactoryClasses.add(soot_class);
+            m_resolver.resolveClass(soot_class.getName(), SootClass.BODIES);
+          }
         } 
       }
     }
@@ -251,8 +260,8 @@ public class FastWholeProgram {
   }
 
   private SootMethod fullyResolveMethod(String method_signature, boolean force_resolve){
-    SignatureUtil util = new SignatureUtil();
-    final String soot_class_str = util.classFromMethodSig(method_signature);
+    MethodSignatureUtil util = new MethodSignatureUtil(method_signature);
+    final String soot_class_str = util.getClassName();
     if(m_resolvedMethods.contains(method_signature)){
       return m_resolver.resolveMethod(method_signature);
     }
@@ -586,6 +595,15 @@ public class FastWholeProgram {
     }
     return false;
   }
+  
+  public boolean shouldDfsMethod(SootMethod method){
+    SootClass soot_class = method.getDeclaringClass();
+    String pkg = soot_class.getPackageName();
+    if(ignorePackage(pkg)){
+      return false;
+    } 
+    return true;
+  }
 
   private String classToFilename(String name) {
     name = name.replace(".", "/");
@@ -608,8 +626,8 @@ public class FastWholeProgram {
     }
   }
 
-  public void singleKernel() {
-    m_currDfsInfo = new DfsInfo();
+  public void singleKernel(SootMethod kernel_method) {
+    m_currDfsInfo = new DfsInfo(kernel_method);
     m_singleKernel = true;
   }
 
@@ -617,14 +635,17 @@ public class FastWholeProgram {
     return m_kernelClasses;
   }
 
-  public void execDFS(SootMethod kernel_method) {
-    m_currDfsInfo = new DfsInfo();    
+  public void fullyLoad(SootMethod kernel_method, boolean find_reachables) {
+    System.out.println("running dfs on: "+kernel_method.getDeclaringClass().getName()+"...");
+    m_currDfsInfo = new DfsInfo(kernel_method);    
     m_dfsInfos.put(kernel_method, m_currDfsInfo);
     
     doDfs(kernel_method);
-    m_currDfsInfo.expandArrayTypes();
-    m_currDfsInfo.orderTypes();
-    m_currDfsInfo.createClassHierarchy();
+    buildFullCallGraph(kernel_method);
+    if(find_reachables){
+      findReachableMethods();
+    }
+    buildHierarchy();
   }
   
   private void doDfs(SootMethod method){
@@ -633,7 +654,7 @@ public class FastWholeProgram {
       return;
     }
     m_currDfsInfo.addMethod(signature);
-    
+        
     SootClass soot_class = method.getDeclaringClass();
     addType(soot_class.getType());
     
@@ -645,12 +666,21 @@ public class FastWholeProgram {
       addType(type);
     }
     
-    Set<SootMethodRef> methods = value_switch.getMethodRefs();
-    for(SootMethodRef ref : methods){
-      SootClass method_class = ref.declaringClass();
+    Set<DfsMethodRef> methods = value_switch.getMethodRefs();
+    for(DfsMethodRef ref : methods){
+      SootMethodRef mref = ref.getSootMethodRef();
+      SootClass method_class = mref.declaringClass();
+      m_resolver.resolveClass(method_class.getName(), SootClass.BODIES);
+      SootMethod dest = mref.resolve();
+
+      if(dest.isConcrete() == false){
+        continue;
+      } 
+      
       addType(method_class.getType());
       
-      doDfs(ref.resolve());
+      m_currDfsInfo.addCallGraphEdge(method, ref.getStmt(), dest);
+      doDfs(dest);
     }
     
     Set<SootFieldRef> fields = value_switch.getFieldRefs();
@@ -659,6 +689,20 @@ public class FastWholeProgram {
       
       SootField field = ref.resolve();
       m_currDfsInfo.addField(field);
+    }
+    
+    Set<Type> instance_ofs = value_switch.getInstanceOfs();
+    for(Type type : instance_ofs){
+      m_currDfsInfo.addInstanceOf(type);
+    }
+    
+    while(soot_class.hasSuperclass()){
+      SootClass super_class = soot_class.getSuperclass();
+      if(super_class.declaresMethod(method.getSubSignature())){
+        SootMethod super_method = super_class.getMethod(method.getSubSignature());
+        doDfs(super_method);
+      }
+      soot_class = super_class;
     }
   }
 
@@ -672,6 +716,8 @@ public class FastWholeProgram {
       if(m_currDfsInfo.containsType(curr)){
         continue;
       }
+        
+      m_currDfsInfo.addType(curr);
       
       SootClass type_class = findTypeClass(curr);
       if(type_class == null){
@@ -679,8 +725,6 @@ public class FastWholeProgram {
       }
       
       type_class = m_resolver.resolveClass(type_class.getName(), SootClass.SIGNATURES);
-      
-      m_currDfsInfo.addType(curr);
       
       if(type_class.hasSuperclass()){
         queue.add(type_class.getSuperclass().getType());
@@ -709,5 +753,88 @@ public class FastWholeProgram {
 
   public FastClassResolver getResolver() {
     return m_resolver;
+  }
+
+  public void buildFullCallGraph(SootMethod kernel_method) {
+    System.out.println("building full call graph for: "+kernel_method.getDeclaringClass().getName()+"...");
+    List<String> methods = new ArrayList<String>();
+    for(String cls : m_applicationClasses){
+      SootClass soot_class = m_resolver.resolveClass(cls, SootClass.BODIES);
+      for(SootMethod method : soot_class.getMethods()){
+        methods.add(method.getSignature());
+      }
+    }
+    
+    MethodSignatureUtil util = new MethodSignatureUtil();
+    for(int i = 0; i < methods.size(); ++i){
+      String method_sig = methods.get(i);
+      util.parse(method_sig);
+      SootClass soot_class = Scene.v().getSootClass(util.getClassName());
+      SootMethod method = soot_class.getMethod(util.getMethodSubSignature());
+      
+      if(method.isConcrete() == false){
+        continue;
+      }
+        
+      DfsValueSwitch value_switch = new DfsValueSwitch();
+      value_switch.run(method);
+        
+      Set<DfsMethodRef> method_refs = value_switch.getMethodRefs();
+      for(DfsMethodRef dfs_ref : method_refs){
+        m_currDfsInfo.addCallGraphEdge(method, dfs_ref.getStmt(), dfs_ref.getSootMethodRef().resolve());
+      }
+    }
+  }
+
+  public void findReachableMethods() {
+    
+    List<SootMethod> queue = new LinkedList<SootMethod>();
+    Set<SootMethod> visited = new HashSet<SootMethod>();
+    
+    SootMethod root_method = m_currDfsInfo.getRootMethod();
+    CallGraph call_graph = m_currDfsInfo.getCallGraph();
+            
+    SootClass soot_class = root_method.getDeclaringClass();
+    
+    for(SootMethod method : soot_class.getMethods()){
+      Iterator<Edge> into = call_graph.edgesInto(method);
+      addToQueue(into, queue, visited);
+    }
+    
+    while(queue.isEmpty() == false){
+      SootMethod curr = queue.get(0);
+      queue.remove(0);
+      
+      doDfs(curr);
+      
+      Iterator<Edge> curr_into = call_graph.edgesInto(curr);
+      
+      addToQueue(curr_into, queue, visited);
+    }
+  }
+  
+  private void addToQueue(Iterator<Edge> edges, List<SootMethod> queue, Set<SootMethod> visited){
+    while(edges.hasNext()){
+      Edge edge = edges.next();
+      
+      SootMethod src = edge.src();
+      if(visited.contains(src) == false && FastWholeProgram.v().shouldDfsMethod(src)){
+        queue.add(src);
+        visited.add(src);
+      }
+      
+      SootMethod dest = edge.tgt();
+      if(visited.contains(dest) == false && FastWholeProgram.v().shouldDfsMethod(dest)){
+        queue.add(dest);
+        visited.add(dest);
+      }
+    }
+  }
+
+  public void buildHierarchy(){   
+    System.out.println("building class hierarchy...");
+    m_currDfsInfo.expandArrayTypes();
+    m_currDfsInfo.orderTypes();
+    m_currDfsInfo.createClassHierarchy(); 
   }
 }

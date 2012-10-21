@@ -39,9 +39,9 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     m_orderedHistory = RootbeerScene.v().getDfsInfo().getOrderedRefTypes();
     m_writeToHeapMethodsMade = new HashSet<RefType>();
     m_attachedReaders = new HashSet<String>();
-    m_ObjSerializing = new Stack<Local>();
+    m_objSerializing = new Stack<Local>();
     m_staticOffsets = new StaticOffsets();
-    m_FieldInspector = inspector;
+    m_fieldInspector = inspector;
     m_currMem = new Stack<Local>();
   }
   
@@ -99,7 +99,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     
     BclMemory bcl_mem = new BclMemory(bcl, memory);
     for(OpenCLField field : static_fields){
-      if(m_FieldInspector.fieldIsWrittenOnGpu(field) == false)
+      if(m_fieldInspector.fieldIsWrittenOnGpu(field) == false)
         continue;
       
       int index = m_staticOffsets.getIndex(field);
@@ -125,7 +125,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
 
   private void attachAndCallReader(SootClass soot_class, List<SootClass> children) {
     String class_name = soot_class.getName();
-    if(m_ClassesToIgnore.contains(class_name))
+    if(m_classesToIgnore.contains(class_name))
       return;
     
     attachReader(soot_class, children);

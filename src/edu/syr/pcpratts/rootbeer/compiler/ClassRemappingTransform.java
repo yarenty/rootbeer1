@@ -8,7 +8,7 @@
 package edu.syr.pcpratts.rootbeer.compiler;
 
 import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
-import edu.syr.pcpratts.rootbeer.util.SignatureUtil;
+import edu.syr.pcpratts.rootbeer.util.MethodSignatureUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,9 +32,8 @@ public class ClassRemappingTransform {
   private ClassRemapping m_classRemapping;
   private Map<SootField, List<FieldRef>> m_fieldsToFix; 
   private Set<String> m_modified;
-  private String m_currClass;
-  private boolean m_hasNext;
-  private boolean m_appClass;
+  private List<SootMethod> m_addedMethods;
+  private SootMethod m_currMethod;
   
   public ClassRemappingTransform(boolean map_runtime){
     m_classRemapping = new ClassRemapping();
@@ -43,29 +42,25 @@ public class ClassRemappingTransform {
     }
     m_fieldsToFix = new HashMap<SootField, List<FieldRef>>();
     m_modified = new HashSet<String>();
-    m_hasNext = true;
+    m_addedMethods = new ArrayList<SootMethod>();
   }
-  
-  public void reset(){
-    m_hasNext = false;
-  }
-  
+    
   public void run(List<String> reachable_methods){
-    Set<String> visited = new HashSet<String>();
-    SignatureUtil sig_util = new SignatureUtil();
-    for(String method_sig : reachable_methods){
-      if(visited.contains(method_sig)){
-        continue;
-      }
-      visited.add(method_sig);
-      
-      String cls_name = sig_util.classFromMethodSig(method_sig);
+    Set<SootClass> reachable_classes = new HashSet<SootClass>();
+    for(String method : reachable_methods){
+      MethodSignatureUtil sig_util = new MethodSignatureUtil(method);
+      String cls_name = sig_util.getClassName();
       SootClass soot_class = Scene.v().getSootClass(cls_name);
-      m_appClass = FastWholeProgram.v().isApplicationClass(soot_class);
-      m_currClass = cls_name;
-      String sub_sig = sig_util.methodSubSigFromMethodSig(method_sig);
-      SootMethod soot_method = soot_class.getMethod(sub_sig);
-      visit(soot_method);
+      if(reachable_classes.contains(soot_class) == false){
+        reachable_classes.add(soot_class);
+      }
+    }
+    
+    for(SootClass curr : reachable_classes){
+      List<SootMethod> methods = curr.getMethods();
+      for(SootMethod method : methods){
+        visit(method);
+      }
     }
   }
   
@@ -75,9 +70,7 @@ public class ClassRemappingTransform {
   }
   
   private void run(String cls, boolean app_class){
-    m_currClass = cls;
     SootClass soot_class = Scene.v().getSootClass(cls);
-    m_appClass = app_class;
     List<SootMethod> methods = soot_class.getMethods();
     for(SootMethod method : methods){
       visit(method);
@@ -99,16 +92,11 @@ public class ClassRemappingTransform {
     return ret;
   }
   
-  public void setModified(){
-    m_modified.add(m_currClass);
-  }
-  
   public void fixFields(){
     Iterator<SootField> iter = m_fieldsToFix.keySet().iterator();
     while(iter.hasNext()){
       SootField curr = iter.next();
       SootClass soot_class = curr.getDeclaringClass();
-      m_appClass = FastWholeProgram.v().isApplicationClass(soot_class);
       SootField orig = curr;
       SootClass field_cls = curr.getDeclaringClass();
       if(shouldMap(field_cls)){
@@ -152,6 +140,9 @@ public class ClassRemappingTransform {
     Body body = method.retrieveActiveBody();
     if(body == null)
       return;
+    
+    m_currMethod = method;
+    
     fixArguments(method);
     Iterator<Unit> iter = body.getUnits().iterator();
     while(iter.hasNext()){
@@ -200,11 +191,11 @@ public class ClassRemappingTransform {
       if(shouldMap(soot_class)){
     	  SootClass new_class = getMapping(soot_class);
     	  if (new_class.declaresMethod(subSignature)) {
-    		  SootMethod new_method = new_class.getMethod(subSignature);
+    		  SootMethod new_method = RootbeerScene.v().getMethod(new_class, subSignature.getString());
+          addAddedMethod(new_method);
     		  fixArguments(new_method);
+          RootbeerScene.v().getDfsInfo().addReachableMethodSig(new_method.getSignature());
     		  expr.setMethodRef(new_method.makeRef());
-    	  } else {
-    		  System.err.println("method not found: " + subSignature);
     	  }
       } else {
     	  if(soot_class.declaresMethod(ref.getSubSignature())){
@@ -218,6 +209,7 @@ public class ClassRemappingTransform {
           soot_class = getMapping(soot_class);
         }
         SootMethod method = soot_class.getMethod(ref.getSubSignature());
+        RootbeerScene.v().getDfsInfo().addReachableMethodSig(method.getSignature());
         expr.setMethodRef(method.makeRef());
       } catch(Exception ex){
         //ex.printStackTrace();
@@ -277,18 +269,13 @@ public class ClassRemappingTransform {
   }
 
   private boolean shouldMap(SootClass soot_class) {
-    if(m_appClass){
-      if(m_classRemapping.containsKey(soot_class.getName())){
-        setModified();
-        return true;
-      } else {
-        return false;
+    if(m_classRemapping.containsKey(soot_class.getName())){
+      String curr_class = m_currMethod.getDeclaringClass().toString();
+      if(m_modified.contains(curr_class) == false){
+        m_modified.add(curr_class);
       }
+      return true;
     } else {
-      if(m_classRemapping.containsKey(soot_class.getName()) && !m_classRemapping.cloned(m_currClass)){
-        m_hasNext = true;
-        m_classRemapping.cloneClass(m_currClass);
-      }
       return false;
     }
   }
@@ -365,29 +352,21 @@ public class ClassRemappingTransform {
     }
   }
 
-  public boolean hasNext() {
-    return m_hasNext;
-  }
-/*
-  private String remapMethodSig(String method_sig) {
-    SignatureUtil util = new SignatureUtil();
-    String cls = util.classFromMethodSig(method_sig);
-    String method_name = util.methodName(method_sig);
-    String return_type = util.getReturnType(method_sig);
-    List<String> params = util.getMethodParams(method_sig);
-    cls = stringRemap(cls);
-    for(int i = 0; i < params.size(); ++i){
-      params.set(i, stringRemap(params.get(i)));
-    }
-    String new_sig = util.buildSignature(cls, method_name, return_type, params);
+  public List<Type> getErasedTypes(){
+    return m_classRemapping.getErasedTypes();
   }
 
-  private String stringRemap(String type){
-    if(m_classRemapping.containsKey(type)){
-      m_hasNext = true;
-      return m_classRemapping.get(type);
-    }
-    return type;
+  public List<Type> getAddedTypes() {
+    return m_classRemapping.getAddedTypes();
   }
-  */
+
+  public List<SootMethod> getAddedMethods() {
+    return m_addedMethods;
+  }
+
+  private void addAddedMethod(SootMethod new_method) {
+    if(m_addedMethods.contains(new_method) == false){
+      m_addedMethods.add(new_method);
+    }
+  }
 }

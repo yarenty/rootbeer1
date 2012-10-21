@@ -10,7 +10,6 @@ package edu.syr.pcpratts.rootbeer.generate.bytecode;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
-import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -180,10 +179,10 @@ public class FieldReadWriteInspector {
 
     Body body;
     try {
-      body = method.getActiveBody();
+      body = method.retrieveActiveBody();
     } catch(RuntimeException ex){
       //no body for method...
-      System.out.println("No body for method: "+method.toString());
+      System.out.println("no body for method: "+method.toString());
       return;
     }
 

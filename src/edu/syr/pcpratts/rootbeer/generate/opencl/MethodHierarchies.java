@@ -93,8 +93,10 @@ public class MethodHierarchies {
         
     public boolean isPolyMorphic(){
       List<Type> class_hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
-      if(class_hierarchy.size() > 1)
+      IsPolyMorphic poly_checker = new IsPolyMorphic();
+      if(poly_checker.isPoly(m_sootMethod, class_hierarchy)){
         return true;
+      }
       return false;
     }
     

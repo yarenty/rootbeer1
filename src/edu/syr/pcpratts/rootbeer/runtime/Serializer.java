@@ -7,11 +7,15 @@
 
 package edu.syr.pcpratts.rootbeer.runtime;
 
+import com.sun.java.swing.plaf.windows.WindowsTreeUI;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
+import edu.syr.pcpratts.rootbeer.runtime.remap.GpuAtomicLong;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public abstract class Serializer {
 
@@ -19,13 +23,17 @@ public abstract class Serializer {
   public Memory mTextureMem;
 
   private static final Map<Object, Long> mWriteToGpuCache;
+  private static final Map<Long, Object> mReverseWriteToGpuCache;
   private static final Map<Long, Object> mReadFromGpuCache;
+  private static Map<Long, Integer> m_classRefToTypeNumber;
   
   private ReadOnlyAnalyzer m_Analyzer;
   
   static {
     mWriteToGpuCache = new IdentityHashMap<Object, Long>();
+    mReverseWriteToGpuCache = new HashMap<Long, Object>();
     mReadFromGpuCache = new HashMap<Long, Object>();
+    m_classRefToTypeNumber = new HashMap<Long, Integer>();
   }
   
   public Serializer(Memory mem, Memory texture_mem){
@@ -33,6 +41,8 @@ public abstract class Serializer {
     mTextureMem = texture_mem;
     mReadFromGpuCache.clear();
     mWriteToGpuCache.clear();
+    mReverseWriteToGpuCache.clear();
+    m_classRefToTypeNumber.clear();
   }
   
   public void setAnalyzer(ReadOnlyAnalyzer analyzer){
@@ -47,7 +57,7 @@ public abstract class Serializer {
     return writeToHeap(o, true);
   }
   
-  private class WriteCacheResult {
+  private static class WriteCacheResult {
     public long m_Ref;
     public boolean m_NeedToWrite;
     public WriteCacheResult(long ref, boolean need_to_write){
@@ -56,21 +66,42 @@ public abstract class Serializer {
     }
   }
   
-  private WriteCacheResult checkWriteCache(Object o, int size, boolean read_only){
+  public void addClassRef(long ref, int class_number){
+    m_classRefToTypeNumber.put(ref, class_number);
+  }
+  
+  public int[] getClassRefArray(){
+    int max_type = 0;
+    for(int num : m_classRefToTypeNumber.values()){
+      if(num > max_type){
+        max_type = num;
+      }
+    }
+    int[] ret = new int[max_type+1];
+    for(long value : m_classRefToTypeNumber.keySet()){
+      int pos = m_classRefToTypeNumber.get(value);
+      ret[pos] = (int) (value >> 4);
+    }
+    return ret;
+  }
+  
+  private static synchronized WriteCacheResult checkWriteCache(Object o, int size, boolean read_only, Memory mem){
+    if(mWriteToGpuCache.containsKey(o)){
+      long ref = mWriteToGpuCache.get(o);
+      return new WriteCacheResult(ref, false);
+    }
+    long ref = mem.mallocWithSize(size);
+    mWriteToGpuCache.put(o, ref);
+    mReverseWriteToGpuCache.put(ref, o);
+    return new WriteCacheResult(ref, true);
+  }
+  
+  public Object writeCacheFetch(long ref){
     synchronized(mWriteToGpuCache){
-      if(mWriteToGpuCache.containsKey(o)){
-        long ref = mWriteToGpuCache.get(o);
-        return new WriteCacheResult(ref, false);
+      if(mReverseWriteToGpuCache.containsKey(ref)){
+        return mReverseWriteToGpuCache.get(ref);
       }
-      Memory mem;
-      if(read_only){
-        mem = mTextureMem;
-      } else {
-        mem = mMem;
-      }
-      long ref = mem.mallocWithSize(size);
-      mWriteToGpuCache.put(o, ref);
-      return new WriteCacheResult(ref, true);
+      return null;
     }
   }
   
@@ -80,7 +111,7 @@ public abstract class Serializer {
     int size = doGetSize(o);
     boolean read_only = false;
     WriteCacheResult result;
-    result = checkWriteCache(o, size, read_only);
+    result = checkWriteCache(o, size, read_only, mMem);
     if(result.m_NeedToWrite == false)
       return result.m_Ref;
     doWriteToHeap(o, write_data, result.m_Ref, read_only);
@@ -123,7 +154,8 @@ public abstract class Serializer {
       try {
         Field f = cls.getDeclaredField(name);
         f.setAccessible(true);
-        return f.get(base);      
+        Object ret = f.get(base);      
+        return ret;
       } catch(Exception ex){
         cls = cls.getSuperclass();
       }

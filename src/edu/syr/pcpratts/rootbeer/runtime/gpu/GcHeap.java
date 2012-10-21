@@ -41,7 +41,7 @@ public abstract class GcHeap {
   protected Memory mGcInfoSpaceMemory;
   protected Memory mExceptionsMemory;
 
-  private Serializer mGcObjectVisitor;
+  protected Serializer mGcObjectVisitor;
   private boolean mUsingGarbageCollector;
   private int m_CountWritten;
   private List<Long> m_HandlesList;

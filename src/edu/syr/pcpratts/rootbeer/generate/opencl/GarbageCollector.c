@@ -4,9 +4,6 @@
 #define GC_OBJ_TYPE_CTOR_USED char
 #define GC_OBJ_TYPE_SIZE int
 
-typedef int boolean;
-typedef int byte;
-
 #define COLOR_GREY 0
 #define COLOR_BLACK 1
 #define COLOR_WHITE 2
@@ -16,6 +13,8 @@ $$__device__$$ void edu_syr_pcpratts_gc_assign($$__global$$ char * gc_info, int 
 $$__device__$$ $$__global$$ char * edu_syr_pcpratts_gc_deref($$__global$$ char * gc_info, int handle);
 $$__device__$$ int edu_syr_pcpratts_gc_malloc($$__global$$ char * gc_info, long long size);
 $$__device__$$ long long edu_syr_pcpratts_gc_malloc_no_fail($$__global$$ char * gc_info, long long size);
+$$__device__$$ int edu_syr_pcpratts_classConstant(int type_num);
+$$__device__$$ long long java_lang_System_nanoTime($$__global$$ char * gc_info, int * exception);
 
 #define CACHE_SIZE_BYTES 32
 #define CACHE_SIZE_INTS (CACHE_SIZE_BYTES / sizeof(int))
@@ -140,6 +139,11 @@ boolean edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu($$__global$$ char 
 $$__device__$$ 
 int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId($$__global$$ char * gc_info, int * exception){
   return getThreadId();
+}
+
+$$__device__$$ 
+long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef($$__global$$ char * gc_info, int ref, int * exception){
+  return ref;
 }
 
 $$__device__$$ char
@@ -338,6 +342,7 @@ edu_syr_pcpratts_strlen(char * str_constant){
   }
 }
 
+
 $$__device__$$ int 
 char__array_new($$__global$$ char * gc_info, int size, int * exception);
 
@@ -437,4 +442,44 @@ java_lang_VirtualMachineError_initab850b60f96d11de8a390800200c9a66_body0_(gc_inf
  thisref, exception);
 //return
 return thisref;
+}
+
+
+$$__device__$$ int
+java_lang_Object_hashCode($$__global$$ char * gc_info, int thisref, int * exception){
+  return thisref;
+}
+
+$$__device__$$ int
+java_lang_Class_getName( char * gc_info , int thisref , int * exception ) { 
+  int $r1 =-1 ; 
+  $r1 = instance_getter_java_lang_Class_name ( gc_info , thisref , exception ) ; 
+  if ( * exception != 0 ) { 
+    return 0 ; 
+  } 
+  return $r1;
+}
+
+$$__device__$$ int
+java_lang_Object_getClass( char * gc_info , int thisref, int * exception ) { 
+  char * mem_loc = edu_syr_pcpratts_gc_deref(gc_info, thisref);
+  int type = edu_syr_pcpratts_gc_get_type(mem_loc);
+  return edu_syr_pcpratts_classConstant(type);
+}
+
+$$__device__$$ int
+java_lang_StringValue_from( char * gc_info , int thisref, int * exception ) { 
+  int i, size, new_ref;
+  char * mem_loc, * new_mem_loc;
+  
+  mem_loc = edu_syr_pcpratts_gc_deref(gc_info, thisref);
+  size = edu_syr_pcpratts_gc_get_size(mem_loc);
+  new_ref = edu_syr_pcpratts_gc_malloc(gc_info, size);
+  new_mem_loc = edu_syr_pcpratts_gc_deref(gc_info, new_ref);
+  
+  for(i = 0; i < size; ++i){
+    new_mem_loc[i] = mem_loc[i];  
+  }
+  
+  return new_ref;
 }
