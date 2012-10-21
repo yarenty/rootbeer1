@@ -63,6 +63,14 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_unload
   (JNIEnv *, jobject);
 
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
+ * Method:    reinit
+ * Signature: (IIJ)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_reinit
+  (JNIEnv *, jobject, jint, jint, jlong);
+
 #ifdef __cplusplus
 }
 #endif

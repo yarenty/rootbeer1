@@ -149,19 +149,10 @@ public class CudaRuntime2 implements ParallelRuntime {
     }
   }
   
-  private native long findReserveMem(int max_blocks, int max_threads);
-  
   public void memoryTest(){
     MemoryTest test = new MemoryTest();
     test.run(m_ToSpace.get(0));
   }
-  
-  private native void setup(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
-  
-  /**
-   * Prints the cuda device details to the screen
-   */
-  public static native void printDeviceInfo();
   
   public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs){
     
@@ -298,19 +289,15 @@ public class CudaRuntime2 implements ParallelRuntime {
     loadFunction(getHeapEndPtr(), dest_filename, m_NumBlocksRun);
   }
   
-  private native void loadFunction(long heap_end_ptr, String filename, int num_blocks);
-  private native void writeClassTypeRef(int[] refs);
-  private native int runBlocks(int size, int block_shape, int grid_shape);
-  private native void unload();
-
   private void runOnGpu(){
     System.out.println("Running "+m_NumBlocksRun+" blocks.");
     System.out.println("BlockShape: "+m_BlockShape+" GridShape: "+m_GridShape);    
     
-    int status = runBlocks(m_NumBlocksRun, m_BlockShape, m_GridShape); 
-    if(status != 0){
-      System.out.println("Error running blocks: "+status);
-      System.exit(-1);
+    try {
+      runBlocks(m_NumBlocksRun, m_BlockShape, m_GridShape);
+    } catch(RuntimeException ex){
+      reinit(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), getReserveMem()); 
+      throw ex;
     }
   }  
     
@@ -422,4 +409,14 @@ public class CudaRuntime2 implements ParallelRuntime {
   public long getDeserializationTime() {
     return m_deserializationTime;
   }
+  
+  private native long findReserveMem(int max_blocks, int max_threads);
+  private native void setup(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
+  public static native void printDeviceInfo();
+  private native void loadFunction(long heap_end_ptr, String filename, int num_blocks);
+  private native void writeClassTypeRef(int[] refs);
+  private native int runBlocks(int size, int block_shape, int grid_shape);
+  private native void unload();
+  private native void reinit(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
+  
 }

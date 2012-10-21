@@ -165,6 +165,7 @@ public class RootbeerCompiler {
       transform2.run(soot_class.getName());
     }
     
+    System.out.println("writing classes out...");
     if(!Main.disable_class_remapping()){
       for(String cls : transform.getModifiedClasses()){
         loadAllMethods(cls);
