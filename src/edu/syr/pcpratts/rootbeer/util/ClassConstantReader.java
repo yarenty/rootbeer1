@@ -18,6 +18,9 @@ public class ClassConstantReader {
       dims++;
       value = value.substring(1);
     }
+    if(dims != 0 && value.charAt(0) == 'L'){
+      value = value.substring(1, value.length()-2);       
+    }
     value = value.replace("/", ".");
     Type base_type = getType(value);
     if(dims != 0){
@@ -45,7 +48,6 @@ public class ClassConstantReader {
     } else if(constant.equals("D")){
       return DoubleType.v();
     } else {
-      constant = constant.substring(1, constant.length()-2);
       return RefType.v(constant);
     }
   }
