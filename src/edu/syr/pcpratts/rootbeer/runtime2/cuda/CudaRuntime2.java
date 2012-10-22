@@ -276,7 +276,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     
     if(Configuration.getRunAllTests() == false){
       BufferPrinter printer = new BufferPrinter();
-      printer.print(m_ToSpace.get(0), 0, 720);
+      printer.print(m_ToSpace.get(0), 0, 896);
     }
 
     return true;
@@ -326,7 +326,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     
     if(Configuration.getRunAllTests() == false){
       BufferPrinter printer = new BufferPrinter();
-      printer.print(m_ToSpace.get(0), 0, 720);
+      printer.print(m_ToSpace.get(0), 0, 2048);
     }
     
     for(int i = 0; i < m_NumBlocksRun; ++i){
@@ -396,6 +396,7 @@ public class CudaRuntime2 implements ParallelRuntime {
       if(mem.getHeapEndPtr() > max)
         max = mem.getHeapEndPtr();
     }
+    System.out.println("heap end ptr: "+max);
     return max;
   }
 
