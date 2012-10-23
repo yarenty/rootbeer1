@@ -202,20 +202,6 @@ public class RootbeerCompiler {
       writeJimpleFile(app_class);
     }
     
-    /*
-    for(SootClass soot_class : kernel_classes){
-      SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
-      DfsInfo dfs_info = FastWholeProgram.v().getDfsInfo(kernel_method);
-      
-      List<RefType> ref_types = dfs_info.getOrderedRefTypes();
-      for(RefType cls : ref_types){
-        loadAllMethods(cls.getClassName());
-        writeClassFile(cls.getClassName());
-        writeJimpleFile(cls.getClassName());
-      }
-    }
-    */ 
-    
     List<String> added_classes = RootbeerScene.v().getAddedClasses();
     for(String cls : added_classes){
       loadAllMethods(cls);
