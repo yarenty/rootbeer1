@@ -17,7 +17,7 @@ public class Main {
   public int m_mode;
   private int m_num_args;
   private boolean m_runTests;
-  private static boolean m_disable_class_remapping=false;
+  private boolean m_disableClassRemapping;
   private String m_testCase;
   private boolean m_simpleCompile;
   private static boolean m_printDeviceInfo = false;
@@ -32,10 +32,6 @@ public class Main {
     m_directories = new ArrayList<String>();
     m_mode = Configuration.MODE_GPU;
     m_simpleCompile = false;
-  }
-
-  public static boolean disable_class_remapping(){
-    return m_disable_class_remapping;
   }
   
   public static boolean largeMemTests(){
@@ -75,7 +71,7 @@ public class Main {
       } else if(arg.equals("-printdeviceinfo")){
         m_printDeviceInfo = true;
       } else if(arg.equals("-disable-class-remapping")){
-        m_disable_class_remapping = true;
+        m_disableClassRemapping = true;
       } else if(arg.equals("-large-mem-tests")){
         m_largeMemTests = true;
       } else {      
@@ -116,15 +112,18 @@ public class Main {
       return;
     } 
     
+    RootbeerCompiler compiler = new RootbeerCompiler();
+    if(m_disableClassRemapping){
+      compiler.disableClassRemapping(); 
+    }
+    
     if(m_simpleCompile){
-      RootbeerCompiler compiler = new RootbeerCompiler();
       try {
         compiler.compile(m_mainJar, m_destJar);
       } catch(Exception ex){
         ex.printStackTrace();
       }
     } else {
-      RootbeerCompiler compiler = new RootbeerCompiler();
       try {
         compiler.compile(m_mainJar, m_libJars, m_directories, m_destJar);
       } catch(Exception ex){

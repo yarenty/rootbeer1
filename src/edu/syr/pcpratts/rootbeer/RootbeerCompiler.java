@@ -38,6 +38,7 @@ public class RootbeerCompiler {
   private String m_jimpleOutputFolder;
   private FastWholeProgram m_fastLoader;
   private String m_provider;
+  private boolean m_disableClassRemapping;
   
   public RootbeerCompiler(){
     clearOutputFolders();
@@ -51,7 +52,12 @@ public class RootbeerCompiler {
       Tweaks.setInstance(new NativeCpuTweaks());
     }
     
+    m_disableClassRemapping = false;
     m_fastLoader = FastWholeProgram.v();
+  }
+  
+  public void disableClassRemapping(){
+    m_disableClassRemapping = true; 
   }
   
   public void compile(String main_jar, List<String> lib_jars, List<String> dirs, String dest_jar) {
@@ -135,12 +141,12 @@ public class RootbeerCompiler {
     
     for(SootClass kernel : kernel_classes){
       SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
-      FastWholeProgram.v().fullyLoad(kernel_method, true);
+      FastWholeProgram.v().fullyLoad(kernel_method, true, m_disableClassRemapping);
     }
       
     ClassRemappingTransform transform = null;
     
-    if(!Main.disable_class_remapping()){
+    if(m_disableClassRemapping = false){
       System.out.println("remapping some classes to GPU versions...");
       
       for(SootClass kernel : kernel_classes){
@@ -153,7 +159,7 @@ public class RootbeerCompiler {
         transform.run(sigs);
         transform.finishClone();  
         
-        FastWholeProgram.v().fullyLoad(kernel_method, false);
+        FastWholeProgram.v().fullyLoad(kernel_method, false, m_disableClassRemapping);
         info = FastWholeProgram.v().getDfsInfo(kernel_method);
         info.setModifiedClasses(transform.getModifiedClasses());
         //info.outputClassTypes();
@@ -169,7 +175,7 @@ public class RootbeerCompiler {
     }
     
     System.out.println("writing classes out...");
-    if(!Main.disable_class_remapping()){
+    if(m_disableClassRemapping){
       
       for(SootClass kernel : kernel_classes){
         SootMethod kernel_method = kernel.getMethod("void gpuMethod()");

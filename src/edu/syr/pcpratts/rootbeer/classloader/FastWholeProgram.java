@@ -48,7 +48,8 @@ public class FastWholeProgram {
   private List<SootClass> m_kernelClasses;
   private List<SootClass> m_testFactoryClasses;
   private boolean m_singleKernel;
-
+  private boolean m_disableClassRemapping;
+  
   public static FastWholeProgram v(){
     if(m_instance == null){
       m_instance = new FastWholeProgram();
@@ -635,13 +636,16 @@ public class FastWholeProgram {
     return m_kernelClasses;
   }
 
-  public void fullyLoad(SootMethod kernel_method, boolean find_reachables) {
+  public void fullyLoad(SootMethod kernel_method, boolean find_reachables, boolean disable_class_remapping) {
     System.out.println("running dfs on: "+kernel_method.getDeclaringClass().getName()+"...");
+    m_disableClassRemapping = disable_class_remapping;
     m_currDfsInfo = new DfsInfo(kernel_method);    
     m_dfsInfos.put(kernel_method, m_currDfsInfo);
     
     doDfs(kernel_method);
-    buildFullCallGraph(kernel_method);
+    if(m_disableClassRemapping = false){
+      buildFullCallGraph(kernel_method);
+    }
     if(find_reachables){
       findReachableMethods();
     }
