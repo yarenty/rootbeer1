@@ -382,8 +382,13 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
         if(cuDeviceGetName(str,1024,dev) == CUDA_SUCCESS)
             printf("Name:                          %s\n", str);
         
-        if(cuMemGetInfo(&free_mem, &total_mem) == CUDA_SUCCESS)
+        if(cuMemGetInfo(&free_mem, &total_mem) == CUDA_SUCCESS){
+          #if (defined linux || defined __APPLE_CC__)
             printf("Total global memory:           %zu/%zu (Free/Total) MBytes\n", free_mem/1024/1024, total_mem/1024/1024);
+          #else
+            printf("Total global memory:           %Iu/%Iu (Free/Total) MBytes\n", free_mem/1024/1024, total_mem/1024/1024);
+          #endif
+        }
         
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK,dev) == CUDA_SUCCESS)
             printf("Total registers per block:     %i\n", a);
@@ -394,7 +399,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_BLOCK,dev) == CUDA_SUCCESS)
             printf("Maximum threads per block:     %i\n", a);        
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK,dev) == CUDA_SUCCESS)
-            printf("Total shared memory per block  %.2f MB\n", a/1024.0/1024.0);
+            printf("Total shared memory per block  %.2f KB\n", a/1024.0);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_CLOCK_RATE,dev) == CUDA_SUCCESS)
             printf("Clock rate:                    %.2f MHz\n",  a/1000000.0);
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE,dev) == CUDA_SUCCESS)
