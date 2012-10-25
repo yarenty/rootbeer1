@@ -146,7 +146,7 @@ public class RootbeerCompiler {
       
     ClassRemappingTransform transform = null;
     
-    if(m_disableClassRemapping = false){
+    if(m_disableClassRemapping == false){
       System.out.println("remapping some classes to GPU versions...");
       
       for(SootClass kernel : kernel_classes){
