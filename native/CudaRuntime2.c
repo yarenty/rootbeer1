@@ -218,9 +218,6 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
   status = cuMemAlloc(&gpuBufferSize, 8);
   CHECK_STATUS(env,"gpuBufferSize memory allocation failed",status)
 
-  status = cuMemAlloc(&gpuBufferSize, 8);
-  CHECK_STATUS(env,"gpuBufferSize memory allocation failed",status)
-
   thisRefClass = (*env)->GetObjectClass(env, this_ref);
   setLongField(env, this_ref, "m_ToSpaceAddr", (jlong) toSpace);
   setLongField(env, this_ref, "m_GpuToSpaceAddr", (jlong) gpuToSpace);
@@ -292,6 +289,7 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
   
   return to_space_size;
 }
+
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  * Method:    findReserveMem
@@ -316,6 +314,17 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
   printf("automatically determining CUDA reserve space...\n");
   
   to_space_size = initContext(env, max_blocks_per_proc, max_threads_per_block);
+
+  //space for 100 types in the scene
+  classMemSize = sizeof(jint)*100;
+
+  num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
+  
+  gc_space_size = 1024;
+  to_space_size -= (num_blocks * sizeof(jlong));
+  to_space_size -= (num_blocks * sizeof(jlong));
+  to_space_size -= gc_space_size;
+  to_space_size -= classMemSize;
   
   for(i = 1024L*1024L; i < to_space_size; i += 100L*1024L*1024L){
     temp_size = to_space_size - i;
@@ -324,22 +333,87 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
  
     status = cuMemHostAlloc(&toSpace, temp_size, 0);  
     if(status != CUDA_SUCCESS){
-	  cuCtxDestroy(cuContext);
-	  initContext(env, max_blocks_per_proc, max_threads_per_block);
+	    cuCtxDestroy(cuContext);
+	    initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
-    } else {
-	  cuMemFreeHost(toSpace);
     }
     
     status = cuMemAlloc(&gpuToSpace, temp_size);
     if(status != CUDA_SUCCESS){
-	  cuCtxDestroy(cuContext);
-	  initContext(env, max_blocks_per_proc, max_threads_per_block);
+	    cuCtxDestroy(cuContext);
+	    initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
-    } else {
-	  cuMemFree(gpuToSpace);
-	}
-	
+    } 
+
+    status = cuMemAlloc(&gpuClassMemory, classMemSize);
+    if(status != CUDA_SUCCESS){
+	    cuCtxDestroy(cuContext);
+	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      continue;
+    } 
+
+    status = cuMemHostAlloc(&handlesMemory, num_blocks * sizeof(jlong), CU_MEMHOSTALLOC_WRITECOMBINED); 
+    if(status != CUDA_SUCCESS){
+	    cuCtxDestroy(cuContext);
+	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      continue;
+    } 
+
+    status = cuMemAlloc(&gpuHandlesMemory, num_blocks * sizeof(jlong)); 
+    if(status != CUDA_SUCCESS){
+	    cuCtxDestroy(cuContext);
+	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      continue;
+    } 
+
+    status = cuMemHostAlloc(&exceptionsMemory, num_blocks * sizeof(jlong), 0); 
+    if(status != CUDA_SUCCESS){
+	    cuCtxDestroy(cuContext);
+	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      continue;
+    } 
+
+    status = cuMemAlloc(&gpuExceptionsMemory, num_blocks * sizeof(jlong)); 
+    if(status != CUDA_SUCCESS){
+	    cuCtxDestroy(cuContext);
+	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      continue;
+    } 
+
+    status = cuMemAlloc(&gcInfoSpace, gc_space_size);  
+    if(status != CUDA_SUCCESS){
+	    cuCtxDestroy(cuContext);
+	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      continue;
+    } 
+
+    status = cuMemAlloc(&gpuHeapEndPtr, 8);
+    if(status != CUDA_SUCCESS){
+	    cuCtxDestroy(cuContext);
+	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      continue;
+    } 
+
+    status = cuMemAlloc(&gpuBufferSize, 8);
+    if(status != CUDA_SUCCESS){
+	    cuCtxDestroy(cuContext);
+	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      continue;
+    } 
+
+    //done, free everything
+    cuMemFree(gpuToSpace);
+    cuMemFree(gpuClassMemory);
+    cuMemFree(gpuHandlesMemory);
+    cuMemFree(gpuExceptionsMemory);
+    cuMemFree(gcInfoSpace);
+    cuMemFree(gpuHeapEndPtr);
+    cuMemFree(gpuBufferSize);
+
+	  cuMemFreeHost(toSpace);
+	  cuMemFreeHost(handlesMemory);
+	  cuMemFreeHost(exceptionsMemory);
+
     return i;
   }
   throw_cuda_errror_exception(env, "unable to find enough space using CUDA", 0); 
