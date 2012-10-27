@@ -10,6 +10,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl.tweaks;
 import edu.syr.pcpratts.compressor.Compressor;
 import edu.syr.pcpratts.deadmethods.DeadMethods;
 import edu.syr.pcpratts.rootbeer.util.CompilerRunner;
+import edu.syr.pcpratts.rootbeer.util.CudaPath;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -67,12 +68,9 @@ public class CudaTweaks extends Tweaks {
       String modelString = "-m64";
 
       String command;
+      CudaPath cuda_path = new CudaPath();
       if(File.separator.equals("/")){
-        String cuda_path = System.getenv("CUDA_BIN_PATH");
-        if(cuda_path == null){
-          cuda_path = "/usr/local/cuda/bin";
-        }
-        command = cuda_path + "/nvcc "+modelString+" -arch sm_20 -ptx "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
+        command = cuda_path.get() + "/nvcc "+modelString+" -arch sm_20 -ptx "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
       } else {
         GenerateClScript generate = new GenerateClScript();
         File cl_script = generate.execute(generated, code_file);

@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.tweaks;
 
+import edu.syr.pcpratts.rootbeer.util.CudaPath;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import java.util.List;
 public class GenerateClScript {
 
   private List<String> m_VisualStudioPaths;
-  private List<String> m_NvidiaPaths;
   
   public GenerateClScript(){
     m_VisualStudioPaths = new ArrayList<String>();
@@ -23,19 +23,12 @@ public class GenerateClScript {
     m_VisualStudioPaths.add("D:\\Program Files\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat");
     m_VisualStudioPaths.add("C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat");
     m_VisualStudioPaths.add("C:\\Program Files\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat");
-    
-    String cuda_path = System.getenv("CUDA_BIN_PATH");
-    
-    if(cuda_path == null)
-        throw new RuntimeException("CUDA_BIN_PATH environment variable was not set, this may mean the Cuda Toolkit is not installed");
-        
-    m_NvidiaPaths = new ArrayList<String>();
-    m_NvidiaPaths.add(cuda_path + "\\nvcc.exe");
   }
   
   public File execute(File generated, File code_file) {
     String vs_path = findPath(m_VisualStudioPaths, "Visual Studio");
-    String nvidia_path = findPath(m_NvidiaPaths, "nvcc.exe");
+    CudaPath cuda_path = new CudaPath();
+    String nvidia_path = cuda_path.get();
         
     String file_text = "";
     String endl = System.getProperty("line.separator"); 
