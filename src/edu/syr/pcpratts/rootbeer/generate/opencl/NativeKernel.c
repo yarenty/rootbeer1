@@ -17,6 +17,10 @@ int getThreadId(){
   return (int) pthread_getspecific(threadIdKey);
 }
 
+void synchthreads()
+{
+}
+
 long long java_lang_System_nanoTime(char * gc_info, int * exception){
   struct timeval tm;
   gettimeofday(&tm, 0);

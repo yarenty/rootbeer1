@@ -145,6 +145,10 @@ $$__device__$$
 long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef($$__global$$ char * gc_info, int ref, int * exception){
   return ref;
 }
+$$__device__$$ 
+void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_synchthreads($$__global$$ char * gc_info, int * exception){
+  synchthreads();
+}
 
 $$__device__$$ char
 edu_syr_pcpratts_cmp(long long lhs, long long rhs){

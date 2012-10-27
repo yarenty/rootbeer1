@@ -26,6 +26,9 @@ public class RootbeerGpu {
   public static int getThreadId() {
     return 0;
   }
+  
+  public static void synchthreads(){ 
+  }
 
   public static long getRef(Object obj) {
     return 0;

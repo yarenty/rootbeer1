@@ -39,13 +39,14 @@ int atomicExch(int * addr, int value){
 }
 
 int getThreadId();
+void synchthreads();
 
 void __threadfence(){ }
 
 #define true 1
 #define false 0
 
-long long m_Local[2];
+long long m_Local[3];
 int * m_Cache;
 
 typedef int boolean;

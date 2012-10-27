@@ -19,5 +19,10 @@ int getThreadId(){
   return blockIdx.x * blockDim.x + threadIdx.x;
 }
 
+__device__
+void synchthreads(){
+  __syncthreads();
+}
+
 typedef int boolean;
 typedef int byte;

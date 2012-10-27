@@ -63,6 +63,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new InstanceofTest());
     ret.add(new DotClassTest());
     ret.add(new PrintTest());
+    ret.add(new BarrierTest());
     
     if(edu.syr.pcpratts.rootbeer.Main.largeMemTests()){
       ret.add(new LargeMemTest());
