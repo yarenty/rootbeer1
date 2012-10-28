@@ -132,7 +132,7 @@ $$__device__$$ double java_lang_StrictMath_tanh( char * gc_info , double paramet
 } 
 
 $$__device__$$ 
-boolean edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu($$__global$$ char * gc_info, int * exception){
+char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu($$__global$$ char * gc_info, int * exception){
   return 1;
 }
 

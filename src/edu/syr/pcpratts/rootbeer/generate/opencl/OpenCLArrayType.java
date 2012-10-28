@@ -68,11 +68,6 @@ public class OpenCLArrayType {
     return ret;    
   }
 
-  private String getRefTypeString(){
-    OpenCLType type = new OpenCLType(m_arrayType);
-    return type.getRefString();
-  }
-
   private List<String> getDecls(){
     List<String> ret = new ArrayList<String>();
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
@@ -127,7 +122,7 @@ public class OpenCLArrayType {
     if(array_type.numDimensions != 1)
       return "int";
     OpenCLType type = new OpenCLType(array_type.baseType);
-    return type.getRefString();
+    return type.getCudaTypeString();
   }
   
   private String initValue(){     

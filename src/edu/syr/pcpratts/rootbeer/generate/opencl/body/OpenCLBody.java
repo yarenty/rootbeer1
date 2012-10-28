@@ -281,7 +281,7 @@ public class OpenCLBody {
     String ret = "";
     for(Local local : locals){
       OpenCLType type = new OpenCLType(local.getType());
-      ret += type.getRefString()+" "+local.getName();
+      ret += type.getCudaTypeString()+" "+local.getName();
       if(type.isRefType())
         ret += " = -1";
       ret += ";\n";

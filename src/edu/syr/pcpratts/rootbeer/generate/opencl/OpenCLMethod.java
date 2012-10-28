@@ -46,7 +46,7 @@ public class OpenCLMethod {
       ret.append("int");
     } else {
       OpenCLType return_type = new OpenCLType(m_sootMethod.getReturnType());
-      ret.append(return_type.getRefString());
+      ret.append(return_type.getCudaTypeString());
     }
     return ret.toString();
   }
@@ -61,7 +61,7 @@ public class OpenCLMethod {
     for(int i = 0; i < args.size(); ++i){
       Type curr_arg = (Type) args.get(i);
       OpenCLType parameter_type = new OpenCLType(curr_arg);
-      ret.append(parameter_type.getRefString());
+      ret.append(parameter_type.getCudaTypeString());
       ret.append(" parameter" + Integer.toString(i));
       if(i < args.size()-1)
         ret.append(", ");

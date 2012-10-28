@@ -33,6 +33,17 @@ public class OpenCLType {
     ret = ret.replaceAll("\\[\\]", "__array");
     return ret;
   }
+  
+  public String getCudaTypeString(){
+    String ret = getRefString();
+    if(ret.equals("byte")){
+      ret = "char";
+    }
+    if(ret.equals("boolean")){
+      ret = "char";
+    }
+    return ret;
+  }
 
   public boolean isRefType(){
     if(m_sootType instanceof RefLikeType)

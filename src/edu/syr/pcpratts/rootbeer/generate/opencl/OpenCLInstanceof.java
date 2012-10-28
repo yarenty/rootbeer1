@@ -33,7 +33,7 @@ public class OpenCLInstanceof {
     String device = Tweaks.v().getDeviceFunctionQualifier();
     String global = Tweaks.v().getGlobalAddressSpaceQualifier();
     
-    String ret = device+" boolean "+getMethodName();
+    String ret = device+" char "+getMethodName();
     ret += "("+global+" char * gc_info, int thisref, int * exception)";
     return ret;
   }

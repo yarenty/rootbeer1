@@ -81,7 +81,7 @@ public class OpenCLField {
 
   private List<String> getDecls(){
     List<String> ret = new ArrayList<String>();
-    String type_string = getType().getRefString();
+    String type_string = getType().getCudaTypeString();
     String device_function_qual = Tweaks.v().getDeviceFunctionQualifier();
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     if(m_SootField.isStatic() == false){
@@ -140,14 +140,12 @@ public class OpenCLField {
     FieldTypeSwitch type_switch){
     
     StringBuilder ret = new StringBuilder();
-    String var_type_string = getType().getRefString();
     List<String> decls = getDecls();
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     
     String cast_string = getCastString();
     
     calculateOffsets(composite);
-    String type = getType().getRefString();
     //instance getter
     ret.append(decls.get(0)+"{\n");
     int field_offset = getOnlyOffset();
@@ -205,7 +203,6 @@ public class OpenCLField {
     StringBuilder ret = new StringBuilder();
     List<String> decls = getDecls();
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
-    String var_type_string = getType().getRefString();
     StaticOffsets static_offsets = new StaticOffsets();
     int offset = static_offsets.getIndex(this);
     
@@ -298,13 +295,7 @@ public class OpenCLField {
   }
 
   private String getCastString() {
-    String ret = getType().getRefString();;
-    if(ret.equals("boolean")){
-      ret = "char";
-    }
-    if(ret.equals("byte")){
-      ret = "char";
-    }
+    String ret = getType().getCudaTypeString();
     return ret;
   }
 

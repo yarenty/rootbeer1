@@ -302,7 +302,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   public void caseCastExpr(CastExpr arg0) {
     Type cast_type = arg0.getCastType();
     OpenCLType ocl_type = new OpenCLType(cast_type);
-    m_output.append("("+ocl_type.getRefString()+") ");
+    m_output.append("("+ocl_type.getCudaTypeString()+") ");
     Value rhs = arg0.getOp();
     rhs.apply(this);
   }
