@@ -61,6 +61,9 @@ public class CudaPath {
 
   private String findWindowsNvcc(String path) {
     File file = new File(path);
+    if(file.exists() == false){
+      return null;
+    }
     File[] children = file.listFiles();
     for(File child : children){
       if(child.isDirectory()){
