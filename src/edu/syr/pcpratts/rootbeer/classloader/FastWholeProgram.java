@@ -643,7 +643,7 @@ public class FastWholeProgram {
     m_dfsInfos.put(kernel_method, m_currDfsInfo);
     
     doDfs(kernel_method);
-    if(m_disableClassRemapping = false){
+    if(m_disableClassRemapping == false){
       buildFullCallGraph(kernel_method);
     }
     if(find_reachables){

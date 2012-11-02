@@ -284,6 +284,9 @@ public class DfsInfo {
 
   public List<Type> getHierarchy(SootClass input_class) {
     List<NumberedType> nret = m_childrenToParents.get(input_class.getType().toString());
+    if(nret == null){
+      System.out.println("hello");
+    }
     List<Type> ret = new ArrayList<Type>();
     for(NumberedType ntype : nret){
       ret.add(ntype.getType());
