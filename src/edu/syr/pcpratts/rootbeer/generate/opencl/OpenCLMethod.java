@@ -159,7 +159,7 @@ public class OpenCLMethod {
     } else {
       ret += "char * mem = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n";
       ret += "char * trash = edu_syr_pcpratts_gc_deref(gc_info, 0) + "+junk_index+";\n";
-      ret += "char * mystery = trash - 4;\n";
+      ret += "char * mystery = trash - 8;\n";
       ret += "mem += 12;\n";
     }
     ret += "int count = 0;\n";
@@ -172,7 +172,7 @@ public class OpenCLMethod {
     } else {
       ret += "  if(old != -1 && old != id){\n";
       ret += "    count++;\n";
-      ret += "    if(count > 99 && *((int *) mystery) == 0){\n";
+      ret += "    if(count > 50 || (*((int *) mystery)) == 0){\n";
       ret += "      count = 0;\n";
       ret += "    }\n";
       ret += "  } else {\n"; 
@@ -196,7 +196,7 @@ public class OpenCLMethod {
             if(isLinux()){
               ret.append("  } else {");
               ret.append("    count++;\n");
-              ret.append("    if(count > 99 && *((int *) mystery) == 0){\n");
+              ret.append("    if(count > 50 || (*((int *) mystery)) == 0){\n");
               ret.append("      count = 0;\n");
               ret.append("    }\n");
               ret.append("  }\n"); 

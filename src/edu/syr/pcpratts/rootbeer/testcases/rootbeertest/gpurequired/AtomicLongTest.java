@@ -28,7 +28,7 @@ public class AtomicLongTest implements TestSerialization {
     //going into the gpu. when it is not-active, it is null.
     //
     //also, making m_Num2 not used on the gpu makes the test case work
-    System.out.println(Math.random());
+    //System.out.println(Math.random());
     
     int size = 5;
     for(int i = 0; i < size; ++i){

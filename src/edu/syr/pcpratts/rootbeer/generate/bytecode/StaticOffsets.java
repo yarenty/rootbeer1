@@ -111,9 +111,10 @@ public class StaticOffsets {
       m_EndIndex += (16 - mod);
       m_ZerosSize += (16 - mod);
     }
-    //give room for junk space
-    m_EndIndex += 16;
-    m_ZerosSize += 16;
+    //give room for junk space. some reason 32 bytes of space are needed for
+    //the synchronized tests to pass.
+    m_EndIndex += 32;
+    m_ZerosSize += 32;
   }
   
   public int getZerosSize(){

@@ -7,6 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.RootbeerPaths;
+import edu.syr.pcpratts.rootbeer.classloader.NumberedType;
 import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
@@ -170,8 +172,24 @@ public class OpenCLScene {
     return ocl_class;
   }
   
+  private void writeTypesToFile(List<NumberedType> types){
+    try {
+      PrintWriter writer = new PrintWriter(RootbeerPaths.v().getTypeFile());
+      for(NumberedType type : types){
+        writer.println(type.getNumber()+" "+type.getType().toString());
+      }
+      writer.flush();
+      writer.close();
+    } catch(Exception ex){
+      ex.printStackTrace();
+    }
+  }
+  
   private String makeSourceCode() throws Exception {
     m_usesGarbageCollector = false;
+    
+    List<NumberedType> types = RootbeerScene.v().getDfsInfo().getNumberedTypes();
+    writeTypesToFile(types);
     
     Set<String> methods = RootbeerScene.v().getDfsInfo().getAllMethods();
     MethodSignatureUtil util = new MethodSignatureUtil();

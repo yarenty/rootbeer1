@@ -394,15 +394,14 @@ public class DfsInfo {
   
   public OpenCLScene getOpenCLScene() {
     Set<Type> to_process = new HashSet<Type>();
-    to_process.addAll(m_dfsTypes);
-    to_process.addAll(m_builtInTypes);
+    to_process.addAll(m_orderedRefLikeTypes);
     
     for(Type type : to_process){
       if(type instanceof RefType == false){
         continue;
       }
       RefType ref_type = (RefType) type;
-      OpenCLClass ocl_class = m_oclScene.addClass(ref_type.getSootClass());
+      m_oclScene.addClass(ref_type.getSootClass());
     }
       
     return m_oclScene;

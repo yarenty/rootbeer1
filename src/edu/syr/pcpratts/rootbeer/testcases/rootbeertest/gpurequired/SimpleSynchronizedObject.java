@@ -7,6 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired;
 
+import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
+
 public class SimpleSynchronizedObject {
 
   private int m_value;

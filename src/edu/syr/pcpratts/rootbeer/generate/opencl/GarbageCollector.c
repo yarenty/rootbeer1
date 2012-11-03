@@ -27,17 +27,17 @@ $$__device__$$ long long java_lang_System_nanoTime($$__global$$ char * gc_info, 
 $$__device__$$
 void edu_syr_pcpratts_exitMonitorRef($$__global$$ char * gc_info, int thisref, int old){
   char * mem = edu_syr_pcpratts_gc_deref(gc_info, thisref); 
+  __threadfence();
   mem += 12;
   if(old == -1){    
-    __threadfence();
     atomicExch((int *) mem, -1); 
   }
 }
 
 $$__device__$$
 void edu_syr_pcpratts_exitMonitorMem($$__global$$ char * gc_info, char * mem, int old){
+  __threadfence(); 
   if(old == -1){   
-    __threadfence(); 
     atomicExch((int *) mem, -1); 
   }
 }

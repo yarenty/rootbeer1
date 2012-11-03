@@ -15,11 +15,9 @@ import java.util.List;
 public class SimpleSynchronizedRunOnGpu implements Kernel {
 
   private SimpleSynchronizedObject m_syncObj;
-  private List<Integer> m_olds;
   
   public SimpleSynchronizedRunOnGpu(SimpleSynchronizedObject sync_obj){
     m_syncObj = sync_obj;
-    m_olds = new ArrayList<Integer>();
   }
   
   public void gpuMethod() {

@@ -27,7 +27,7 @@ public class SimpleSynchronizedTest implements TestSerialization {
   public boolean compare(Kernel original, Kernel from_gpu) {
     SimpleSynchronizedRunOnGpu lhs = (SimpleSynchronizedRunOnGpu) original;
     SimpleSynchronizedRunOnGpu rhs = (SimpleSynchronizedRunOnGpu) from_gpu;
-    
+        
     if(lhs.getSyncObj().get() != rhs.getSyncObj().get()){
       System.out.println("lhs: "+lhs.getSyncObj().get());
       System.out.println("rhs: "+rhs.getSyncObj().get());

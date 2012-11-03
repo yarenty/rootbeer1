@@ -29,6 +29,11 @@ public class RootbeerPaths {
     return folder+File.separator+"config";
   }
   
+  public String getTypeFile(){
+    String folder = getRootbeerHome();
+    return folder+File.separator+"types";
+  }
+  
   public String getRootbeerHome(){
     String home = System.getProperty("user.home");
     File folder = new File(home+File.separator+".rootbeer"+File.separator);

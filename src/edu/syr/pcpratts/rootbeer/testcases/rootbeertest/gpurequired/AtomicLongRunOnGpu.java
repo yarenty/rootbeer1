@@ -31,12 +31,10 @@ public class AtomicLongRunOnGpu implements Kernel {
     m_Num1 = m_ALong.addAndGet(10);
     m_Random = (float) random.nextDouble();
     m_Random2 = Math.random();
-    //AtomicLong newlong = new AtomicLong(30);
-    //m_Num1 = newlong.get();
-    //m_Num2 = newlong.get();
+    AtomicLong newlong = new AtomicLong(30);
+    m_Num1 = newlong.get();
+    m_Num2 = newlong.get();
     m_Random2 = 10;
-    m_Num1 = 10;
-    m_Num2 = 20;
   }
   
   boolean compare(AtomicLongRunOnGpu grhs) {
