@@ -31,3 +31,13 @@ glob:*.so.1
 /target
 /.settings
 /.classpath
+native/*.o
+native/*.so.1
+examples/*/code_file.ptx
+examples/*/cudaruntime*
+examples/*/generated.*
+examples/*/missing_classes.txt
+examples/MMult/MMult.jar
+examples/ArraySumApp/ArraySumApp.jar
+
+
