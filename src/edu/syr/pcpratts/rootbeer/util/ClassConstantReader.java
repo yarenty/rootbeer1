@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.util;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import soot.*;
 
 public class ClassConstantReader {

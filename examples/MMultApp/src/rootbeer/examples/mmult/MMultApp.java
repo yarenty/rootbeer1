@@ -9,31 +9,31 @@ import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
 
 public class MMultApp {
 
-  public void multMatrices(int[] a, int[] b, int[] c){
+  public void multMatrices(int[] a, int[] b, int[] c, int size){
     List<Kernel> jobs = new ArrayList<Kernel>();
-    for(int i = 0; i < a.length; ++i){
-      jobs.add(new MMult(a, b, c, i, a.length));
+    for(int i = 0; i < size; ++i){
+      jobs.add(new MMult(a, b, c, i, size));
     }
 
     Rootbeer rootbeer = new Rootbeer();
     rootbeer.runAll(jobs);
   }
 
-  public void cpuMultMatrices(int[] a, int[] b, int[] c){
-    for(int x = 0; x < a.length; ++x){
-      for(int y = 0; y < a.length; ++y){
+  public void cpuMultMatrices(int[] a, int[] b, int[] c, int size){
+    for(int x = 0; x < size; ++x){
+      for(int y = 0; y < size; ++y){
         int sum = 0;
-        for(int k = 0; k < a.length; ++k){
-          sum += (a[x*a.length+y]*b[y*a.length+k]);
+        for(int k = 0; k < size; ++k){
+          sum += (a[x*size+y]*b[y*size+k]);
         }
-        c[x*a.length+y] = sum;
+        c[x*size+y] = sum;
       }
     }
   }
 
   public static void main(String[] args){
     MMultApp app = new MMultApp();
-    int size = 1024;
+    int size = 4096;
     int[] a = new int[size*size];
     int[] b = new int[size*size];
     int[] c_gpu = new int[size*size];
@@ -48,13 +48,13 @@ public class MMultApp {
 
     Stopwatch watch = new Stopwatch();
     watch.start();
-    app.multMatrices(a, b, c_gpu);
+    app.multMatrices(a, b, c_gpu, size);
     watch.stop();
     System.out.println("gpu time: "+watch.elapsedTimeMillis());
 
     watch = new Stopwatch();
     watch.start();
-    app.cpuMultMatrices(a, b, c_cpu);
+    app.cpuMultMatrices(a, b, c_cpu, size);
     watch.stop();
     System.out.println("cpu time: "+watch.elapsedTimeMillis());
   }

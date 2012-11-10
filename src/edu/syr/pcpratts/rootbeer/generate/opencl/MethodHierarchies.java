@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,6 +15,7 @@ import soot.RefType;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.Type;
+import soot.rbclassload.RootbeerClassLoader;
 
 /**
  * Represents all the versions of methods in a class Hierarchy
@@ -72,7 +72,7 @@ public class MethodHierarchies {
     
     public List<OpenCLMethod> getMethods(){
       List<OpenCLMethod> ret = new ArrayList<OpenCLMethod>();
-      List<Type> class_hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
+      List<Type> class_hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
       for(Type type : class_hierarchy){
         if(type instanceof RefType == false){
           continue;
@@ -92,7 +92,7 @@ public class MethodHierarchies {
     }
         
     public boolean isPolyMorphic(){
-      List<Type> class_hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
+      List<Type> class_hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
       IsPolyMorphic poly_checker = new IsPolyMorphic();
       if(poly_checker.isPoly(m_sootMethod, class_hierarchy)){
         return true;
@@ -101,7 +101,7 @@ public class MethodHierarchies {
     }
     
     public OpenCLPolymorphicMethod getOpenCLPolyMorphicMethod(){
-      List<Type> class_hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
+      List<Type> class_hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
       for(Type type : class_hierarchy){
         if(type instanceof RefType == false){
           continue;
@@ -142,7 +142,7 @@ public class MethodHierarchies {
     }
 
     private void saveHierarchy() {
-      m_hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
+      m_hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
     }
   }
 }

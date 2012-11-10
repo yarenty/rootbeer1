@@ -38,7 +38,7 @@ public class MMult implements Kernel {
       for(int k = 0; k < lsize; ++k){
         sum += (la[lindex*lsize+j]*lb[j*lsize+k]);
       }
-      lc[lindex*lsize+j] = sum + len;
+      lc[lindex*lsize+j] = sum;
     }
   }
 }

@@ -7,8 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer;
 
-import edu.syr.pcpratts.rootbeer.classloader.DfsInfo;
-import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
 import edu.syr.pcpratts.rootbeer.compiler.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.NativeCpuTweaks;
@@ -30,15 +28,18 @@ import pack.Pack;
 import soot.*;
 import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.options.Options;
+import soot.rbclassload.EntryPointDetector;
+import soot.rbclassload.RootbeerClassLoader;
+import soot.util.Chain;
 import soot.util.JasminOutputStream;
 
 public class RootbeerCompiler {
 
   private String m_classOutputFolder;
   private String m_jimpleOutputFolder;
-  private FastWholeProgram m_fastLoader;
   private String m_provider;
-  private boolean m_disableClassRemapping;
+  private boolean m_enableClassRemapping;
+  private EntryPointDetector m_entryDetector;
   
   public RootbeerCompiler(){
     clearOutputFolders();
@@ -52,54 +53,88 @@ public class RootbeerCompiler {
       Tweaks.setInstance(new NativeCpuTweaks());
     }
     
-    m_disableClassRemapping = false;
-    m_fastLoader = FastWholeProgram.v();
+    m_enableClassRemapping = true;
   }
   
   public void disableClassRemapping(){
-    m_disableClassRemapping = true; 
+    m_enableClassRemapping = false; 
   }
   
   public void compile(String main_jar, List<String> lib_jars, List<String> dirs, String dest_jar) {
     
   }
     
-  private List<String> getRuntimeJars(){
-    List<String> ret = new ArrayList<String>();
-    String s = File.separator;
-    if(System.getProperty("os.name").equals("Mac OS X")) {
-	    //in Mac OS X, rt.jar is split into classes.jar and ui.jar
-      ret.add(System.getProperty("java.home")+s+".."+s+"Classes"+s+"classes.jar");
-      ret.add(System.getProperty("java.home")+s+".."+s+"Classes"+s+"ui.jar");
-	  } else {
-      //if windows or linux
-      ret.add(System.getProperty("java.home")+s+"lib"+s+"rt.jar");
-      ret.add(System.getProperty("java.home")+s+"lib"+s+"jce.jar");
-      ret.add(System.getProperty("java.home")+s+"lib"+s+"charsets.jar");
-      ret.add(System.getProperty("java.home")+s+"lib"+s+"jsse.jar");
-    }
-    return ret;
-  }  
-    
-  public void compile(String jar_filename, String outname, String test_case) throws Exception {
-    Options.v().set_allow_phantom_refs(true);
-    
+  private void setupSoot(String jar_filename, String rootbeer_jar, boolean runtests){
     extractJar(jar_filename);
-    m_fastLoader.addPath(jar_filename);
-    m_fastLoader.addClassPath(getRuntimeJars());
-    m_fastLoader.init();
     
-    FindKernelForTestCase finder = new FindKernelForTestCase();
-    SootClass kernel = finder.get(test_case, m_fastLoader.getKernelClasses());
-    m_provider = finder.getProvider();
+    List<String> proc_dir = new ArrayList<String>();
+    proc_dir.add(Constants.JAR_CONTENTS_FOLDER);
     
-    SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
-    m_fastLoader.singleKernel(kernel_method);
+    Options.v().set_allow_phantom_refs(true);
+    Options.v().set_rbclassload(true);
+    Options.v().set_prepend_classpath(true);
+    Options.v().set_process_dir(proc_dir);
+    if(m_enableClassRemapping){
+      Options.v().set_rbclassload_buildcg(true);
+    }
+    if(rootbeer_jar.equals("") == false){
+      Options.v().set_soot_classpath(rootbeer_jar);
+    }
     
-    List<SootClass> kernel_classes = new ArrayList<SootClass>();
-    kernel_classes.add(kernel);
+    RootbeerClassLoader.v().addEntryPointDetector(m_entryDetector);
     
-    compileForKernels(outname, kernel_classes);
+    RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.compressor.");
+    RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.deadmethods.");
+    RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.jpp.");
+    RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.rootbeer.");
+    RootbeerClassLoader.v().addIgnorePackage("pack.");
+    RootbeerClassLoader.v().addIgnorePackage("jasmin.");
+    RootbeerClassLoader.v().addIgnorePackage("soot.");
+    RootbeerClassLoader.v().addIgnorePackage("beaver.");
+    RootbeerClassLoader.v().addIgnorePackage("polyglot.");
+    RootbeerClassLoader.v().addIgnorePackage("org.antlr.");
+    RootbeerClassLoader.v().addIgnorePackage("java_cup.");
+    RootbeerClassLoader.v().addIgnorePackage("ppg.");
+    RootbeerClassLoader.v().addIgnorePackage("antlr.");
+    RootbeerClassLoader.v().addIgnorePackage("jas.");
+    RootbeerClassLoader.v().addIgnorePackage("scm.");
+    RootbeerClassLoader.v().addIgnorePackage("org.xmlpull.v1.");
+    RootbeerClassLoader.v().addIgnorePackage("android.util.");
+    RootbeerClassLoader.v().addIgnorePackage("android.content.res.");
+    RootbeerClassLoader.v().addIgnorePackage("org.apache.commons.codec.");
+    
+    if(runtests){
+      RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.testcases.");   
+    }
+    RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime.remap.");   
+    
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.generate.bytecode.Constants");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerFactory");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.Rootbeer");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.Kernel");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.CompiledKernel");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.Serializer");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestSerialization");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestSerializationFactory");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestException");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestExceptionFactory");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.PrivateFields");
+    
+    RootbeerClassLoader.v().loadNecessaryClasses();
+  }
+  
+  public void compile(String jar_filename, String outname, String test_case) throws Exception {
+    TestCaseEntryPointDetector detector = new TestCaseEntryPointDetector(test_case);
+    m_entryDetector = detector;
+    setupSoot(jar_filename, "", true);
+    m_provider = detector.getProvider();
+        
+    List<SootMethod> kernel_methods = Scene.v().getEntryPoints();
+    compileForKernels(outname, kernel_methods);
   }
   
   public void compile(String jar_filename, String outname) throws Exception {
@@ -107,106 +142,53 @@ public class RootbeerCompiler {
   }
   
   public void compile(String jar_filename, String outname, boolean run_tests) throws Exception {
-    Options.v().set_allow_phantom_refs(true);
-    
+    m_entryDetector = new KernelEntryPointDetector();
     CurrJarName jar_name = new CurrJarName();
+    setupSoot(jar_filename, jar_name.get(), run_tests);
     
-    extractJar(jar_filename);
-    m_fastLoader.addPath(jar_filename);
-    m_fastLoader.addRootbeerPath(jar_name.get(), run_tests);
-    m_fastLoader.addClassPath(getRuntimeJars());
-    m_fastLoader.init();
-    
-    List<SootClass> kernel_classes = m_fastLoader.getKernelClasses();
-    compileForKernels(outname, kernel_classes);
+    List<SootMethod> kernel_methods = Scene.v().getEntryPoints();
+    compileForKernels(outname, kernel_methods);
   }
   
-  private void compileForKernels(String outname, List<SootClass> kernel_classes) throws Exception {
+  private void compileForKernels(String outname, List<SootMethod> kernel_methods) throws Exception {
     
-    if(kernel_classes.isEmpty()){
+    if(kernel_methods.isEmpty()){
       System.out.println("There are no kernel classes. Please implement the following interface to use rootbeer:");
       System.out.println("edu.syr.pcpratts.rootbeer.runtime.Kernel");
       System.exit(0);
     }
     
-    String[] sorted = new String[kernel_classes.size()];
-    for(int i = 0; i < kernel_classes.size(); ++i){
-      sorted[i] = kernel_classes.get(i).getName();
-    }
-    Arrays.sort(sorted);
-    kernel_classes.clear();
-    for(String cls : sorted){
-      kernel_classes.add(Scene.v().getSootClass(cls));
-    }
-    
-    for(SootClass kernel : kernel_classes){
-      SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
-      FastWholeProgram.v().fullyLoad(kernel_method, true, m_disableClassRemapping);
-    }
-      
-    ClassRemappingTransform transform = null;
-    
-    if(m_disableClassRemapping == false){
-      System.out.println("remapping some classes to GPU versions...");
-      
-      for(SootClass kernel : kernel_classes){
-        SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
-        DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
-        RootbeerScene.v().setDfsInfo(info);
-        
-        List<String> sigs = info.getReachableMethodSigs();
-        transform = new ClassRemappingTransform(false);
-        transform.run(sigs);
-        transform.finishClone();  
-        
-        FastWholeProgram.v().fullyLoad(kernel_method, false, m_disableClassRemapping);
-        info = FastWholeProgram.v().getDfsInfo(kernel_method);
-        info.setModifiedClasses(transform.getModifiedClasses());
-        //info.outputClassTypes();
-      }
+    if(m_enableClassRemapping){
+      RootbeerClassLoader.v().remapClasses();
     }
       
     Transform2 transform2 = new Transform2();
-    for(SootClass soot_class : kernel_classes){      
-      SootMethod kernel_method = soot_class.getMethod("void gpuMethod()");
-      DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
-      RootbeerScene.v().setDfsInfo(info);
+    for(SootMethod kernel_method : kernel_methods){   
+      RootbeerClassLoader.v().loadDfsInfo(kernel_method);
+      SootClass soot_class = kernel_method.getDeclaringClass();
       transform2.run(soot_class.getName());
     }
     
     System.out.println("writing classes out...");
-    if(m_disableClassRemapping){
-      
-      for(SootClass kernel : kernel_classes){
-        SootMethod kernel_method = kernel.getMethod("void gpuMethod()");
-        DfsInfo info = FastWholeProgram.v().getDfsInfo(kernel_method);
-        
-        Set<String> modified = info.getModifiedClasses();
-        if(modified == null){
-          continue;
-        }
-        
-        for(String cls : modified){
-          loadAllMethods(cls);
-          writeClassFile(cls);
-          writeJimpleFile(cls);
-        }    
-      }
-      
+    List<SootClass> remapped_classes = Scene.v().getRemappedClasses();
+    for(SootClass cls : remapped_classes){
+      loadAllMethods(cls.getName());
+      writeClassFile(cls.getName());
+      writeJimpleFile(cls.getName());
     }
     
-    List<String> app_classes = FastWholeProgram.v().getApplicationClasses();
-    for(String app_class : app_classes){
-      loadAllMethods(app_class);
-      writeClassFile(app_class);
-      writeJimpleFile(app_class);
+    Chain<SootClass> app_classes = Scene.v().getApplicationClasses();
+    for(SootClass app_class : app_classes){
+      loadAllMethods(app_class.getName());
+      writeClassFile(app_class.getName());
+      writeJimpleFile(app_class.getName());
     }
     
-    List<String> added_classes = RootbeerScene.v().getAddedClasses();
-    for(String cls : added_classes){
-      loadAllMethods(cls);
-      writeClassFile(cls);
-      writeJimpleFile(cls);
+    List<SootClass> added_classes = Scene.v().getGeneratedClasses();
+    for(SootClass cls : added_classes){
+      loadAllMethods(cls.getName());
+      writeClassFile(cls.getName());
+      writeJimpleFile(cls.getName());
     }    
     
     makeOutJar();
@@ -477,7 +459,7 @@ public class RootbeerCompiler {
     List<SootMethod> methods = soot_class.getMethods();
     for(SootMethod method : methods){
       if(method.isConcrete()){
-        m_fastLoader.loadToBodyLater(method.getSignature());
+        SootResolver.v().resolveMethod(method);
         Body body = method.retrieveActiveBody();
         SpecialInvokeFixup fixup = new SpecialInvokeFixup();
         method.setActiveBody(fixup.fixup(body));

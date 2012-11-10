@@ -7,8 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.util;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;

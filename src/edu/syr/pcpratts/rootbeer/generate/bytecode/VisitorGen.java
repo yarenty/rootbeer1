@@ -7,9 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
-import edu.syr.pcpratts.rootbeer.classloader.NumberedType;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -19,6 +16,8 @@ import java.util.Set;
 import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.NullConstant;
+import soot.rbclassload.NumberedType;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class VisitorGen extends AbstractVisitorGen {
 
@@ -75,7 +74,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_thisRef = m_bcl.top().refThis();
     m_param0 = m_bcl.top().refParameter(0);
     
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
+    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
     for(Type type : types){
       makeGetSizeMethodForType(type);
     }
@@ -90,7 +89,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_thisRef = m_bcl.top().refThis();
     m_param0 = m_bcl.top().refParameter(0);
     
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
+    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
     for(Type type : types){
       makeGetLengthMethodForType(type);
     }
@@ -158,14 +157,14 @@ public class VisitorGen extends AbstractVisitorGen {
   }
   
   private void makeWriteToHeapMethod() {
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
+    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
     VisitorWriteGen write_gen = new VisitorWriteGen(types, 
       m_className, m_bcl.top(), m_fieldInspector);
     write_gen.makeWriteToHeapMethod();
   }
       
   private void makeReadFromHeapMethod() {
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
+    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
     VisitorReadGen read_gen = new VisitorReadGen(types, 
       m_className, m_bcl.top(), m_fieldInspector);
     read_gen.makeReadFromHeapMethod();
@@ -213,7 +212,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_sentinalCtorsCreated.add(soot_class.getName());
     
     soot_class = Scene.v().getSootClass(soot_class.getName());
-    if(FastWholeProgram.v().isApplicationClass(soot_class) == false)
+    if(soot_class.isApplicationClass() == false)
       return;
     
     if(soot_class.declaresMethod("void <init>(edu.syr.pcpratts.rootbeer.runtime.Sentinal)")){
@@ -229,7 +228,7 @@ public class VisitorGen extends AbstractVisitorGen {
     Local thisref = bcl.refThis();
 
     String parent_name = parent_class.getName();
-    if(FastWholeProgram.v().isApplicationClass(parent_class) == false){
+    if(parent_class.isApplicationClass() == false){
       if(parent_class.declaresMethod("void <init>()")){
         bcl.pushMethod(parent_name, "<init>", VoidType.v());
         bcl.invokeMethodNoRet(thisref);
@@ -246,7 +245,7 @@ public class VisitorGen extends AbstractVisitorGen {
   }
 
   private void makeSentinalCtors() {
-    List<NumberedType> types = RootbeerScene.v().getDfsInfo().getNumberedTypes();
+    List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedTypes();
     for(int i = types.size() - 1; i >= 0; --i){
       NumberedType ntype = types.get(i);
       Type type = ntype.getType();

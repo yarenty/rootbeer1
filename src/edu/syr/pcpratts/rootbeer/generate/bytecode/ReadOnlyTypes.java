@@ -8,10 +8,8 @@
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import edu.syr.pcpratts.rootbeer.compiler.FindMethodCalls;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import soot.Body;
 import soot.SootClass;

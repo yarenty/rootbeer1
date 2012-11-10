@@ -7,13 +7,12 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
-import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import soot.*;
 import soot.jimple.*;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class BytecodeLanguage {
 
@@ -38,7 +37,7 @@ public class BytecodeLanguage {
 
     SootClass object_soot_class = Scene.v().getSootClass("java.lang.Object");
     ret.setSuperclass(object_soot_class);
-    RootbeerScene.v().addClass(ret);
+    Scene.v().addGeneratedClass(ret);
     ret.setApplicationClass();
 
     mCurrClass = ret;
@@ -52,7 +51,7 @@ public class BytecodeLanguage {
     SootClass parent_class = Scene.v().getSootClass(parent);
     ret.setSuperclass(parent_class);
 
-    RootbeerScene.v().addClass(ret);
+    Scene.v().addGeneratedClass(ret);
     ret.setApplicationClass();
 
     mCurrClass = ret;
@@ -404,7 +403,7 @@ public class BytecodeLanguage {
     }
 
     //couldn't find the field, try searching the class hierarchy
-    List<Type> types = RootbeerScene.v().getDfsInfo().getHierarchy(original_class);
+    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getHierarchy(original_class);
     for(Type type : types){
       if(type instanceof RefType == false){
         continue;

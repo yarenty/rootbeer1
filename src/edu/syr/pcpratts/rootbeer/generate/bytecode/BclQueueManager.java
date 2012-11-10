@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import java.util.ArrayList;
 import java.util.List;
 import soot.Local;

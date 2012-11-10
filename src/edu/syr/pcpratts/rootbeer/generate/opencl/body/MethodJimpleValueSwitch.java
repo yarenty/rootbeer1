@@ -7,11 +7,9 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.util.ClassConstantReader;
-import java.util.List;
 import soot.*;
 import soot.jimple.AddExpr;
 import soot.jimple.AndExpr;
@@ -61,6 +59,7 @@ import soot.jimple.ThisRef;
 import soot.jimple.UshrExpr;
 import soot.jimple.VirtualInvokeExpr;
 import soot.jimple.XorExpr;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   protected final StringBuilder m_output;
@@ -391,7 +390,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   public void caseClassConstant(ClassConstant arg0) {
     String value = arg0.getValue();
     Type type = m_classConstantReader.stringToType(value);
-    int num = RootbeerScene.v().getDfsInfo().getClassNumber(type);
+    int num = RootbeerClassLoader.v().getDfsInfo().getClassNumber(type);
     m_output.append("edu_syr_pcpratts_classConstant("+num+")");
   }
  

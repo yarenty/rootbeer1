@@ -7,13 +7,13 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
-import edu.syr.pcpratts.rootbeer.classloader.NumberedType;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.List;
 import soot.RefType;
 import soot.Type;
 import soot.jimple.InstanceOfExpr;
+import soot.rbclassload.NumberedType;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class OpenCLInstanceof {
 
@@ -47,7 +47,7 @@ public class OpenCLInstanceof {
       throw new RuntimeException("not supported yet");
     }
     RefType ref_type = (RefType) m_type;
-    List<NumberedType> type_list = RootbeerScene.v().getDfsInfo().getNumberedHierarchyDown(ref_type.getSootClass());
+    List<NumberedType> type_list = RootbeerClassLoader.v().getDfsInfo().getNumberedHierarchyDown(ref_type.getSootClass());
     
     String ret = getDecl();
     ret += "{\n";

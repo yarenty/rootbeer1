@@ -7,8 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
@@ -21,6 +19,7 @@ import java.util.Set;
 import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.StringConstant;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class VisitorWriteGen extends AbstractVisitorGen {
   
@@ -75,7 +74,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     m_Core = m_bcl.top().refParameter(4);
     
     
-    List<Type> types = RootbeerScene.v().getDfsInfo().getOrderedRefLikeTypes();
+    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
     for(Type type : types){
       if(type instanceof ArrayType)
       makeWriteToHeapBodyForArrayType((ArrayType) type);
@@ -157,7 +156,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     Local object_to_write_from = bcl.cast(type, m_Param0);
 
     Local length = bcl.lengthof(object_to_write_from);
-    int class_id = RootbeerScene.v().getDfsInfo().getClassNumber(type);
+    int class_id = RootbeerClassLoader.v().getDfsInfo().getClassNumber(type);
 
     BclMemory bcl_mem = new BclMemory(bcl, m_CurrentMem.top());
     bcl_mem.writeByte((byte) 0);
@@ -227,7 +226,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   private void makeWriteToHeapBodyForRefType(RefType type){
     BytecodeLanguage bcl = m_bcl.top();
     BclMemory bcl_mem = new BclMemory(bcl, m_CurrentMem.top());
-    int class_id = RootbeerScene.v().getDfsInfo().getClassNumber(type);
+    int class_id = RootbeerClassLoader.v().getDfsInfo().getClassNumber(type);
     SootClass soot_class = type.getSootClass();
     
     Local object_to_write_from = bcl.cast(type, m_Param0);
@@ -275,7 +274,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   }
   
   private void writeFields(boolean ref_fields){    
-    if(FastWholeProgram.v().isApplicationClass(m_CurrClass)){
+    if(m_CurrClass.isApplicationClass()){
       attachWriter(m_CurrClass.getName(), ref_fields);
       callBaseClassWriter(m_CurrClass.getName(), ref_fields);
     } else {
@@ -285,7 +284,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   
   public void invokeWriteRefs(SootClass curr_class, Local mem_local) {
     BytecodeLanguage bcl = m_bcl.top();
-    if(FastWholeProgram.v().isApplicationClass(curr_class)){
+    if(curr_class.isApplicationClass()){
       SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
       String specialization = JavaNameToOpenCL.convert(curr_class.getName())+OpenCLScene.v().getIdent();
       bcl.pushMethod(m_CurrObj.top(), "edu_syr_pcpratts_writeRefs"+specialization, VoidType.v(), mem.getType());
@@ -312,7 +311,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     SootClass parent = curr_class.getSuperclass();
     parent = Scene.v().getSootClass(parent.getName());
     if(parent.getName().equals("java.lang.Object") == false){
-      if(FastWholeProgram.v().isApplicationClass(parent)){
+      if(parent.isApplicationClass()){
         attachWriter(parent.getName(), ref_fields);
         callBaseClassWriter(parent.getName(), ref_fields);
       } else {
@@ -329,7 +328,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     if(soot_class.getName().equals(gc_type.getClassName())){
       return false;
     } else {
-      return FastWholeProgram.v().isApplicationClass(soot_class);
+      return soot_class.isApplicationClass();
     }
   }
 
@@ -340,7 +339,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
       soot_class = Scene.v().getSootClass(soot_class.getSuperclass().getName());
       if(soot_class.getName().equals("java.lang.Object"))
         return ret;
-      if(FastWholeProgram.v().isApplicationClass(soot_class))
+      if(soot_class.isApplicationClass())
         return ret;
     }
     
@@ -365,7 +364,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     SootClass curr_class = Scene.v().getSootClass(class_name);
     SootClass parent = curr_class.getSuperclass();
     parent = Scene.v().getSootClass(parent.getName());
-    if(FastWholeProgram.v().isApplicationClass(parent)){
+    if(parent.isApplicationClass()){
       attachWriter(parent.getName(), ref_fields);
     }    
     
@@ -393,7 +392,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     doWriter(class_name, ref_fields, true); 
     
     if(parent.getName().equals("java.lang.Object") == false){
-      if(FastWholeProgram.v().isApplicationClass(parent)){        
+      if(parent.isApplicationClass()){        
         callBaseClassWriter(parent.getName(), ref_fields);
       } else {
         insertWriter(parent.getName(), ref_fields);
@@ -418,7 +417,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
         bcl_mem.writeRef(ref);
       }
       
-      if(FastWholeProgram.v().isApplicationClass(parent))
+      if(parent.isApplicationClass())
         invokeWriteRefs(parent, m_CurrentMem.top());
         
       bcl.returnVoid();

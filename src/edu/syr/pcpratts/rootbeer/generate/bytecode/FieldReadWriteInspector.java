@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import java.util.HashSet;
@@ -31,6 +30,7 @@ import soot.jimple.ArrayRef;
 import soot.jimple.AssignStmt;
 import soot.jimple.FieldRef;
 import soot.jimple.InvokeExpr;
+import soot.rbclassload.RootbeerClassLoader;
 import soot.util.Chain;
 
 public class FieldReadWriteInspector {
@@ -118,7 +118,7 @@ public class FieldReadWriteInspector {
       return false;
     mWritenOnGpuFieldsClassesChecked.add(soot_type.toString());
 
-    List<Type> hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(soot_class);
+    List<Type> hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(soot_class);
     for(Type curr_type : hierarchy){
       if(curr_type instanceof RefType == false){
         continue;

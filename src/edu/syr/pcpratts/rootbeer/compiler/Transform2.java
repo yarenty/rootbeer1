@@ -7,12 +7,12 @@
 
 package edu.syr.pcpratts.rootbeer.compiler;
 
-import edu.syr.pcpratts.rootbeer.classloader.DfsInfo;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.GenerateRuntimeBasicBlock;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
-import soot.Scene;
-import soot.SootClass;
-import soot.SootMethod;
+import java.util.List;
+import soot.*;
+import soot.rbclassload.DfsInfo;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class Transform2 {
   
@@ -23,8 +23,18 @@ public class Transform2 {
   }
 
   public void run(String cls){    
-    DfsInfo dfs_info = RootbeerScene.v().getDfsInfo();
-    OpenCLScene.setInstance(dfs_info.getOpenCLScene());
+    DfsInfo dfs_info = RootbeerClassLoader.v().getDfsInfo();
+    List<Type> types = dfs_info.getOrderedRefLikeTypes();
+    OpenCLScene scene = new OpenCLScene();
+    for(Type type : types){
+      if(type instanceof RefType == false){
+        continue;
+      }
+      RefType ref_type = (RefType) type;
+      scene.addClass(ref_type.getSootClass());
+    }
+    
+    OpenCLScene.setInstance(scene);
     
     System.out.println("running Transform2 on: "+cls);
     

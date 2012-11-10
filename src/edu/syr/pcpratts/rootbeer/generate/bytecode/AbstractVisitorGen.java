@@ -7,8 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
@@ -123,12 +121,12 @@ public class AbstractVisitorGen {
     bcl_mem.pushAddress();
     bcl_mem.setAddress(ref);
 
-    //mBcl.println("reading field: "+ref_field.getName());
+    //bcl.println("reading field: "+ref_field.getName());
     
     SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
     SootClass string = Scene.v().getSootClass("java.lang.String");
     Local original_field_value;
-    if(FastWholeProgram.v().isApplicationClass(soot_class) == false){
+    if(soot_class.isApplicationClass() == false){
       bcl.pushMethod(gc_obj_visit, "readField", obj_class.getType(), obj_class.getType(), string.getType());       
       original_field_value = bcl.invokeMethodRet(gc_obj_visit, m_objSerializing.top(), StringConstant.v(soot_field.getName()));
     } else {
@@ -146,7 +144,7 @@ public class AbstractVisitorGen {
     Type type = soot_field.getType();
     Local ret = bcl.cast(type, ret_obj);
 
-    if(FastWholeProgram.v().isApplicationClass(soot_class) == false){
+    if(soot_class.isApplicationClass() == false){
       bcl.pushMethod(gc_obj_visit, "writeField", VoidType.v(), obj_class.getType(), string.getType(), obj_class.getType());       
       bcl.invokeMethodNoRet(gc_obj_visit, m_objSerializing.top(), StringConstant.v(soot_field.getName()), ret);
     } else {
@@ -169,7 +167,7 @@ public class AbstractVisitorGen {
     Local data = bcl.invokeMethodRet(m_currMem.top());
 
     SootClass soot_class = Scene.v().getSootClass(soot_field.getDeclaringClass().getName());
-    if(FastWholeProgram.v().isApplicationClass(soot_class)){
+    if(soot_class.isApplicationClass()){
       if(field.isInstance()){
         bcl.setInstanceField(soot_field, m_objSerializing.top(), data);
       } else {

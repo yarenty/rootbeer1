@@ -7,10 +7,10 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.List;
 import soot.*;
+import soot.rbclassload.RootbeerClassLoader;
 
 /**
  * Represents an OpenCL function that dispatches to the real OpenCL function
@@ -102,7 +102,7 @@ public class OpenCLPolymorphicMethod {
           SootClass sclass = curr_ref_type.getSootClass();
           if(sootClassHasMethod(sclass) == false)
             continue;
-          ret.append("else if(derived_type == "+RootbeerScene.v().getDfsInfo().getClassNumber(sclass)+"){\n");
+          ret.append("else if(derived_type == "+RootbeerClassLoader.v().getDfsInfo().getClassNumber(sclass)+"){\n");
           if(m_sootMethod.getReturnType() instanceof VoidType == false){
             ret.append("return ");
           }
@@ -166,7 +166,7 @@ public class OpenCLPolymorphicMethod {
 
   private List<Type> getHierarchy(){
     SootClass soot_class = m_sootMethod.getDeclaringClass();
-    return RootbeerScene.v().getDfsInfo().getHierarchy(soot_class);
+    return RootbeerClassLoader.v().getDfsInfo().getHierarchy(soot_class);
   }
 
   @Override

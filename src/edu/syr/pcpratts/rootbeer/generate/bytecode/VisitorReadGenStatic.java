@@ -7,8 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraph;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraphNode;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -23,6 +21,7 @@ import soot.jimple.ClassConstant;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 import soot.jimple.StringConstant;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class VisitorReadGenStatic extends AbstractVisitorGen {
   
@@ -36,7 +35,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     super(inspector);
     m_bcl.push(bcl);
     
-    m_orderedHistory = RootbeerScene.v().getDfsInfo().getOrderedRefTypes();
+    m_orderedHistory = RootbeerClassLoader.v().getDfsInfo().getOrderedRefTypes();
     m_writeToHeapMethodsMade = new HashSet<RefType>();
     m_attachedReaders = new HashSet<String>();
     m_objSerializing = new Stack<Local>();
@@ -60,7 +59,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     List<PermissionGraphNode> roots = graph.getRoots();
     for(PermissionGraphNode node : roots){
       SootClass soot_class = node.getSootClass();
-      if(FastWholeProgram.v().isApplicationClass(soot_class)){
+      if(soot_class.isApplicationClass()){
         attachAndCallReader(soot_class, node.getChildren());
       } else {
         doReader(soot_class);
@@ -158,7 +157,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
         Local ref = bcl_mem.readRef();
         bcl_mem.useInstancePointer();
         
-        if(FastWholeProgram.v().isApplicationClass(soot_class)){
+        if(soot_class.isApplicationClass()){
           bcl_mem.useStaticPointer();
           bcl_mem.setAddress(LongConstant.v(m_staticOffsets.getIndex(field)));
           field_value = bcl_mem.readVar(field.getType().getSootType());
@@ -190,7 +189,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
         continue;
       }
       
-      if(FastWholeProgram.v().isApplicationClass(soot_class)){
+      if(soot_class.isApplicationClass()){
         bcl.setStaticField(field.getSootField(), field_value);
       } else {
         SootClass string = Scene.v().getSootClass("java.lang.String");

@@ -7,8 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraph;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraphNode;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -22,6 +20,7 @@ import soot.jimple.ClassConstant;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 import soot.jimple.StringConstant;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class VisitorWriteGenStatic extends AbstractVisitorGen {
   
@@ -54,7 +53,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     List<PermissionGraphNode> roots = graph.getRoots();
     for(PermissionGraphNode node : roots){
       SootClass soot_class = node.getSootClass();
-      if(FastWholeProgram.v().isApplicationClass(soot_class)){
+      if(soot_class.isApplicationClass()){
         attachAndCallWriter(soot_class, node.getChildren());
       } else {
         doWriter(soot_class);
@@ -62,7 +61,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     }
     
     //write .class's for array types
-    Set<ArrayType> array_types = RootbeerScene.v().getDfsInfo().getArrayTypes();
+    Set<ArrayType> array_types = RootbeerClassLoader.v().getDfsInfo().getArrayTypes();
     for(ArrayType type : array_types){
       writeType(type);
     }
@@ -152,7 +151,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     SootClass obj = Scene.v().getSootClass("java.lang.Object");
     for(OpenCLField field : static_fields){
       Local field_value;
-      if(FastWholeProgram.v().isApplicationClass(soot_class)){
+      if(soot_class.isApplicationClass()){
         field_value = bcl.refStaticField(soot_class.getType(), field.getName());
       } else {
         SootClass string = Scene.v().getSootClass("java.lang.String");
@@ -184,7 +183,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
   }
 
   private void writeType(Type type) {
-    int number = RootbeerScene.v().getDfsInfo().getClassNumber(type);
+    int number = RootbeerClassLoader.v().getDfsInfo().getClassNumber(type);
     Local gc_visit = m_gcObjVisitor.top();
     Local class_obj = null;
     

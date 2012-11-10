@@ -7,10 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
-import edu.syr.pcpratts.rootbeer.classloader.DfsInfo;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
-import edu.syr.pcpratts.rootbeer.generate.bytecode.Constants;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

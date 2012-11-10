@@ -7,8 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.fields;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
-import edu.syr.pcpratts.rootbeer.generate.bytecode.FieldReadWriteInspector;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -8,8 +8,6 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.RootbeerPaths;
-import edu.syr.pcpratts.rootbeer.classloader.NumberedType;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.ReadOnlyTypes;
@@ -37,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import soot.*;
+import soot.rbclassload.NumberedType;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class OpenCLScene {
   private static OpenCLScene m_instance;
@@ -91,7 +91,7 @@ public class OpenCLScene {
   }
 
   public int getClassType(SootClass soot_class){
-    return RootbeerScene.v().getDfsInfo().getClassNumber(soot_class);
+    return RootbeerClassLoader.v().getDfsInfo().getClassNumber(soot_class);
   }
   
   public void addMethod(SootMethod soot_method){
@@ -188,10 +188,10 @@ public class OpenCLScene {
   private String makeSourceCode() throws Exception {
     m_usesGarbageCollector = false;
     
-    List<NumberedType> types = RootbeerScene.v().getDfsInfo().getNumberedTypes();
+    List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedTypes();
     writeTypesToFile(types);
     
-    Set<String> methods = RootbeerScene.v().getDfsInfo().getAllMethods();
+    Set<String> methods = RootbeerClassLoader.v().getDfsInfo().getAllMethods();
     MethodSignatureUtil util = new MethodSignatureUtil();
     for(String method_sig : methods){
       util.parse(method_sig);
@@ -199,22 +199,22 @@ public class OpenCLScene {
       String method_sub_sig = util.getMethodSubSignature();
       SootClass soot_class = Scene.v().getSootClass(cls);
       OpenCLScene.v().addClass(soot_class);
-      SootMethod method = RootbeerScene.v().getMethod(soot_class, method_sub_sig);
+      SootMethod method = RootbeerClassLoader.v().findMethod(soot_class, method_sub_sig);
       addMethod(method);
     }
     
-    Set<SootField> fields = RootbeerScene.v().getDfsInfo().getFields();
+    Set<SootField> fields = RootbeerClassLoader.v().getDfsInfo().getFields();
     for(SootField field : fields){
       addField(field);
     }
     
-    Set<ArrayType> array_types = RootbeerScene.v().getDfsInfo().getArrayTypes();
+    Set<ArrayType> array_types = RootbeerClassLoader.v().getDfsInfo().getArrayTypes();
     for(ArrayType array_type : array_types){
       OpenCLArrayType ocl_array_type = new OpenCLArrayType(array_type);
       addArrayType(ocl_array_type);
     }
     
-    Set<Type> instanceofs = RootbeerScene.v().getDfsInfo().getInstanceOfs();
+    Set<Type> instanceofs = RootbeerClassLoader.v().getDfsInfo().getInstanceOfs();
     for(Type type : instanceofs){
       addInstanceof(type);
     }

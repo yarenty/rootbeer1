@@ -8,8 +8,6 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.Constants;
-import edu.syr.pcpratts.rootbeer.classloader.FastWholeProgram;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.OpenCLBody;
@@ -17,13 +15,13 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import soot.*;
 import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
+import soot.rbclassload.RootbeerClassLoader;
 
 /**
  * Represents an OpenCL function. 
@@ -181,7 +179,6 @@ public class OpenCLMethod {
   }
   
   public String getMethodBody(){
-    loadToBody();
     StringBuilder ret = new StringBuilder();
     if(shouldEmitBody()){
       ret.append(getMethodDecl(false)+"{\n");
@@ -271,7 +268,7 @@ public class OpenCLMethod {
       hierarchy.add(obj.getType());
     } else if (base_type instanceof RefType){
       RefType ref_type = (RefType) base_type;
-      hierarchy = RootbeerScene.v().getDfsInfo().getHierarchy(ref_type.getSootClass());
+      hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(ref_type.getSootClass());
     } else {
       throw new UnsupportedOperationException("how do we handle this case?");
     }
@@ -475,9 +472,5 @@ public class OpenCLMethod {
 
   public String getSignature() {
     return m_sootMethod.getSignature();
-  }
-
-  private void loadToBody() {
-    FastWholeProgram.v().loadToBodyLater(m_sootMethod.getSignature());
   }
 }

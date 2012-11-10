@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.Constants;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
@@ -21,6 +20,7 @@ import soot.Value;
 import soot.jimple.ArrayRef;
 import soot.jimple.NewArrayExpr;
 import soot.jimple.NewMultiArrayExpr;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class OpenCLArrayType {
 
@@ -167,7 +167,7 @@ public class OpenCLArrayType {
     ret.append("}\n");
     
     //new
-    int derived_type = RootbeerScene.v().getDfsInfo().getClassNumber(m_arrayType);
+    int derived_type = RootbeerClassLoader.v().getDfsInfo().getClassNumber(m_arrayType);
     ret.append(decls.get(2)+"{\n");
     ret.append("int i;\n");
     ret.append("int total_size = (size * "+element_size+")+ "+offset_size+";\n");
@@ -291,7 +291,7 @@ public class OpenCLArrayType {
   }
 
   int getTypeInteger() {
-    return RootbeerScene.v().getDfsInfo().getClassNumber(m_arrayType);
+    return RootbeerClassLoader.v().getDfsInfo().getClassNumber(m_arrayType);
   }
 
   private boolean isCharArray() {

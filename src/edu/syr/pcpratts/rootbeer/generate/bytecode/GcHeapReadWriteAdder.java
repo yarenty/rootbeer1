@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.HashSet;

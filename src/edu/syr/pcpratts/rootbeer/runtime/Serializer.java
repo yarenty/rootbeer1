@@ -7,15 +7,11 @@
 
 package edu.syr.pcpratts.rootbeer.runtime;
 
-import com.sun.java.swing.plaf.windows.WindowsTreeUI;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
-import edu.syr.pcpratts.rootbeer.runtime.remap.GpuAtomicLong;
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 public abstract class Serializer {
 

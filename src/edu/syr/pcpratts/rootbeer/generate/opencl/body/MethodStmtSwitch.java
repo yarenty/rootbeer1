@@ -8,20 +8,15 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
 import edu.syr.pcpratts.rootbeer.Constants;
-import edu.syr.pcpratts.rootbeer.classloader.NumberedType;
-import edu.syr.pcpratts.rootbeer.compiler.RootbeerScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLMethod;
-import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.util.Stack;
 import java.util.ArrayList;
 import java.util.List;
-import soot.Local;
 import soot.SootMethod;
 import soot.Type;
 import soot.Unit;
 import soot.Value;
-import soot.VoidType;
 import soot.jimple.ArrayRef;
 import soot.jimple.AssignStmt;
 import soot.jimple.BreakpointStmt;
@@ -33,9 +28,7 @@ import soot.jimple.GotoStmt;
 import soot.jimple.IdentityStmt;
 import soot.jimple.IfStmt;
 import soot.jimple.IntConstant;
-import soot.jimple.InvokeExpr;
 import soot.jimple.InvokeStmt;
-import soot.jimple.JimpleValueSwitch;
 import soot.jimple.LookupSwitchStmt;
 import soot.jimple.NopStmt;
 import soot.jimple.RetStmt;
@@ -44,6 +37,8 @@ import soot.jimple.ReturnVoidStmt;
 import soot.jimple.StmtSwitch;
 import soot.jimple.TableSwitchStmt;
 import soot.jimple.ThrowStmt;
+import soot.rbclassload.NumberedType;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class MethodStmtSwitch implements StmtSwitch {
   protected StringBuilder m_output;
@@ -337,7 +332,7 @@ public class MethodStmtSwitch implements StmtSwitch {
       m_output.append("if(0){}\n");
       for(TrapItem item : m_trapItems){
         m_output.append("else if(");
-        List<NumberedType> types = RootbeerScene.v().getDfsInfo().getNumberedHierarchyDown(item.getException());
+        List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedHierarchyDown(item.getException());
         for(int i = 0; i < types.size(); ++i){
           m_output.append("ex_type == "+types.get(i).getNumber());
           if(i < types.size() - 1){
