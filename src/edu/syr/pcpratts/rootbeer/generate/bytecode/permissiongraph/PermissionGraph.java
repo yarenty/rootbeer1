@@ -33,6 +33,9 @@ public class PermissionGraph {
       SootClass soot_class = type.getSootClass();
       if(soot_class.isPublic() == false){
         PermissionGraphNode root = findRoot(soot_class);
+        if(root == null){
+          continue;
+        }
         root.addChild(soot_class);
       }
     }
@@ -49,6 +52,6 @@ public class PermissionGraph {
       if(pkg.equals(root_pkg))
         return node;
     }
-    throw new RuntimeException("can't find root");
+    return null;
   }
 }

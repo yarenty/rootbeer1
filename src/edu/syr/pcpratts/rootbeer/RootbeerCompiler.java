@@ -130,7 +130,8 @@ public class RootbeerCompiler {
   public void compile(String jar_filename, String outname, String test_case) throws Exception {
     TestCaseEntryPointDetector detector = new TestCaseEntryPointDetector(test_case);
     m_entryDetector = detector;
-    setupSoot(jar_filename, "", true);
+    CurrJarName jar_name = new CurrJarName();
+    setupSoot(jar_filename, jar_name.get(), true);
     m_provider = detector.getProvider();
         
     List<SootMethod> kernel_methods = Scene.v().getEntryPoints();
@@ -472,6 +473,7 @@ public class RootbeerCompiler {
     deleter.delete(Constants.OUTPUT_JAR_FOLDER);
     deleter.delete(Constants.OUTPUT_CLASS_FOLDER);
     deleter.delete(Constants.OUTPUT_SHIMPLE_FOLDER);
+    deleter.delete(Constants.JAR_CONTENTS_FOLDER);
   }
 
   public String getProvider() {

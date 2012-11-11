@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer;
 
 import edu.syr.pcpratts.rootbeer.util.CurrJarName;
 import java.lang.reflect.Method;
+import soot.Modifier;
 
 public class RootbeerTest {
   
