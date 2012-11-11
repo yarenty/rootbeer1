@@ -9,7 +9,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
 import edu.syr.pcpratts.rootbeer.generate.opencl.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
-import edu.syr.pcpratts.rootbeer.util.ClassConstantReader;
+import soot.rbclassload.ClassConstantReader;
 import soot.*;
 import soot.jimple.AddExpr;
 import soot.jimple.AndExpr;

@@ -20,7 +20,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CompileResult;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
-import edu.syr.pcpratts.rootbeer.util.MethodSignatureUtil;
+import soot.rbclassload.MethodSignatureUtil;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
