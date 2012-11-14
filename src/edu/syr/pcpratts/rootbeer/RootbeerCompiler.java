@@ -178,11 +178,11 @@ public class RootbeerCompiler {
       writeJimpleFile(cls.getName());
     }
     
-    Chain<SootClass> app_classes = Scene.v().getApplicationClasses();
-    for(SootClass app_class : app_classes){
-      loadAllMethods(app_class.getName());
-      writeClassFile(app_class.getName());
-      writeJimpleFile(app_class.getName());
+    List<String> app_classes = RootbeerClassLoader.v().getAllAppClasses();
+    for(String app_class : app_classes){
+      loadAllMethods(app_class);
+      writeClassFile(app_class);
+      writeJimpleFile(app_class);
     }
     
     List<SootClass> added_classes = Scene.v().getGeneratedClasses();
