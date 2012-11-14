@@ -11,144 +11,143 @@ import java.lang.reflect.Field;
 
 public class PrivateFields {
 
-  public byte readByte(Object obj, String name){
+  public byte readByte(Object obj, String name, String cls_name){
     try {
-      return getField(obj, name).getByte(obj);
+      return getField(obj, name, cls_name).getByte(obj);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }
   }
   
-  public short readShort(Object obj, String name){
+  public short readShort(Object obj, String name, String cls_name){
     try {
-      return getField(obj, name).getShort(obj);
+      return getField(obj, name, cls_name).getShort(obj);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }
   }
   
-  public char readChar(Object obj, String name){
+  public char readChar(Object obj, String name, String cls_name){
     try {
-      return getField(obj, name).getChar(obj);
+      return getField(obj, name, cls_name).getChar(obj);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }
   }
   
-  public boolean readBoolean(Object obj, String name){
+  public boolean readBoolean(Object obj, String name, String cls_name){
     try {
-      return getField(obj, name).getBoolean(obj);
+      return getField(obj, name, cls_name).getBoolean(obj);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }
   }
   
-  public int readInt(Object obj, String name){
+  public int readInt(Object obj, String name, String cls_name){
     try {
-      return getField(obj, name).getInt(obj);
+      return getField(obj, name, cls_name).getInt(obj);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }
   }
   
-  public long readLong(Object obj, String name){
+  public long readLong(Object obj, String name, String cls_name){
     try {
-      return getField(obj, name).getLong(obj);
+      return getField(obj, name, cls_name).getLong(obj);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }
   }
   
-  public float readFloat(Object obj, String name){
+  public float readFloat(Object obj, String name, String cls_name){
     try {
-      return getField(obj, name).getFloat(obj);
+      return getField(obj, name, cls_name).getFloat(obj);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }
   }
     
-  public double readDouble(Object obj, String name){
+  public double readDouble(Object obj, String name, String cls_name){
     try {
-      return getField(obj, name).getDouble(obj);
+      return getField(obj, name, cls_name).getDouble(obj);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }
   }
   
-  public void writeByte(Object obj, String name, byte value){
+  public void writeByte(Object obj, String name, String cls_name, byte value){
     try {
-      getField(obj, name).setByte(obj, value);
+      getField(obj, name, cls_name).setByte(obj, value);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }  
   }
   
-  public void writeShort(Object obj, String name, short value){
+  public void writeShort(Object obj, String name, String cls_name, short value){
     try {
-      getField(obj, name).setShort(obj, value);
+      getField(obj, name, cls_name).setShort(obj, value);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }  
   }
   
-  public void writeChar(Object obj, String name, char value){
+  public void writeChar(Object obj, String name, String cls_name, char value){
     try {
-      getField(obj, name).setChar(obj, value);
+      getField(obj, name, cls_name).setChar(obj, value);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }  
   }
     
-  public void writeBoolean(Object obj, String name, boolean value){
+  public void writeBoolean(Object obj, String name, String cls_name, boolean value){
     try {
-      getField(obj, name).setBoolean(obj, value);
+      getField(obj, name, cls_name).setBoolean(obj, value);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }  
   }
     
-  public void writeInt(Object obj, String name, int value){
+  public void writeInt(Object obj, String name, String cls_name, int value){
     try {
-      getField(obj, name).setInt(obj, value);
+      getField(obj, name, cls_name).setInt(obj, value);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }  
   }
     
-  public void writeLong(Object obj, String name, long value){
+  public void writeLong(Object obj, String name, String cls_name, long value){
     try {
-      getField(obj, name).setLong(obj, value);
+      getField(obj, name, cls_name).setLong(obj, value);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }  
   }
     
-  public void writeFloat(Object obj, String name, float value){
+  public void writeFloat(Object obj, String name, String cls_name, float value){
     try {
-      getField(obj, name).setFloat(obj, value);
+      getField(obj, name, cls_name).setFloat(obj, value);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }  
   }
     
-  public void writeDouble(Object obj, String name, double value){
+  public void writeDouble(Object obj, String name, String cls_name, double value){
     try {
-      getField(obj, name).setDouble(obj, value);
+      getField(obj, name, cls_name).setDouble(obj, value);
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }  
   }
   
-  public Field getField(Object base, String name){
-    Class cls = base.getClass();
-    while(true){
-      try {
-        Field f = cls.getDeclaredField(name);
-        f.setAccessible(true);
-        return f;      
-      } catch(Exception ex){
-        cls = cls.getSuperclass();
-      }
-    } 
+  public Field getField(Object base, String name, String cls_name){
+    try {
+      Class cls = Class.forName(cls_name);
+      Field f = cls.getDeclaredField(name);
+      f.setAccessible(true);
+      return f;
+    } catch(Exception ex){
+      ex.printStackTrace();
+      return null;
+    }
   }
 }

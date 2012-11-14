@@ -56,7 +56,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
       if(soot_class.isApplicationClass()){
         attachAndCallWriter(soot_class, node.getChildren());
       } else {
-        doWriter(soot_class);
+        doWriter(soot_class, node.getChildren());
       }
     }
     
@@ -124,11 +124,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     m_currMem.push(memory);
     m_gcObjVisitor.push(gc_visit);
     
-    doWriter(soot_class);
-    
-    for(SootClass child : children){
-      attachAndCallWriter(child, new ArrayList<SootClass>());
-    }
+    doWriter(soot_class, children);
     
     bcl.returnVoid();
     bcl.endMethod();
@@ -138,7 +134,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     m_bcl.pop();
   }
   
-  private void doWriter(SootClass soot_class){  
+  private void doWriter(SootClass soot_class, List<SootClass> children){  
     BytecodeLanguage bcl = m_bcl.top();
     Local memory = m_currMem.top();
     Local gc_visit = m_gcObjVisitor.top();
@@ -180,6 +176,10 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
         bcl_mem.useInstancePointer();
       }
     } 
+    
+    for(SootClass child : children){
+      attachAndCallWriter(child, new ArrayList<SootClass>());
+    }
   }
 
   private void writeType(Type type) {
