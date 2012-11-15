@@ -56,7 +56,8 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
       if(soot_class.isApplicationClass()){
         attachAndCallWriter(soot_class, node.getChildren());
       } else {
-        doWriter(soot_class, node.getChildren());
+        //doWriter(soot_class, node.getChildren());
+        doWriter(soot_class, new ArrayList<SootClass>());
       }
     }
     

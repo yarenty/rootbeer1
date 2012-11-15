@@ -23,9 +23,6 @@ public class Transform2 {
   }
 
   public void run(String cls){    
-    if(cls.equals("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.NewOnGpuRunOnGpu")){
-      System.out.println("hello");
-    }
     DfsInfo dfs_info = RootbeerClassLoader.v().getDfsInfo();
     List<Type> types = dfs_info.getOrderedRefLikeTypes();
     OpenCLScene scene = new OpenCLScene();
