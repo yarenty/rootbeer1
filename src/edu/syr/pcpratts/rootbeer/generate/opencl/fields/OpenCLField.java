@@ -195,7 +195,7 @@ public class OpenCLField {
       }
     }
     ret.append("}\n");
-
+    
     return ret.toString();
   }
   

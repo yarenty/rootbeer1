@@ -21,3 +21,5 @@ __device__
 void synchthreads(){
   __syncthreads();
 }
+
+__device__ clock_t global_now;

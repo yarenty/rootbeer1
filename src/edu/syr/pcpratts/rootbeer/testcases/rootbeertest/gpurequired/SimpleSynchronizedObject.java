@@ -12,12 +12,15 @@ import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
 public class SimpleSynchronizedObject {
 
   private int m_value;
+  private int m_hello;
   
   public SimpleSynchronizedObject(){
+    m_hello = 0;
     m_value = 0;
   }
   
   public synchronized void inc(){
+    m_hello = 0;
     m_value++;
   }
   

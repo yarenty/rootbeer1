@@ -245,7 +245,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     object_to_write_to = bcl.invokeMethodRet(m_thisRef, m_RefParam, object_to_write_to);
     object_to_write_to = bcl.cast(type, object_to_write_to);
     
-    bcl_mem.incrementAddress(12);       
+    int read_bytes = 4;
+    bcl_mem.incrementAddress(Constants.SizeGcInfo-read_bytes);       
     
     m_CurrObj.push(object_to_write_to);
     m_objSerializing.push(object_to_write_to);
