@@ -243,8 +243,12 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     bcl_mem.incrementAddress(4);
     bcl_mem.writeInt(-1);
     
+    int written_size = 1+1+1+1+4+4+4;
+    
+    bcl_mem.incrementAddress(Constants.SizeGcInfo - written_size);
+    
     bcl_mem.pushAddress();
-
+    
     int size_minus_gc_info = size - Constants.SizeGcInfo;
     bcl_mem.incrementAddress(size_minus_gc_info);
         

@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 public class Constants {
 
-  public final static int SizeGcInfo = 16;
+  //if SiceGcInfo is 16, the synch tests fail
+  public final static int SizeGcInfo = 32;
   public final static int ArrayOffsetSize = 16;
 }

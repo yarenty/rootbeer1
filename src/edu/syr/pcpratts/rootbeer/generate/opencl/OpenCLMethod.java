@@ -176,21 +176,25 @@ public class OpenCLMethod {
       ret += "  } else {\n"; 
     }    
     
-    //http://stackoverflow.com/questions/11217117/equivalent-of-usleep-in-cuda-kernel
-    ret += "clock_t prev = clock();\n";
-    ret += "long long cycles = 0;\n";
-    ret += "for (;;) {\n";
-    ret += "  clock_t curr = clock();\n";
-    ret += "  if(prev > curr){\n";
-    ret += "    cycles += (0xffffffff - prev) + curr;\n";
-    ret += "  } else {\n";
-    ret += "    cycles += (curr - prev);\n";
-    ret += "  }\n";
-    ret += "  if (cycles >= 10000000) {\n";
-    ret += "    break;\n";
-    ret += "  }\n";
-    ret += "}\n";
-    ret += "global_now = cycles;";
+    //adding this in makes the WhileTrueTest pass.
+    //for some reason the first write to memory doesn't work well inside a sync block.
+    if(m_sootMethod.isStatic() == false){
+      ret += "  if ( thisref ==-1 ) { \n";
+      ret += "    * exception = 11;\n";
+      ret += "  }\n";
+
+      ret += "  if ( * exception != 0 ) {\n";
+      ret += "    edu_syr_pcpratts_exitMonitorMem ( gc_info , mem , old ) ;\n";
+      if(returnsAValue()){
+        ret += "    return 0;\n";
+      } else {
+        ret += "    return;\n";
+      }
+      ret += "  }\n";
+
+      ret += "  char * thisref_synch_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref );\n";
+      ret += "  * ( ( int * ) & thisref_synch_deref [ 16 ] ) = 20 ;\n";
+    }
     return ret;
   }
   

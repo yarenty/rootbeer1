@@ -8,7 +8,9 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
 import edu.syr.pcpratts.rootbeer.Constants;
+import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLMethod;
+import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.util.Stack;
 import java.util.ArrayList;
@@ -159,12 +161,19 @@ public class MethodStmtSwitch implements StmtSwitch {
   public void caseEnterMonitorStmt(EnterMonitorStmt arg0) {
     String id = getVarName();
     String mem = getVarName();
+    String synch = getVarName();
     String count = getVarName();
     String old = getVarName();
     m_oldValueFromMonitorStack.push(old);
     
+    OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(m_sootMethod.getDeclaringClass());
+    OpenCLMethod ocl_method = ocl_class.getMethod(m_sootMethod.getSignature());
+    
     m_output.append("int "+id+" = getThreadId();\n");
     m_output.append("char * "+mem+" = edu_syr_pcpratts_gc_deref(gc_info, ");
+    arg0.getOp().apply(m_valueSwitch);
+    m_output.append(");\n");
+    m_output.append("char * "+synch+" = edu_syr_pcpratts_gc_deref(gc_info, ");
     arg0.getOp().apply(m_valueSwitch);
     m_output.append(");\n");
     m_output.append(mem+" += 12;\n");
@@ -178,6 +187,9 @@ public class MethodStmtSwitch implements StmtSwitch {
     m_output.append("      "+count+" = 0;\n");
     m_output.append("    }\n");
     m_output.append("  } else {\n");
+    
+    //the first write gets messed up in synch test cases
+    m_output.append("  * ( ( int * ) & "+synch+" [ 16 ] ) = 20 ;\n");
   }
 
   public void caseExitMonitorStmt(ExitMonitorStmt arg0) {

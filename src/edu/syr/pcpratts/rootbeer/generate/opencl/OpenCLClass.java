@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class OpenCLClass {
       OffsetCalculator calc = OpenCLScene.v().getOffsetCalculator(m_SootClass);
       return calc.getSize(m_SootClass);
     } catch(RuntimeException ex){
-      return 0;
+      return edu.syr.pcpratts.rootbeer.generate.bytecode.Constants.SizeGcInfo;
     }
   }
   
@@ -205,6 +206,15 @@ public class OpenCLClass {
     for(OpenCLField field : mAllUsedStaticFields){
       if(field.getName().equals(name))
         return field;
+    }
+    return null;
+  }
+
+  public OpenCLMethod getMethod(String signature) {
+    for(OpenCLMethod ocl_method : m_Methods){
+      if(ocl_method.getSignature().equals(signature)){
+        return ocl_method;
+      }
     }
     return null;
   }
