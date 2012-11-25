@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CudaPath {
@@ -47,14 +48,14 @@ public class CudaPath {
   }
 
   private String getWindows() {
-    if(System.getenv().containsKey("CUDA_BIN_PATH")){
-      return findWindowsNvcc(System.getenv("CUDA_BIN_PATH"));
-    }
     for(String path : m_windowsSearchPaths){
       String nvcc = findWindowsNvcc(path);
       if(nvcc != null){
         return nvcc;
       }
+    }    
+    if(System.getenv().containsKey("CUDA_BIN_PATH")){
+      return findWindowsNvcc(System.getenv("CUDA_BIN_PATH"));
     }
     throw new RuntimeException("cannot find nvcc.exe. Try setting the CUDA_BIN_PATH to the folder with nvcc.exe");
   }
@@ -65,9 +66,21 @@ public class CudaPath {
       return null;
     }
     File[] children = file.listFiles();
+    FileSorter[] sorted_children = new FileSorter[children.length];
+    for(int i = 0; i < children.length; ++i){
+      File child = children[i];
+      sorted_children[i] = new FileSorter(child);
+    }
+    Arrays.sort(sorted_children);
+    for(int i = 0; i < sorted_children.length; ++i){
+      children[i] = sorted_children[i].getFile();
+    }
     for(File child : children){
       if(child.isDirectory()){
-        findWindowsNvcc(child.getAbsolutePath());
+        String nvcc = findWindowsNvcc(child.getAbsolutePath());
+        if(nvcc != null){
+          return nvcc;
+        }
       } else {
         if(child.getName().equals("nvcc.exe")){
           return child.getAbsolutePath();
@@ -75,5 +88,25 @@ public class CudaPath {
       }
     }
     return null;
+  }
+  
+  private class FileSorter implements Comparable<FileSorter> {
+
+    private File m_file;
+    
+    public FileSorter(File file){
+      m_file = file;
+    }
+    
+    public int compareTo(FileSorter o) {
+      String lhs = m_file.getAbsolutePath();
+      String rhs = o.m_file.getAbsolutePath();
+      
+      return rhs.compareTo(lhs);
+    }
+    
+    public File getFile(){
+      return m_file;
+    }
   }
 }
