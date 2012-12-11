@@ -58,6 +58,9 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error) {
 	char msg[1024];
 	jclass exp;
 	jfieldID fid;
+  int a = 0;
+  int b = 0;
+  char name[1024];
 
 	if(error == CUDA_SUCCESS){
 		return;
@@ -70,6 +73,11 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error) {
 		case CUDA_ERROR_OUT_OF_MEMORY:
 			sprintf(msg, "CUDA_ERROR_OUT_OF_MEMORY: %.900s",message);
 			break;
+    case CUDA_ERROR_NO_BINARY_FOR_GPU:
+      cuDeviceGetName(name,1024,cuDevice);
+      cuDeviceComputeCapability(&a, &b, cuDevice);
+      sprintf(msg, "No binary for gpu. Selected %s (%d.%d). 2.0 compatibility required.", name, a, b);
+      break;
 		default:
 			sprintf(msg, "ERROR STATUS:%i : %.900s", error, message);
 	}
