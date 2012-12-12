@@ -12,4 +12,5 @@ import java.util.List;
 public interface TestSerializationFactory {
 
   List<TestSerialization> getProviders();
+  void makeHarder();
 }

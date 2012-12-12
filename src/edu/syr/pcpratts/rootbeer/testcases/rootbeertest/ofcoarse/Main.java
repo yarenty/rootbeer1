@@ -54,4 +54,8 @@ public class Main implements TestSerializationFactory {
     }
     System.out.println("PASSED");
   }
+
+  public void makeHarder() {
+    //ignore
+  }
 }

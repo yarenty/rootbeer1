@@ -11,9 +11,12 @@ import java.util.List;
 
 public class LoadTestSerialization {
 
-  public List<TestSerialization> load(ClassLoader loader, String class_name) throws Exception {
+  public List<TestSerialization> load(ClassLoader loader, String class_name, boolean run_hard_tests) throws Exception {
     Object instance = doLoad(loader, class_name);
     TestSerializationFactory factory = (TestSerializationFactory) instance;
+    if(run_hard_tests){
+      factory.makeHarder();
+    }
     return factory.getProviders();
   }
 

@@ -17,6 +17,7 @@ public class Main {
   public int m_mode;
   private int m_num_args;
   private boolean m_runTests;
+  private boolean m_runHardTests;
   private boolean m_disableClassRemapping;
   private String m_testCase;
   private boolean m_simpleCompile;
@@ -32,6 +33,7 @@ public class Main {
     m_directories = new ArrayList<String>();
     m_mode = Configuration.MODE_GPU;
     m_simpleCompile = false;
+    m_runHardTests = false;
   }
   
   public static boolean largeMemTests(){
@@ -64,9 +66,15 @@ public class Main {
       } else if(arg.equals("-runtests")){
         m_runTests = true;
         m_testCase = null;
+        m_runHardTests = true;
+      } else if(arg.equals("-runeasytests")){
+        m_runTests = true;
+        m_testCase = null;
+        m_runHardTests = false;
       } else if(arg.equals("-runtest")){
         m_runTests = true;
         m_testCase = safeGet(args, i+1, "-runtest");
+        m_runHardTests = true;
         ++i;
       } else if(arg.equals("-printdeviceinfo")){
         m_printDeviceInfo = true;
@@ -108,7 +116,7 @@ public class Main {
     
     if(m_runTests){
       RootbeerTest test = new RootbeerTest();
-      test.runTests(m_testCase);
+      test.runTests(m_testCase, m_runHardTests);
       return;
     } 
     

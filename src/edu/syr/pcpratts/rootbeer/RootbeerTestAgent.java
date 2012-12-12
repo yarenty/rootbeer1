@@ -60,9 +60,9 @@ public class RootbeerTestAgent {
     }
   }
   
-  public void test(ClassLoader cls_loader) throws Exception {
+  public void test(ClassLoader cls_loader, boolean run_hard_tests) throws Exception {
     LoadTestSerialization loader = new LoadTestSerialization();
-    List<TestSerialization> creators = loader.load(cls_loader, "edu.syr.pcpratts.rootbeer.testcases.rootbeertest.Main");
+    List<TestSerialization> creators = loader.load(cls_loader, "edu.syr.pcpratts.rootbeer.testcases.rootbeertest.Main", run_hard_tests);
     List<TestException> ex_creators = loader.loadException(cls_loader, "edu.syr.pcpratts.rootbeer.testcases.rootbeertest.ExMain");
     int num_tests = creators.size() + ex_creators.size();
     int test_num = 1;

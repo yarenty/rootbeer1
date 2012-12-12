@@ -26,4 +26,8 @@ public class PerformanceTests implements TestSerializationFactory {
     ret.add(new BruteForceFFTTest());
     return ret;
   }
+
+  public void makeHarder() {
+    //ignore
+  }
 }

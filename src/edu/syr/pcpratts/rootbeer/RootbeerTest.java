@@ -16,7 +16,7 @@ public class RootbeerTest {
   public RootbeerTest(){
   }
   
-  public void runTests(String test_case) {
+  public void runTests(String test_case, boolean run_hard_tests) {
     RootbeerCompiler compiler = new RootbeerCompiler();
     String dest_jar = "output.jar";   
     CurrJarName jar_name = new CurrJarName();
@@ -39,7 +39,7 @@ public class RootbeerTest {
       Method[] methods = agent_class.getMethods();
       if(test_case == null){
         Method test_method = findMethodByName("test", methods);
-        test_method.invoke(agent_obj, cls_loader);
+        test_method.invoke(agent_obj, cls_loader, run_hard_tests);
       } else {
         Method test_method = findMethodByName("testOne", methods);
         test_method.invoke(agent_obj, cls_loader, test_case);

@@ -21,6 +21,16 @@ import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.*;
 
 public class Main implements TestSerializationFactory {
 
+  private boolean m_hardTests;
+  
+  public Main(){
+    m_hardTests = false;
+  }
+  
+  public void makeHarder(){
+    m_hardTests = true;
+  }
+  
   public List<TestSerialization> getProviders() {
     List<TestSerialization> ret = new ArrayList<TestSerialization>();
     ret.add(new NewOnGpu());
@@ -47,12 +57,6 @@ public class Main implements TestSerializationFactory {
     ret.add(new StrictMathTest()); 
     ret.add(new AtomicLongTest());
     ret.add(new NativeStrictMathTest());  
-    ret.add(new SimpleSynchronizedTest());
-    ret.add(new SynchronizedMethodTest());
-    ret.add(new SynchronizedMethod2Test());
-    ret.add(new SynchronizedMethod3Test());
-    ret.add(new SynchronizedStaticMethodTest());
-    ret.add(new SynchronizedObjectTest());
     ret.add(new SuperClass());
     ret.add(new StringTest());
     ret.add(new StepFilterTest());
@@ -64,6 +68,15 @@ public class Main implements TestSerializationFactory {
     ret.add(new DotClassTest());
     ret.add(new PrintTest());
     ret.add(new BarrierTest());
+    
+    if(m_hardTests){
+      ret.add(new SimpleSynchronizedTest());
+      ret.add(new SynchronizedMethodTest());
+      ret.add(new SynchronizedMethod2Test());
+      ret.add(new SynchronizedMethod3Test());
+      ret.add(new SynchronizedStaticMethodTest());
+      ret.add(new SynchronizedObjectTest());
+    }
     
     if(edu.syr.pcpratts.rootbeer.Main.largeMemTests()){
       ret.add(new LargeMemTest());
