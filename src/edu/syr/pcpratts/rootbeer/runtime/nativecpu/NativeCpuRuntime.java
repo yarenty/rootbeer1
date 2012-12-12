@@ -10,6 +10,7 @@ package edu.syr.pcpratts.rootbeer.runtime.nativecpu;
 import edu.syr.pcpratts.rootbeer.runtime.ParallelRuntime;
 import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
 import java.util.Iterator;
 
 public class NativeCpuRuntime implements ParallelRuntime {
@@ -28,7 +29,7 @@ public class NativeCpuRuntime implements ParallelRuntime {
     m_Device = new NativeCpuDevice();
   }
   
-  public PartiallyCompletedParallelJob run(Iterator<Kernel> blocks) {
+  public PartiallyCompletedParallelJob run(Iterator<Kernel> blocks, Rootbeer rootbeer) {
     return m_Device.run(blocks);
   }
 

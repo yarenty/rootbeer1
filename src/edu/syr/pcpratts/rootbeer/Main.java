@@ -95,15 +95,15 @@ public class Main {
   private void run() {
     // Now we have loaded the dll's if we need to print the device details to it
     if(m_printDeviceInfo){
-        if(m_num_args == 1){
-            CudaLoader loader = new CudaLoader();
-            loader.load();
-            CudaRuntime2.printDeviceInfo();
-        } else {
-            System.out.println("-printdeviceinfo can only be used by itself. Remove other arguments.");  
-            System.out.flush();
-            return;
-        }
+      if(m_num_args == 1){
+        CudaLoader loader = new CudaLoader();
+        loader.load();
+        CudaRuntime2.printDeviceInfo();
+      } else {
+        System.out.println("-printdeviceinfo can only be used by itself. Remove other arguments.");  
+        System.out.flush();
+        return;
+      }
     }
     
     if(m_runTests){

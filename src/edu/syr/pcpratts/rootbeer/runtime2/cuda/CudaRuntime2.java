@@ -10,13 +10,7 @@ package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 import edu.syr.pcpratts.rootbeer.Configuration;
 import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.RootbeerPaths;
-import edu.syr.pcpratts.rootbeer.runtime.Serializer;
-import edu.syr.pcpratts.rootbeer.runtime.ParallelRuntime;
-import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
-import edu.syr.pcpratts.rootbeer.runtime.ReadOnlyAnalyzer;
-import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-import edu.syr.pcpratts.rootbeer.runtime.CompiledKernel;
+import edu.syr.pcpratts.rootbeer.runtime.*;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
 import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
@@ -61,9 +55,12 @@ public class CudaRuntime2 implements ParallelRuntime {
   private int m_GridShape;
   private long m_MaxGridDim;
   private long m_NumMultiProcessors;
+  
   private long m_serializationTime;
   private long m_executionTime;
   private long m_deserializationTime;
+  private long m_initTime;
+  private long m_overallTime;
   
   private List<Kernel> m_JobsToWrite;
   private List<Kernel> m_JobsWritten;
@@ -118,7 +115,11 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_Handles = new Handles(m_HandlesAddr, m_GpuHandlesAddr);
     m_ExceptionHandles = new Handles(m_ExceptionsHandlesAddr, m_GpuExceptionsHandlesAddr);
     m_CpuRunner = new CpuRunner();
-    watch.stopAndPrint("CudaRuntime2 ctor: ");
+    
+    //this will be overwitten in edu.syr.pcpratts.rootbeer.runtime.Rootbeer.<init>(boolean)
+    Configuration.setPrintMem(false);
+    
+    m_initTime = watch.elapsedTimeMillis();
   }
   
   private long getReserveMem(){
@@ -159,7 +160,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     test.run(m_ToSpace.get(0));
   }
   
-  public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs){
+  public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs, Rootbeer rootbeer){
     
     Stopwatch watch2 = new Stopwatch();
     watch2.start();
@@ -189,7 +190,14 @@ public class CudaRuntime2 implements ParallelRuntime {
     runExtraBlocks();
     
     RootbeerGpu.setIsOnGpu(false);
-    watch2.stopAndPrint("CudaRuntime2.run: ");
+    
+    m_overallTime = watch2.elapsedTimeMillis();
+    
+    StatsRow stats_row = new StatsRow(m_serializationTime, m_executionTime, 
+                                      m_deserializationTime, m_overallTime, 
+                                      m_GridShape, m_BlockShape);
+    
+    rootbeer.addStatsRow(stats_row);
     return m_Partial;
   }
 
@@ -274,7 +282,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     watch.stop();
     m_serializationTime = watch.elapsedTimeMillis();
     
-    if(Configuration.getRunAllTests() == false){
+    if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
       printer.print(m_ToSpace.get(0), 0, 896);
     }
@@ -294,10 +302,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     loadFunction(getHeapEndPtr(), dest_filename, m_NumBlocksRun);
   }
   
-  private void runOnGpu(){
-    System.out.println("Running "+m_NumBlocksRun+" blocks.");
-    System.out.println("BlockShape: "+m_BlockShape+" GridShape: "+m_GridShape);    
-    
+  private void runOnGpu(){    
     try {
       runBlocks(m_NumBlocksRun, m_BlockShape, m_GridShape);
     } catch(RuntimeException ex){
@@ -324,7 +329,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     
     m_ExceptionHandles.activate();
     
-    if(Configuration.getRunAllTests() == false){
+    if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
       printer.print(m_ToSpace.get(0), 0, 2048);
     }
@@ -396,24 +401,11 @@ public class CudaRuntime2 implements ParallelRuntime {
       if(mem.getHeapEndPtr() > max)
         max = mem.getHeapEndPtr();
     }
-    System.out.println("heap end ptr: "+max);
     return max;
   }
 
   public boolean isGpuPresent() {
     return true;
-  }
-
-  public long getExecutionTime() {
-    return m_executionTime;
-  }
-
-  public long getSerializationTime() {
-    return m_serializationTime;
-  }
-  
-  public long getDeserializationTime() {
-    return m_deserializationTime;
   }
   
   private native long findReserveMem(int max_blocks, int max_threads);

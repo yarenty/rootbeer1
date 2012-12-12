@@ -7,18 +7,21 @@
 
 package edu.syr.pcpratts.rootbeer.runtime;
 
+import edu.syr.pcpratts.rootbeer.Configuration;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class Rootbeer implements IRootbeer {
 
   private IRootbeer m_Rootbeer;
+  private List<StatsRow> m_stats;
   
   public Rootbeer(){
     RootbeerFactory factory = new RootbeerFactory();
-    m_Rootbeer = factory.create();
+    m_Rootbeer = factory.create(this);
   }
-
+  
   public void runAll(List<Kernel> jobs) {
     if(jobs.isEmpty()){
       return;
@@ -28,6 +31,7 @@ public class Rootbeer implements IRootbeer {
         job.gpuMethod();
       }
     } else {
+      m_stats = new ArrayList<StatsRow>();
       m_Rootbeer.runAll(jobs);
     }
   }
@@ -36,15 +40,11 @@ public class Rootbeer implements IRootbeer {
     return m_Rootbeer.run(jobs);
   }
   
-  public long getExecutionTime() {
-    return m_Rootbeer.getExecutionTime();  
+  public void addStatsRow(StatsRow row) {
+    m_stats.add(row);
   }
   
-  public long getSerializationTime() {
-    return m_Rootbeer.getSerializationTime();
-  }
-  
-  public long getDeserializationTime() {
-    return m_Rootbeer.getDeserializationTime();
+  public List<StatsRow> getStats(){
+    return m_stats;
   }
 }

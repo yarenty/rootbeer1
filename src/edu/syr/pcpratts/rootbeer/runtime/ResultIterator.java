@@ -12,37 +12,39 @@ import java.util.List;
 
 public class ResultIterator implements Iterator<Kernel> {
 
-  private Iterator<Kernel> m_CurrIter;
-  private Iterator<Kernel> m_JobsToEnqueue;
-  private ParallelRuntime m_Runtime;
+  private Iterator<Kernel> m_currIter;
+  private Iterator<Kernel> m_jobsToEnqueue;
+  private ParallelRuntime m_runtime;
+  private Rootbeer m_rootbeer;
 
-  public ResultIterator(PartiallyCompletedParallelJob partial, ParallelRuntime runtime){
+  public ResultIterator(PartiallyCompletedParallelJob partial, ParallelRuntime runtime, Rootbeer rootbeer){
     readPartial(partial);
-    m_Runtime = runtime;
+    m_runtime = runtime;
+    m_rootbeer = rootbeer;
   }
 
   private void readPartial(PartiallyCompletedParallelJob partial){
     List<Kernel> active_jobs = partial.getActiveJobs();
-    m_CurrIter = active_jobs.iterator();
-    m_JobsToEnqueue = partial.getJobsToEnqueue();
+    m_currIter = active_jobs.iterator();
+    m_jobsToEnqueue = partial.getJobsToEnqueue();
   }
 
   public boolean hasNext() {
-    if(m_CurrIter.hasNext())
+    if(m_currIter.hasNext())
       return true;
-    if(m_JobsToEnqueue.hasNext() == false)
+    if(m_jobsToEnqueue.hasNext() == false)
       return false;
     try {
-      readPartial(m_Runtime.run(m_JobsToEnqueue));
+      readPartial(m_runtime.run(m_jobsToEnqueue, m_rootbeer));
     } catch(Exception ex){
       ex.printStackTrace();
       return false;
     }
-    return m_CurrIter.hasNext();
+    return m_currIter.hasNext();
   }
 
   public Kernel next() {
-    return m_CurrIter.next();
+    return m_currIter.next();
   }
 
   public void remove() {

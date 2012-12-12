@@ -31,13 +31,12 @@ public class RootbeerTestAgent {
   }
   
   public void testOne(ClassLoader cls_loader, String test_case) throws Exception {
-    Configuration.setRunAllTests(false);
     Class test_case_cls = cls_loader.loadClass(test_case);
     Object test_case_obj = test_case_cls.newInstance();
     if(test_case_obj instanceof TestSerialization){
       TestSerialization test_ser = (TestSerialization) test_case_obj;
       System.out.println("[TEST 1/1] "+test_ser.toString());
-      test(test_ser);      
+      test(test_ser, true);      
       if(m_passed){
         System.out.println("  PASSED");
         System.out.println("  Cpu time: "+m_cpuTime+" ms");
@@ -62,7 +61,6 @@ public class RootbeerTestAgent {
   }
   
   public void test(ClassLoader cls_loader) throws Exception {
-    Configuration.setRunAllTests(true);
     LoadTestSerialization loader = new LoadTestSerialization();
     List<TestSerialization> creators = loader.load(cls_loader, "edu.syr.pcpratts.rootbeer.testcases.rootbeertest.Main");
     List<TestException> ex_creators = loader.loadException(cls_loader, "edu.syr.pcpratts.rootbeer.testcases.rootbeertest.ExMain");
@@ -71,7 +69,7 @@ public class RootbeerTestAgent {
 
     for(TestSerialization creator : creators){
       System.out.println("[TEST "+test_num+"/"+num_tests+"] "+creator.toString());
-      test(creator);
+      test(creator, false);
       if(m_passed){
         System.out.println("  PASSED");
         System.out.println("  Cpu time: "+m_cpuTime+" ms");
@@ -109,11 +107,11 @@ public class RootbeerTestAgent {
     } 
   }
   
-  
-  private void test(TestSerialization creator) {
+  private void test(TestSerialization creator, boolean print_mem) {
     int i = 0;
     try {      
       Rootbeer rootbeer = new Rootbeer();
+      Configuration.setPrintMem(print_mem);
       List<Kernel> known_good_items = creator.create();
       List<Kernel> testing_items = creator.create();
       Stopwatch watch = new Stopwatch();

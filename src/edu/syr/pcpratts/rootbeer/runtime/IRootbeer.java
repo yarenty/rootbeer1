@@ -14,8 +14,5 @@ public interface IRootbeer {
   
   void runAll(List<Kernel> jobs);
   Iterator<Kernel> run(Iterator<Kernel> jobs);
-  long getExecutionTime();
-  long getSerializationTime();
-  long getDeserializationTime();
 
 }

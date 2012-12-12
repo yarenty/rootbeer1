@@ -19,9 +19,11 @@ import java.util.List;
 
 public class ConcreteRootbeer implements IRootbeer {
 
-  boolean m_GpuWorking;
+  private boolean m_GpuWorking;
+  private Rootbeer m_rootbeer;
 
-  public ConcreteRootbeer(){
+  public ConcreteRootbeer(Rootbeer rootbeer){
+    m_rootbeer = rootbeer;
     m_GpuWorking = true;
     if(Configuration.runtimeInstance().getMode() == Configuration.MODE_GPU) {
       CudaRuntime2.v();
@@ -47,8 +49,8 @@ public class ConcreteRootbeer implements IRootbeer {
 
   private Iterator<Kernel> runOnCpu(Iterator<Kernel> jobs) {
     try {
-      PartiallyCompletedParallelJob partial = CpuRuntime.v().run(jobs);
-      return new ResultIterator(partial, CpuRuntime.v());
+      PartiallyCompletedParallelJob partial = CpuRuntime.v().run(jobs, m_rootbeer);
+      return new ResultIterator(partial, CpuRuntime.v(), m_rootbeer);
     } catch (Exception ex){
       ex.printStackTrace();
       System.exit(-1);
@@ -58,30 +60,13 @@ public class ConcreteRootbeer implements IRootbeer {
   
   private Iterator<Kernel> runOnCudaGpu(Iterator<Kernel> jobs) {    
     Tweaks.setInstance(new CudaTweaks());
-    PartiallyCompletedParallelJob partial = CudaRuntime2.v().run(jobs);
-    return new ResultIterator(partial, CudaRuntime2.v());
+    PartiallyCompletedParallelJob partial = CudaRuntime2.v().run(jobs, m_rootbeer);
+    return new ResultIterator(partial, CudaRuntime2.v(), m_rootbeer);
   }
   
   private Iterator<Kernel> runOnNativeCpu(Iterator<Kernel> jobs) {
     Tweaks.setInstance(new NativeCpuTweaks());
-    PartiallyCompletedParallelJob partial = NativeCpuRuntime.v().run(jobs);
-    return new ResultIterator(partial, NativeCpuRuntime.v());
-  }
-
-  public long getExecutionTime() {
-    return CudaRuntime2.v().getExecutionTime();
-  }
-  
-  public long getSerializationTime() {
-    return CudaRuntime2.v().getSerializationTime();
-  }
-  
-  public long getDeserializationTime() {
-    return CudaRuntime2.v().getDeserializationTime();
-  }
-  
-  public static void main(String[] args){
-    ConcreteRootbeer rootbeer = new ConcreteRootbeer();
-    
+    PartiallyCompletedParallelJob partial = NativeCpuRuntime.v().run(jobs, m_rootbeer);
+    return new ResultIterator(partial, NativeCpuRuntime.v(), m_rootbeer);
   }
 }

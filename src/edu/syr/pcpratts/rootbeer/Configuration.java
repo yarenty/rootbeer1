@@ -34,10 +34,11 @@ public class Configuration {
     }
     return m_Instance;
   }
-  
+
   private int m_mode;
   private boolean m_compilerInstance;
   private static boolean m_runAll;
+  private static boolean m_printMem;
   
   private Configuration(){
     m_compilerInstance = true;
@@ -68,5 +69,13 @@ public class Configuration {
   
   public static boolean getRunAllTests(){
     return m_runAll;
+  }
+  
+  public static boolean getPrintMem() {
+    return m_printMem;
+  }
+  
+  public static void setPrintMem(boolean print){
+    m_printMem = print;
   }
 }
