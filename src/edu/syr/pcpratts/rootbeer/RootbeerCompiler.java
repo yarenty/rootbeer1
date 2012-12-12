@@ -44,7 +44,7 @@ public class RootbeerCompiler {
   public RootbeerCompiler(){
     clearOutputFolders();
     
-    m_classOutputFolder = Constants.OUTPUT_CLASS_FOLDER;
+    m_classOutputFolder = RootbeerPaths.v().getOutputClassFolder();
     m_jimpleOutputFolder = "output-jimple";
     
     if(Configuration.compilerInstance().getMode() == Configuration.MODE_GPU){      
@@ -68,7 +68,7 @@ public class RootbeerCompiler {
     extractJar(jar_filename);
     
     List<String> proc_dir = new ArrayList<String>();
-    proc_dir.add(Constants.JAR_CONTENTS_FOLDER);
+    proc_dir.add(RootbeerPaths.v().getJarContentsFolder());
     
     Options.v().set_allow_phantom_refs(true);
     Options.v().set_rbclassload(true);
@@ -199,7 +199,7 @@ public class RootbeerCompiler {
   
   public void pack(String outjar_name) throws Exception {
     Pack p = new Pack();
-    String main_jar = Constants.OUTPUT_JAR_FOLDER + File.separator + "partial-ret.jar";
+    String main_jar = RootbeerPaths.v().getOutputJarFolder() + File.separator + "partial-ret.jar";
     List<String> lib_jars = new ArrayList<String>();
     CurrJarName jar_name = new CurrJarName();
     lib_jars.add(jar_name.get());
@@ -207,8 +207,8 @@ public class RootbeerCompiler {
   }
 
   public void makeOutJar() throws Exception {
-    JarEntryHelp.mkdir(Constants.OUTPUT_JAR_FOLDER + File.separator);
-    String outfile = Constants.OUTPUT_JAR_FOLDER + File.separator + "partial-ret.jar";
+    JarEntryHelp.mkdir(RootbeerPaths.v().getOutputJarFolder() + File.separator);
+    String outfile = RootbeerPaths.v().getOutputJarFolder() + File.separator + "partial-ret.jar";
 
     ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(outfile));
     addJarInputManifestFiles(zos);
@@ -219,18 +219,18 @@ public class RootbeerCompiler {
   }
   
   private void addJarInputManifestFiles(ZipOutputStream zos) throws Exception {
-    List<File> jar_input_files = getFiles(Constants.JAR_CONTENTS_FOLDER);
+    List<File> jar_input_files = getFiles(RootbeerPaths.v().getJarContentsFolder());
     for(File f : jar_input_files){
       if(f.getPath().contains("META-INF")){
-        writeFileToOutput(f, zos, Constants.JAR_CONTENTS_FOLDER);
+        writeFileToOutput(f, zos, RootbeerPaths.v().getJarContentsFolder());
       }
     }
   }
 
   private void addOutputClassFiles(ZipOutputStream zos) throws Exception {
-    List<File> output_class_files = getFiles(Constants.OUTPUT_CLASS_FOLDER);
+    List<File> output_class_files = getFiles(RootbeerPaths.v().getOutputClassFolder());
     for(File f : output_class_files){
-      writeFileToOutput(f, zos, Constants.OUTPUT_CLASS_FOLDER);
+      writeFileToOutput(f, zos, RootbeerPaths.v().getOutputClassFolder());
     }
   }
   
@@ -281,7 +281,7 @@ public class RootbeerCompiler {
     zos.write(contents);
     zos.flush();
     
-    FileOutputStream fout = new FileOutputStream(Constants.OUTPUT_CLASS_FOLDER+File.separator+name);
+    FileOutputStream fout = new FileOutputStream(RootbeerPaths.v().getOutputClassFolder()+File.separator+name);
     fout.write(contents);
     fout.flush();
     fout.close();
@@ -416,7 +416,7 @@ public class RootbeerCompiler {
 
     String src = cls.replace(".", File.separator);
     src += ".class";
-    File f = new File(Constants.JAR_CONTENTS_FOLDER);
+    File f = new File(RootbeerPaths.v().getJarContentsFolder());
     src = f.getAbsolutePath() + File.separator + src;
 
     copyFile(dest, src);
@@ -471,10 +471,10 @@ public class RootbeerCompiler {
   
   private void clearOutputFolders() {
     DeleteFolder deleter = new DeleteFolder();
-    deleter.delete(Constants.OUTPUT_JAR_FOLDER);
-    deleter.delete(Constants.OUTPUT_CLASS_FOLDER);
-    deleter.delete(Constants.OUTPUT_SHIMPLE_FOLDER);
-    deleter.delete(Constants.JAR_CONTENTS_FOLDER);
+    deleter.delete(RootbeerPaths.v().getOutputJarFolder());
+    deleter.delete(RootbeerPaths.v().getOutputClassFolder());
+    deleter.delete(RootbeerPaths.v().getOutputShimpleFolder());
+    deleter.delete(RootbeerPaths.v().getJarContentsFolder());
   }
 
   public String getProvider() {
@@ -484,7 +484,7 @@ public class RootbeerCompiler {
   private void extractJar(String jar_filename) {
     JarToFolder extractor = new JarToFolder();
     try {
-      extractor.writeJar(jar_filename, Constants.JAR_CONTENTS_FOLDER);
+      extractor.writeJar(jar_filename, RootbeerPaths.v().getJarContentsFolder());
     } catch(Exception ex){
       ex.printStackTrace();
       System.exit(0);

@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import edu.syr.pcpratts.rootbeer.Configuration;
+import edu.syr.pcpratts.rootbeer.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.LoopCodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.MethodCodeSegment;
@@ -164,7 +165,7 @@ public class GenerateRuntimeBasicBlock {
   private String cubinFilename(boolean use_class_folder){
     String class_name = File.separator + gcObjectVisitorClassName.replace(".", File.separator) + ".cubin";
     if(use_class_folder)
-      return edu.syr.pcpratts.rootbeer.Constants.OUTPUT_CLASS_FOLDER + class_name;
+      return RootbeerPaths.v().getOutputClassFolder() + class_name;
     else
       return class_name;
   }

@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.util;
 
 import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.RootbeerCompiler;
+import edu.syr.pcpratts.rootbeer.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.util.JarEntryHelp;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,7 +65,7 @@ public class ReadJar {
         if(jarEntryEqual(entry.getName(), cls) == false)
           continue;
         String entry_name = entry.getName();
-        String filename = Constants.JAR_CONTENTS_FOLDER + File.separator + entry_name;
+        String filename = RootbeerPaths.v().getJarContentsFolder() + File.separator + entry_name;
 
         if(m_UseDirectories)
           JarEntryHelp.mkdir(filename);
@@ -84,7 +85,7 @@ public class ReadJar {
   private void writeClassFromFile(URL url, String cls) {
     try {
       InputStream fin = url.openStream();
-      String outfilename = Constants.JAR_CONTENTS_FOLDER + cls;
+      String outfilename = RootbeerPaths.v().getJarContentsFolder() + cls;
 
       if(m_UseDirectories)
         JarEntryHelp.mkdir(outfilename);

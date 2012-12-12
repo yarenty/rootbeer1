@@ -29,6 +29,26 @@ public class RootbeerPaths {
     return folder+File.separator+"config";
   }
   
+  public String getJarContentsFolder(){
+    String folder = getRootbeerHome();
+    return folder+File.separator+"jar-contents";
+  }
+  
+  public String getOutputJarFolder(){
+    String folder = getRootbeerHome();
+    return folder+File.separator+"output-jar";
+  }
+  
+  public String getOutputClassFolder(){
+    String folder = getRootbeerHome();
+    return folder+File.separator+"output-class";
+  }
+  
+  public String getOutputShimpleFolder(){
+    String folder = getRootbeerHome();
+    return folder+File.separator+"output-shimple";
+  }
+  
   public String getTypeFile(){
     String folder = getRootbeerHome();
     return folder+File.separator+"types";

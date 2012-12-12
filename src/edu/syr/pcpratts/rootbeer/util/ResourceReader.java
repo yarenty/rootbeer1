@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.util;
 
 import edu.syr.pcpratts.rootbeer.Constants;
+import edu.syr.pcpratts.rootbeer.RootbeerPaths;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +39,7 @@ public class ResourceReader {
   public static List<byte[]> getResourceArray(String jar_path) throws IOException {
     InputStream is = ResourceReader.class.getResourceAsStream(jar_path);
     if(is == null){
-      jar_path = Constants.OUTPUT_CLASS_FOLDER + File.separator + jar_path;
+      jar_path = RootbeerPaths.v().getOutputClassFolder() + File.separator + jar_path;
       is = new FileInputStream(jar_path);
     }
     List<byte[]> ret = new ArrayList<byte[]>();
