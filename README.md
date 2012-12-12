@@ -61,9 +61,6 @@ Rootbeer does NOT automatically parallelize code. It provides help serializing
 state and writing CUDA code, but you still must specify what each GPU core
 is going to do.
 
-Phil Pratt-Szeliga is still a PhD student at Syracuse University. All the code
-was written by Phil. Dr. Jim Fawcett and Dr. Roy Welch are Phil's PhD advisors.
-
 ## About
 
 Rootbeer is written by:
