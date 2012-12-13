@@ -163,6 +163,9 @@ public class RootbeerCompiler {
     if(m_enableClassRemapping){
       RootbeerClassLoader.v().remapClasses();
     }
+    
+    System.out.println("applying optimizations...");
+    RootbeerClassLoader.v().applyOptimizations();
       
     Transform2 transform2 = new Transform2();
     for(SootMethod kernel_method : kernel_methods){   
