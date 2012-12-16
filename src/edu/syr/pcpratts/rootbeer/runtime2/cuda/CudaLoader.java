@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
+import edu.syr.pcpratts.rootbeer.RootbeerPaths;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,27 +27,27 @@ public class CudaLoader {
     
     if ("Mac OS X".equals(System.getProperty("os.name"))){
         m_libCudas.add("/usr/local/cuda/lib/libcuda.dylib");
-        m_rootbeers.add("cudaruntime.dylib");
+        m_rootbeers.add(RootbeerPaths.v().getRootbeerHome()+"cudaruntime.dylib");
         extract("cudaruntime.dylib");
     } else if(File.separator.equals("/")){
       if(is32Bit()){
         m_libCudas.add("/usr/lib/libcuda.so");
-        m_rootbeers.add("cudaruntime_x86.so.1");
+        m_rootbeers.add(RootbeerPaths.v().getRootbeerHome()+"cudaruntime_x86.so.1");
         extract("cudaruntime_x86.so.1");
       } else {
         m_libCudas.add("/usr/lib64/libcuda.so");
-        m_rootbeers.add("cudaruntime_x64.so.1");
+        m_rootbeers.add(RootbeerPaths.v().getRootbeerHome()+"cudaruntime_x64.so.1");
         extract("cudaruntime_x64.so.1");
       }
     } else {
       if(is32Bit()){
         m_libCudas.add("C:\\Windows\\System32\\nvcuda.dll"); 
-        m_rootbeers.add("cudaruntime_x86.dll");
+        m_rootbeers.add(RootbeerPaths.v().getRootbeerHome()+"cudaruntime_x86.dll");
         extract("cudaruntime_x86.dll");
       } else {
         m_libCudas.add("C:\\Windows\\System32\\nvcuda.dll"); 
         m_libCudas.add("C:\\Windows\\SysWow64\\nvcuda.dll");
-        m_rootbeers.add("cudaruntime_x64.dll");
+        m_rootbeers.add(RootbeerPaths.v().getRootbeerHome()+"cudaruntime_x64.dll");
         extract("cudaruntime_x64.dll");
       }
     }
@@ -87,7 +88,7 @@ public class CudaLoader {
         path = "src"+path;
         is = new FileInputStream(path);
       }
-      OutputStream os = new FileOutputStream(filename);
+      OutputStream os = new FileOutputStream(RootbeerPaths.v().getRootbeerHome()+filename);
       while(true){
         byte[] buffer = new byte[32*1024];
         int len = is.read(buffer);

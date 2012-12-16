@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl.tweaks;
 
 import edu.syr.pcpratts.compressor.Compressor;
 import edu.syr.pcpratts.deadmethods.DeadMethods;
+import edu.syr.pcpratts.rootbeer.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.util.CompilerRunner;
 import edu.syr.pcpratts.rootbeer.util.CudaPath;
 import java.io.File;
@@ -43,8 +44,7 @@ public class CudaTweaks extends Tweaks {
 
   public CompileResult compileProgram(String cuda_code) {
     try {      
-      
-      File pre_dead = new File("pre_dead.cu");
+      File pre_dead = new File(RootbeerPaths.v().getRootbeerHome()+"pre_dead.cu");
       PrintWriter writer = new PrintWriter(pre_dead.getAbsoluteFile());
       writer.println(cuda_code.toString());
       writer.flush();
@@ -57,13 +57,13 @@ public class CudaTweaks extends Tweaks {
       //cuda_code = compressor.compress(cuda_code);
       
       //print out code for debugging
-      File generated = new File("generated.cu");
+      File generated = new File(RootbeerPaths.v().getRootbeerHome()+"generated.cu");
       writer = new PrintWriter(generated.getAbsoluteFile());
       writer.println(cuda_code.toString());
       writer.flush();
       writer.close();
 
-      File code_file = new File("code_file.ptx");
+      File code_file = new File(RootbeerPaths.v().getRootbeerHome()+"code_file.ptx");
       //String modelString = "-m"+System.getProperty("sun.arch.data.model");
       String modelString = "-m64";
 

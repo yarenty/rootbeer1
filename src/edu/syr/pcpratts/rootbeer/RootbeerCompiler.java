@@ -45,7 +45,7 @@ public class RootbeerCompiler {
     clearOutputFolders();
     
     m_classOutputFolder = RootbeerPaths.v().getOutputClassFolder();
-    m_jimpleOutputFolder = "output-jimple";
+    m_jimpleOutputFolder = RootbeerPaths.v().getOutputJimpleFolder();
     
     if(Configuration.compilerInstance().getMode() == Configuration.MODE_GPU){      
       Tweaks.setInstance(new CudaTweaks());

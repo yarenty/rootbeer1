@@ -239,7 +239,7 @@ public class OpenCLScene {
     cuda_code = cuda_code.replaceAll("%%invoke_run%%", replacement);
     
     //print out code for debugging
-    PrintWriter writer = new PrintWriter(new FileWriter("generated.cu"));
+    PrintWriter writer = new PrintWriter(new FileWriter(RootbeerPaths.v().getRootbeerHome()+"generated.cu"));
     writer.println(cuda_code.toString());
     writer.flush();
     writer.close();

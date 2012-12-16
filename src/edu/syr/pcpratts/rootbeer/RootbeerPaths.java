@@ -26,32 +26,37 @@ public class RootbeerPaths {
   
   public String getConfigFile(){
     String folder = getRootbeerHome();
-    return folder+File.separator+"config";
+    return folder+"config";
   }
   
   public String getJarContentsFolder(){
     String folder = getRootbeerHome();
-    return folder+File.separator+"jar-contents";
+    return folder+"jar-contents";
   }
   
   public String getOutputJarFolder(){
     String folder = getRootbeerHome();
-    return folder+File.separator+"output-jar";
+    return folder+"output-jar";
   }
   
   public String getOutputClassFolder(){
     String folder = getRootbeerHome();
-    return folder+File.separator+"output-class";
+    return folder+"output-class";
   }
   
   public String getOutputShimpleFolder(){
     String folder = getRootbeerHome();
-    return folder+File.separator+"output-shimple";
+    return folder+"output-shimple";
+  }
+
+  public String getOutputJimpleFolder() {
+    String folder = getRootbeerHome();
+    return folder+"output-jimple";
   }
   
   public String getTypeFile(){
     String folder = getRootbeerHome();
-    return folder+File.separator+"types";
+    return folder+"types";
   }
   
   public String getRootbeerHome(){
@@ -60,6 +65,6 @@ public class RootbeerPaths {
     if(folder.exists() == false){
       folder.mkdirs(); 
     }
-    return folder.getAbsolutePath();
+    return folder.getAbsolutePath()+File.separator;
   }
 }
