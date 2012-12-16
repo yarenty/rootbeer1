@@ -257,11 +257,9 @@ public class RootbeerCompiler {
 
   private String makeJarFileName(File f, String folder) {
     try {
-      String abs_path = f.getAbsolutePath();
-      String s = File.separator;
-      if(s.equals("\\"))
-        s = "\\\\";
-      String[] tokens = abs_path.split(folder+s);
+      String abs_path = f.getAbsolutePath()+File.separator;
+      folder = folder.replace("\\", "\\\\");
+      String[] tokens = abs_path.split(folder);
       String ret = tokens[1];
       if(File.separator.equals("\\")){
         ret = ret.replace("\\", "/");
