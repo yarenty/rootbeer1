@@ -82,11 +82,10 @@ public class Main {
         m_disableClassRemapping = true;
       } else if(arg.equals("-large-mem-tests")){
         m_largeMemTests = true;
-      } else {      
+      } else if(m_simpleCompile == false){      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);
         m_simpleCompile = true;
-        break;
       }
     }
     Configuration.compilerInstance().setMode(m_mode);
