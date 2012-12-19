@@ -489,6 +489,7 @@ public class RootbeerCompiler {
   private void extractJar(String jar_filename) {
     JarToFolder extractor = new JarToFolder();
     try {
+      System.out.println("extracting jar "+jar_filename+"...");
       extractor.writeJar(jar_filename, RootbeerPaths.v().getJarContentsFolder());
     } catch(Exception ex){
       ex.printStackTrace();

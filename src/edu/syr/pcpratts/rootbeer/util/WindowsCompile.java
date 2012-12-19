@@ -47,31 +47,30 @@ public class WindowsCompile {
   }
   
   public String jdkPath(){
-    List<String> possible_paths = findPossibleJdkPaths();
-    String[] path_array = new String[possible_paths.size()];
-    path_array = possible_paths.toArray(path_array);
-    Arrays.sort(path_array);
-    return path_array[path_array.length-1];
-  }
-  
-  private List<String> findPossibleJdkPaths(){
-    List<String> ret = new ArrayList<String>();
     for(String root : m_jdkPaths){
-      File file = new File(root);
-      if(file.exists() == false){
+      List<String> possible_paths = findPossibleJdkPaths(root);
+      if(possible_paths.isEmpty()){
         continue;
       }
-      File[] children = file.listFiles();
-      for(File child : children){
-        String name = child.getName();
-        if(name.startsWith("jdk")){
-          ret.add(child.getAbsolutePath());
-        }
-      }
+      String[] path_array = new String[possible_paths.size()];
+      path_array = possible_paths.toArray(path_array);
+      Arrays.sort(path_array);
+      return path_array[path_array.length-1];
     }
-    if(ret.isEmpty()){
-      System.out.println("JDK not installed. Please install.");
-      System.exit(-1);
+    System.out.println("JDK not installed. Please install.");
+    System.exit(-1);
+    return "";
+  }
+  
+  private List<String> findPossibleJdkPaths(String root){
+    List<String> ret = new ArrayList<String>();
+    File file = new File(root);
+    File[] children = file.listFiles();
+    for(File child : children){
+      String name = child.getName();
+      if(name.startsWith("jdk")){
+        ret.add(child.getAbsolutePath());
+      }
     }
     return ret;
   }

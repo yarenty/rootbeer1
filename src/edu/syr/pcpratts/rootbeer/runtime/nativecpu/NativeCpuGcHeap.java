@@ -28,7 +28,6 @@ public class NativeCpuGcHeap extends GcHeap {
   protected void allocateMemory() {
     mBufferSize = 128*1024*1024L;
     mToSpaceMemory = new BasicSwappedMemory(mBufferSize);
-    mTextureMemory = new BasicSwappedMemory(mBufferSize);
     mHandlesMemory = new BasicSwappedMemory(mBufferSize);
     mHeapEndPtrMemory = new BasicSwappedMemory(8);
     mGcInfoSpaceMemory = new BasicSwappedMemory(mGcInfoSpaceSize);
