@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.runtime.nativecpu;
 
+import edu.syr.pcpratts.deadmethods.DeadMethods;
 import edu.syr.pcpratts.rootbeer.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
@@ -77,23 +78,71 @@ public class NativeCpuDevice implements GpuDevice {
     writer.close();
   }
   
-  private String compileUnix(File nemu_file, String jdk_path, String code) throws Exception {
+  private String compileMac(File nemu_file) throws Exception {
     String nemu = nemu_file.getAbsolutePath()+File.separator;
-    PrintWriter writer = new PrintWriter(nemu+"generated.c");
-    writer.println(code);
-    writer.flush();
-    writer.close();
+    
+    String name = "libnemu";
+    
+    int status;
+    String cmd;
+    Process p;
+    
+    String cflags = "-fno-common -Os -arch i386 -arch x86_64 -c";
+    cmd = "llvm-gcc "+cflags+" -I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers "+nemu+"NativeCpuDevice.c -o "+nemu+"NativeCpuDevice.o"; 
+    p = Runtime.getRuntime().exec(cmd, null, nemu_file);
+    status = p.waitFor();
+    if(status != 0){
+      System.out.println("Compilation failure!");
+      System.out.println(cmd);
+      System.exit(-1);
+    }
+    
+    cmd = "llvm-gcc "+cflags+" -lpthread "+nemu+"generated.c -o "+nemu+"generated.o";
+    p = Runtime.getRuntime().exec(cmd, null, nemu_file);
+    status = p.waitFor();
+    if(status != 0){
+      System.out.println("Compilation failure!");
+      System.out.println(cmd);
+      System.exit(-1);
+    }
+    
+    String ldflags = "-arch i386 -arch x86_64 -dynamiclib";
+    
+    cmd = "llvm-gcc "+ldflags+" -o "+nemu+"nativecpudev.dylib -dylib "+nemu+"NativeCpuDevice.o -lc";
+    p = Runtime.getRuntime().exec(cmd, null, nemu_file);
+    status = p.waitFor();
+    if(status != 0){
+      System.out.println("Compilation failure!");
+      System.out.println(cmd);
+      System.exit(-1);
+    }
+    
+    cmd = "llvm-gcc "+ldflags+" -o "+nemu+name+".dylib -dylib "+nemu+"generated.o -lc";
+    p = Runtime.getRuntime().exec(cmd, null, nemu_file);
+    status = p.waitFor();
+    if(status != 0){
+      System.out.println("Compilation failure!");
+      System.out.println(cmd);
+      System.exit(-1);
+    }
+
+    File f1 = new File(nemu+"nativecpudev.dylib");
+    System.load(f1.getAbsolutePath());     
+
+    File f2 = new File(nemu+name+".dylib");
+    return f2.getAbsolutePath();
+  }
+  
+  private String compileLinux(File nemu_file) throws Exception {
+    String nemu = nemu_file.getAbsolutePath()+File.separator;
 
     String name = "libnemu";
 
     int status;
     String cmd;
     Process p;
-
-    extractFromNative("NativeCpuDevice.c", nemu);
-    extractFromNative("edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCpuDevice.h", nemu);
     
-    cmd = "gcc -ggdb -Wall -fPIC -g -c -I"+jdk_path+"include/ -I/usr/lib/jvm/java-6-openjdk/include/linux "+nemu+"NativeCpuDevice.c -o "+nemu+"NativeCpuDevice.o";
+    cmd = "gcc -ggdb -Wall -fPIC -g -c -I/usr/lib/jvm/java-6-openjdk/include/ -I/usr/lib/jvm/java-6-openjdk/include/linux "+nemu+"NativeCpuDevice.c -o "+nemu+"NativeCpuDevice.o";
     p = Runtime.getRuntime().exec(cmd, null, nemu_file);
     status = p.waitFor();
     if(status != 0){
@@ -148,12 +197,19 @@ public class NativeCpuDevice implements GpuDevice {
         nemu_file.mkdirs();  
       }
       
+      String nemu = nemu_file.getAbsolutePath()+File.separator;
+      extractFromNative("NativeCpuDevice.c", nemu);
+      extractFromNative("edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCpuDevice.h", nemu);
+      
+      PrintWriter writer = new PrintWriter(nemu+"generated.c");
+      writer.println(code);
+      writer.flush();
+      writer.close();
+      
       if ("Mac OS X".equals(System.getProperty("os.name"))){
-        String jdk_path = unixSearchJdk("/System/Library/Java/JavaVirtualMachines/");
-        return compileUnix(nemu_file, jdk_path, code); 
+        return compileMac(nemu_file); 
       } else if(File.separator.equals("/")){
-        String jdk_path = unixSearchJdk("/usr/lib/jvm/");
-        return compileUnix(nemu_file, jdk_path, code);
+        return compileLinux(nemu_file);
       } else { 
         return compileWindows(nemu_file, code);
       }      
@@ -164,10 +220,6 @@ public class NativeCpuDevice implements GpuDevice {
     }
   }
 
-  private String unixSearchJdk(String base_path){
-    return "/usr/lib/jvm/java-6-openjdk/";
-  }
-  
   public long getGlobalMemSize() {
     throw new UnsupportedOperationException("Not supported yet.");
   }

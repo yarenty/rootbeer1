@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
+import edu.syr.pcpratts.deadmethods.DeadMethods;
 import edu.syr.pcpratts.rootbeer.Configuration;
 import edu.syr.pcpratts.rootbeer.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
@@ -157,6 +158,11 @@ public class GenerateRuntimeBasicBlock {
       }
     } else {
       String code = OpenCLScene.v().getOpenCLCode();
+      
+      System.out.println("removing dead methods...");
+      DeadMethods dead_methods = new DeadMethods("entry");
+      code = dead_methods.filter(code);
+      
       makeGetCodeMethodThatReturnsString(code);
       makeGetCodeMethodThatReturnsBytes("");
     }

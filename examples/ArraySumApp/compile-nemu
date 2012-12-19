@@ -1,0 +1,5 @@
+#!/bin/sh
+
+ant jar
+
+java -jar Rootbeer.jar ArraySumApp.jar ArraySumApp-GPU.jar -nemu
