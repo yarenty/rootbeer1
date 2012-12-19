@@ -7,8 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.runtime.nativecpu;
 
-import edu.syr.pcpratts.deadmethods.DeadMethods;
 import edu.syr.pcpratts.rootbeer.RootbeerPaths;
+import edu.syr.pcpratts.rootbeer.util.WindowsCompile;
 import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 import edu.syr.pcpratts.rootbeer.runtime.CompiledKernel;
@@ -16,14 +16,12 @@ import edu.syr.pcpratts.rootbeer.runtime.Serializer;
 import edu.syr.pcpratts.rootbeer.runtime.gpu.GcHeap;
 import edu.syr.pcpratts.rootbeer.runtime.gpu.GpuDevice;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BasicMemory;
-import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 public class NativeCpuDevice implements GpuDevice {
   
@@ -185,8 +183,32 @@ public class NativeCpuDevice implements GpuDevice {
     return f2.getAbsolutePath();
   }
   
-  private String compileWindows(File nemu_file, String code){
-    throw new UnsupportedOperationException();
+  private String compileWindows(File nemu_file){
+    String nemu = nemu_file.getAbsolutePath()+File.separator;
+    String name = "libnemu";
+    
+    WindowsCompile compiler = new WindowsCompile();
+    String jdk_path = compiler.jdkPath();
+  
+    windowsCompile("cl /I\""+jdk_path+"\\include\" /I"+jdk_path+"\\include\\win32\" "+nemu+"generated.c /link /DLL /OUT:libnemu.dll /MACHINE:X64");
+  
+    File f1 = new File(nemu+"nativecpudev.dll");
+    System.load(f1.getAbsolutePath());
+    
+    File f2 = new File(nemu+name+".dll");
+    return f2.getAbsolutePath();
+  }
+  
+  private void windowsCompile(String cmd){
+    WindowsCompile compiler = new WindowsCompile();
+    List<String> errors = compiler.compile(cmd);
+    if(errors.isEmpty()){
+      System.out.println("compilation failed!");
+      for(String error : errors){
+        System.out.println(error);
+      }
+      System.exit(-1);
+    }
   }
 
   private String compileNativeCpuDev() {
@@ -211,7 +233,7 @@ public class NativeCpuDevice implements GpuDevice {
       } else if(File.separator.equals("/")){
         return compileLinux(nemu_file);
       } else { 
-        return compileWindows(nemu_file, code);
+        return compileWindows(nemu_file);
       }      
     } catch(Exception ex){
       ex.printStackTrace();

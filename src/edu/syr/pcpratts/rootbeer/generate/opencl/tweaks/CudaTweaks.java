@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.tweaks;
 
+import edu.syr.pcpratts.rootbeer.util.WindowsCompile;
 import edu.syr.pcpratts.compressor.Compressor;
 import edu.syr.pcpratts.deadmethods.DeadMethods;
 import edu.syr.pcpratts.rootbeer.RootbeerPaths;
@@ -71,16 +72,19 @@ public class CudaTweaks extends Tweaks {
       CudaPath cuda_path = new CudaPath();
       if(File.separator.equals("/")){
         command = cuda_path.get() + "/nvcc "+modelString+" -arch sm_20 -ptx "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
+        CompilerRunner runner = new CompilerRunner();
+        List<String> errors = runner.run(command);      
+        if(errors.isEmpty() == false){
+          return new CompileResult(null, errors);
+        }
       } else {
-        GenerateClScript generate = new GenerateClScript();
-        File cl_script = generate.execute(generated, code_file);
-        command = "cmd /c \""+cl_script.getAbsolutePath()+"\"";
-      }
-      
-      CompilerRunner runner = new CompilerRunner();
-      List<String> errors = runner.run(command);      
-      if(errors.isEmpty() == false){
-        return new CompileResult(null, errors);
+        WindowsCompile compile = new WindowsCompile();
+        String nvidia_path = cuda_path.get();
+        command = "\""+nvidia_path+"\" -arch sm_20 -cubin \""+generated.getAbsolutePath()+"\" -o \""+code_file.getAbsolutePath()+"\""+compile.endl();
+        List<String> errors = compile.compile(command);
+        if(errors.isEmpty() == false){
+          return new CompileResult(null, errors);
+        }
       }
         
       List<byte[]> file_contents = null;
@@ -90,7 +94,7 @@ public class CudaTweaks extends Tweaks {
         file_contents = new ArrayList<byte[]>();
         ex.printStackTrace();
       }
-      return new CompileResult(file_contents, errors);
+      return new CompileResult(file_contents, new ArrayList<String>());
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }
