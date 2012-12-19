@@ -85,6 +85,7 @@ public class Main {
       } else if(m_simpleCompile == false){      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);
+        ++i;
         m_simpleCompile = true;
       }
     }

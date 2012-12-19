@@ -39,5 +39,5 @@ examples/*/generated.*
 examples/*/missing_classes.txt
 examples/MMult/MMult.jar
 examples/ArraySumApp/ArraySumApp.jar
-
+.DS_Store
 
