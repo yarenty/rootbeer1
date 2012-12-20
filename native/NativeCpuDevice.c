@@ -51,7 +51,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   nexceptions = (*env)->GetByteArrayElements(env, exceptions, JNI_FALSE);
   nclass_refs = (jbyte *) (*env)->GetIntArrayElements(env, java_lang_class_refs, JNI_FALSE);
 
-  printf("one\n");
   str = (char *) (*env)->GetStringUTFChars(env, lib_name, NULL);
 
 #if (defined linux || defined __APPLE_CC__)  
@@ -60,7 +59,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   lib_handle = LoadLibrary(str);
 #endif
 
-  printf("two\n");
   (*env)->ReleaseStringUTFChars(env, lib_name, str);
 
   to_space = (jlong *) malloc(sizeof(jlong *) * to_space_count);
@@ -68,7 +66,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
     curr_to_space = array_get(env, to_space_array, i);
     to_space[i] = (jlong) (*env)->GetByteArrayElements(env, curr_to_space, JNI_FALSE);
   }
-  printf("three\n");
   
 #if (defined linux || defined __APPLE_CC__)  
   entry = dlsym(lib_handle, "entry");
@@ -76,22 +73,18 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   entry = GetProcAddress(lib_handle, "entry");
 #endif
   
-  printf("four\n");
   (*entry)((char *) ngc_info, to_space, (jlong *) nhandles, (jlong *) nheap_end_ptr, (jlong *) nexceptions, (jint *) nclass_refs, 100*1024*1024, num_threads);  
-  printf("five\n");
+
 #if (defined linux || defined __APPLE_CC__)  
   dlclose(lib_handle);
 #else
   FreeLibrary(lib_handle);
 #endif
 
-  printf("six\n");
   for(i = 0; i < to_space_count; ++i){
     curr_to_space = array_get(env, to_space_array, i);
     (*env)->ReleaseByteArrayElements(env, curr_to_space, (jbyte *) to_space[i], 0);
   }
-
-  printf("seven\n");
   
   (*env)->ReleaseByteArrayElements(env, handles, nhandles, 0);
   (*env)->ReleaseByteArrayElements(env, heap_end_ptr, nheap_end_ptr, 0);
@@ -99,6 +92,5 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   (*env)->ReleaseByteArrayElements(env, exceptions, nexceptions, 0);
   (*env)->ReleaseIntArrayElements(env, java_lang_class_refs, nclass_refs, 0);
 
-  printf("eight\n");
   free(to_space);
 }

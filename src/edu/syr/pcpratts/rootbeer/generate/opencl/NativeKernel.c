@@ -1,9 +1,9 @@
 
 char * global_gc_info;
-int * global_handles;
+long long * global_handles;
 int thread_id;
 int global_num_threads;
-int * global_exceptions;
+long long * global_exceptions;
 int * global_class_refs;
 
 void synchthreads()
@@ -134,6 +134,7 @@ void entry(char * gc_info_space,
   int i;
   int rc;
   int num_cores;
+  char * gc_info;
 
 #if (defined linux || defined __APPLE_CC__)
   pthread_t ** threads;
@@ -142,7 +143,7 @@ void entry(char * gc_info_space,
   HANDLE * threads;
 #endif
 
-  char * gc_info = edu_syr_pcpratts_gc_init(gc_info_space, to_space,
+  gc_info = edu_syr_pcpratts_gc_init(gc_info_space, to_space,
     *to_space_free_ptr, space_size);
   global_num_threads = num_threads;
   thread_id = 0;
