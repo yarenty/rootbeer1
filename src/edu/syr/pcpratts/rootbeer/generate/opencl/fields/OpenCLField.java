@@ -154,17 +154,19 @@ public class OpenCLField {
     //ret.append("  thisref += "+field_offset+";\n");
     //ret.append("  return edu_syr_pcpratts_cache_get_"+type+"(thisref);\n");
     //ret.append("} else {\n");   
+    ret.append("GC_OBJ_TYPE_TYPE derived_type;\n");
+    ret.append("int offset;\n");
+    ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("if(thisref == -1){\n");
     ret.append("  *exception = "+Constants.NullPointerNumber+";\n");
     ret.append("  return 0;\n");
     ret.append("}\n");
-    ret.append(address_qual+" char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
+    ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
     if(composite.getClasses().size() == 1){
       SootClass sclass = composite.getClasses().get(0);
       ret.append("return *(("+address_qual+" "+cast_string+" *) &thisref_deref["+Integer.toString(field_offset)+"]);\n");
     } else {
-      ret.append("GC_OBJ_TYPE_TYPE derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
-      ret.append("int offset;\n");
+      ret.append("derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
       ret.append("offset = "+type_switch.typeSwitchName(m_Offsets)+"(derived_type);\n");
       ret.append("return *(("+address_qual+" "+cast_string+" *) &thisref_deref[offset]);\n");
     }
@@ -172,11 +174,14 @@ public class OpenCLField {
     ret.append("}\n");
     //instance setter
     ret.append(decls.get(1)+"{\n");
+    ret.append("GC_OBJ_TYPE_TYPE derived_type;\n");
+    ret.append("int offset;\n");
+    ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("if(thisref == -1){\n");
     ret.append("  *exception = "+Constants.NullPointerNumber+";\n");
     ret.append("  return;\n");
     ret.append("}\n");
-    ret.append(address_qual+" char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");    
+    ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");    
     if(composite.getClasses().size() == 1){
       SootClass sclass = composite.getClasses().get(0);  
       if(getType().isRefType()){
@@ -185,8 +190,7 @@ public class OpenCLField {
         ret.append("*(("+address_qual+" "+cast_string+" *) &thisref_deref["+Integer.toString(field_offset)+"]) = parameter0;\n");
       }
     } else {
-      ret.append("GC_OBJ_TYPE_TYPE derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
-      ret.append("int offset;\n");
+      ret.append("derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
       ret.append("offset = "+type_switch.typeSwitchName(m_Offsets)+"(derived_type);\n");     
       if(getType().isRefType()){
         ret.append("edu_syr_pcpratts_gc_assign_global(gc_info, ("+address_qual+" "+cast_string+" *) &thisref_deref[offset], parameter0);\n");

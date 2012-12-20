@@ -1,40 +1,107 @@
 #include <stdio.h>
-#include <pthread.h>
+#include <stdlib.h>
 #include <math.h>
-#include <sys/time.h>
 
-pthread_mutex_t atom_add_mutex;
+#if (defined linux || defined __APPLE_CC__)
+
+  #include <sys/time.h>
+  #include <pthread.h>
+
+  pthread_key_t threadIdKey = 0;
+  pthread_mutex_t atom_add_mutex;
+  pthread_mutex_t thread_id_mutex;
+  pthread_attr_t attr;
+
+  void lock_atom_add(){
+    pthread_mutex_lock(&atom_add_mutex);
+  }
+
+  void unlock_atom_add(){
+    pthread_mutex_unlock(&atom_add_mutex);
+  }
+
+  void lock_thread_id(){
+    pthread_mutex_lock(&thread_id_mutex);
+  }
+
+  void unlock_thread_id(){
+    pthread_mutex_unlock(&thread_id_mutex);
+  }
+
+  int getThreadId(){
+    return (int) pthread_getspecific(threadIdKey);
+  }
+
+  long long java_lang_System_nanoTime(char * gc_info, int * exception){
+    struct timeval tm;
+    gettimeofday(&tm, 0);
+    return tm.tv_sec * 1000000 + tm.tv_usec;
+  }
+#else
+
+  #include <Windows.h>
+
+  DWORD threadIdKey;
+  CRITICAL_SECTION atom_add_mutex;
+  CRITICAL_SECTION thread_id_mutex;
+
+  void lock_atom_add(){
+    EnterCriticalSection(&atom_add_mutex);
+  }
+
+  void unlock_atom_add(){
+    LeaveCriticalSection(&atom_add_mutex);
+  }
+
+  void lock_thread_id(){
+    EnterCriticalSection(&thread_id_mutex);
+  }
+
+  void unlock_thread_id(){
+    LeaveCriticalSection(&thread_id_mutex);
+  }
+
+  int getThreadId(){
+    return (int) TlsGetValue(threadIdKey);
+  }
+
+  long long java_lang_System_nanoTime(char * gc_info, int * exception){
+    SYSTEMTIME system_time;
+    GetSystemTime(&system_time);
+    return system_time.wMilliseconds;
+  }
+#endif
 
 long long atom_add(long long * addr, long long value){
-  pthread_mutex_lock(&atom_add_mutex);
+  lock_atom_add();
   long long ret = *addr;
   *addr += value;
-  pthread_mutex_unlock(&atom_add_mutex);
+  unlock_atom_add();
   return ret;
 }
 
 unsigned long long atomicAdd(unsigned long long * addr, long long value){
-  pthread_mutex_lock(&atom_add_mutex);
+  lock_atom_add();
   long long ret = *addr;
   *addr += value;
-  pthread_mutex_unlock(&atom_add_mutex);
+  unlock_atom_add();
   return ret;
 }
 
 int atomicCAS(int * addr, int compare, int set){
-  pthread_mutex_lock(&atom_add_mutex);
+  lock_atom_add();
   int ret = *addr;
   if(ret == compare)
     *addr = set;
-  pthread_mutex_unlock(&atom_add_mutex);
+  unlock_atom_add();
   return ret;
 }
 
 int atomicExch(int * addr, int value){
-  pthread_mutex_lock(&atom_add_mutex);
+  lock_atom_add();
   int ret = *addr;
   *addr = value;
-  pthread_mutex_unlock(&atom_add_mutex);
+  unlock_atom_add();
   return ret;
 }
 
@@ -43,11 +110,5 @@ void synchthreads();
 
 void __threadfence(){ }
 
-#define true 1
-#define false 0
-
 long long m_Local[3];
 int * m_Cache;
-
-typedef int boolean;
-typedef int byte;

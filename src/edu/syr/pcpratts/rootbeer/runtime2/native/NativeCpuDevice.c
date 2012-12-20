@@ -1,9 +1,11 @@
 #include "edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCpuDevice.h"
-#ifdef _WIN32
 
+#if (defined linux || defined __APPLE_CC__)
+  #include <dlfcn.h>
 #else
-#include <dlfcn.h>
+  #include <Windows.h>
 #endif
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -25,40 +27,78 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
    jint num_threads, jstring lib_name){
 
   int i;
-  jbyte * nhandles = (*env)->GetByteArrayElements(env, handles, JNI_FALSE);
-  jbyte * nheap_end_ptr = (*env)->GetByteArrayElements(env, heap_end_ptr, JNI_FALSE);
-  jbyte * ngc_info = (*env)->GetByteArrayElements(env, gc_info, JNI_FALSE);
-  jbyte * nexceptions = (*env)->GetByteArrayElements(env, exceptions, JNI_FALSE);
-  jint * nclass_refs = (*env)->GetIntArrayElements(env, java_lang_class_refs, JNI_FALSE);
-
-  const char *str = (*env)->GetStringUTFChars(env, lib_name, NULL);
-  void * lib_handle = dlopen(str, RTLD_LAZY);
-  (*env)->ReleaseStringUTFChars(env, lib_name, str);
-
-  jlong * to_space = (jlong *) malloc(sizeof(jlong *) * to_space_count);
-  for(i = 0; i < to_space_count; ++i){
-    jbyteArray curr_to_space = array_get(env, to_space_array, i);
-    to_space[i] = (jlong) (*env)->GetByteArrayElements(env, curr_to_space, JNI_FALSE);
-  }
+  jbyte * nhandles;
+  jbyte * nheap_end_ptr;
+  jbyte * ngc_info;
+  jbyte * nexceptions;
+  jbyte * nclass_refs;
+  char * str;
+  jlong * to_space;
+  jbyteArray curr_to_space;
 
   void (*entry)(char * gc_info_space, jlong * to_space, jlong * handles, 
     jlong * to_space_free_ptr, jlong * exceptions, jint * class_refs, jlong space_size, int num_threads);
+  
+#if (defined linux || defined __APPLE_CC__)  
+  void * lib_handle;
+#else
+  HMODULE lib_handle;
+#endif
 
-  entry = dlsym(lib_handle, "entry");
-  (*entry)((char *) ngc_info, to_space, (jlong *) nhandles, (jlong *) nheap_end_ptr, (jlong *) nexceptions, (jint *) nclass_refs, 100*1024*1024, num_threads);  
+  nhandles = (*env)->GetByteArrayElements(env, handles, JNI_FALSE);
+  nheap_end_ptr = (*env)->GetByteArrayElements(env, heap_end_ptr, JNI_FALSE);
+  ngc_info = (*env)->GetByteArrayElements(env, gc_info, JNI_FALSE);
+  nexceptions = (*env)->GetByteArrayElements(env, exceptions, JNI_FALSE);
+  nclass_refs = (jbyte *) (*env)->GetIntArrayElements(env, java_lang_class_refs, JNI_FALSE);
 
-  dlclose(lib_handle);
+  printf("one\n");
+  str = (char *) (*env)->GetStringUTFChars(env, lib_name, NULL);
 
+#if (defined linux || defined __APPLE_CC__)  
+  lib_handle = dlopen(str, RTLD_LAZY);
+#else
+  lib_handle = LoadLibrary(str);
+#endif
+
+  printf("two\n");
+  (*env)->ReleaseStringUTFChars(env, lib_name, str);
+
+  to_space = (jlong *) malloc(sizeof(jlong *) * to_space_count);
   for(i = 0; i < to_space_count; ++i){
-    jbyteArray curr_to_space = array_get(env, to_space_array, i);
+    curr_to_space = array_get(env, to_space_array, i);
+    to_space[i] = (jlong) (*env)->GetByteArrayElements(env, curr_to_space, JNI_FALSE);
+  }
+  printf("three\n");
+  
+#if (defined linux || defined __APPLE_CC__)  
+  entry = dlsym(lib_handle, "entry");
+#else
+  entry = GetProcAddress(lib_handle, "entry");
+#endif
+  
+  printf("four\n");
+  (*entry)((char *) ngc_info, to_space, (jlong *) nhandles, (jlong *) nheap_end_ptr, (jlong *) nexceptions, (jint *) nclass_refs, 100*1024*1024, num_threads);  
+  printf("five\n");
+#if (defined linux || defined __APPLE_CC__)  
+  dlclose(lib_handle);
+#else
+  FreeLibrary(lib_handle);
+#endif
+
+  printf("six\n");
+  for(i = 0; i < to_space_count; ++i){
+    curr_to_space = array_get(env, to_space_array, i);
     (*env)->ReleaseByteArrayElements(env, curr_to_space, (jbyte *) to_space[i], 0);
   }
 
+  printf("seven\n");
+  
   (*env)->ReleaseByteArrayElements(env, handles, nhandles, 0);
   (*env)->ReleaseByteArrayElements(env, heap_end_ptr, nheap_end_ptr, 0);
   (*env)->ReleaseByteArrayElements(env, gc_info, ngc_info, 0);
   (*env)->ReleaseByteArrayElements(env, exceptions, nexceptions, 0);
   (*env)->ReleaseIntArrayElements(env, java_lang_class_refs, nclass_refs, 0);
 
+  printf("eight\n");
   free(to_space);
 }

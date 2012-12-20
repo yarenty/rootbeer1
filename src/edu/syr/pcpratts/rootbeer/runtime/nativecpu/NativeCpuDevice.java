@@ -190,9 +190,10 @@ public class NativeCpuDevice implements GpuDevice {
     WindowsCompile compiler = new WindowsCompile();
     String jdk_path = compiler.jdkPath();
   
-    windowsCompile("cl /I\""+jdk_path+"\\include\" /I"+jdk_path+"\\include\\win32\" "+nemu+"generated.c /link /DLL /OUT:libnemu.dll /MACHINE:X64");
+    windowsCompile("cl /I\""+jdk_path+"\\include\" /I\""+jdk_path+"\\include\\win32\" "+nemu+"NativeCpuDevice.c /link /DLL /OUT:\""+nemu+"nativecpudevice.dll\" /MACHINE:X64");
+    windowsCompile("cl /I\""+jdk_path+"\\include\" /I\""+jdk_path+"\\include\\win32\" "+nemu+"generated.c /link /DLL /OUT:\""+nemu+"libnemu.dll\" /MACHINE:X64");
   
-    File f1 = new File(nemu+"nativecpudev.dll");
+    File f1 = new File(nemu+"nativecpudevice.dll");
     System.load(f1.getAbsolutePath());
     
     File f2 = new File(nemu+name+".dll");
@@ -202,7 +203,7 @@ public class NativeCpuDevice implements GpuDevice {
   private void windowsCompile(String cmd){
     WindowsCompile compiler = new WindowsCompile();
     List<String> errors = compiler.compile(cmd);
-    if(errors.isEmpty()){
+    if(errors.isEmpty() == false){
       System.out.println("compilation failed!");
       for(String error : errors){
         System.out.println(error);
