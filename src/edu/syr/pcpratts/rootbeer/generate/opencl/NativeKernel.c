@@ -44,7 +44,7 @@ edu_syr_pcpratts_gc_malloc(char * gc_info, long long size){
   addr = (long long *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
   space_size = edu_syr_pcpratts_getlong(gc_info, 16);
   size += 8;
-  while(true){
+  while(1){
     ret = atom_add(addr, (long) size);
     mod = ret % 8;
     if(mod != 0)
@@ -80,7 +80,13 @@ edu_syr_pcpratts_gc_init(char * gc_info_space,
   return (char *) gc_info_space;
 }
 
-static void * run(void * data){
+
+#if (defined linux || defined __APPLE_CC__)  
+static void * run(void * data)
+#else
+static DWORD run(void * data)
+#endif
+{
   int index;
   long long lhandle;
   int exception;
@@ -108,7 +114,12 @@ static void * run(void * data){
     %%invoke_run%%(global_gc_info, handle, &exception);
     global_exceptions[index] = exception;
   }
+
+#if (defined linux || defined __APPLE_CC__)  
   return NULL;
+#else
+  return 0;
+#endif
 }
 
 #if (defined linux || defined __APPLE_CC__)  

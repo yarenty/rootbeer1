@@ -139,22 +139,25 @@ public class OpenCLArrayType {
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     //get
     ret.append(decls.get(0)+"{\n");
-    ret.append("int offset = "+offset_size+"+(parameter0*"+element_size+");\n");
+    ret.append("int offset;\n");
+    ret.append(address_qual+" char * thisref_deref;\n");
+    ret.append("offset = "+offset_size+"+(parameter0*"+element_size+");\n");
     ret.append("if(thisref == -1){\n");
     ret.append("  *exception = "+edu.syr.pcpratts.rootbeer.Constants.NullPointerNumber+";\n");
     ret.append("  return 0;\n");
     ret.append("}\n");
-    ret.append(address_qual+" char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
+    ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
     ret.append("return *(("+address_qual+" "+getAssignType()+" *) &thisref_deref[offset]);\n");
     ret.append("}\n");
 
     //set
     ret.append(decls.get(1)+"{\n");
+    ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("  if(thisref == -1){\n");
     ret.append("    *exception = "+edu.syr.pcpratts.rootbeer.Constants.NullPointerNumber+";\n");
     ret.append("    return;\n");
     ret.append("  }\n");
-    ret.append(address_qual+" char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
+    ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
     if(isCharArray()){
       ret.append("*(("+address_qual+" int *) &thisref_deref["+offset_size+"+(parameter0*"+element_size+")]) = 0;\n");
     }
@@ -166,16 +169,20 @@ public class OpenCLArrayType {
     int derived_type = RootbeerClassLoader.v().getDfsInfo().getClassNumber(m_arrayType);
     ret.append(decls.get(2)+"{\n");
     ret.append("int i;\n");
-    ret.append("int total_size = (size * "+element_size+")+ "+offset_size+";\n");
-    ret.append("int mod = total_size % 8;\n");
+    ret.append("int total_size;\n");
+    ret.append("int mod;\n");
+    ret.append("int thisref;\n");
+    ret.append(address_qual+" char * thisref_deref;\n");
+    ret.append("total_size = (size * "+element_size+")+ "+offset_size+";\n");
+    ret.append("mod = total_size % 8;\n");
     ret.append("if(mod != 0)\n");
     ret.append("  total_size += (8 - mod);\n");
-    ret.append("int thisref = edu_syr_pcpratts_gc_malloc(gc_info, total_size);\n");
+    ret.append("thisref = edu_syr_pcpratts_gc_malloc(gc_info, total_size);\n");
     ret.append("if(thisref == -1){\n");
     ret.append("  *exception = -1;\n");
     ret.append("  return -1;\n");
     ret.append("}\n");
-    ret.append(address_qual+" char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
+    ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
     ret.append("\n//class info\n");
     ret.append("edu_syr_pcpratts_gc_set_count(thisref_deref, 0);\n");
     ret.append("edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY);\n");
@@ -196,15 +203,19 @@ public class OpenCLArrayType {
     ret.append("int total_size = (dim0 * 8) + "+offset_size+";\n"); 
     for(int i = 0; i < dim; ++i){
       ret.append("int index"+i+";\n");
+      ret.append("int aref"+i+";\n");
     }
-    ret.append("int mod = total_size % 8;\n");
+    ret.append("int mod;\n");
+    ret.append("int thisref;\n");
+    ret.append(address_qual+" char * thisref_deref;\n");
+    ret.append("mod = total_size % 8;\n");
     ret.append("if(mod != 0)\n");
     ret.append("  total_size += (8 - mod);\n");
-    ret.append("int thisref = edu_syr_pcpratts_gc_malloc(gc_info, total_size);\n");
+    ret.append("thisref = edu_syr_pcpratts_gc_malloc(gc_info, total_size);\n");
     ret.append("if(thisref == -1){\n");
     ret.append("  return -1;\n");
     ret.append("}\n");
-    ret.append(address_qual+" char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
+    ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
     ret.append("\n//class info\n");
     ret.append("edu_syr_pcpratts_gc_set_count(thisref_deref, 0);\n");
     ret.append("edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY);\n");
@@ -232,7 +243,7 @@ public class OpenCLArrayType {
       String set_str = getMultiDeref(dim-i)+"_set("+address_qual+"gc_info, "+thisref;
       if(i < dim - 1){
         String new_str = getMultiDeref(dim-1-i)+"_new("+address_qual+"gc_info, dim"+(i+1)+", exception)";
-        ret += "  int aref"+i+" = "+new_str+";\n";
+        ret += "  aref"+i+" = "+new_str+";\n";
         ret += "  "+set_str+", index"+i+", aref"+i+", exception);\n";
       } else {
         ret += "  "+set_str+", index"+i+", "+initValue()+", exception);\n";

@@ -222,8 +222,9 @@ edu_syr_pcpratts_gc_set_color($$__global$$ char * mem_loc, GC_OBJ_TYPE_COLOR val
 
 $$__device__$$ void
 edu_syr_pcpratts_gc_init_monitor($$__global$$ char * mem_loc){
+  int * addr;
   mem_loc += 12;
-  int * addr = (int *) mem_loc;
+  addr = (int *) mem_loc;
   *addr = -1;
 }
 

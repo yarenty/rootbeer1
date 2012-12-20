@@ -73,24 +73,27 @@
 #endif
 
 long long atom_add(long long * addr, long long value){
+  long long ret;
   lock_atom_add();
-  long long ret = *addr;
+  ret = *addr;
   *addr += value;
   unlock_atom_add();
   return ret;
 }
 
 unsigned long long atomicAdd(unsigned long long * addr, long long value){
+  long long ret;
   lock_atom_add();
-  long long ret = *addr;
+  ret = *addr;
   *addr += value;
   unlock_atom_add();
   return ret;
 }
 
 int atomicCAS(int * addr, int compare, int set){
+  int ret;
   lock_atom_add();
-  int ret = *addr;
+  ret = *addr;
   if(ret == compare)
     *addr = set;
   unlock_atom_add();
@@ -98,8 +101,9 @@ int atomicCAS(int * addr, int compare, int set){
 }
 
 int atomicExch(int * addr, int value){
+  int ret;
   lock_atom_add();
-  int ret = *addr;
+  ret = *addr;
   *addr = value;
   unlock_atom_add();
   return ret;
