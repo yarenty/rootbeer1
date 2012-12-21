@@ -16,7 +16,7 @@ public class StepFilterTest implements TestSerialization {
 
   @Override
   public List<Kernel> create() {
-    int size = 1600*1200*100/4;
+    int size = 1600*1200/4;
     short[] a0 = new short[size];
     short[] b0 = new short[size];
     short[] a1 = new short[size];

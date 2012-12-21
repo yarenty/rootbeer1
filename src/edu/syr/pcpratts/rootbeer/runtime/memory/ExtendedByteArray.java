@@ -57,7 +57,12 @@ public class ExtendedByteArray {
     int offset = (int) (index % m_MaxSize);
     
     byte[] data = m_Data.get(array);
-    data[offset] = value;
+    try {
+      data[offset] = value;
+    } catch(ArrayIndexOutOfBoundsException ex){
+      System.out.println("invalid: "+index+" "+array+" "+offset+" "+data.length+" "+m_Size+" "+m_MaxSize);
+      throw ex;
+    }
   }
   
   public static void main(String[] args){
