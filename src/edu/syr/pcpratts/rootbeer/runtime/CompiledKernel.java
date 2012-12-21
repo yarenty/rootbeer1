@@ -10,7 +10,8 @@ package edu.syr.pcpratts.rootbeer.runtime;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
 
 public interface CompiledKernel {
-  public String getCode();
+  public String getCodeUnix();
+  public String getCodeWindows();
   public String getCubin();
   public Serializer getSerializer(Memory mem, Memory texture_mem);
   public boolean isUsingGarbageCollector();

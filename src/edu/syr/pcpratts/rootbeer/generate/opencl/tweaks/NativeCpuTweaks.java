@@ -15,8 +15,18 @@ public class NativeCpuTweaks extends Tweaks {
   }
 
   @Override
-  public String getHeaderPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/NativeHeader.c";
+  public String getUnixHeaderPath() {
+    return "/edu/syr/pcpratts/rootbeer/generate/opencl/UnixNativeHeader.c";
+  }
+  
+  @Override
+  public String getWindowsHeaderPath() {
+    return "/edu/syr/pcpratts/rootbeer/generate/opencl/WindowsNativeHeader.c";
+  }
+  
+  @Override
+  public String getBothHeaderPath() {
+    return "/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeHeader.c";
   }
 
   @Override
@@ -25,8 +35,18 @@ public class NativeCpuTweaks extends Tweaks {
   }
 
   @Override
-  public String getKernelPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/NativeKernel.c";
+  public String getUnixKernelPath() {
+    return "/edu/syr/pcpratts/rootbeer/generate/opencl/UnixNativeKernel.c";
+  }
+
+  @Override
+  public String getWindowsKernelPath() {
+    return "/edu/syr/pcpratts/rootbeer/generate/opencl/WindowsNativeKernel.c";
+  }
+
+  @Override
+  public String getBothKernelPath() {
+    return "/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeKernel.c";
   }
 
   @Override

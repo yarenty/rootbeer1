@@ -29,8 +29,18 @@ public class CudaTweaks extends Tweaks {
   }
 
   @Override
-  public String getHeaderPath() {
+  public String getUnixHeaderPath() {
     return "/edu/syr/pcpratts/rootbeer/generate/opencl/CudaHeader.c";
+  }
+  
+  @Override
+  public String getWindowsHeaderPath() {
+    return "/edu/syr/pcpratts/rootbeer/generate/opencl/CudaHeader.c";
+  }
+  
+  @Override
+  public String getBothHeaderPath() {
+    return null;
   }
   
   @Override
@@ -39,8 +49,18 @@ public class CudaTweaks extends Tweaks {
   }
 
   @Override
-  public String getKernelPath() {
+  public String getUnixKernelPath() {
     return "/edu/syr/pcpratts/rootbeer/generate/opencl/CudaKernel.c";
+  }
+  
+  @Override
+  public String getWindowsKernelPath() {
+    return "/edu/syr/pcpratts/rootbeer/generate/opencl/CudaKernel.c";
+  }
+
+  @Override
+  public String getBothKernelPath() {
+    return null;
   }
 
   public CompileResult compileProgram(String cuda_code) {

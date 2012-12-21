@@ -78,9 +78,15 @@ public class GenerateRuntimeBasicBlock {
     bcl.endMethod();
   }
   
-  private void makeGetCodeMethodThatReturnsString(String gpu_code){    
+  private void makeGetCodeMethodThatReturnsString(String gpu_code, boolean unix){    
     //make the getCode method with the results of the opencl code generation
-    SootMethod getCode = new SootMethod("getCode", new ArrayList(), RefType.v("java.lang.String"), Modifier.PUBLIC);
+    String name = "getCode";
+    if(unix){
+      name += "Unix";
+    } else {
+      name += "Windows";
+    }
+    SootMethod getCode = new SootMethod(name, new ArrayList(), RefType.v("java.lang.String"), Modifier.PUBLIC);
     getCode.setDeclaringClass(mSootClass);
     mSootClass.addMethod(getCode);
 
@@ -149,21 +155,31 @@ public class GenerateRuntimeBasicBlock {
       CompileResult result = OpenCLScene.v().getCudaCode();
       if(result.getBinary() == null){
         makeGetCodeMethodThatReturnsBytes(cubinFilename(false)+".error");
-        makeGetCodeMethodThatReturnsString("");
+        makeGetCodeMethodThatReturnsString("", true);
+        makeGetCodeMethodThatReturnsString("", false);
       } else {
         List<byte[]> bytes = result.getBinary();
         writeBytesToFile(bytes, cubinFilename(true));
         makeGetCodeMethodThatReturnsBytes(cubinFilename(false));
-        makeGetCodeMethodThatReturnsString("");
+        makeGetCodeMethodThatReturnsString("", true);
+        makeGetCodeMethodThatReturnsString("", false);
       }
     } else {
-      String code = OpenCLScene.v().getOpenCLCode();
+      String[] code = OpenCLScene.v().getOpenCLCode();
+      //code[0] is unix
+      //code[1] is windows
       
       System.out.println("removing dead methods...");
       DeadMethods dead_methods = new DeadMethods("entry");
-      code = dead_methods.filter(code);
+      code[0] = dead_methods.filter(code[0]);
+      dead_methods = new DeadMethods("entry");
+      code[1] = dead_methods.filter(code[1]);
       
-      makeGetCodeMethodThatReturnsString(code);
+      //jpp can't handle declspec very well
+      code[1] = code[1].replace("void entry(char * gc_info_space,", "__declspec(export)\nvoid entry(char * gc_info_space,");
+      
+      makeGetCodeMethodThatReturnsString(code[0], true);
+      makeGetCodeMethodThatReturnsString(code[1], false);
       makeGetCodeMethodThatReturnsBytes("");
     }
   }

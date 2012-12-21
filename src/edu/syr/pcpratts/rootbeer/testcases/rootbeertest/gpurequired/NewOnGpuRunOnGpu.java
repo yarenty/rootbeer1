@@ -45,11 +45,23 @@ public class NewOnGpuRunOnGpu implements Kernel {
   }
 
   boolean compare(NewOnGpuRunOnGpu brhs) {
+    if(brhs.obj == null){
+      System.out.println("brhs.obj == null");
+      return false;
+    }
+    if(brhs.element1 == null){
+      System.out.println("brhs.element1 == null");
+      return false;
+    }
+    if(brhs.test == null){
+      System.out.println("brhs.test == null");
+      return false;
+    }
     if(obj.value != brhs.obj.value)
       return false;
     if(element1.length != brhs.element1.length)
       return false;
-    if(test.length != test.length)
+    if(test.length != brhs.test.length)
       return false;
     for(int i = 0; i < test.length; ++i){
       NewOnGpuRefObject left = test[i];

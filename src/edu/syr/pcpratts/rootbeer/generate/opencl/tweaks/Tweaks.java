@@ -21,9 +21,13 @@ public abstract class Tweaks {
     m_Instance = instance;
   }
 
-  public abstract String getHeaderPath();
+  public abstract String getUnixHeaderPath();
+  public abstract String getWindowsHeaderPath();
+  public abstract String getBothHeaderPath();
+  public abstract String getUnixKernelPath();
+  public abstract String getWindowsKernelPath();
+  public abstract String getBothKernelPath();
   public abstract String getGlobalAddressSpaceQualifier();
   public abstract String getGarbageCollectorPath();
-  public abstract String getKernelPath();
   public abstract String getDeviceFunctionQualifier();
 }

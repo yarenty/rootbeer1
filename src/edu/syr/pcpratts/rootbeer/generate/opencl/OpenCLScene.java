@@ -185,7 +185,7 @@ public class OpenCLScene {
     }
   }
   
-  private String makeSourceCode() throws Exception {
+  private String[] makeSourceCode() throws Exception {
     m_usesGarbageCollector = false;
     
     List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedTypes();
@@ -219,49 +219,98 @@ public class OpenCLScene {
       addInstanceof(type);
     }
     
-    StringBuilder ret = new StringBuilder();
-    ret.append(headerString());
-    ret.append(methodPrototypesString());
-    ret.append(garbageCollectorString());
-    ret.append(methodBodiesString());
+    StringBuilder unix_code = new StringBuilder();
+    StringBuilder windows_code = new StringBuilder();
+    
+    String method_protos = methodPrototypesString();
+    String gc_string = garbageCollectorString();
+    String bodies_string = methodBodiesString();
+    
+    unix_code.append(headerString(true));
+    unix_code.append(method_protos);
+    unix_code.append(gc_string);
+    unix_code.append(bodies_string);
+    unix_code.append(kernelString(true));
 
-    String cuda_code;
-    //for debugging you can read the cuda code from a generated.cu
-    if(true){
-      cuda_code = ret.toString();
-    } else {
-      cuda_code = readCudaCodeFromFile();
-    }
+    windows_code.append(headerString(false));
+    windows_code.append(method_protos);
+    windows_code.append(gc_string);
+    windows_code.append(bodies_string);
+    windows_code.append(kernelString(false));
+    
+    String cuda_unix = setupEntryPoint(unix_code);
+    String cuda_windows = setupEntryPoint(windows_code);
+    
+    //print out code for debugging
+    PrintWriter writer = new PrintWriter(new FileWriter(RootbeerPaths.v().getRootbeerHome()+"generated_unix.cu"));
+    writer.println(cuda_unix);
+    writer.flush();
+    writer.close();
+    
+    //print out code for debugging
+    writer = new PrintWriter(new FileWriter(RootbeerPaths.v().getRootbeerHome()+"generated_windows.cu"));
+    writer.println(cuda_windows);
+    writer.flush();
+    writer.close();
+    
+    String[] ret = new String[2];
+    ret[0] = cuda_unix;
+    ret[1] = cuda_windows;
+    return ret;
+  }
+
+  private String setupEntryPoint(StringBuilder builder){
+    String cuda_code = builder.toString();
     String mangle = NameMangling.v().mangle(VoidType.v());
     String replacement = getRuntimeBasicBlockClassName()+"_gpuMethod"+mangle;
     //class names can have $ in them, make them regex safe
     replacement = replacement.replace("$", "\\$");
-    cuda_code = cuda_code.replaceAll("%%invoke_run%%", replacement);
-    
-    //print out code for debugging
-    PrintWriter writer = new PrintWriter(new FileWriter(RootbeerPaths.v().getRootbeerHome()+"generated.cu"));
-    writer.println(cuda_code.toString());
-    writer.flush();
-    writer.close();
-    
+    cuda_code = cuda_code.replaceAll("%%invoke_run%%", replacement);  
     return cuda_code;
   }
-
-  public String getOpenCLCode() throws Exception {
-    String source_code = makeSourceCode();
+  
+  public String[] getOpenCLCode() throws Exception {
+    String[] source_code = makeSourceCode();
     return source_code;
   }
 
   public CompileResult getCudaCode() throws Exception {
-    String source_code = makeSourceCode();
-    return new CudaTweaks().compileProgram(source_code);
+    String[] source_code = makeSourceCode();
+    return new CudaTweaks().compileProgram(source_code[0]);
   }
 
-  private String headerString() throws IOException {
-    String path = Tweaks.v().getHeaderPath();
-    if(path == null)
+  private String headerString(boolean unix) throws IOException {
+    String specific_path;
+    if(unix){
+      specific_path = Tweaks.v().getUnixHeaderPath();
+    } else {
+      specific_path = Tweaks.v().getWindowsHeaderPath();
+    }
+    if(specific_path == null)
       return "";
-    return ResourceReader.getResource(path);
+    String both_path = Tweaks.v().getBothHeaderPath();
+    String both_header = "";
+    if(both_path != null){
+      both_header = ResourceReader.getResource(both_path);
+    }
+    String specific_header = ResourceReader.getResource(specific_path);
+    return specific_header + "\n" + both_header;
+  }
+  
+  private String kernelString(boolean unix) throws IOException {
+    String kernel_path;
+    if(unix){
+      kernel_path = Tweaks.v().getUnixKernelPath();
+    } else {
+      kernel_path = Tweaks.v().getWindowsKernelPath();
+    }
+    String specific_kernel_code = ResourceReader.getResource(kernel_path);
+    String both_kernel_code = "";
+    String both_kernel_path = Tweaks.v().getBothKernelPath();
+    if(both_kernel_path != null){
+      both_kernel_code = ResourceReader.getResource(both_kernel_path);
+    }
+    return both_kernel_code + "\n" + specific_kernel_code;
   }
   
   private String garbageCollectorString() throws IOException {
@@ -340,8 +389,6 @@ public class OpenCLScene {
     while(iter.hasNext()){
       ret.append(iter.next());
     }
-    String kernel_path = Tweaks.v().getKernelPath();
-    ret.append(ResourceReader.getResource(kernel_path));
     return ret.toString();
   }
   

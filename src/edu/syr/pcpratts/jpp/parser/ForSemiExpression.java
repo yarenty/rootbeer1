@@ -38,6 +38,7 @@ public class ForSemiExpression implements Iterator<CFileItem>{
       addTokens(tokens);
     }
     CStatement ret = new CStatement(tokens);
+    System.out.println("for_sem: "+ret.toString());
     m_BraceCount = ret.braceCount(m_BraceCount);
     return ret;
   }

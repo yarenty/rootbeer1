@@ -39,8 +39,13 @@ public class MethodPass implements Pass {
 
       if(isMethodStatement(tokens)){
         CMethod cmethod = parseMethod(stmt);
+        System.out.println("adding method: "+cmethod.getMethodName());
+        if(cmethod.getMethodName().equals("run")){
+          System.out.println("hello");
+        }
         ret.addItem(cmethod);
       } else {
+        System.out.println("not method: "+next.toString());
         ret.addItem(next);
       }
     }
