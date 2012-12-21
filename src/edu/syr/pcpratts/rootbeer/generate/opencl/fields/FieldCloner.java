@@ -93,8 +93,10 @@ public class FieldCloner {
       }
     }
     
-    for(TreeNode child : node.getChildren()){
-      processNodeField(child, field, ref_field, composite);
+    if(soot_field.isPrivate() == false){
+      for(TreeNode child : node.getChildren()){
+        processNodeField(child, field, ref_field, composite);
+      }
     }
   }
 

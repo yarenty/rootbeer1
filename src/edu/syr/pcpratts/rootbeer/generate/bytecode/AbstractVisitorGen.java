@@ -106,8 +106,7 @@ public class AbstractVisitorGen {
       return true;
     }
   }
-  
-  
+    
   protected void readRefField(OpenCLField ref_field) {
     SootField soot_field = ref_field.getSootField();
     SootClass soot_class = Scene.v().getSootClass(soot_field.getDeclaringClass().getName());
@@ -125,15 +124,23 @@ public class AbstractVisitorGen {
     
     SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
     SootClass string = Scene.v().getSootClass("java.lang.String");
+    SootClass class_class = Scene.v().getSootClass("java.lang.Class");
     Local original_field_value;
     if(soot_class.isApplicationClass() == false){
-      bcl.pushMethod(gc_obj_visit, "readField", obj_class.getType(), obj_class.getType(), string.getType());       
-      original_field_value = bcl.invokeMethodRet(gc_obj_visit, m_objSerializing.top(), StringConstant.v(soot_field.getName()));
+      if(ref_field.isInstance()){
+        bcl.pushMethod(gc_obj_visit, "readField", obj_class.getType(), obj_class.getType(), string.getType());       
+        original_field_value = bcl.invokeMethodRet(gc_obj_visit, m_objSerializing.top(), StringConstant.v(soot_field.getName()));
+      } else { 
+        bcl.pushMethod(gc_obj_visit, "readStaticField", obj_class.getType(), class_class.getType(), string.getType());
+        Local cls = bcl.classConstant(soot_field.getDeclaringClass().getType());
+        original_field_value = bcl.invokeMethodRet(gc_obj_visit, cls, StringConstant.v(soot_field.getName()));
+      }
     } else {
-      if(ref_field.isInstance())
+      if(ref_field.isInstance()){
         original_field_value = bcl.refInstanceField(m_objSerializing.top(), ref_field.getName());
-      else
+      } else {
         original_field_value = bcl.refStaticField(soot_class.getType(), ref_field.getName());
+      } 
     }
     bcl.pushMethod(gc_obj_visit, "readFromHeap", obj_class.getType(), obj_class.getType(), BooleanType.v(), LongType.v());
     int should_read = 0;
@@ -145,8 +152,14 @@ public class AbstractVisitorGen {
     Local ret = bcl.cast(type, ret_obj);
 
     if(soot_class.isApplicationClass() == false){
-      bcl.pushMethod(gc_obj_visit, "writeField", VoidType.v(), obj_class.getType(), string.getType(), obj_class.getType());       
-      bcl.invokeMethodNoRet(gc_obj_visit, m_objSerializing.top(), StringConstant.v(soot_field.getName()), ret);
+      if(ref_field.isInstance()){
+        bcl.pushMethod(gc_obj_visit, "writeField", VoidType.v(), obj_class.getType(), string.getType(), obj_class.getType());       
+        bcl.invokeMethodNoRet(gc_obj_visit, m_objSerializing.top(), StringConstant.v(soot_field.getName()), ret);
+      } else {
+        bcl.pushMethod(gc_obj_visit, "writeStaticField", VoidType.v(), class_class.getType(), string.getType(), obj_class.getType());
+        Local cls = bcl.classConstant(soot_field.getDeclaringClass().getType());
+        bcl.invokeMethodNoRet(gc_obj_visit, cls, StringConstant.v(soot_field.getName()), ret);
+      }
     } else {
       if(ref_field.isInstance()){
         bcl.setInstanceField(soot_field, m_objSerializing.top(), ret);

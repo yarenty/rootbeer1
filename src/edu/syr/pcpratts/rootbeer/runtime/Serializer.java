@@ -154,6 +154,10 @@ public abstract class Serializer {
         return ret;
       } catch(Exception ex){
         cls = cls.getSuperclass();
+        //java.lang.Throwable.backtrace cannot be found this way, I don't know why.
+        if(cls == null){
+          return null;
+        }
       }
     }
   }

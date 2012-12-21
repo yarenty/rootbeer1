@@ -71,7 +71,7 @@ public class StaticOffsets {
     List<SortableField> sortable_fields = new ArrayList<SortableField>();
     for(CompositeField composite : composites){
       List<SootClass> classes = composite.getClasses();
-      for(SootClass soot_class : classes){      
+      for(SootClass soot_class : classes){
         sortable_fields.addAll(convert(composite.getRefFieldsByClass(soot_class), soot_class));
         sortable_fields.addAll(convert(composite.getNonRefFieldsByClass(soot_class), soot_class));
 

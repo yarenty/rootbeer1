@@ -142,10 +142,6 @@ public class PrivateFields {
   public Field getField(Object base, String name, String cls_name){
     try {
       Class cls = Class.forName(cls_name);
-      Field[] fields = cls.getDeclaredFields();
-      for(Field field : fields){
-        System.out.println("field: "+cls_name+" "+field.toString());
-      }
       Field f = cls.getDeclaredField(name);
       f.setAccessible(true);
       return f;

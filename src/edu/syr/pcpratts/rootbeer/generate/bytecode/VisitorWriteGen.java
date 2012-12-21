@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import soot.*;
 import soot.jimple.IntConstant;
+import soot.jimple.Jimple;
 import soot.jimple.StringConstant;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -111,9 +112,6 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     m_CurrentMem.push(mem);
         
     for(Type type : m_OrderedHistory){
-      if(type.toString().equals("java.lang.String")){
-        System.out.println("hello");
-      }
       makeWriteToHeapMethodForType(type);
     }
 

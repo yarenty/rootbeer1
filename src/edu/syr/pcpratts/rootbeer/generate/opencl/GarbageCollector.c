@@ -348,7 +348,7 @@ edu_syr_pcpratts_gc_get_space_size($$__global$$ char * gc_info){
 $$__device__$$ int
 edu_syr_pcpratts_strlen(char * str_constant){
   int ret = 0;
-  while(true){
+  while(1){
     if(str_constant[ret] != '\0')
       ret++;
     else
@@ -437,7 +437,7 @@ $$__device__$$ void java_lang_VirtualMachineError_initab850b60f96d11de8a39080020
 $$__device__$$ int java_lang_OutOfMemoryError_initab850b60f96d11de8a390800200c9a66($$__global$$ char * gc_info, int * exception){
 
 int r0 = -1;
-int thisref = edu_syr_pcpratts_gc_malloc_no_fail(gc_info, 40);
+int thisref = edu_syr_pcpratts_gc_malloc(gc_info, 40);
 char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
 
 //class info
