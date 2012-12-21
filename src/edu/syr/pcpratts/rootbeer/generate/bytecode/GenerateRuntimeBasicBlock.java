@@ -176,7 +176,7 @@ public class GenerateRuntimeBasicBlock {
       code[1] = dead_methods.filter(code[1]);
       
       //jpp can't handle declspec very well
-      code[1] = code[1].replace("void entry(char * gc_info_space,", "__declspec(export)\nvoid entry(char * gc_info_space,");
+      code[1] = code[1].replace("void entry ( char * gc_info_space ,", "__declspec(dllexport)\nvoid entry ( char * gc_info_space ,");
       
       makeGetCodeMethodThatReturnsString(code[0], true);
       makeGetCodeMethodThatReturnsString(code[1], false);

@@ -172,7 +172,7 @@ public abstract class GcHeap {
         
     if(Configuration.getRunAllTests() == false){
       BufferPrinter printer = new BufferPrinter();
-      printer.print(mToSpaceMemory, 0, 512);
+      printer.print(mToSpaceMemory, 0, 1024);
     }
     return m_CountWritten;
   }
@@ -182,7 +182,7 @@ public abstract class GcHeap {
   public PartiallyCompletedParallelJob readRuntimeBasicBlocks(){    
     if(Configuration.getRunAllTests() == false){
       BufferPrinter printer1 = new BufferPrinter();
-      printer1.print(mToSpaceMemory, 0, 512);
+      printer1.print(mToSpaceMemory, 0, 1024);
     }
     
     Stopwatch watch = new Stopwatch();

@@ -64,7 +64,7 @@ void entry(char * gc_info_space,
   }
 
   for(i = 0; i < num_cores; ++i){
-    WaitForSingleObject(&threads[i], INFINITE);
+    WaitForSingleObject(threads[i], INFINITE);
   }
 
   free(threads);
