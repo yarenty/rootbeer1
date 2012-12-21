@@ -12,8 +12,9 @@ DWORD run(void * data)
     ++thread_id;
     unlock_thread_id();
     
-    if(index >= global_num_threads)
+    if(index >= global_num_threads){
       break;
+    }
 
     TlsSetValue(threadIdKey, (void *) index);
 

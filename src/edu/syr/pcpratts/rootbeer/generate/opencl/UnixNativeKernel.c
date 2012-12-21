@@ -11,10 +11,11 @@ static void * run(void * data){
     ++thread_id;
     unlock_thread_id();
     
-    if(index >= global_num_threads)
+    if(index >= global_num_threads){
       break;
+    }
 
-    pthread_setspecific(threadIdKey, (void *) index);\
+    pthread_setspecific(threadIdKey, (void *) index);
 
     lhandle = global_handles[index];
     lhandle = lhandle >> 4;
