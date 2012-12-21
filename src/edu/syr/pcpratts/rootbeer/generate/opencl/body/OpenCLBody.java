@@ -106,6 +106,18 @@ public class OpenCLBody {
     return ret.toString();
   }
   
+  public String getBodyNoLocals(){
+    determineLabels();
+
+    StringBuilder ret = new StringBuilder();
+    ret.append(writeBody());
+    return ret.toString();  
+  }
+  
+  public String getLocals(){
+    return writeLocals();
+  }
+  
   private void addTrapItem(Unit unit, TrapItem item){
     if(m_TrapMap.containsKey(unit)){
       List<TrapItem> traps = m_TrapMap.get(unit);

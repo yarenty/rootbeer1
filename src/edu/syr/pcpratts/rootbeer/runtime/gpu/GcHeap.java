@@ -169,8 +169,8 @@ public abstract class GcHeap {
       mToHandleMapMemory.finishCopy(mMaxToHandleMapAddress);
     }
     mHeapEndPtrMemory.finishCopy(8);    
-        
-    if(Configuration.getRunAllTests() == false){
+       
+    if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
       printer.print(mToSpaceMemory, 0, 1024);
     }
@@ -180,7 +180,7 @@ public abstract class GcHeap {
   protected abstract void allocateMemory();
 
   public PartiallyCompletedParallelJob readRuntimeBasicBlocks(){    
-    if(Configuration.getRunAllTests() == false){
+    if(Configuration.getPrintMem()){
       BufferPrinter printer1 = new BufferPrinter();
       printer1.print(mToSpaceMemory, 0, 1024);
     }

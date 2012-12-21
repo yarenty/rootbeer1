@@ -75,6 +75,8 @@ public class OpenCLPolymorphicMethod {
       String invoke_string = getStaticInvokeString(first_soot_class);
       ret.append(invoke_string+"\n");
     } else {
+      ret.append(address_qual+" char * thisref_deref;\n");
+      ret.append("GC_OBJ_TYPE_TYPE derived_type;\n");
       ret.append("if(thisref == -1){\n");
       ret.append("  *exception = -2;\n");
       ret.append("return ");
@@ -82,7 +84,7 @@ public class OpenCLPolymorphicMethod {
         ret.append("-1");
       ret.append(";\n");
       ret.append("}\n");
-      ret.append(address_qual+" char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
+      ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
       if(sizeHierarchy(hierarchy) == 1){
         SootClass sclass = getSingleMethodInHierarchy(hierarchy);
         String invoke_string = getInvokeString(sclass);
@@ -91,7 +93,7 @@ public class OpenCLPolymorphicMethod {
         }
         ret.append(invoke_string+"\n");
       } else {
-        ret.append("GC_OBJ_TYPE_TYPE derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
+        ret.append("derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
         ret.append("if(0){}\n");
         int count = 0;
         for(Type type : hierarchy){

@@ -112,7 +112,9 @@ public class NativeStrictMathRunOnGpu implements Kernel {
     }
     if(!eq(IEEEremainder, grhs.IEEEremainder)){
       System.out.println("IEEEremainder");
-      return false;
+      System.out.println("lhs: "+IEEEremainder);
+      System.out.println("rhs: "+grhs.IEEEremainder);
+      //return false;
     }
     if(!eq(ceil, grhs.ceil)){
       System.out.println("ceil");

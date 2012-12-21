@@ -26,6 +26,11 @@ import java.util.List;
 public class NativeCpuDevice implements GpuDevice {
   
   private List<CompiledKernel> m_Blocks;
+  private boolean m_nativeCpuInitialized;
+  
+  public NativeCpuDevice(){
+    m_nativeCpuInitialized = false;
+  }
   
   public GcHeap CreateHeap() {
     return new NativeCpuGcHeap(this);
@@ -86,13 +91,16 @@ public class NativeCpuDevice implements GpuDevice {
     Process p;
     
     String cflags = "-fno-common -Os -arch i386 -arch x86_64 -c";
-    cmd = "llvm-gcc "+cflags+" -I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers "+nemu+"NativeCpuDevice.c -o "+nemu+"NativeCpuDevice.o"; 
-    p = Runtime.getRuntime().exec(cmd, null, nemu_file);
-    status = p.waitFor();
-    if(status != 0){
-      System.out.println("Compilation failure!");
-      System.out.println(cmd);
-      System.exit(-1);
+    
+    if(m_nativeCpuInitialized == false){
+      cmd = "llvm-gcc "+cflags+" -I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers "+nemu+"NativeCpuDevice.c -o "+nemu+"NativeCpuDevice.o"; 
+      p = Runtime.getRuntime().exec(cmd, null, nemu_file);
+      status = p.waitFor();
+      if(status != 0){
+        System.out.println("Compilation failure!");
+        System.out.println(cmd);
+        System.exit(-1);
+      }
     }
     
     cmd = "llvm-gcc "+cflags+" -lpthread "+nemu+"generated.c -o "+nemu+"generated.o";
@@ -106,13 +114,15 @@ public class NativeCpuDevice implements GpuDevice {
     
     String ldflags = "-arch i386 -arch x86_64 -dynamiclib";
     
-    cmd = "llvm-gcc "+ldflags+" -o "+nemu+"nativecpudev.dylib -dylib "+nemu+"NativeCpuDevice.o -lc";
-    p = Runtime.getRuntime().exec(cmd, null, nemu_file);
-    status = p.waitFor();
-    if(status != 0){
-      System.out.println("Compilation failure!");
-      System.out.println(cmd);
-      System.exit(-1);
+    if(m_nativeCpuInitialized == false){
+      cmd = "llvm-gcc "+ldflags+" -o "+nemu+"nativecpudev.dylib -dylib "+nemu+"NativeCpuDevice.o -lc";
+      p = Runtime.getRuntime().exec(cmd, null, nemu_file);
+      status = p.waitFor();
+      if(status != 0){
+        System.out.println("Compilation failure!");
+        System.out.println(cmd);
+        System.exit(-1);
+      }
     }
     
     cmd = "llvm-gcc "+ldflags+" -o "+nemu+name+".dylib -dylib "+nemu+"generated.o -lc";
@@ -124,8 +134,11 @@ public class NativeCpuDevice implements GpuDevice {
       System.exit(-1);
     }
 
-    File f1 = new File(nemu+"nativecpudev.dylib");
-    System.load(f1.getAbsolutePath());     
+    if(m_nativeCpuInitialized == false){
+      File f1 = new File(nemu+"nativecpudev.dylib");
+      System.load(f1.getAbsolutePath());  
+      m_nativeCpuInitialized = true;
+    }
 
     File f2 = new File(nemu+name+".dylib");
     return f2.getAbsolutePath();
@@ -140,13 +153,15 @@ public class NativeCpuDevice implements GpuDevice {
     String cmd;
     Process p;
     
-    cmd = "gcc -ggdb -Wall -fPIC -g -c -I/usr/lib/jvm/java-6-openjdk/include/ -I/usr/lib/jvm/java-6-openjdk/include/linux "+nemu+"NativeCpuDevice.c -o "+nemu+"NativeCpuDevice.o";
-    p = Runtime.getRuntime().exec(cmd, null, nemu_file);
-    status = p.waitFor();
-    if(status != 0){
-      System.out.println("Compilation failure!");
-      System.out.println(cmd);
-      System.exit(-1);
+    if(m_nativeCpuInitialized == false){
+      cmd = "gcc -ggdb -Wall -fPIC -g -c -I/usr/lib/jvm/java-6-openjdk/include/ -I/usr/lib/jvm/java-6-openjdk/include/linux "+nemu+"NativeCpuDevice.c -o "+nemu+"NativeCpuDevice.o";
+      p = Runtime.getRuntime().exec(cmd, null, nemu_file);
+      status = p.waitFor();
+      if(status != 0){
+        System.out.println("Compilation failure!");
+        System.out.println(cmd);
+        System.exit(-1);
+      }
     }
 
     cmd = "gcc -ggdb -fPIC -Wall -g -c -lpthread "+nemu+"generated.c -o "+nemu+"generated.o";
@@ -167,17 +182,22 @@ public class NativeCpuDevice implements GpuDevice {
       System.exit(-1);
     }
 
-    cmd = "gcc -shared -Wl,-soname,nativecpudev -o "+nemu+"nativecpudev.so.1 "+nemu+"NativeCpuDevice.o "+nemu+"generated.o -lc";
-    p = Runtime.getRuntime().exec(cmd, null, nemu_file);
-    status = p.waitFor();
-    if(status != 0){
-      System.out.println("Compilation failure!");
-      System.out.println(cmd);
-      System.exit(-1);
+    if(m_nativeCpuInitialized == false){
+      cmd = "gcc -shared -Wl,-soname,nativecpudev -o "+nemu+"nativecpudev.so.1 "+nemu+"NativeCpuDevice.o "+nemu+"generated.o -lc";
+      p = Runtime.getRuntime().exec(cmd, null, nemu_file);
+      status = p.waitFor();
+      if(status != 0){
+        System.out.println("Compilation failure!");
+        System.out.println(cmd);
+        System.exit(-1);
+      }
     }
 
-    File f1 = new File(nemu+"nativecpudev.so.1");
-    System.load(f1.getAbsolutePath());     
+    if(m_nativeCpuInitialized == false){
+      File f1 = new File(nemu+"nativecpudev.so.1");
+      System.load(f1.getAbsolutePath());  
+      m_nativeCpuInitialized = true;
+    }
 
     File f2 = new File(nemu+name+".so.1");
     return f2.getAbsolutePath();
@@ -190,11 +210,17 @@ public class NativeCpuDevice implements GpuDevice {
     WindowsCompile compiler = new WindowsCompile();
     String jdk_path = compiler.jdkPath();
   
-    windowsCompile("cl /I\""+jdk_path+"\\include\" /I\""+jdk_path+"\\include\\win32\" "+nemu+"NativeCpuDevice.c /link /DLL /OUT:\""+nemu+"nativecpudevice.dll\" /MACHINE:X64");
+    if(m_nativeCpuInitialized == false){
+      windowsCompile("cl /I\""+jdk_path+"\\include\" /I\""+jdk_path+"\\include\\win32\" "+nemu+"NativeCpuDevice.c /link /DLL /OUT:\""+nemu+"nativecpudevice.dll\" /MACHINE:X64");
+    }
+    
     windowsCompile("cl /I\""+jdk_path+"\\include\" /I\""+jdk_path+"\\include\\win32\" "+nemu+"generated.c /link /DLL /OUT:\""+nemu+"libnemu.dll\" /MACHINE:X64");
   
-    File f1 = new File(nemu+"nativecpudevice.dll");
-    System.load(f1.getAbsolutePath());
+    if(m_nativeCpuInitialized == false){
+      File f1 = new File(nemu+"nativecpudevice.dll");
+      System.load(f1.getAbsolutePath());
+      m_nativeCpuInitialized = true;
+    }
     
     File f2 = new File(nemu+name+".dll");
     return f2.getAbsolutePath();

@@ -72,7 +72,16 @@ $$__device__$$ double java_lang_StrictMath_sqrt( char * gc_info , double paramet
 } 
 
 $$__device__$$ double java_lang_StrictMath_cbrt( char * gc_info , double parameter0 , int * exception ) { 
-  return cbrt(parameter0); 
+  //2.2204460492503131e-16 is DBL_EPSILON
+  if (fabs(parameter0) < 2.2204460492503131e-16){
+    return 0.0;
+  }
+
+  if (parameter0 > 0.0) {
+    return pow(parameter0, 1.0/3.0);
+  }
+
+  return -pow(-parameter0, 1.0/3.0);
 } 
 
 $$__device__$$ double java_lang_StrictMath_IEEEremainder( char * gc_info , double parameter0 , double parameter1, int * exception ) { 

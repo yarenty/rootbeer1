@@ -133,7 +133,13 @@ public class OpenCLMethod {
   
   private String synchronizedEnter(){
     String ret = "";
-    
+    ret += "int id;\n";
+    ret += "char * mem;\n";
+    ret += "char * trash;\n";
+    ret += "char * mystery;\n";
+    ret += "int count;\n";
+    ret += "int old;\n";
+    ret += "char * thisref_synch_deref;\n";
     if(m_sootMethod.isStatic() == false){
       ret += "if(thisref == -1){\n";
       ret += "  *exception = "+Constants.NullPointerNumber+";\n";
@@ -144,24 +150,23 @@ public class OpenCLMethod {
       }
       ret += "}\n";
     }
-    ret += "int id = getThreadId();\n";
+    ret += "id = getThreadId();\n";
     StaticOffsets static_offsets = new StaticOffsets();
     int junk_index = static_offsets.getEndIndex() - 4;
     int mystery_index = junk_index - 4;
     if(m_sootMethod.isStatic()){
       int offset = static_offsets.getIndex(m_sootClass);
-      ret += "char * mem = edu_syr_pcpratts_gc_deref(gc_info, 0);\n";
-      ret += "char * trash = mem + "+junk_index+";\n";
-      ret += "char * mystery = mem + "+mystery_index+";\n";
+      ret += "mem = edu_syr_pcpratts_gc_deref(gc_info, 0);\n";
+      ret += "trash = mem + "+junk_index+";\n";
+      ret += "mystery = mem + "+mystery_index+";\n";
       ret += "mem += "+offset+";\n";
     } else {
-      ret += "char * mem = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n";
-      ret += "char * trash = edu_syr_pcpratts_gc_deref(gc_info, 0) + "+junk_index+";\n";
-      ret += "char * mystery = trash - 8;\n";
+      ret += "mem = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n";
+      ret += "trash = edu_syr_pcpratts_gc_deref(gc_info, 0) + "+junk_index+";\n";
+      ret += "mystery = trash - 8;\n";
       ret += "mem += 12;\n";
     }
-    ret += "int count = 0;\n";
-    ret += "int old;\n";
+    ret += "count = 0;\n";
     ret += "while(count < 100){\n";
     ret += "  old = atomicCAS((int *) mem, -1 , id);\n";
     ret += "  *((int *) trash) = old;\n";
@@ -192,7 +197,7 @@ public class OpenCLMethod {
       }
       ret += "  }\n";
 
-      ret += "  char * thisref_synch_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref );\n";
+      ret += "  thisref_synch_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref );\n";
       ret += "  * ( ( int * ) & thisref_synch_deref [ 16 ] ) = 20 ;\n";
     }
     return ret;
@@ -204,11 +209,12 @@ public class OpenCLMethod {
       ret.append(getMethodDecl(false)+"{\n");
       try {
         if(methodIsRuntimeBasicBlockRun() == false){
+          OpenCLBody ocl_body = new OpenCLBody(m_sootMethod, isConstructor());
+          ret.append(ocl_body.getLocals());
           if(isSynchronized()){
             ret.append(synchronizedEnter()); 
           }
-          OpenCLBody ocl_body = new OpenCLBody(m_sootMethod, isConstructor());
-          ret.append(ocl_body.getBody());
+          ret.append(ocl_body.getBodyNoLocals());
           if(isSynchronized()){
             if(isLinux()){
               ret.append("  } else {");

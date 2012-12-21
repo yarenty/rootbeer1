@@ -1,4 +1,7 @@
 
+#define NAN 0x7ff8000000000000L
+#define INFINITY 0x7ff0000000000000L
+
 long long atom_add(long long * addr, long long value){
   long long ret;
   lock_atom_add();
