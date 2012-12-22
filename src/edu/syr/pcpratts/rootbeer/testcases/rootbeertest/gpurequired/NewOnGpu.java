@@ -16,7 +16,7 @@ public class NewOnGpu implements TestSerialization {
 
   public List<Kernel> create() {
     List<Kernel> jobs = new ArrayList<Kernel>();
-    for(int i = 0; i < 500; ++i){
+    for(int i = 0; i < 10; ++i){
       NewOnGpuRunOnGpu curr = new NewOnGpuRunOnGpu();
       jobs.add(curr);
     }

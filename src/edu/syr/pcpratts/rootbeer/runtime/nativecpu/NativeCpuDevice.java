@@ -101,6 +101,7 @@ public class NativeCpuDevice implements GpuDevice {
         System.out.println(cmd);
         System.exit(-1);
       }
+      p.destroy();
     }
     
     cmd = "llvm-gcc "+cflags+" -lpthread "+nemu+"generated.c -o "+nemu+"generated.o";
@@ -111,6 +112,7 @@ public class NativeCpuDevice implements GpuDevice {
       System.out.println(cmd);
       System.exit(-1);
     }
+    p.destroy();
     
     String ldflags = "-arch i386 -arch x86_64 -dynamiclib";
     
@@ -123,6 +125,7 @@ public class NativeCpuDevice implements GpuDevice {
         System.out.println(cmd);
         System.exit(-1);
       }
+      p.destroy();
     }
     
     cmd = "llvm-gcc "+ldflags+" -o "+nemu+name+".dylib -dylib "+nemu+"generated.o -lc";
@@ -133,6 +136,7 @@ public class NativeCpuDevice implements GpuDevice {
       System.out.println(cmd);
       System.exit(-1);
     }
+    p.destroy();
 
     if(m_nativeCpuInitialized == false){
       File f1 = new File(nemu+"nativecpudev.dylib");
@@ -162,6 +166,7 @@ public class NativeCpuDevice implements GpuDevice {
         System.out.println(cmd);
         System.exit(-1);
       }
+      p.destroy();
     }
 
     cmd = "gcc -ggdb -fPIC -Wall -g -c -lpthread "+nemu+"generated.c -o "+nemu+"generated.o";
@@ -172,6 +177,7 @@ public class NativeCpuDevice implements GpuDevice {
       System.out.println(cmd);
       System.exit(-1);
     }
+    p.destroy();
 
     cmd = "gcc -shared -Wl,-soname,"+name+" -o "+nemu+name+".so.1 "+nemu+"generated.o -lc";
     p = Runtime.getRuntime().exec(cmd, null, nemu_file);
@@ -181,6 +187,7 @@ public class NativeCpuDevice implements GpuDevice {
       System.out.println(cmd);
       System.exit(-1);
     }
+    p.destroy();
 
     if(m_nativeCpuInitialized == false){
       cmd = "gcc -shared -Wl,-soname,nativecpudev -o "+nemu+"nativecpudev.so.1 "+nemu+"NativeCpuDevice.o "+nemu+"generated.o -lc";
@@ -191,6 +198,7 @@ public class NativeCpuDevice implements GpuDevice {
         System.out.println(cmd);
         System.exit(-1);
       }
+      p.destroy();
     }
 
     if(m_nativeCpuInitialized == false){

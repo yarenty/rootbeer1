@@ -17,7 +17,7 @@ public class StaticsTest3 implements TestSerialization {
   @Override
   public List<Kernel> create() {
     List<Kernel> jobs = new ArrayList<Kernel>();
-    for(int i = 0; i < 50; ++i){
+    for(int i = 0; i < 10; ++i){
       StaticsTest3RunOnGpu curr = new StaticsTest3RunOnGpu();
       jobs.add(curr);
     }

@@ -13,6 +13,7 @@ import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
 import edu.syr.pcpratts.rootbeer.test.LoadTestSerialization;
 import edu.syr.pcpratts.rootbeer.test.TestException;
 import edu.syr.pcpratts.rootbeer.test.TestSerialization;
+import edu.syr.pcpratts.rootbeer.util.ForceGC;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ public class RootbeerTestAgent {
     for(TestSerialization creator : creators){
       System.out.println("[TEST "+test_num+"/"+num_tests+"] "+creator.toString());
       test(creator, false);
+      ForceGC.gc();
       if(m_passed){
         System.out.println("  PASSED");
         System.out.println("  Cpu time: "+m_cpuTime+" ms");

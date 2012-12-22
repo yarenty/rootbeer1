@@ -17,7 +17,7 @@ public class StrictMathTest implements TestSerialization {
   @Override
   public List<Kernel> create() {
     List<Kernel> ret = new ArrayList<Kernel>();
-    for(int i = 0; i < 500; ++i){
+    for(int i = 0; i < 20; ++i){
       ret.add(new StrictMatchRunOnGpu());
     }
     return ret;    

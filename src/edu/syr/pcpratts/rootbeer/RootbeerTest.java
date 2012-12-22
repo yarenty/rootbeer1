@@ -8,7 +8,10 @@
 package edu.syr.pcpratts.rootbeer;
 
 import edu.syr.pcpratts.rootbeer.util.CurrJarName;
+import edu.syr.pcpratts.rootbeer.util.ForceGC;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+import soot.G;
 import soot.Modifier;
 
 public class RootbeerTest {
@@ -29,6 +32,11 @@ public class RootbeerTest {
       }
       
       test_case = compiler.getProvider();
+      
+      //clear out the memory used by soot and compiler
+      compiler = null;
+      G.reset();
+      ForceGC.gc();
       
       JarClassLoader loader_factory = new JarClassLoader(dest_jar);
       ClassLoader cls_loader = loader_factory.getLoader();

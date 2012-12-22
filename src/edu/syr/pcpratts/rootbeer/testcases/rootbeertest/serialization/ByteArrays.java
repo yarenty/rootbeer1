@@ -16,7 +16,7 @@ public class ByteArrays implements TestSerialization {
 
   public List<Kernel> create() {
     List<Kernel> jobs = new ArrayList<Kernel>();
-    for(int i = 0; i < 500; ++i){
+    for(int i = 0; i < 20; ++i){
       ByteArraysRunOnGpu curr = new ByteArraysRunOnGpu();
       jobs.add(curr);
     }

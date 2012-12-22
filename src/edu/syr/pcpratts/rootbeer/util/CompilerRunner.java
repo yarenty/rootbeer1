@@ -30,7 +30,8 @@ public class CompilerRunner {
         reader2.print();
         ret.addAll(reader1.m_Lines);
         ret.addAll(reader2.m_Lines);
-      } 
+      }
+      p.destroy();
       return ret;
     } catch (Exception ex) {
       ex.printStackTrace();
