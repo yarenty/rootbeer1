@@ -60,7 +60,11 @@ public class RootbeerGpu {
   }
   
   public static boolean getSharedBoolean(int index){
-    
+    if(m_sharedMem[index] == 1){
+      return true;
+    } else {
+      return false;
+    }
   }
   
   public static void setSharedBoolean(int index, boolean value){
@@ -73,9 +77,25 @@ public class RootbeerGpu {
     m_sharedMem[index] = value_byte;
   }
   
+  public static short getSharedShort(int index){
+    short ret = 0;
+    ret |= m_sharedMem[index] & 0xff;
+    ret |= (m_sharedMem[index + 1] << 8) & 0xff00;
+    return ret;
+  }
+  
   public static void setSharedShort(int index, short value){
     m_sharedMem[index] = (byte) (value & 0xff);
     m_sharedMem[index + 1] = (byte) ((value >> 8) & 0xff);
+  }
+  
+  public static int getSharedInteger(int index){
+    int ret = 0;
+    ret |= m_sharedMem[index] & 0x000000ff;
+    ret |= (m_sharedMem[index + 1] <<  8) & 0x0000ff00;
+    ret |= (m_sharedMem[index + 1] << 16) & 0x00ff0000;
+    ret |= (m_sharedMem[index + 1] << 24) & 0xff000000;
+    return ret;  
   }
   
   public static void setSharedInteger(int index, int value){
@@ -83,6 +103,19 @@ public class RootbeerGpu {
     m_sharedMem[index + 1] = (byte) ((value >> 8)  & 0xff);
     m_sharedMem[index + 2] = (byte) ((value >> 16) & 0xff);
     m_sharedMem[index + 3] = (byte) ((value >> 24) & 0xff);
+  }
+  
+  public static long getSharedLong(int index){
+    long ret = 0;
+    ret |= m_sharedMem[index] & 0x00000000000000ffL;
+    ret |= (m_sharedMem[index + 1] <<  8) & 0x000000000000ff00L;
+    ret |= (m_sharedMem[index + 1] << 16) & 0x0000000000ff0000L;
+    ret |= (m_sharedMem[index + 1] << 24) & 0x00000000ff000000L;
+    ret |= (m_sharedMem[index + 1] << 32) & 0x000000ff00000000L;
+    ret |= (m_sharedMem[index + 1] << 40) & 0x0000ff0000000000L;
+    ret |= (m_sharedMem[index + 1] << 48) & 0x00ff000000000000L;
+    ret |= (m_sharedMem[index + 1] << 56) & 0xff00000000000000L;
+    return ret;    
   }
   
   public static void setSharedLong(int index, long value){
@@ -96,9 +129,19 @@ public class RootbeerGpu {
     m_sharedMem[index + 7] = (byte) ((value >> 56) & 0xff);
   }
   
+  public static float getSharedFloat(int index){
+    int value_int = getSharedInteger(index);
+    return Float.intBitsToFloat(value_int);
+  }
+  
   public static void setSharedFloat(int index, float value){ 
     int value_int = Float.floatToIntBits(value);
     setSharedInteger(index, value_int);
+  }
+  
+  public static double getSharedDouble(int index){
+    long value_long = getSharedLong(index);
+    return Double.longBitsToDouble(value_long);
   }
   
   public static void setSharedDouble(int index, double value){
