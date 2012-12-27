@@ -18,7 +18,7 @@ public class StringConstantKernel implements Kernel {
   }
 
   boolean compare(StringConstantKernel rhs) {
-    if(m_string.equals(rhs.m_string)){
+    if(m_string.equals(rhs.m_string) == false){
       System.out.println("rhs.m_string: "+rhs.m_string);
       return false;
     }
