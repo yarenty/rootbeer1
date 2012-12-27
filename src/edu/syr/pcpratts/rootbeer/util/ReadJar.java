@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.util;
 
-import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.RootbeerCompiler;
 import edu.syr.pcpratts.rootbeer.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.util.JarEntryHelp;

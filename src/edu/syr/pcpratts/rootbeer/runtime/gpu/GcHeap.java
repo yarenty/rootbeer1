@@ -9,7 +9,6 @@ package edu.syr.pcpratts.rootbeer.runtime.gpu;
 
 import edu.syr.pcpratts.rootbeer.Aug4th2011PerformanceStudy;
 import edu.syr.pcpratts.rootbeer.Configuration;
-import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.runtime.Serializer;
 import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
@@ -199,7 +198,7 @@ public abstract class GcHeap {
     mExceptionsMemory.setAddress(0);
     for(int i = 0; i < m_CountWritten; ++i){
       int reference = mExceptionsMemory.readInt();
-      if(reference == Constants.NullPointerNumber){
+      if(reference == first_block.getNullPointerNumber()){
         throw new NullPointerException();
       }
       if(reference != 0){

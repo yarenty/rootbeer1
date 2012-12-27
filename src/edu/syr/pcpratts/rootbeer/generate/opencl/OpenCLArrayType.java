@@ -137,13 +137,14 @@ public class OpenCLArrayType {
     int offset_size = Constants.ArrayOffsetSize;
     
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
+    SootClass null_ptr = Scene.v().getSootClass("java.lang.NullPointerException");
     //get
     ret.append(decls.get(0)+"{\n");
     ret.append("int offset;\n");
     ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("offset = "+offset_size+"+(parameter0*"+element_size+");\n");
     ret.append("if(thisref == -1){\n");
-    ret.append("  *exception = "+edu.syr.pcpratts.rootbeer.Constants.NullPointerNumber+";\n");
+    ret.append("  *exception = "+RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_ptr) +";\n");
     ret.append("  return 0;\n");
     ret.append("}\n");
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
@@ -154,7 +155,7 @@ public class OpenCLArrayType {
     ret.append(decls.get(1)+"{\n");
     ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("  if(thisref == -1){\n");
-    ret.append("    *exception = "+edu.syr.pcpratts.rootbeer.Constants.NullPointerNumber+";\n");
+    ret.append("    *exception = "+RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_ptr) +";\n");
     ret.append("    return;\n");
     ret.append("  }\n");
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");

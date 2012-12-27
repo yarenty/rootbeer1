@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.fields;
 
-import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -22,11 +21,13 @@ import java.util.Map;
 import java.util.TreeMap;
 import soot.Local;
 import soot.Modifier;
+import soot.Scene;
 import soot.SootClass;
 import soot.SootField;
 import soot.Type;
 import soot.Value;
 import soot.jimple.toolkits.typing.fast.Integer127Type;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class OpenCLField {
   private final SootField m_SootField;
@@ -146,6 +147,10 @@ public class OpenCLField {
     String cast_string = getCastString();
     
     calculateOffsets(composite);
+    
+    SootClass null_cls = Scene.v().getSootClass("java.lang.NullPointerException");
+    int null_num = RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_cls);
+    
     //instance getter
     ret.append(decls.get(0)+"{\n");
     int field_offset = getOnlyOffset();
@@ -158,7 +163,7 @@ public class OpenCLField {
     ret.append("int offset;\n");
     ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("if(thisref == -1){\n");
-    ret.append("  *exception = "+Constants.NullPointerNumber+";\n");
+    ret.append("  *exception = "+null_num+";\n");
     ret.append("  return 0;\n");
     ret.append("}\n");
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
@@ -178,7 +183,7 @@ public class OpenCLField {
     ret.append("int offset;\n");
     ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("if(thisref == -1){\n");
-    ret.append("  *exception = "+Constants.NullPointerNumber+";\n");
+    ret.append("  *exception = "+null_num+";\n");
     ret.append("  return;\n");
     ret.append("}\n");
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");    

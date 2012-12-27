@@ -363,9 +363,6 @@ char__array_new($$__global$$ char * gc_info, int size, int * exception);
 $$__device__$$ void 
 char__array_set($$__global$$ char * gc_info, int thisref, int parameter0, char parameter1, int * exception);
 
-$$__device__$$ int 
-java_lang_String_initab850b60f96d11de8a390800200c9a660_a4_($$__global$$ char * gc_info, int parameter0, int * exception);
-
 $$__device__$$ int
 edu_syr_pcpratts_string_constant($$__global$$ char * gc_info, char * str_constant, int * exception){
   int i;
@@ -375,7 +372,7 @@ edu_syr_pcpratts_string_constant($$__global$$ char * gc_info, char * str_constan
     char__array_set(gc_info, characters, i, str_constant[i], exception);
   }
   
-  return java_lang_String_initab850b60f96d11de8a390800200c9a660_a4_(gc_info, characters, exception);
+  return java_lang_String_initab850b60f96d11de8a390800200c9a66(gc_info, characters, exception);
 }
 
 $$__device__$$ int

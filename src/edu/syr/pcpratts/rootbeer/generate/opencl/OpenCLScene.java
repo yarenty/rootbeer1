@@ -205,7 +205,6 @@ public class OpenCLScene {
     
     Set<SootField> fields = RootbeerClassLoader.v().getDfsInfo().getFields();
     for(SootField field : fields){
-      System.out.println("addField: "+field.toString());
       addField(field);
     }
     

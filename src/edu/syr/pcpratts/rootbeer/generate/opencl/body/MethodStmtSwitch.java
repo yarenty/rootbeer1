@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
-import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLMethod;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -15,6 +14,8 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.util.Stack;
 import java.util.ArrayList;
 import java.util.List;
+import soot.Scene;
+import soot.SootClass;
 import soot.SootMethod;
 import soot.Type;
 import soot.Unit;
@@ -329,8 +330,10 @@ public class MethodStmtSwitch implements StmtSwitch {
   }
 
   private void checkException() {    
-    int oom_num = Constants.OutOfMemoryNumber;
-    int null_num = Constants.NullPointerNumber;
+    SootClass oom_cls = Scene.v().getSootClass("java.lang.OutOfMemoryError");
+    SootClass null_cls = Scene.v().getSootClass("java.lang.NullPointerException");
+    int oom_num = RootbeerClassLoader.v().getDfsInfo().getClassNumber(oom_cls);
+    int null_num = RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_cls);
     m_output.append("if(*exception != 0) { \n");
     if(m_trapItems != null){    
       m_output.append("  GC_OBJ_TYPE_TYPE ex_type;\n");

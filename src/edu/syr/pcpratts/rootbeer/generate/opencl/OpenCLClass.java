@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
-import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
 import java.util.ArrayList;

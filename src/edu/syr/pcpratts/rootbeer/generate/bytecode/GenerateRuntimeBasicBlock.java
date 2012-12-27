@@ -26,6 +26,7 @@ import soot.jimple.IntConstant;
 import soot.jimple.Jimple;
 import soot.jimple.JimpleBody;
 import soot.jimple.StringConstant;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class GenerateRuntimeBasicBlock {
   private CodeSegment codeSegment;
@@ -59,6 +60,7 @@ public class GenerateRuntimeBasicBlock {
     makeGpuBody();
     makeIsUsingGarbageCollectorBody();
     makeIsReadOnly();    
+    makeExceptionNumbers();
                             
     GcHeapReadWriteAdder adder = new GcHeapReadWriteAdder();
     adder.add(codeSegment);
@@ -245,6 +247,23 @@ public class GenerateRuntimeBasicBlock {
       bcl.returnValue(IntConstant.v(1));
     else
       bcl.returnValue(IntConstant.v(0));
+    bcl.endMethod();
+  }
+
+  private void makeExceptionNumbers() {
+    makeExceptionMethod("getNullPointerNumber", "java.lang.NullPointerException");
+    makeExceptionMethod("getOutOfMemoryNumber", "java.lang.OutOfMemoryError");
+  }
+  
+  private void makeExceptionMethod(String method_name, String cls_name) {
+    SootClass soot_class = Scene.v().getSootClass(cls_name);
+    int number = RootbeerClassLoader.v().getDfsInfo().getClassNumber(soot_class);
+    
+    BytecodeLanguage bcl = new BytecodeLanguage();
+    bcl.openClass(mSootClass);
+    bcl.startMethod(method_name, IntType.v());
+    bcl.refThis();
+    bcl.returnValue(IntConstant.v(number));
     bcl.endMethod();
   }
 

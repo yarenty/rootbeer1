@@ -8,7 +8,6 @@
 package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
 import edu.syr.pcpratts.rootbeer.Configuration;
-import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.runtime.*;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
@@ -338,9 +337,9 @@ public class CudaRuntime2 implements ParallelRuntime {
       long ref = m_ExceptionHandles.readLong();
       if(ref != 0){
         long ref_num = ref >> 4;
-        if(ref_num == Constants.NullPointerNumber){
+        if(ref_num == m_FirstJob.getNullPointerNumber()){
           throw new NullPointerException(); 
-        } else if(ref_num == Constants.OutOfMemoryNumber){
+        } else if(ref_num == m_FirstJob.getOutOfMemoryNumber()){
           throw new OutOfMemoryError();
         }
         Memory mem = m_ToSpace.get(0);

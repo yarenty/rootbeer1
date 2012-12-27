@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
-import edu.syr.pcpratts.rootbeer.Constants;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.OpenCLBody;
@@ -31,6 +30,7 @@ public class OpenCLMethod {
   private final SootMethod m_sootMethod;
   private SootClass m_sootClass;
   private Set<String> m_dontMangleMethods;
+  private Set<String> m_emitUnmangled;
   
   public OpenCLMethod(SootMethod soot_method, SootClass soot_class){
     m_sootMethod = soot_method;
@@ -142,7 +142,8 @@ public class OpenCLMethod {
     ret += "char * thisref_synch_deref;\n";
     if(m_sootMethod.isStatic() == false){
       ret += "if(thisref == -1){\n";
-      ret += "  *exception = "+Constants.NullPointerNumber+";\n";
+      SootClass null_ptr = Scene.v().getSootClass("java.lang.NullPointerException");
+      ret += "  *exception = "+RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_ptr)+";\n";
       if(returnsAValue()){
         ret += "  return 0;\n";
       } else {
@@ -425,6 +426,9 @@ public class OpenCLMethod {
   
   private boolean shouldEmitBody(){
     String ret = getBaseMethodName();
+    if(m_emitUnmangled.contains(ret)){
+      return true;
+    }
     if(m_dontMangleMethods.contains(ret))
       return false;
     return true;
@@ -458,6 +462,7 @@ public class OpenCLMethod {
   
   private void createDontMangleMethods() {
     m_dontMangleMethods = new HashSet<String>();
+    m_emitUnmangled = new HashSet<String>();
     m_dontMangleMethods.add("java_lang_StrictMath_exp");
     m_dontMangleMethods.add("java_lang_StrictMath_log");
     m_dontMangleMethods.add("java_lang_StrictMath_log10");
@@ -494,6 +499,8 @@ public class OpenCLMethod {
     m_dontMangleMethods.add("java_lang_Class_getName");
     m_dontMangleMethods.add("java_lang_Object_getClass");
     m_dontMangleMethods.add("java_lang_StringValue_from");
+    m_dontMangleMethods.add("java_lang_String_initab850b60f96d11de8a390800200c9a66");
+    m_emitUnmangled.add("java_lang_String_initab850b60f96d11de8a390800200c9a66");
   }
 
   public String getSignature() {
