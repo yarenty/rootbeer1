@@ -205,6 +205,9 @@ public class OpenCLMethod {
   }
   
   public String getMethodBody(){
+    if(m_sootMethod.getSignature().equals("<java.lang.String: void <init>(char[])>")){
+      System.out.println("hello");
+    }
     StringBuilder ret = new StringBuilder();
     if(shouldEmitBody()){
       ret.append(getMethodDecl(false)+"{\n");
@@ -408,7 +411,8 @@ public class OpenCLMethod {
     if(ctor_body){
       ret += "_body";  
     }
-    if(m_dontMangleMethods.contains(ret) == false)
+    String signature = m_sootMethod.getSignature();
+    if(m_dontMangleMethods.contains(signature) == false)
       ret += NameMangling.v().mangleArgs(m_sootMethod);
     return ret;
   }
@@ -425,12 +429,13 @@ public class OpenCLMethod {
   }
   
   private boolean shouldEmitBody(){
-    String ret = getBaseMethodName();
-    if(m_emitUnmangled.contains(ret)){
+    String signature = m_sootMethod.getSignature();
+    if(m_emitUnmangled.contains(signature)){
       return true;
     }
-    if(m_dontMangleMethods.contains(ret))
+    if(m_dontMangleMethods.contains(signature)){
       return false;
+    }
     return true;
   }
   
@@ -463,44 +468,45 @@ public class OpenCLMethod {
   private void createDontMangleMethods() {
     m_dontMangleMethods = new HashSet<String>();
     m_emitUnmangled = new HashSet<String>();
-    m_dontMangleMethods.add("java_lang_StrictMath_exp");
-    m_dontMangleMethods.add("java_lang_StrictMath_log");
-    m_dontMangleMethods.add("java_lang_StrictMath_log10");
-    m_dontMangleMethods.add("java_lang_StrictMath_sqrt");
-    m_dontMangleMethods.add("java_lang_StrictMath_cbrt");
-    m_dontMangleMethods.add("java_lang_StrictMath_IEEEremainder");    
-    m_dontMangleMethods.add("java_lang_StrictMath_ceil");
-    m_dontMangleMethods.add("java_lang_StrictMath_floor");
-    m_dontMangleMethods.add("java_lang_StrictMath_sin");
-    m_dontMangleMethods.add("java_lang_StrictMath_cos");
-    m_dontMangleMethods.add("java_lang_StrictMath_tan");
-    m_dontMangleMethods.add("java_lang_StrictMath_asin");
-    m_dontMangleMethods.add("java_lang_StrictMath_acos");
-    m_dontMangleMethods.add("java_lang_StrictMath_atan");
-    m_dontMangleMethods.add("java_lang_StrictMath_atan2");
-    m_dontMangleMethods.add("java_lang_StrictMath_pow");
-    m_dontMangleMethods.add("java_lang_StrictMath_sinh");
-    m_dontMangleMethods.add("java_lang_StrictMath_cosh");
-    m_dontMangleMethods.add("java_lang_StrictMath_tanh");
-    m_dontMangleMethods.add("java_lang_Double_doubleToLongBits");
-    m_dontMangleMethods.add("java_lang_Double_longBitsToDouble");
-    m_dontMangleMethods.add("java_lang_System_arraycopy");
-    m_dontMangleMethods.add("java_lang_Throwable_fillInStackTrace");
-    m_dontMangleMethods.add("java_lang_Throwable_getStackTraceDepth");
-    m_dontMangleMethods.add("java_lang_Throwable_getStackTraceElement");
-    m_dontMangleMethods.add("java_lang_Object_clone");
-    m_dontMangleMethods.add("java_lang_Object_hashCode");
-    m_dontMangleMethods.add("java_lang_OutOfMemoryError_initab850b60f96d11de8a390800200c9a66");
-    m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu");
-    m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId");
-    m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef");
-    m_dontMangleMethods.add("edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_synchthreads");
-    m_dontMangleMethods.add("java_lang_System_nanoTime");
-    m_dontMangleMethods.add("java_lang_Class_getName");
-    m_dontMangleMethods.add("java_lang_Object_getClass");
-    m_dontMangleMethods.add("java_lang_StringValue_from");
-    m_dontMangleMethods.add("java_lang_String_initab850b60f96d11de8a390800200c9a66");
-    m_emitUnmangled.add("java_lang_String_initab850b60f96d11de8a390800200c9a66");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double exp(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double log(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double log10(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double log(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double sqrt(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double cbrt(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double IEEEremainder(double,double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double ceil(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double floor(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double sin(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double cos(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double tan(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double asin(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double acos(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double atan(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double atan2(double,double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double pow(double,double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double sinh(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double cosh(double)>");
+    m_dontMangleMethods.add("<java.lang.StrictMath: double tanh(double)>");
+    m_dontMangleMethods.add("<java.lang.Double: long doubleToLongBits(double)>");
+    m_dontMangleMethods.add("<java.lang.Double: double longBitsToDouble(long)>");
+    m_dontMangleMethods.add("<java.lang.System: void arraycopy(java.lang.Object,int,java.lang.Object,int,int)>");
+    m_dontMangleMethods.add("<java.lang.Throwable: java.lang.Throwable fillInStackTrace()>");
+    m_dontMangleMethods.add("<java.lang.Throwable: int getStackTraceDepth()>");
+    m_dontMangleMethods.add("<java.lang.Throwable: java.lang.StackTraceElement getStackTraceElement(int)>");
+    m_dontMangleMethods.add("<java.lang.Object: java.lang.Object clone()>");
+    m_dontMangleMethods.add("<java.lang.Object: int hashCode()>");
+    m_dontMangleMethods.add("<java.lang.OutOfMemoryError: void <init>()>");
+    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: boolean isOnGpu()>");
+    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadId()>");
+    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: long getRef(java.lang.Object)>");
+    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void synchthreads()>");
+    m_dontMangleMethods.add("<java.lang.System: long nanoTime()>");
+    m_dontMangleMethods.add("<java.lang.Class: java.lang.String getName()>");
+    m_dontMangleMethods.add("<java.lang.Object: java.lang.Class getClass()>");
+    m_dontMangleMethods.add("<java.lang.StringValue: char[] from(char[])");
+    m_dontMangleMethods.add("<java.lang.String: void <init>(char[])>");
+    m_emitUnmangled.add("<java.lang.String: void <init>(char[])>");
   }
 
   public String getSignature() {
