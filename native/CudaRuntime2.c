@@ -8,14 +8,14 @@
 
 #define CHECK_STATUS(env,msg,status) \
 if (CUDA_SUCCESS != status) {\
-    throw_cuda_errror_exception(env, msg, status);\
-    return;\
+  throw_cuda_errror_exception(env, msg, status);\
+  return;\
 }
 
 #define CHECK_STATUS_RTN(env,msg,status,rtn) \
 if (CUDA_SUCCESS != status) {\
-    throw_cuda_errror_exception(env, msg, status);\
-    return rtn;\
+  throw_cuda_errror_exception(env, msg, status);\
+  return rtn;\
 }
 
 static CUdevice cuDevice;
@@ -55,37 +55,37 @@ static size_t gc_space_size;
 * id - variable the memory assignment was for
 */
 void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error) {
-	char msg[1024];
-	jclass exp;
-	jfieldID fid;
+  char msg[1024];
+  jclass exp;
+  jfieldID fid;
   int a = 0;
   int b = 0;
   char name[1024];
 
-	if(error == CUDA_SUCCESS){
-		return;
-	}
+  if(error == CUDA_SUCCESS){
+    return;
+  }
 
-	exp = (*env)->FindClass(env,"edu/syr/pcpratts/rootbeer/runtime2/cuda/CudaErrorException");
+  exp = (*env)->FindClass(env,"edu/syr/pcpratts/rootbeer/runtime2/cuda/CudaErrorException");
 
-    // we truncate the message to 900 characters to stop any buffer overflow
-	switch(error){
-		case CUDA_ERROR_OUT_OF_MEMORY:
-			sprintf(msg, "CUDA_ERROR_OUT_OF_MEMORY: %.900s",message);
-			break;
+  // we truncate the message to 900 characters to stop any buffer overflow
+  switch(error){
+    case CUDA_ERROR_OUT_OF_MEMORY:
+      sprintf(msg, "CUDA_ERROR_OUT_OF_MEMORY: %.900s",message);
+      break;
     case CUDA_ERROR_NO_BINARY_FOR_GPU:
       cuDeviceGetName(name,1024,cuDevice);
       cuDeviceComputeCapability(&a, &b, cuDevice);
       sprintf(msg, "No binary for gpu. Selected %s (%d.%d). 2.0 compatibility required.", name, a, b);
       break;
-		default:
-			sprintf(msg, "ERROR STATUS:%i : %.900s", error, message);
-	}
+    default:
+      sprintf(msg, "ERROR STATUS:%i : %.900s", error, message);
+  }
 
-	fid = (*env)->GetFieldID(env,exp, "cudaError_enum", "I");
-	(*env)->SetLongField(env,exp,fid, (jint)error);
+  fid = (*env)->GetFieldID(env,exp, "cudaError_enum", "I");
+  (*env)->SetLongField(env,exp,fid, (jint)error);
 
-    (*env)->ThrowNew(env,exp,msg);
+  (*env)->ThrowNew(env,exp,msg);
 }
 
 void setLongField(JNIEnv *env, jobject obj, const char * name, jlong value){
@@ -133,6 +133,21 @@ void getBestDevice(JNIEnv *env){
 
 }
 
+void savePointers(JNIEnv * env, jobject this_ref){
+  thisRefClass = (*env)->GetObjectClass(env, this_ref);
+  setLongField(env, this_ref, "m_ToSpaceAddr", (jlong) toSpace);
+  setLongField(env, this_ref, "m_GpuToSpaceAddr", (jlong) gpuToSpace);
+  setLongField(env, this_ref, "m_TextureAddr", (jlong) textureMemory);
+  setLongField(env, this_ref, "m_GpuTextureAddr", (jlong) gpuTexture);
+  setLongField(env, this_ref, "m_HandlesAddr", (jlong) handlesMemory);
+  setLongField(env, this_ref, "m_GpuHandlesAddr", (jlong) gpuHandlesMemory);
+  setLongField(env, this_ref, "m_ExceptionsHandlesAddr", (jlong) exceptionsMemory);
+  setLongField(env, this_ref, "m_GpuExceptionsHandlesAddr", (jlong) gpuExceptionsMemory);
+  setLongField(env, this_ref, "m_ToSpaceSize", (jlong) bufferSize);
+  setLongField(env, this_ref, "m_MaxGridDim", (jlong) maxGridDim);
+  setLongField(env, this_ref, "m_NumMultiProcessors", (jlong) numMultiProcessors);
+}
+
 void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
 {          
   int status;
@@ -158,17 +173,6 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
   
   num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
-#if DEBUG
-
-  printf("Memory: %i(MB)/%i(MB) (Free/Total)\n",f_mem/1024/1024, t_mem/1024/1024);
-  
-  printf("num_blocks = %i\n",num_blocks);
-  printf("numMultiProcessors = %i\n",numMultiProcessors);
-  printf("max_threads_per_block = %i\n",max_threads_per_block);
-  printf("max_blocks_per_proc = %i\n",max_blocks_per_proc);
-  fflush(stdout);
-#endif
-
   //space for 100 types in the scene
   classMemSize = sizeof(jint)*100;
   
@@ -178,6 +182,8 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
   to_space_size -= gc_space_size;
   to_space_size -= free_space;
   to_space_size -= classMemSize;
+  //leave 2MB for module
+  to_space_size -= 2L*1024L*1024L;
 
   //to_space_size -= textureMemSize;
   bufferSize = to_space_size;
@@ -226,18 +232,7 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
   status = cuMemAlloc(&gpuBufferSize, 8);
   CHECK_STATUS(env,"gpuBufferSize memory allocation failed",status)
 
-  thisRefClass = (*env)->GetObjectClass(env, this_ref);
-  setLongField(env, this_ref, "m_ToSpaceAddr", (jlong) toSpace);
-  setLongField(env, this_ref, "m_GpuToSpaceAddr", (jlong) gpuToSpace);
-  setLongField(env, this_ref, "m_TextureAddr", (jlong) textureMemory);
-  setLongField(env, this_ref, "m_GpuTextureAddr", (jlong) gpuTexture);
-  setLongField(env, this_ref, "m_HandlesAddr", (jlong) handlesMemory);
-  setLongField(env, this_ref, "m_GpuHandlesAddr", (jlong) gpuHandlesMemory);
-  setLongField(env, this_ref, "m_ExceptionsHandlesAddr", (jlong) exceptionsMemory);
-  setLongField(env, this_ref, "m_GpuExceptionsHandlesAddr", (jlong) gpuExceptionsMemory);
-  setLongField(env, this_ref, "m_ToSpaceSize", (jlong) bufferSize);
-  setLongField(env, this_ref, "m_MaxGridDim", (jlong) maxGridDim);
-  setLongField(env, this_ref, "m_NumMultiProcessors", (jlong) numMultiProcessors);
+  savePointers(env, this_ref);
 }
 
 /*
@@ -294,6 +289,8 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
   to_space_size -= (num_blocks * sizeof(jlong));
   to_space_size -= gc_space_size;
   to_space_size -= classMemSize;
+  //leave 2MB for module
+  to_space_size -= 2L*1024L*1024L;
   
   return to_space_size;
 }
@@ -322,17 +319,6 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
   printf("automatically determining CUDA reserve space...\n");
   
   to_space_size = initContext(env, max_blocks_per_proc, max_threads_per_block);
-
-  //space for 100 types in the scene
-  classMemSize = sizeof(jint)*100;
-
-  num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
-  
-  gc_space_size = 1024;
-  to_space_size -= (num_blocks * sizeof(jlong));
-  to_space_size -= (num_blocks * sizeof(jlong));
-  to_space_size -= gc_space_size;
-  to_space_size -= classMemSize;
   
   for(i = 1024L*1024L; i < to_space_size; i += 100L*1024L*1024L){
     temp_size = to_space_size - i;
@@ -341,86 +327,77 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
  
     status = cuMemHostAlloc(&toSpace, temp_size, 0);  
     if(status != CUDA_SUCCESS){
-	    cuCtxDestroy(cuContext);
-	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      cuCtxDestroy(cuContext);
+      initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     }
     
     status = cuMemAlloc(&gpuToSpace, temp_size);
     if(status != CUDA_SUCCESS){
-	    cuCtxDestroy(cuContext);
-	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      cuCtxDestroy(cuContext);
+      initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
     status = cuMemAlloc(&gpuClassMemory, classMemSize);
     if(status != CUDA_SUCCESS){
-	    cuCtxDestroy(cuContext);
-	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      cuCtxDestroy(cuContext);
+      initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
     status = cuMemHostAlloc(&handlesMemory, num_blocks * sizeof(jlong), CU_MEMHOSTALLOC_WRITECOMBINED); 
     if(status != CUDA_SUCCESS){
-	    cuCtxDestroy(cuContext);
-	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      cuCtxDestroy(cuContext);
+      initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
     status = cuMemAlloc(&gpuHandlesMemory, num_blocks * sizeof(jlong)); 
     if(status != CUDA_SUCCESS){
-	    cuCtxDestroy(cuContext);
-	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      cuCtxDestroy(cuContext);
+      initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
     status = cuMemHostAlloc(&exceptionsMemory, num_blocks * sizeof(jlong), 0); 
     if(status != CUDA_SUCCESS){
-	    cuCtxDestroy(cuContext);
-	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      cuCtxDestroy(cuContext);
+      initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
     status = cuMemAlloc(&gpuExceptionsMemory, num_blocks * sizeof(jlong)); 
     if(status != CUDA_SUCCESS){
-	    cuCtxDestroy(cuContext);
-	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      cuCtxDestroy(cuContext);
+      initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
     status = cuMemAlloc(&gcInfoSpace, gc_space_size);  
     if(status != CUDA_SUCCESS){
-	    cuCtxDestroy(cuContext);
-	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      cuCtxDestroy(cuContext);
+      initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
     status = cuMemAlloc(&gpuHeapEndPtr, 8);
     if(status != CUDA_SUCCESS){
-	    cuCtxDestroy(cuContext);
-	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      cuCtxDestroy(cuContext);
+      initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
     status = cuMemAlloc(&gpuBufferSize, 8);
     if(status != CUDA_SUCCESS){
-	    cuCtxDestroy(cuContext);
-	    initContext(env, max_blocks_per_proc, max_threads_per_block);
+      cuCtxDestroy(cuContext);
+      initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
-    //done, free everything
-    cuMemFree(gpuToSpace);
-    cuMemFree(gpuClassMemory);
-    cuMemFree(gpuHandlesMemory);
-    cuMemFree(gpuExceptionsMemory);
-    cuMemFree(gcInfoSpace);
-    cuMemFree(gpuHeapEndPtr);
-    cuMemFree(gpuBufferSize);
 
-	  cuMemFreeHost(toSpace);
-	  cuMemFreeHost(handlesMemory);
-	  cuMemFreeHost(exceptionsMemory);
+    bufferSize = temp_size;
+    savePointers(env, this_ref);
 
     return i;
   }
@@ -509,7 +486,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z,dev) == CUDA_SUCCESS)
             printf("Maximum dimension z of grid:   %i\n", a);
 			
-		cuCtxDestroy(cuContext);
+        cuCtxDestroy(cuContext);
     } 
 }
 
@@ -522,13 +499,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   (JNIEnv *env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
 {
   int status;
-  jint num_blocks;
-  int deviceCount = 0;
-  size_t f_mem;
-  size_t t_mem;
-  size_t to_space_size;
-  //size_t free_space = 1530L*1024L*1024L;
-  textureMemSize = 1;
   
   status = cuInit(0);
   CHECK_STATUS(env,"error in cuInit",status)

@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
-import org.xml.sax.InputSource;
 
 public class CudaRuntime2 implements ParallelRuntime {
 
@@ -54,6 +53,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   private int m_GridShape;
   private long m_MaxGridDim;
   private long m_NumMultiProcessors;
+  private long m_reserveMem;
   
   private long m_serializationTime;
   private long m_executionTime;
@@ -83,9 +83,8 @@ public class CudaRuntime2 implements ParallelRuntime {
     loader.load();
         
     m_BlockShaper = new BlockShaper();
-    // the 200*1024*1024 factor here is the amount of free memory that should NOT
-    // be allocated for transfering data to and from the gpu
-    setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), getReserveMem());
+    initNativeModule();
+    System.out.println("to_space_size: "+m_ToSpaceSize);
     m_JobsToWrite = new ArrayList<Kernel>();
     m_JobsWritten = new ArrayList<Kernel>();  
     m_NotWritten = new ArrayList<Kernel>();
@@ -121,12 +120,12 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_initTime = watch.elapsedTimeMillis();
   }
   
-  private long getReserveMem(){
+  private void initNativeModule(){
     File file = new File(RootbeerPaths.v().getConfigFile());
     if(file.exists() == false){
-      long reserve_mem = findReserveMem(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock());
+      m_reserveMem = findReserveMem(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock());
       Properties props = new Properties();
-      props.setProperty("reserve_mem", Long.toString(reserve_mem));
+      props.setProperty("reserve_mem", Long.toString(m_reserveMem));
       try {
         OutputStream fout = new FileOutputStream(file);
         OutputStreamWriter writer = new OutputStreamWriter(fout);
@@ -135,10 +134,8 @@ public class CudaRuntime2 implements ParallelRuntime {
         fout.flush();
         writer.close();
         fout.close();
-        return reserve_mem;
       } catch(Exception ex){
         ex.printStackTrace();
-        return reserve_mem;
       }
     } else {
       try {
@@ -146,10 +143,10 @@ public class CudaRuntime2 implements ParallelRuntime {
         BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
         Properties props = new Properties();
         props.load(reader);
-        return Integer.parseInt(props.getProperty("reserve_mem"));
+        m_reserveMem = Long.parseLong(props.getProperty("reserve_mem"));
+        setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), m_reserveMem);
       } catch(Exception ex){
         ex.printStackTrace();
-        return findReserveMem(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock());
       }
     }
   }
@@ -305,7 +302,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     try {
       runBlocks(m_NumBlocksRun, m_BlockShape, m_GridShape);
     } catch(RuntimeException ex){
-      reinit(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), getReserveMem()); 
+      reinit(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), m_reserveMem); 
       throw ex;
     }
   }  
