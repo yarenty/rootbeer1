@@ -84,7 +84,6 @@ public class CudaRuntime2 implements ParallelRuntime {
         
     m_BlockShaper = new BlockShaper();
     initNativeModule();
-    System.out.println("to_space_size: "+m_ToSpaceSize);
     m_JobsToWrite = new ArrayList<Kernel>();
     m_JobsWritten = new ArrayList<Kernel>();  
     m_NotWritten = new ArrayList<Kernel>();

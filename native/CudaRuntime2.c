@@ -319,6 +319,7 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
   printf("automatically determining CUDA reserve space...\n");
   
   to_space_size = initContext(env, max_blocks_per_proc, max_threads_per_block);
+  num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
   for(i = 1024L*1024L; i < to_space_size; i += 100L*1024L*1024L){
     temp_size = to_space_size - i;
@@ -346,7 +347,7 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
       continue;
     } 
 
-    status = cuMemHostAlloc(&handlesMemory, num_blocks * sizeof(jlong), CU_MEMHOSTALLOC_WRITECOMBINED); 
+    status = cuMemHostAlloc(&handlesMemory, num_blocks * sizeof(jlong), 0); 
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
       initContext(env, max_blocks_per_proc, max_threads_per_block);
