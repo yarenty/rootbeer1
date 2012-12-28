@@ -205,9 +205,6 @@ public class OpenCLMethod {
   }
   
   public String getMethodBody(){
-    if(m_sootMethod.getSignature().equals("<java.lang.String: void <init>(char[])>")){
-      System.out.println("hello");
-    }
     StringBuilder ret = new StringBuilder();
     if(shouldEmitBody()){
       ret.append(getMethodDecl(false)+"{\n");
@@ -490,6 +487,8 @@ public class OpenCLMethod {
     m_dontMangleMethods.add("<java.lang.StrictMath: double tanh(double)>");
     m_dontMangleMethods.add("<java.lang.Double: long doubleToLongBits(double)>");
     m_dontMangleMethods.add("<java.lang.Double: double longBitsToDouble(long)>");
+    m_dontMangleMethods.add("<java.lang.Float: int floatToIntBits(float)>");
+    m_dontMangleMethods.add("<java.lang.Float: float intBitsToFloat(int)>");
     m_dontMangleMethods.add("<java.lang.System: void arraycopy(java.lang.Object,int,java.lang.Object,int,int)>");
     m_dontMangleMethods.add("<java.lang.Throwable: java.lang.Throwable fillInStackTrace()>");
     m_dontMangleMethods.add("<java.lang.Throwable: int getStackTraceDepth()>");

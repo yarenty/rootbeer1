@@ -43,17 +43,28 @@ void edu_syr_pcpratts_exitMonitorMem($$__global$$ char * gc_info, char * mem, in
 }
 
 $$__device__$$ 
-long long java_lang_Double_doubleToLongBits($$__global$$ char * gc_info,  double value , int * exception){
+long long java_lang_Double_doubleToLongBits($$__global$$ char * gc_info, double value, int * exception){
   long long ret = *((long long *) ((double *) &value));
   return ret;
 }
 
 $$__device__$$ 
-double java_lang_Double_longBitsToDouble($$__global$$ char * gc_info, long long value , int * exception){
+double java_lang_Double_longBitsToDouble($$__global$$ char * gc_info, long long value, int * exception){
   double ret = *((double *) ((long long *) &value));
   return ret;
 }
-    
+
+$$__device__$$
+int java_lang_Float_floatToIntBits($$__global$$ char * gc_info, float value, int * exception){
+  int ret = *((int *) ((float *) &value));
+  return ret;
+}  
+
+$$__device__$$
+float java_lang_Float_intBitsToFloat($$__global$$ char * gc_info, int value, int * exception){
+  float ret = *((float *) ((int *) &value));
+  return ret;
+}
 
 $$__device__$$ double java_lang_StrictMath_exp( char * gc_info , double parameter0 , int * exception ) { 
   return exp(parameter0); 
