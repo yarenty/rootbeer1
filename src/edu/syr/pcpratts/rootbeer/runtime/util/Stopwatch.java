@@ -8,19 +8,36 @@
 package edu.syr.pcpratts.rootbeer.runtime.util;
 
 public class Stopwatch {
-  private long start;
-  private long stop;
+  private long m_start;
+  private long m_stop;
+  private long m_totalTime;
+  private long m_totalStops;
 
+  public Stopwatch(){
+    m_totalTime = 0;
+    m_totalStops = 0;
+  }
+  
   public void start() {
-    start = System.currentTimeMillis(); // start timing
+    m_start = System.currentTimeMillis(); // start timing
   }
 
   public void stop() {
-    stop = System.currentTimeMillis(); // stop timing
+    m_stop = System.currentTimeMillis(); // stop timing
+    m_totalTime += elapsedTimeMillis();
+    m_totalStops++;
   }
 
   public long elapsedTimeMillis() {
-    return stop - start;
+    return m_stop - m_start;
+  }
+  
+  public long getAverageTime(){
+    if(m_totalStops > 0){
+      return m_totalTime / m_totalStops; 
+    } else {
+      return 0;
+    }
   }
 
   public @Override String toString() {
