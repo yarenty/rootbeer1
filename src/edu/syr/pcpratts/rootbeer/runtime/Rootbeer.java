@@ -16,6 +16,7 @@ public class Rootbeer implements IRootbeer {
 
   private IRootbeer m_Rootbeer;
   private List<StatsRow> m_stats;
+  private boolean m_ranGpu;
   
   public Rootbeer(){
     RootbeerFactory factory = new RootbeerFactory();
@@ -24,18 +25,25 @@ public class Rootbeer implements IRootbeer {
   
   public void runAll(List<Kernel> jobs) {
     if(jobs.isEmpty()){
+      m_ranGpu = false;
       return;
     }
     if(jobs.get(0) instanceof CompiledKernel == false){
       for(Kernel job : jobs){
         job.gpuMethod();
       }
+      m_ranGpu = false;
     } else {
       m_stats = new ArrayList<StatsRow>();
       m_Rootbeer.runAll(jobs);
+      m_ranGpu = true;
     }
   }
 
+  public boolean getRanGpu(){
+    return m_ranGpu;  
+  }
+  
   public Iterator<Kernel> run(Iterator<Kernel> jobs) {
     return m_Rootbeer.run(jobs);
   }
