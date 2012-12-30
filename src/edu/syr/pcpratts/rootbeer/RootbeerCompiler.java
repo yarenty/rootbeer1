@@ -65,6 +65,7 @@ public class RootbeerCompiler {
   }
     
   private void setupSoot(String jar_filename, String rootbeer_jar, boolean runtests){
+    RootbeerClassLoader.v().setUserJar(jar_filename);
     extractJar(jar_filename);
     
     List<String> proc_dir = new ArrayList<String>();
