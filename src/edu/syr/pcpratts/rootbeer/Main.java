@@ -49,6 +49,8 @@ public class Main {
         m_mode = Configuration.MODE_NEMU;
       } else if(arg.equals("-jemu")){
         m_mode = Configuration.MODE_JEMU;
+      } else if(arg.equals("-remap-sparse")){ 
+        Configuration.compilerInstance().setRemapSparse();
       } else if(arg.equals("-mainjar")){
         m_mainJar = safeGet(args, i+1, "-mainjar");
         ++i;

@@ -39,9 +39,11 @@ public class Configuration {
   private boolean m_compilerInstance;
   private static boolean m_runAll;
   private static boolean m_printMem;
+  private boolean m_remapAll;
   
   private Configuration(){
     m_compilerInstance = true;
+    m_remapAll = true;
   }
 
   private Configuration(boolean load) {
@@ -61,6 +63,14 @@ public class Configuration {
   
   public int getMode(){
     return m_mode;
+  }
+  
+  public void setRemapSparse(){
+    m_remapAll = false;
+  }
+  
+  public boolean getRemapAll(){
+    return m_remapAll;
   }
   
   public static void setRunAllTests(boolean run_all){
