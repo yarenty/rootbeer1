@@ -67,5 +67,5 @@ Rootbeer is written by:
 
 Phil Pratt-Szeliga<br />
 Syracuse University<br />
-pcpratts@chirrup.org<br />
-http://chirrup.org/
+pcpratts@trifort.org<br />
+http://trifort.org/
