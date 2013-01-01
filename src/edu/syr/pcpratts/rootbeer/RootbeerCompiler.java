@@ -164,10 +164,6 @@ public class RootbeerCompiler {
       System.exit(0);
     }
     
-    if(m_enableClassRemapping){
-      RootbeerClassLoader.v().remapClasses();
-    }
-    
     System.out.println("applying optimizations...");
     RootbeerClassLoader.v().applyOptimizations();
       
