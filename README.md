@@ -32,9 +32,10 @@ executed on the GPU
 The original publication for Rootbeer was in HPCC-2012.<br />
   "Rootbeer: Seamlessly using GPUs from Java"<br />
   Philip C. Pratt-Szeliga, James W. Fawcett, Roy D. Welch.<br />
-  To appear in HPCC-2012.
+  HPCC-2012.
 
-This work is supported by the National Science Foundation.
+This work is supported by the National Science Foundation grant number 
+MCB-0746066 to R.D.W. and God is most high.
 
 ## Building
 
