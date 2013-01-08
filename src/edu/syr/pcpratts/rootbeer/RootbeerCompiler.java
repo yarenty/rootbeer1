@@ -139,7 +139,7 @@ public class RootbeerCompiler {
     setupSoot(jar_filename, jar_name.get(), true);
     m_provider = detector.getProvider();
         
-    List<SootMethod> kernel_methods = Scene.v().getEntryPoints();
+    List<SootMethod> kernel_methods = RootbeerClassLoader.v().getEntryPoints();
     compileForKernels(outname, kernel_methods);
   }
   
@@ -152,7 +152,7 @@ public class RootbeerCompiler {
     CurrJarName jar_name = new CurrJarName();
     setupSoot(jar_filename, jar_name.get(), run_tests);
     
-    List<SootMethod> kernel_methods = Scene.v().getEntryPoints();
+    List<SootMethod> kernel_methods = RootbeerClassLoader.v().getEntryPoints();
     compileForKernels(outname, kernel_methods);
   }
   
@@ -169,6 +169,7 @@ public class RootbeerCompiler {
       
     Transform2 transform2 = new Transform2();
     for(SootMethod kernel_method : kernel_methods){   
+      System.out.println("running transform2 on: "+kernel_method.getSignature()+"...");
       RootbeerClassLoader.v().loadDfsInfo(kernel_method);
       SootClass soot_class = kernel_method.getDeclaringClass();
       transform2.run(soot_class.getName());

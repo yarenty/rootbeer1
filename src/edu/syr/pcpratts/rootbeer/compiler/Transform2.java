@@ -36,8 +36,6 @@ public class Transform2 {
     
     OpenCLScene.setInstance(scene);
     
-    System.out.println("running Transform2 on: "+cls);
-    
     SootClass soot_class1 = Scene.v().getSootClass(cls);
     SootMethod method = soot_class1.getMethod("void gpuMethod()");
     
