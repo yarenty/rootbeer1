@@ -406,36 +406,6 @@ public class RootbeerCompiler {
     return cls;
   }
   
-  private void copyClass(String cls) {
-    String dest = classNameToFileName(cls, false);
-
-    String src = cls.replace(".", File.separator);
-    src += ".class";
-    File f = new File(RootbeerPaths.v().getJarContentsFolder());
-    src = f.getAbsolutePath() + File.separator + src;
-
-    copyFile(dest, src);
-  }
-  
-  private void copyFile(String dest, String src) {
-    try {
-      InputStream is = new FileInputStream(src);
-      OutputStream os = new FileOutputStream(dest);
-      while(true){
-        byte[] buffer = new byte[1024];
-        int len = is.read(buffer);
-        if(len == -1)
-          break;
-        os.write(buffer, 0, len);
-      }
-      os.flush();
-      os.close();
-      is.close();
-    } catch(Exception ex){
-      ex.printStackTrace();
-    }
-  }
-  
   private void clearOutputFolders() {
     DeleteFolder deleter = new DeleteFolder();
     deleter.delete(RootbeerPaths.v().getOutputJarFolder());
