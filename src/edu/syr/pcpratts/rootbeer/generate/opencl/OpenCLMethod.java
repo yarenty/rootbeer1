@@ -20,6 +20,7 @@ import soot.*;
 import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
+import soot.options.Options;
 import soot.rbclassload.RootbeerClassLoader;
 
 /**
@@ -132,6 +133,8 @@ public class OpenCLMethod {
   }
   
   private String synchronizedEnter(){
+    String prefix = Options.v().rbcl_remap_prefix();
+    
     String ret = "";
     ret += "int id;\n";
     ret += "char * mem;\n";
@@ -142,7 +145,7 @@ public class OpenCLMethod {
     ret += "char * thisref_synch_deref;\n";
     if(m_sootMethod.isStatic() == false){
       ret += "if(thisref == -1){\n";
-      SootClass null_ptr = Scene.v().getSootClass("java.lang.NullPointerException");
+      SootClass null_ptr = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
       ret += "  *exception = "+RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_ptr)+";\n";
       if(returnsAValue()){
         ret += "  return 0;\n";

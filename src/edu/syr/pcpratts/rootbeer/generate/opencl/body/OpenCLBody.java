@@ -23,6 +23,7 @@ import soot.jimple.IfStmt;
 import soot.jimple.JimpleBody;
 import soot.jimple.LookupSwitchStmt;
 import soot.jimple.TableSwitchStmt;
+import soot.options.Options;
 import soot.shimple.Shimple;
 import soot.shimple.ShimpleBody;
 import soot.util.Chain;

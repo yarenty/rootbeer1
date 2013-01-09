@@ -20,6 +20,7 @@ import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.Jimple;
 import soot.jimple.StringConstant;
+import soot.options.Options;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class VisitorWriteGen extends AbstractVisitorGen {

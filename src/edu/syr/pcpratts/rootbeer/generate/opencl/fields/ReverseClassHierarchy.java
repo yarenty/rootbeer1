@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import soot.Scene;
 import soot.SootClass;
+import soot.options.Options;
 
 public class ReverseClassHierarchy {
   private List<TreeNode> m_Hierarchy;

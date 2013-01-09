@@ -40,6 +40,7 @@ import soot.jimple.ReturnVoidStmt;
 import soot.jimple.StmtSwitch;
 import soot.jimple.TableSwitchStmt;
 import soot.jimple.ThrowStmt;
+import soot.options.Options;
 import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -330,8 +331,9 @@ public class MethodStmtSwitch implements StmtSwitch {
   }
 
   private void checkException() {    
-    SootClass oom_cls = Scene.v().getSootClass("java.lang.OutOfMemoryError");
-    SootClass null_cls = Scene.v().getSootClass("java.lang.NullPointerException");
+    String prefix = Options.v().rbcl_remap_prefix();
+    SootClass oom_cls = Scene.v().getSootClass(prefix+"java.lang.OutOfMemoryError");
+    SootClass null_cls = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
     int oom_num = RootbeerClassLoader.v().getDfsInfo().getClassNumber(oom_cls);
     int null_num = RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_cls);
     m_output.append("if(*exception != 0) { \n");

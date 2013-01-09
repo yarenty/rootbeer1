@@ -27,6 +27,7 @@ import soot.SootField;
 import soot.Type;
 import soot.Value;
 import soot.jimple.toolkits.typing.fast.Integer127Type;
+import soot.options.Options;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class OpenCLField {
@@ -148,7 +149,8 @@ public class OpenCLField {
     
     calculateOffsets(composite);
     
-    SootClass null_cls = Scene.v().getSootClass("java.lang.NullPointerException");
+    String prefix = Options.v().rbcl_remap_prefix();
+    SootClass null_cls = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
     int null_num = RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_cls);
     
     //instance getter

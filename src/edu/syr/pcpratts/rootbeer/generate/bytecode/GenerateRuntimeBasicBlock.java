@@ -26,6 +26,7 @@ import soot.jimple.IntConstant;
 import soot.jimple.Jimple;
 import soot.jimple.JimpleBody;
 import soot.jimple.StringConstant;
+import soot.options.Options;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class GenerateRuntimeBasicBlock {
@@ -251,8 +252,9 @@ public class GenerateRuntimeBasicBlock {
   }
 
   private void makeExceptionNumbers() {
-    makeExceptionMethod("getNullPointerNumber", "java.lang.NullPointerException");
-    makeExceptionMethod("getOutOfMemoryNumber", "java.lang.OutOfMemoryError");
+    String prefix = Options.v().rbcl_remap_prefix();
+    makeExceptionMethod("getNullPointerNumber", prefix+"java.lang.NullPointerException");
+    makeExceptionMethod("getOutOfMemoryNumber", prefix+"java.lang.OutOfMemoryError");
   }
   
   private void makeExceptionMethod(String method_name, String cls_name) {

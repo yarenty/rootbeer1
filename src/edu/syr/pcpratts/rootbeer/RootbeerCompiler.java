@@ -175,27 +175,16 @@ public class RootbeerCompiler {
       transform2.run(soot_class.getName());
     }
     
+    
     System.out.println("writing classes out...");
-    List<SootClass> remapped_classes = Scene.v().getRemappedClasses();
-    for(SootClass cls : remapped_classes){
-      loadAllMethods(cls.getName());
-      writeClassFile(cls.getName());
-      writeJimpleFile(cls.getName());
-    }
     
-    List<String> app_classes = RootbeerClassLoader.v().getAllAppClasses();
-    for(String app_class : app_classes){
-      loadAllMethods(app_class);
-      writeClassFile(app_class);
-      writeJimpleFile(app_class);
-    }
+    RootbeerClassLoader.v().setLoaded();
     
-    List<SootClass> added_classes = Scene.v().getGeneratedClasses();
-    for(SootClass cls : added_classes){
-      loadAllMethods(cls.getName());
-      writeClassFile(cls.getName());
-      writeJimpleFile(cls.getName());
-    }    
+    List<String> all_classes = RootbeerClassLoader.v().getClassesToOutput();
+    for(String cls : all_classes){
+      writeClassFile(cls);
+      writeJimpleFile(cls);
+    }
     
     makeOutJar();
     pack(outname);
@@ -444,34 +433,6 @@ public class RootbeerCompiler {
       is.close();
     } catch(Exception ex){
       ex.printStackTrace();
-    }
-  }
-    
-  private String remapFilename(String cls) {
-    File f = new File("src");
-    
-    cls = cls.replace(".", File.separator);
-    cls += ".class";
-    
-    cls = f.getAbsolutePath()+File.separator + cls;
-    
-    File f2 = new File(cls);
-    String folder = f2.getParent();
-    new File(folder).mkdirs();
-    
-    return cls;
-  }
-
-  private void loadAllMethods(String cls) {
-    SootClass soot_class = Scene.v().getSootClass(cls);
-    List<SootMethod> methods = soot_class.getMethods();
-    for(SootMethod method : methods){
-      if(method.isConcrete()){
-        SootResolver.v().resolveMethod(method);
-        Body body = method.retrieveActiveBody();
-        SpecialInvokeFixup fixup = new SpecialInvokeFixup();
-        method.setActiveBody(fixup.fixup(body));
-      }
     }
   }
   

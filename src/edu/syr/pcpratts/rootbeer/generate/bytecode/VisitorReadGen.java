@@ -19,6 +19,7 @@ import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 import soot.jimple.NullConstant;
+import soot.options.Options;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class VisitorReadGen extends AbstractVisitorGen {
@@ -212,7 +213,6 @@ public class VisitorReadGen extends AbstractVisitorGen {
   }
 
   private Local makeReadFromHeapBodyForSootClass(RefType type){
-    
     BytecodeLanguage bcl = m_bcl.top();
     SootClass soot_class = type.getSootClass();
     soot_class = Scene.v().getSootClass(soot_class.getName()); 
@@ -270,7 +270,6 @@ public class VisitorReadGen extends AbstractVisitorGen {
   }
     
   private Local readFromHeapArray(Local object_to_read_from, Local i, Local size) {
-    
     BytecodeLanguage bcl = m_bcl.top();
     BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top());   
     
@@ -318,7 +317,6 @@ public class VisitorReadGen extends AbstractVisitorGen {
   }
   
   private void makeReadForNullForType(Type type_to_create, Local type_id){
-    
     if(type_to_create instanceof ArrayType == false && type_to_create instanceof RefType == false)
       return;
     
@@ -387,7 +385,6 @@ public class VisitorReadGen extends AbstractVisitorGen {
   }
   
   public void attachReader(String class_name, boolean ref_fields){
-    
     String specialization;
     
     if(ref_fields){
@@ -440,7 +437,6 @@ public class VisitorReadGen extends AbstractVisitorGen {
   } 
   
   public void insertReader(String class_name, boolean ref_fields){
-       
     doReader(class_name, ref_fields);
     
     SootClass curr_class = Scene.v().getSootClass(class_name);

@@ -30,6 +30,7 @@ import soot.jimple.ArrayRef;
 import soot.jimple.AssignStmt;
 import soot.jimple.FieldRef;
 import soot.jimple.InvokeExpr;
+import soot.rbclassload.DfsInfo;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.util.Chain;
 
@@ -93,6 +94,12 @@ public class FieldReadWriteInspector {
   }
 
   private boolean fieldIsWrittenOnGpu(SootField soot_field){
+    DfsInfo dfs_info = RootbeerClassLoader.v().getDfsInfo();
+    Set<SootField> reachable_fields = dfs_info.getFields();
+    if(reachable_fields.contains(soot_field) == false){
+      return false;
+    }
+    
     if(mWrittenOnGpuFields.contains(soot_field))
       return true;
     
@@ -127,8 +134,9 @@ public class FieldReadWriteInspector {
       SootClass curr_class = ref_type.getSootClass();
       Chain<SootField> fields = curr_class.getFields();
       for(SootField field : fields){
-        if(fieldIsWrittenOnGpu(field))
+        if(fieldIsWrittenOnGpu(field)){
           return true;
+        }
       }
     }
     return false;
