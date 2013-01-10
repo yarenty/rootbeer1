@@ -332,6 +332,9 @@ public class MethodStmtSwitch implements StmtSwitch {
 
   private void checkException() {    
     String prefix = Options.v().rbcl_remap_prefix();
+    if(Options.v().rbcl_remap_all() == false){
+      prefix = "";
+    }
     SootClass oom_cls = Scene.v().getSootClass(prefix+"java.lang.OutOfMemoryError");
     SootClass null_cls = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
     int oom_num = RootbeerClassLoader.v().getDfsInfo().getClassNumber(oom_cls);

@@ -82,7 +82,8 @@ public class RootbeerCompiler {
       Options.v().set_soot_classpath(rootbeer_jar);
     }
     
-    Options.v().set_rbcl_remap_all(Configuration.compilerInstance().getRemapAll());
+    //Options.v().set_rbcl_remap_all(Configuration.compilerInstance().getRemapAll());
+    Options.v().set_rbcl_remap_all(false);
     Options.v().set_rbcl_remap_prefix("edu.syr.pcpratts.rootbeer.runtime.remap.");
     
     RootbeerClassLoader.v().addEntryPointDetector(m_entryDetector);

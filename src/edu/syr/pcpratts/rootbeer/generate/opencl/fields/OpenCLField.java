@@ -149,7 +149,10 @@ public class OpenCLField {
     
     calculateOffsets(composite);
     
-    String prefix = Options.v().rbcl_remap_prefix();
+    String prefix = Options.v().rbcl_remap_prefix();    
+    if(Options.v().rbcl_remap_all() == false){
+      prefix = "";
+    }
     SootClass null_cls = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
     int null_num = RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_cls);
     

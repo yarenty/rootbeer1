@@ -253,6 +253,9 @@ public class GenerateRuntimeBasicBlock {
 
   private void makeExceptionNumbers() {
     String prefix = Options.v().rbcl_remap_prefix();
+    if(Options.v().rbcl_remap_all() == false){
+      prefix = "";
+    }
     makeExceptionMethod("getNullPointerNumber", prefix+"java.lang.NullPointerException");
     makeExceptionMethod("getOutOfMemoryNumber", prefix+"java.lang.OutOfMemoryError");
   }

@@ -133,7 +133,10 @@ public class OpenCLMethod {
   }
   
   private String synchronizedEnter(){
-    String prefix = Options.v().rbcl_remap_prefix();
+    String prefix = Options.v().rbcl_remap_prefix();    
+    if(Options.v().rbcl_remap_all() == false){
+      prefix = "";
+    }
     
     String ret = "";
     ret += "int id;\n";
@@ -239,6 +242,7 @@ public class OpenCLMethod {
         }
       } catch(RuntimeException ex){
         System.out.println("error creating method body: "+m_sootMethod.getSignature());
+        ex.printStackTrace();
         OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, m_sootClass);
         if(ocl_method.returnsAValue())
           ret.append("return 0;\n");
