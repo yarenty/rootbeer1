@@ -19,6 +19,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CompileResult;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import soot.*;
@@ -173,6 +174,16 @@ public class GenerateRuntimeBasicBlock {
       String[] code = OpenCLScene.v().getOpenCLCode();
       //code[0] is unix
       //code[1] is windows
+      
+      PrintWriter writer = new PrintWriter(RootbeerPaths.v().getRootbeerHome()+"pre_dead_unix.c");
+      writer.println(code[0]);
+      writer.flush();
+      writer.close();
+      
+      writer = new PrintWriter(RootbeerPaths.v().getRootbeerHome()+"pre_dead_windows.c");
+      writer.println(code[1]);
+      writer.flush();
+      writer.close();
       
       System.out.println("removing dead methods...");
       DeadMethods dead_methods = new DeadMethods("entry");

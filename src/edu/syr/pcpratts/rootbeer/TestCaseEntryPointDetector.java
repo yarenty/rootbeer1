@@ -22,6 +22,7 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
   private String m_provider;
   private boolean m_initialized;
   private String m_signature;
+  private List<String> m_entryPoints;
   
   public TestCaseEntryPointDetector(String test_case){
     m_testCase = test_case;
@@ -38,6 +39,7 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
     m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.");
 
     m_initialized = false;
+    m_entryPoints = new ArrayList<String>();
   }
   
   private void init(){
@@ -57,16 +59,6 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
     SootMethod gpu_method = kernel_class.getMethodByName("gpuMethod");
     m_signature = gpu_method.getSignature();
     m_initialized = true;
-  }
-  
-  public boolean isEntryPoint(SootMethod sm) {
-    if(m_initialized == false){
-      init();
-    }
-    if(sm.getSignature().equals(m_signature)){
-      return true;
-    }
-    return false;
   }
 
   public String getProvider() {
@@ -101,5 +93,18 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
       }
     }
     return null;
+  }
+
+  public void testEntryPoint(SootMethod sm) {
+    if(m_initialized == false){
+      init();
+    }
+    if(sm.getSignature().equals(m_signature)){
+      m_entryPoints.add(sm.getSignature());
+    }
+  }
+
+  public List<String> getEntryPoints() {
+    return m_entryPoints;
   }
 }

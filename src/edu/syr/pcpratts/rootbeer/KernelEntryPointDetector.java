@@ -7,21 +7,29 @@
 
 package edu.syr.pcpratts.rootbeer;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.rbclassload.EntryPointDetector;
 
 public class KernelEntryPointDetector implements EntryPointDetector {
 
-  public boolean isEntryPoint(SootMethod sm) {
+  /*
+    */
+   
+  private List<String> m_entryPoints;
+  
+  public KernelEntryPointDetector(){
+    m_entryPoints = new ArrayList<String>();
+    m_entryPoints.add("<edu.syr.pcpratts.rootbeer.runtime.Rootbeer: void runAll(java.util.List)>");
+  }
+    
+  public void testEntryPoint(SootMethod sm) {
     if(isKernel(sm)){
-      return true;
+      m_entryPoints.add(sm.getSignature());
     }
-    if(isRootbeer(sm)){
-      return true;
-    }
-    return false;
   }
 
   private boolean isKernel(SootMethod sm){
@@ -39,10 +47,7 @@ public class KernelEntryPointDetector implements EntryPointDetector {
     return false;
   }
   
-  private boolean isRootbeer(SootMethod sm){
-    if(sm.getSignature().equals("<edu.syr.pcpratts.rootbeer.runtime.Rootbeer: void runAll(java.util.List)>")){
-      return true;
-    }
-    return false;
+  public List<String> getEntryPoints(){
+    return m_entryPoints;
   }
 }
