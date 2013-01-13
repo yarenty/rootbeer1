@@ -111,6 +111,11 @@ public class VisitorGen extends AbstractVisitorGen {
   }
 
   private void makeGetSizeMethodForType(Type type) {
+    if(type instanceof ArrayType == false &&
+       type instanceof RefType == false){
+      return;
+    }
+    
     if(m_getSizeMethodsMade.contains(type))
       return;
     m_getSizeMethodsMade.add(type);

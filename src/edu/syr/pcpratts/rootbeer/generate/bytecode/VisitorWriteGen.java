@@ -121,6 +121,11 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   }
   
   private void makeWriteToHeapMethodForType(Type type){
+    if(type instanceof ArrayType == false &&
+       type instanceof RefType == false){
+      return;
+    }
+    
     if(mWriteToHeapMethodsMade.contains(type))
       return;
     mWriteToHeapMethodsMade.add(type);

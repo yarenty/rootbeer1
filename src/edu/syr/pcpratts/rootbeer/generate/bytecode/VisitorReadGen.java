@@ -106,6 +106,11 @@ public class VisitorReadGen extends AbstractVisitorGen {
    
   private void makeReadFromHeapMethodForType(Type type, boolean doing_object)
   {
+    if(type instanceof ArrayType == false &&
+       type instanceof RefType == false){
+      return;
+    }
+    
     if(m_ReadFromHeapMethodsMade.containsKey(type))
       return;
     
