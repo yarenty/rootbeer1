@@ -346,6 +346,7 @@ public class RootbeerCompiler {
     FileOutputStream fos = null;
     PrintWriter writer = null;
     SootClass c = Scene.v().getSootClass(cls);
+    List<String> before_sigs = getMethodSignatures(c);
     try {
       fos = new FileOutputStream(filename);
       OutputStream out1 = new JasminOutputStream(fos);
@@ -353,30 +354,33 @@ public class RootbeerCompiler {
       new soot.jimple.JasminClass(c).print(writer);
     } catch(Exception ex){
       System.out.println("Error writing .class: "+cls);
-      if(cls.equals("java.lang.Object") == false){
-        ex.printStackTrace();
-        PrintWriter writer2 = new PrintWriter(System.out);
-        try {
-          List<SootMethod> methods = c.getMethods();
-          for(SootMethod method : methods){
-            if(method.hasActiveBody()){
-              System.out.println(method.getSignature());
-              Body body = method.getActiveBody();
-              Printer.v().printTo(body, writer2);
-              writer2.flush();
-              System.out.flush();
-            }
-          }
-        } catch(Exception ex2){
-          ex2.printStackTrace(); 
-        }
-      }
+      ex.printStackTrace();
+      List<String> after_sigs = getMethodSignatures(c);
+      System.out.println("Before sigs: ");
+      printMethodSigs(before_sigs);
+      System.out.println("After sigs: ");
+      printMethodSigs(after_sigs);
     } finally { 
       writer.flush();
       writer.close();
       try {
         fos.close(); 
       } catch(Exception ex){ }
+    }
+  }
+  
+  private List<String> getMethodSignatures(SootClass c){
+    List<String> ret = new ArrayList<String>();
+    List<SootMethod> methods = c.getMethods();
+    for(SootMethod method : methods){
+      ret.add(method.getSignature());
+    }
+    return ret;
+  }
+  
+  private void printMethodSigs(List<String> sigs){
+    for(String sig : sigs){
+      System.out.println("  "+sig);
     }
   }
   
