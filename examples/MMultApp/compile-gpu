@@ -1,0 +1,5 @@
+#!/bin/sh
+
+ant jar
+
+java -jar Rootbeer.jar MMultApp.jar MMultApp-GPU.jar

@@ -41,3 +41,12 @@ examples/MMult/MMult.jar
 examples/ArraySumApp/ArraySumApp.jar
 .DS_Store
 Rootbeer.jar
+examples/ArraySumApp/ArraySumApp-GPU.jar
+examples/ArraySumApp/output.txt
+examples/ArraySumApp/output_err.txt
+examples/MMultApp/MMUltApp-GPU.jar
+examples/MMultApp/MMUltApp.jar
+examples/QuickSort/QuickSort-GPU.jar
+examples/QuickSort/QuickSort.jar
+examples/RandomDemap/RandomRemapApp-GPU.jar
+examples/RandomDemap/RandomRemapApp.jar

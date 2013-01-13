@@ -1,0 +1,5 @@
+#!/bin/sh
+
+ant jar
+
+java -jar Rootbeer.jar QuickSort.jar QuickSort-GPU.jar -nemu

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+ant jar
+
+java -jar Rootbeer.jar RandomRemapApp.jar RandomRemapApp-GPU.jar
