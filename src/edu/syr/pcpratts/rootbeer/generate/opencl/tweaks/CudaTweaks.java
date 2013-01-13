@@ -10,7 +10,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl.tweaks;
 import edu.syr.pcpratts.rootbeer.util.WindowsCompile;
 import edu.syr.pcpratts.compressor.Compressor;
 import edu.syr.pcpratts.deadmethods.DeadMethods;
-import edu.syr.pcpratts.rootbeer.RootbeerPaths;
+import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.util.CompilerRunner;
 import edu.syr.pcpratts.rootbeer.util.CudaPath;
 import java.io.File;

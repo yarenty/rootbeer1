@@ -7,7 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
-import edu.syr.pcpratts.rootbeer.RootbeerPaths;
+import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

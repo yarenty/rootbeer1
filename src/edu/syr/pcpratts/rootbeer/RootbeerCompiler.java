@@ -7,6 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer;
 
+import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.compiler.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.NativeCpuTweaks;
@@ -111,7 +113,7 @@ public class RootbeerCompiler {
     if(runtests){
       RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.testcases.");   
     }
-    RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime.remap.");   
+    RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime.remap.");
     
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.generate.bytecode.Constants");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerFactory");
@@ -266,7 +268,8 @@ public class RootbeerCompiler {
   }
 
   private void addConfigurationFile(ZipOutputStream zos) throws IOException {
-    String name = "edu/syr/pcpratts/rootbeer/runtime/config.txt";
+    String folder_name = "edu/syr/pcpratts/rootbeer/runtime/";
+    String name = folder_name + "config.txt";
     ZipEntry entry = new ZipEntry(name);
     entry.setSize(1);
     byte[] contents = new byte[1];
@@ -276,6 +279,11 @@ public class RootbeerCompiler {
     zos.putNextEntry(entry);
     zos.write(contents);
     zos.flush();
+    
+    File file = new File(RootbeerPaths.v().getOutputClassFolder()+File.separator+folder_name);
+    if(file.exists() == false){
+      file.mkdirs();
+    }
     
     FileOutputStream fout = new FileOutputStream(RootbeerPaths.v().getOutputClassFolder()+File.separator+name);
     fout.write(contents);

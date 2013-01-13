@@ -7,7 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.runtime;
 
-import edu.syr.pcpratts.rootbeer.Configuration;
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

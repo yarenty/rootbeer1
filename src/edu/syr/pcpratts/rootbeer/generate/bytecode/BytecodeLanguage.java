@@ -91,8 +91,8 @@ public class BytecodeLanguage {
     mCurrBody = jimple.newBody(mCurrMethod);
     mCurrMethod.setActiveBody(mCurrBody);
     mCurrClass.addMethod(mCurrMethod);
-
-    //System.out.println("Starting method: "+mCurrMethod.getName());
+    
+    RootbeerClassLoader.v().addGeneratedMethod(mCurrMethod.getSignature());
   }
   
   public void startStaticMethod(String method_name, Type return_type, Type... arg_types){

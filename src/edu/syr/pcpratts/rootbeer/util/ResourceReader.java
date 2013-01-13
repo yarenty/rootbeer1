@@ -7,7 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.util;
 
-import edu.syr.pcpratts.rootbeer.RootbeerPaths;
+import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;

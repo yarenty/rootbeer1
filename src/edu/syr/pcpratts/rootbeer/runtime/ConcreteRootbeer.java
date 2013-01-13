@@ -7,7 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.runtime;
 
-import edu.syr.pcpratts.rootbeer.Configuration;
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.NativeCpuTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;

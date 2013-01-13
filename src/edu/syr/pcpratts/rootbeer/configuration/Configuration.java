@@ -5,7 +5,7 @@
  * See the file LICENSE for copying permission.
  */
 
-package edu.syr.pcpratts.rootbeer;
+package edu.syr.pcpratts.rootbeer.configuration;
 
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
 import java.lang.reflect.Method;

@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer;
 
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaLoader;
 import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaRuntime2;
 import java.util.ArrayList;

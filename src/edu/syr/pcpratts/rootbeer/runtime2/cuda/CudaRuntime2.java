@@ -7,8 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
-import edu.syr.pcpratts.rootbeer.Configuration;
-import edu.syr.pcpratts.rootbeer.RootbeerPaths;
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
+import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.runtime.*;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;

@@ -8,7 +8,7 @@
 package edu.syr.pcpratts.rootbeer.runtime.gpu;
 
 import edu.syr.pcpratts.rootbeer.Aug4th2011PerformanceStudy;
-import edu.syr.pcpratts.rootbeer.Configuration;
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.runtime.Serializer;
 import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;

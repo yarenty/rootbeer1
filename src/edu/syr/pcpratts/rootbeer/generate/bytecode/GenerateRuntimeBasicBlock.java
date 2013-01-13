@@ -8,8 +8,8 @@
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import edu.syr.pcpratts.deadmethods.DeadMethods;
-import edu.syr.pcpratts.rootbeer.Configuration;
-import edu.syr.pcpratts.rootbeer.RootbeerPaths;
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
+import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.LoopCodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.MethodCodeSegment;
