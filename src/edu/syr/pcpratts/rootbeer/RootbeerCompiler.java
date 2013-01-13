@@ -113,7 +113,8 @@ public class RootbeerCompiler {
     if(runtests){
       RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.testcases.");   
     }
-    RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime.remap.");
+    RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime.");
+    RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.configuration.");
     
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.generate.bytecode.Constants");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerFactory");

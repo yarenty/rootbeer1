@@ -92,6 +92,8 @@ public class GenerateRuntimeBasicBlock {
     SootMethod getCode = new SootMethod(name, new ArrayList(), RefType.v("java.lang.String"), Modifier.PUBLIC);
     getCode.setDeclaringClass(mSootClass);
     mSootClass.addMethod(getCode);
+    
+    RootbeerClassLoader.v().addGeneratedMethod(getCode.getSignature());
 
     JimpleBody body = jimple.newBody(getCode);
     UnitAssembler assembler = new UnitAssembler();
