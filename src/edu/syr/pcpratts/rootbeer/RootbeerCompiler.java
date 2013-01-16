@@ -373,7 +373,7 @@ public class RootbeerCompiler {
       new soot.jimple.JasminClass(c).print(writer);
     } catch(Exception ex){
       System.out.println("Error writing .class: "+cls);
-      ex.printStackTrace();
+      ex.printStackTrace(System.out);
       List<String> after_sigs = getMethodSignatures(c);
       System.out.println("Before sigs: ");
       printMethodSigs(before_sigs);
