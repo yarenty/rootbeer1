@@ -34,9 +34,11 @@ public class Rootbeer implements IRootbeer {
       }
       m_ranGpu = false;
     } else {
+      //this must happen above Rootbeer.runAll in case exceptions are thrown
+      m_ranGpu = true;
+      
       m_stats = new ArrayList<StatsRow>();
       m_Rootbeer.runAll(jobs);
-      m_ranGpu = true;
     }
   }
 
