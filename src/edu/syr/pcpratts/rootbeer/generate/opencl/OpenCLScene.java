@@ -194,6 +194,7 @@ public class OpenCLScene {
     Set<String> methods = RootbeerClassLoader.v().getDfsInfo().getMethods();
     MethodSignatureUtil util = new MethodSignatureUtil();
     for(String method_sig : methods){
+      System.out.println("reachable method: "+method_sig);
       util.parse(method_sig);
       String cls = util.getClassName();
       String method_sub_sig = util.getMethodSubSignature();
