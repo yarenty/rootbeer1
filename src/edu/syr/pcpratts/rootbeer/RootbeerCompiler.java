@@ -143,6 +143,10 @@ public class RootbeerCompiler {
     cuda_entries.add("<edu.syr.pcpratts.rootbeer.runtime.Sentinal: void <init>()>");
     RootbeerClassLoader.v().setCudaEntryPoints(cuda_entries);
     
+    List<String> cuda_fields = new ArrayList<String>();
+    cuda_fields.add("<java.lang.Class: java.lang.String name>");
+    RootbeerClassLoader.v().setCudaFields(cuda_fields);
+    
     RootbeerClassLoader.v().loadNecessaryClasses();
   }
   
