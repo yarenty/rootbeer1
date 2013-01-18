@@ -112,6 +112,8 @@ public class RootbeerCompiler {
     
     if(runtests){
       RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.testcases.");   
+      RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.testagent.");   
+      RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.test."); 
     }
     RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime.");
     RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.configuration.");
@@ -132,6 +134,7 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestExceptionFactory");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.PrivateFields");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.util.IntStack");
     
     List<String> cuda_entries = new ArrayList<String>();
     cuda_entries.add("<java.lang.String: void <init>(char[])>");

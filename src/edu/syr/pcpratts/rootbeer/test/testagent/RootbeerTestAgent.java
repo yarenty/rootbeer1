@@ -5,7 +5,7 @@
  * See the file LICENSE for copying permission.
  */
 
-package edu.syr.pcpratts.rootbeer;
+package edu.syr.pcpratts.rootbeer.test.testagent;
 
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
