@@ -5,7 +5,7 @@
  * See the file LICENSE for copying permission.
  */
 
-package edu.syr.pcpratts.rootbeer.testcases.rootbeertest;
+package edu.syr.pcpratts.rootbeer.test;
 
 import edu.syr.pcpratts.rootbeer.test.TestException;
 import edu.syr.pcpratts.rootbeer.test.TestExceptionFactory;

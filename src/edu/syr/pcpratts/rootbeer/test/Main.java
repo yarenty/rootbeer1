@@ -5,11 +5,12 @@
  * See the file LICENSE for copying permission.
  */
 
-package edu.syr.pcpratts.rootbeer.testcases.rootbeertest;
+package edu.syr.pcpratts.rootbeer.test;
 
 import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
 import edu.syr.pcpratts.rootbeer.test.TestSerialization;
 import edu.syr.pcpratts.rootbeer.test.TestSerializationFactory;
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.SuperClass;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.arraysum.ArraySumTest;
 import java.util.ArrayList;
 import java.util.Iterator;

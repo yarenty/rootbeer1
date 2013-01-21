@@ -15,7 +15,10 @@ public class ForceGC {
     Object obj = new Object();
     WeakReference ref = new WeakReference<Object>(obj);
     obj = null;
-    while(ref.get() != null) {
+    for(int i = 0; i < 3; ++i){
+      if(ref.get() == null){
+        break;
+      }
       System.gc();
     }
   }

@@ -42,7 +42,7 @@ public class RootbeerTest {
       ClassLoader cls_loader = loader_factory.getLoader();
       Thread.currentThread().setContextClassLoader(cls_loader);
       
-      Class agent_class = cls_loader.loadClass("edu.syr.pcpratts.rootbeer.RootbeerTestAgent");
+      Class agent_class = cls_loader.loadClass("edu.syr.pcpratts.rootbeer.test.RootbeerTestAgent");
       Object agent_obj = agent_class.newInstance();
       Method[] methods = agent_class.getMethods();
       if(test_case == null){
