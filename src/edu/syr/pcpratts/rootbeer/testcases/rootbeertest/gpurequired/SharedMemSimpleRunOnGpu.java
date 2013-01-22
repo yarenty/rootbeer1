@@ -43,6 +43,14 @@ public class SharedMemSimpleRunOnGpu implements Kernel {
     m_double = RootbeerGpu.getSharedDouble(22);
   }
 
+  private String floatToString(float value){
+    int bits = Float.floatToIntBits(value);
+    String str = Integer.toBinaryString(bits);
+    while(str.length() < 32){
+      str = "0" + str;
+    }
+    return str;
+  }
   public boolean compare(SharedMemSimpleRunOnGpu rhs) {
     if(m_boolean != rhs.m_boolean){
       System.out.println("m_boolean");
@@ -69,7 +77,10 @@ public class SharedMemSimpleRunOnGpu implements Kernel {
       return false;
     }
     if(m_float != rhs.m_float){
-      System.out.append("m_float");
+      System.out.println("m_float");
+      System.out.println("org: "+floatToString(7.1f));
+      System.out.println("lhs: "+floatToString(m_float));
+      System.out.println("rhs: "+floatToString(rhs.m_float));
       return false;
     }
     if(m_double != rhs.m_double){

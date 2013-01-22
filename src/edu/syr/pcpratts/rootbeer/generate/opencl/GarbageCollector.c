@@ -168,81 +168,113 @@ long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef($$__global$$ char
 
 $$__device__$$
 char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedByte($$__global$$ char * gc_info, int index, int * exception){
-  return 0; 
+  return m_shared[index]; 
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedByte($$__global$$ char * gc_info, int index, char value, int * exception){
- 
+  m_shared[index] = value;
 }
   
 $$__device__$$
 char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedChar($$__global$$ char * gc_info, int index, int * exception){
-  return 0; 
+  return m_shared[index]; 
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedChar($$__global$$ char * gc_info, int index, char value, int * exception){
-  
+  m_shared[index] = value;
 }
   
 $$__device__$$
 char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedBoolean($$__global$$ char * gc_info, int index, int * exception){
-  return 0; 
+  return m_shared[index]; 
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedBoolean($$__global$$ char * gc_info, int index, char value, int * exception){
-  
+  m_shared[index] = value;
 }
   
 $$__device__$$
 short edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedShort($$__global$$ char * gc_info, int index, int * exception){
-  return 0; 
+  short ret = 0;
+  ret |= m_shared[index] & 0xff;
+  ret |= (m_shared[index + 1] << 8) & 0xff00;
+  return ret;
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedShort($$__global$$ char * gc_info, int index, short value, int * exception){
- 
+  m_shared[index] = (char) (value & 0xff);
+  m_shared[index + 1] = (char) ((value >> 8) & 0xff);
 }
 
 $$__device__$$
 int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedInteger($$__global$$ char * gc_info, int index, int * exception){
-  return 0; 
+  int ret = 0;
+  ret |= m_shared[index] & 0x000000ff;
+  ret |= (m_shared[index + 1] << 8)  & 0x0000ff00;
+  ret |= (m_shared[index + 2] << 16) & 0x00ff0000;
+  ret |= (m_shared[index + 3] << 24) & 0xff000000;
+  return ret;
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger($$__global$$ char * gc_info, int index, int value, int * exception){
- 
+  m_shared[index] = (char) (value & 0xff);
+  m_shared[index + 1] = (char) ((value >> 8)  & 0xff);
+  m_shared[index + 2] = (char) ((value >> 16) & 0xff);
+  m_shared[index + 3] = (char) ((value >> 24) & 0xff);
 }
 
 $$__device__$$
 long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedLong($$__global$$ char * gc_info, int index, int * exception){
-  return 0; 
+  long long ret = 0;
+  ret |= m_shared[index] & 0x00000000000000ffL;
+  ret |= (m_shared[index + 1] << 8)  & 0x000000000000ff00L;
+  ret |= (m_shared[index + 2] << 16) & 0x0000000000ff0000L;
+  ret |= (m_shared[index + 3] << 24) & 0x00000000ff000000L;
+  ret |= (m_shared[index + 4] << 32) & 0x000000ff00000000L;
+  ret |= (m_shared[index + 5] << 40) & 0x0000ff0000000000L;
+  ret |= (m_shared[index + 6] << 48) & 0x00ff000000000000L;
+  ret |= (m_shared[index + 7] << 56) & 0xff00000000000000L;
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedLong($$__global$$ char * gc_info, int index, long long value, int * exception){
-  
+  m_shared[index] = (char) (value & 0xff);
+  m_shared[index + 1] = (char) ((value >> 8)  & 0xff);
+  m_shared[index + 2] = (char) ((value >> 16) & 0xff);
+  m_shared[index + 3] = (char) ((value >> 24) & 0xff);
+  m_shared[index + 4] = (char) ((value >> 32) & 0xff);
+  m_shared[index + 5] = (char) ((value >> 40) & 0xff);
+  m_shared[index + 6] = (char) ((value >> 48) & 0xff);
+  m_shared[index + 7] = (char) ((value >> 56) & 0xff);
 }
   
 $$__device__$$
 float edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedFloat($$__global$$ char * gc_info, int index, int * exception){
-  return 0; 
+  int int_value = edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedInteger(gc_info, index, exception);
+  return *((float *) &int_value);
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedFloat($$__global$$ char * gc_info, int index, float value, int * exception){
- 
+  int int_value = *((int *) &value);
+  edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger(gc_info, index, int_value, exception);
 }
   
 $$__device__$$
 double edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedDouble($$__global$$ char * gc_info, int index, int * exception){
-  return 0; 
+  long long long_value = edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedLong(gc_info, index, exception);
+  return *((double *) &long_value);
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedDouble($$__global$$ char * gc_info, int index, double value, int * exception){
+  long long long_value = *((long long *) &value);
+  edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedLong(gc_info, index, long_value, exception);
 }
 
 $$__device__$$ 

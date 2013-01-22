@@ -9,8 +9,7 @@
 #endif
 
 __shared__ size_t m_Local[3];
-texture<int> m_Cache;
-__shared__ int m_ScratchPad;
+__shared__ char m_shared[40*1024];
 
 __device__
 int getThreadId(){
