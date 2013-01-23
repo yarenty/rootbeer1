@@ -46,3 +46,4 @@ void __threadfence(){ }
 
 long long m_Local[3];
 int * m_Cache;
+long long m_shared[40*1024];
