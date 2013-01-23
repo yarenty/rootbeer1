@@ -107,7 +107,7 @@ public class RootbeerGpu {
   
   public static long getSharedLong(int index){
     long ret = 0;
-    ret |= (long)  m_sharedMem[index] & 0x00000000000000ffL;
+    ret |=  (long) m_sharedMem[index]            & 0x00000000000000ffL;
     ret |= ((long) m_sharedMem[index + 1] <<  8) & 0x000000000000ff00L;
     ret |= ((long) m_sharedMem[index + 2] << 16) & 0x0000000000ff0000L;
     ret |= ((long) m_sharedMem[index + 3] << 24) & 0x00000000ff000000L;

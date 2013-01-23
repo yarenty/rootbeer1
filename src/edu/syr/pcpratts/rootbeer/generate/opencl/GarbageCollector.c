@@ -231,14 +231,15 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger($$__global$$
 $$__device__$$
 long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedLong($$__global$$ char * gc_info, int index, int * exception){
   long long ret = 0;
-  ret |= m_shared[index] & 0x00000000000000ffL;
-  ret |= (m_shared[index + 1] << 8)  & 0x000000000000ff00L;
-  ret |= (m_shared[index + 2] << 16) & 0x0000000000ff0000L;
-  ret |= (m_shared[index + 3] << 24) & 0x00000000ff000000L;
-  ret |= (m_shared[index + 4] << 32) & 0x000000ff00000000L;
-  ret |= (m_shared[index + 5] << 40) & 0x0000ff0000000000L;
-  ret |= (m_shared[index + 6] << 48) & 0x00ff000000000000L;
-  ret |= (m_shared[index + 7] << 56) & 0xff00000000000000L;
+  ret |=  (long long) m_shared[index] & 0x00000000000000ffL;
+  ret |= ((long long) m_shared[index + 1] << 8)  & 0x000000000000ff00L;
+  ret |= ((long long) m_shared[index + 2] << 16) & 0x0000000000ff0000L;
+  ret |= ((long long) m_shared[index + 3] << 24) & 0x00000000ff000000L;
+  ret |= ((long long) m_shared[index + 4] << 32) & 0x000000ff00000000L;
+  ret |= ((long long) m_shared[index + 5] << 40) & 0x0000ff0000000000L;
+  ret |= ((long long) m_shared[index + 6] << 48) & 0x00ff000000000000L;
+  ret |= ((long long) m_shared[index + 7] << 56) & 0xff00000000000000L;
+  return ret;
 }
 
 $$__device__$$

@@ -69,6 +69,14 @@ public class SharedMemSimpleRunOnGpu implements Kernel {
     return str;
   }
   
+  private String longToString(long value){
+    String str = Long.toBinaryString(value);
+    while(str.length() < 64){
+      str = "0" + str;
+    }
+    return str;
+  }
+  
   public boolean compare(SharedMemSimpleRunOnGpu rhs) {
     if(m_boolean != rhs.m_boolean){
       System.out.println("m_boolean");
@@ -92,6 +100,11 @@ public class SharedMemSimpleRunOnGpu implements Kernel {
     }
     if(m_long != rhs.m_long){
       System.out.println("m_long");
+      System.out.println("org: "+longToString(6));
+      System.out.println("lhs: "+longToString(m_long));
+      System.out.println("rhs: "+longToString(rhs.m_long));
+      System.out.println("  rhs byte 0: "+byteToString(RootbeerGpu.getSharedByte(10)));
+      System.out.println("  rhs byte 7: "+byteToString(RootbeerGpu.getSharedByte(17)));
       return false;
     }
     if(m_float != rhs.m_float){
