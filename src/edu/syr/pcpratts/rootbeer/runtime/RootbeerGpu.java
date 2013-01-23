@@ -107,14 +107,14 @@ public class RootbeerGpu {
   
   public static long getSharedLong(int index){
     long ret = 0;
-    ret |= m_sharedMem[index] & 0x00000000000000ffL;
-    ret |= (m_sharedMem[index + 1] <<  8) & 0x000000000000ff00L;
-    ret |= (m_sharedMem[index + 2] << 16) & 0x0000000000ff0000L;
-    ret |= (m_sharedMem[index + 3] << 24) & 0x00000000ff000000L;
-    ret |= (m_sharedMem[index + 4] << 32) & 0x000000ff00000000L;
-    ret |= (m_sharedMem[index + 5] << 40) & 0x0000ff0000000000L;
-    ret |= (m_sharedMem[index + 6] << 48) & 0x00ff000000000000L;
-    ret |= (m_sharedMem[index + 7] << 56) & 0xff00000000000000L;
+    ret |= (long)  m_sharedMem[index] & 0x00000000000000ffL;
+    ret |= ((long) m_sharedMem[index + 1] <<  8) & 0x000000000000ff00L;
+    ret |= ((long) m_sharedMem[index + 2] << 16) & 0x0000000000ff0000L;
+    ret |= ((long) m_sharedMem[index + 3] << 24) & 0x00000000ff000000L;
+    ret |= ((long) m_sharedMem[index + 4] << 32) & 0x000000ff00000000L;
+    ret |= ((long) m_sharedMem[index + 5] << 40) & 0x0000ff0000000000L;
+    ret |= ((long) m_sharedMem[index + 6] << 48) & 0x00ff000000000000L;
+    ret |= ((long) m_sharedMem[index + 7] << 56) & 0xff00000000000000L;
     return ret;    
   }
   
@@ -123,8 +123,8 @@ public class RootbeerGpu {
     m_sharedMem[index + 1] = (byte) ((value >> 8)  & 0xff);
     m_sharedMem[index + 2] = (byte) ((value >> 16) & 0xff);
     m_sharedMem[index + 3] = (byte) ((value >> 24) & 0xff);
-    m_sharedMem[index + 4] = (byte) ((value >> 32));
-    m_sharedMem[index + 5] = (byte) ((value >> 40)  & 0xff);
+    m_sharedMem[index + 4] = (byte) ((value >> 32) & 0xff);
+    m_sharedMem[index + 5] = (byte) ((value >> 40) & 0xff);
     m_sharedMem[index + 6] = (byte) ((value >> 48) & 0xff);
     m_sharedMem[index + 7] = (byte) ((value >> 56) & 0xff);
   }

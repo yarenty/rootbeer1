@@ -51,6 +51,24 @@ public class SharedMemSimpleRunOnGpu implements Kernel {
     }
     return str;
   }
+  
+  private String doubleToString(double value){
+    long bits = Double.doubleToLongBits(value);
+    String str = Long.toBinaryString(bits);
+    while(str.length() < 64){
+      str = "0" + str;
+    }
+    return str;
+  }
+  
+  private String byteToString(byte value){
+    String str = Integer.toBinaryString(value);
+    while(str.length() < 8){
+      str = "0" + str;
+    }
+    return str;
+  }
+  
   public boolean compare(SharedMemSimpleRunOnGpu rhs) {
     if(m_boolean != rhs.m_boolean){
       System.out.println("m_boolean");
@@ -85,6 +103,17 @@ public class SharedMemSimpleRunOnGpu implements Kernel {
     }
     if(m_double != rhs.m_double){
       System.out.println("m_double");
+      System.out.println("org: "+doubleToString(8.2));
+      System.out.println("lhs: "+doubleToString(m_double));
+      System.out.println("  lhs byte 0: "+byteToString(RootbeerGpu.getSharedByte(22)));
+      System.out.println("  lhs byte 1: "+byteToString(RootbeerGpu.getSharedByte(22+1)));
+      System.out.println("  lhs byte 2: "+byteToString(RootbeerGpu.getSharedByte(22+2)));
+      System.out.println("  lhs byte 3: "+byteToString(RootbeerGpu.getSharedByte(22+3)));
+      System.out.println("  lhs byte 4: "+byteToString(RootbeerGpu.getSharedByte(22+4)));
+      System.out.println("  lhs byte 5: "+byteToString(RootbeerGpu.getSharedByte(22+5)));
+      System.out.println("  lhs byte 6: "+byteToString(RootbeerGpu.getSharedByte(22+6)));
+      System.out.println("  lhs byte 7: "+byteToString(RootbeerGpu.getSharedByte(22+7)));
+      System.out.println("rhs: "+doubleToString(rhs.m_double));
       return false;
     }
     return true;
