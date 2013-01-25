@@ -85,6 +85,9 @@ public class MethodHierarchies {
         } catch(Exception ex){
           continue;
         }
+        if(soot_method.isConcrete() == false){
+          continue;
+        }
         OpenCLMethod method = new OpenCLMethod(soot_method, soot_class);
         ret.add(method);
       }      

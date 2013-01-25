@@ -14,6 +14,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import soot.*;
@@ -21,6 +22,7 @@ import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
 import soot.options.Options;
+import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 
 /**
@@ -422,16 +424,38 @@ public class OpenCLMethod {
   }
 
   private String getBaseMethodName(){
-    OpenCLClass ocl_class = new OpenCLClass(m_sootClass);
+    //if we are here and a method is not concrete, it is the case where a 
+    //invoke expresion is to an interface pointer and the method is not polymorphic
+    if(m_sootMethod.isConcrete() == false){
+      Set<String> virtual_signatures = RootbeerClassLoader.v().getVirtualSignaturesDown(m_sootMethod);
+      //double check that we are safe to do the interface remapping
+      if(virtual_signatures.size() != 1){
+        //not safe, go back to normal method
+        return getBaseMethodName(m_sootClass, m_sootMethod);
+      } else {
+        String signature = virtual_signatures.iterator().next();
+        MethodSignatureUtil util = new MethodSignatureUtil();
+        util.parse(signature);
+        
+        SootMethod soot_method = util.getSootMethod();
+        SootClass soot_class = soot_method.getDeclaringClass();
+        return getBaseMethodName(soot_class, soot_method);
+      }
+    } else {
+      return getBaseMethodName(m_sootClass, m_sootMethod);  
+    }
+  }
+  
+  private String getBaseMethodName(SootClass soot_class, SootMethod soot_method){
+    OpenCLClass ocl_class = new OpenCLClass(soot_class);
 
-    String method_name = m_sootMethod.getName();
+    String method_name = soot_method.getName();
     //here I use a certain uuid for init so there is low chance of collisions
     method_name = method_name.replace("<init>", "init"+OpenCLScene.v().getUuid());
 
     String ret = ocl_class.getName()+"_"+method_name;
     return ret;
   }
-  
   private boolean shouldEmitBody(){
     String signature = m_sootMethod.getSignature();
     if(m_emitUnmangled.contains(signature)){
