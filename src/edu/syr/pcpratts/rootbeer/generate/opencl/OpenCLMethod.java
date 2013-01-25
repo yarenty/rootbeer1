@@ -241,6 +241,7 @@ public class OpenCLMethod {
           }
         }
       } catch(RuntimeException ex){
+        ex.printStackTrace(System.out);
         System.out.println("error creating method body: "+m_sootMethod.getSignature());
         OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, m_sootClass);
         if(ocl_method.returnsAValue())

@@ -71,6 +71,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new BarrierTest());
     ret.add(new SharedMemSimpleTest());
     ret.add(new StringConstantTest());
+    ret.add(new AbstractTest());
             
     if(m_hardTests){
       ret.add(new SimpleSynchronizedTest());
