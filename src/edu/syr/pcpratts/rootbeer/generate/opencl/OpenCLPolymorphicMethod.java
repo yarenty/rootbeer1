@@ -102,8 +102,9 @@ public class OpenCLPolymorphicMethod {
           }
           RefType curr_ref_type = (RefType) type;
           SootClass sclass = curr_ref_type.getSootClass();
-          if(sootClassHasMethod(sclass) == false)
+          if(sootClassHasMethod(sclass) == false){
             continue;
+          }
           ret.append("else if(derived_type == "+RootbeerClassLoader.v().getDfsInfo().getClassNumber(sclass)+"){\n");
           if(m_sootMethod.getReturnType() instanceof VoidType == false){
             ret.append("return ");
@@ -127,12 +128,30 @@ public class OpenCLPolymorphicMethod {
   private String getInvokeString(SootClass soot_class){
     if(m_sootMethod.getName().equals("<init>"))
       return "";
-    OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, soot_class);
+    
+    SootMethod soot_method = null;
+    String subsig = m_sootMethod.getSubSignature();
+    while(true){
+      if(soot_class.declaresMethod(subsig)){
+        SootMethod curr = soot_class.getMethod(subsig);
+        if(curr.isConcrete()){
+          soot_method = curr;
+          break;
+        }
+      }
+      if(soot_class.hasSuperclass()){
+        soot_class = soot_class.getSuperclass();
+      } else {
+        throw new RuntimeException("cannot find concrete base method: "+m_sootMethod.getSignature());
+      }
+    }
+    
+    OpenCLMethod ocl_method = new OpenCLMethod(soot_method, soot_class);
     String ret = ocl_method.getPolymorphicName() + "(";
 
     //write the gc_info and thisref
     ret += "gc_info, thisref";
-    List args = m_sootMethod.getParameterTypes();
+    List args = soot_method.getParameterTypes();
     if(args.size() != 0)
       ret += ", ";
 
