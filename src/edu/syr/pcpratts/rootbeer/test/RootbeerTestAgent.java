@@ -50,7 +50,7 @@ public class RootbeerTestAgent {
     } else if(test_case_obj instanceof TestException){
       TestException test_ex = (TestException) test_case_obj;
       System.out.println("[TEST 1/1] "+test_ex.toString());
-      ex_test(test_ex);
+      ex_test(test_ex, true);
       if(m_passed){
         System.out.println("  PASSED");
       } else {
@@ -87,7 +87,7 @@ public class RootbeerTestAgent {
 
     for(TestException ex_creator : ex_creators){
       System.out.println("[TEST "+test_num+"/"+num_tests+"] "+ex_creator.toString());
-      ex_test(ex_creator);
+      ex_test(ex_creator, false);
       if(m_passed){
         System.out.println("  PASSED");
       } else {
@@ -157,8 +157,9 @@ public class RootbeerTestAgent {
     }
   }
 
-  private void ex_test(TestException creator) {
+  private void ex_test(TestException creator, boolean print_mem) {
     Rootbeer rootbeer = new Rootbeer();
+    Configuration.setPrintMem(print_mem);
     List<Kernel> testing_items = creator.create();
     try {
       rootbeer.runAll(testing_items);
