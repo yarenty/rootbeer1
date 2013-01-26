@@ -125,10 +125,11 @@ public class OpenCLPolymorphicMethod {
   }
 
   //used to invoke polymorphic method inside this function
-  private String getInvokeString(SootClass soot_class){
+  private String getInvokeString(SootClass start_class){
     if(m_sootMethod.getName().equals("<init>"))
       return "";
     
+    SootClass soot_class = start_class;
     SootMethod soot_method = null;
     String subsig = m_sootMethod.getSubSignature();
     while(true){
@@ -142,7 +143,7 @@ public class OpenCLPolymorphicMethod {
       if(soot_class.hasSuperclass()){
         soot_class = soot_class.getSuperclass();
       } else {
-        throw new RuntimeException("cannot find concrete base method: "+m_sootMethod.getSignature());
+        throw new RuntimeException("cannot find concrete base method: "+m_sootMethod.getSignature()+" "+start_class);
       }
     }
     
@@ -212,10 +213,20 @@ public class OpenCLPolymorphicMethod {
   }
 
   private boolean sootClassHasMethod(SootClass sclass) {
-    try {
-      SootMethod soot_method = sclass.getMethod(m_sootMethod.getSubSignature());
-      return true;
-    } catch(Exception ex){
+    String subsig = m_sootMethod.getSubSignature();
+    return sootClassHasMethod0(sclass, subsig);
+  }
+  
+  private boolean sootClassHasMethod0(SootClass sclass, String subsig){
+    if(sclass.declaresMethod(subsig)){
+      SootMethod soot_method = sclass.getMethod(subsig);
+      if(soot_method.isConcrete()){
+        return true;
+      }
+    }
+    if(sclass.hasSuperclass()){
+      return sootClassHasMethod0(sclass.getSuperclass(), subsig);
+    } else {
       return false;
     }
   }
