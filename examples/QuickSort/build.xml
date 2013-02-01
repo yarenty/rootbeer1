@@ -4,7 +4,7 @@
     </target>
     <target name="compile">
         <mkdir dir="build/classes"/>
-        <javac srcdir="src" destdir="build/classes" classpath="Rootbeer.jar" />
+        <javac srcdir="src" destdir="build/classes" classpath="../../Rootbeer.jar" />
     </target>
     <target name="jar" depends="compile">
         <jar destfile="QuickSort.jar" basedir="build/classes">
