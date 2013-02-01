@@ -73,6 +73,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new StringConstantTest());
     ret.add(new AbstractTest());
     ret.add(new PairHmmJimpleTest());
+    ret.add(new AutoboxingTest());
             
     if(m_hardTests){
       ret.add(new SimpleSynchronizedTest());
