@@ -128,6 +128,7 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.Serializer");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.ThreadConfig");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestSerialization");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestSerializationFactory");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestException");

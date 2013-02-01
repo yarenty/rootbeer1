@@ -17,6 +17,21 @@ int getThreadId(){
 }
 
 __device__
+int getThreadIdxx(){
+  return threadIdx.x;
+}
+
+__device__
+int getBlockIdxx(){
+  return blockIdx.x;
+}
+
+__device__
+int getBlockDimx(){
+  return blockDim.x;
+}
+
+__device__
 void synchthreads(){
   __syncthreads();
 }

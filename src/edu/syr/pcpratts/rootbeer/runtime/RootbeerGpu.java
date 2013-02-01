@@ -28,7 +28,22 @@ public class RootbeerGpu {
     m_isOnGpu = value;
   }
 
+  /**
+   * @return blockIdx.x * blockDim.x + threadIdx.x;
+   */
   public static int getThreadId() {
+    return 0;
+  }
+  
+  public static int getThreadIdxx(){
+    return 0;
+  }
+  
+  public static int getBlockIdxx(){
+    return 0;
+  }
+  
+  public static int getBlockDimx(){
     return 0;
   }
   

@@ -40,6 +40,10 @@ int atomicExch(int * addr, int value){
 }
 
 int getThreadId();
+int getThreadIdxx();
+int getBlockIdxx();
+int getBlockDimx();
+
 void synchthreads();
 
 void __threadfence(){ }

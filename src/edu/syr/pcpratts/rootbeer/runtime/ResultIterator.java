@@ -35,7 +35,7 @@ public class ResultIterator implements Iterator<Kernel> {
     if(m_jobsToEnqueue.hasNext() == false)
       return false;
     try {
-      readPartial(m_runtime.run(m_jobsToEnqueue, m_rootbeer));
+      readPartial(m_runtime.run(m_jobsToEnqueue, m_rootbeer, null));
     } catch(Exception ex){
       ex.printStackTrace();
       return false;

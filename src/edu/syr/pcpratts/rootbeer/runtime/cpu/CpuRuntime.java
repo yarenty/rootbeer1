@@ -7,10 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.runtime.cpu;
 
-import edu.syr.pcpratts.rootbeer.runtime.ParallelRuntime;
-import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
+import edu.syr.pcpratts.rootbeer.runtime.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +31,7 @@ public class CpuRuntime implements ParallelRuntime {
     }
   }
 
-  public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs, Rootbeer rootbeer) throws Exception {
+  public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs, Rootbeer rootbeer, ThreadConfig thread_config) throws Exception {
     PartiallyCompletedParallelJob ret = new PartiallyCompletedParallelJob(jobs);
     int enqueued = 0;
     for(int i = 0; i < m_Cores.size(); ++i){
