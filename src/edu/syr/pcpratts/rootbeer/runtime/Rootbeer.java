@@ -14,13 +14,18 @@ import java.util.List;
 
 public class Rootbeer implements IRootbeer {
 
-  private IRootbeer m_Rootbeer;
+  private IRootbeerInternal m_Rootbeer;
   private List<StatsRow> m_stats;
   private boolean m_ranGpu;
+  private ThreadConfig m_threadConfig;
   
   public Rootbeer(){
     RootbeerFactory factory = new RootbeerFactory();
     m_Rootbeer = factory.create(this);
+  }
+  
+  public void setThreadConfig(int block_shape_x, int grid_shape_x){
+    m_threadConfig = new ThreadConfig(block_shape_x, grid_shape_x);
   }
   
   public void runAll(List<Kernel> jobs) {
@@ -38,6 +43,12 @@ public class Rootbeer implements IRootbeer {
       m_ranGpu = true;
       
       m_stats = new ArrayList<StatsRow>();
+      if(m_threadConfig != null){
+        m_Rootbeer.setThreadConfig(m_threadConfig);
+        m_threadConfig = null;
+      } else {
+        m_Rootbeer.clearThreadConfig();
+      }
       m_Rootbeer.runAll(jobs);
     }
   }

@@ -17,10 +17,11 @@ import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaRuntime2;
 import java.util.Iterator;
 import java.util.List;
 
-public class ConcreteRootbeer implements IRootbeer {
+public class ConcreteRootbeer implements IRootbeerInternal {
 
   private boolean m_GpuWorking;
   private Rootbeer m_rootbeer;
+  private ThreadConfig m_threadConfig;
 
   public ConcreteRootbeer(Rootbeer rootbeer){
     m_rootbeer = rootbeer;
@@ -49,7 +50,7 @@ public class ConcreteRootbeer implements IRootbeer {
 
   private Iterator<Kernel> runOnCpu(Iterator<Kernel> jobs) {
     try {
-      PartiallyCompletedParallelJob partial = CpuRuntime.v().run(jobs, m_rootbeer);
+      PartiallyCompletedParallelJob partial = CpuRuntime.v().run(jobs, m_rootbeer, m_threadConfig);
       return new ResultIterator(partial, CpuRuntime.v(), m_rootbeer);
     } catch (Exception ex){
       ex.printStackTrace();
@@ -60,13 +61,21 @@ public class ConcreteRootbeer implements IRootbeer {
   
   private Iterator<Kernel> runOnCudaGpu(Iterator<Kernel> jobs) {    
     Tweaks.setInstance(new CudaTweaks());
-    PartiallyCompletedParallelJob partial = CudaRuntime2.v().run(jobs, m_rootbeer);
+    PartiallyCompletedParallelJob partial = CudaRuntime2.v().run(jobs, m_rootbeer, m_threadConfig);
     return new ResultIterator(partial, CudaRuntime2.v(), m_rootbeer);
   }
   
   private Iterator<Kernel> runOnNativeCpu(Iterator<Kernel> jobs) {
     Tweaks.setInstance(new NativeCpuTweaks());
-    PartiallyCompletedParallelJob partial = NativeCpuRuntime.v().run(jobs, m_rootbeer);
+    PartiallyCompletedParallelJob partial = NativeCpuRuntime.v().run(jobs, m_rootbeer, m_threadConfig);
     return new ResultIterator(partial, NativeCpuRuntime.v(), m_rootbeer);
+  }
+
+  public void setThreadConfig(ThreadConfig thread_config) {
+    m_threadConfig = thread_config;
+  }
+
+  public void clearThreadConfig() {
+    m_threadConfig = null;
   }
 }

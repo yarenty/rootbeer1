@@ -11,6 +11,6 @@ import java.util.Iterator;
 
 public interface ParallelRuntime {
 
-  public PartiallyCompletedParallelJob run(Iterator<Kernel> blocks, Rootbeer rootbeer) throws Exception;
+  public PartiallyCompletedParallelJob run(Iterator<Kernel> blocks, Rootbeer rootbeer, ThreadConfig thread_config) throws Exception;
   public boolean isGpuPresent();
 }

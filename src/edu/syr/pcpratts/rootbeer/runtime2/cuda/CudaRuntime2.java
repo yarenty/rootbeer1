@@ -155,7 +155,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     test.run(m_ToSpace.get(0));
   }
   
-  public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs, Rootbeer rootbeer){
+  public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs, Rootbeer rootbeer, ThreadConfig thread_config){
     
     Stopwatch watch2 = new Stopwatch();
     watch2.start();
@@ -170,7 +170,16 @@ public class CudaRuntime2 implements ParallelRuntime {
     if(filename.endsWith(".error")){
       return m_Partial;
     }
-    calculateShape();
+    if(thread_config == null){
+      calculateShape();
+    } else {
+      m_BlockShape = thread_config.getBlockShapeX();
+      m_GridShape = thread_config.getGridShapeX(); 
+      m_NumBlocksRun = m_GridShape * m_BlockShape;    
+      if(m_NumBlocksRun > m_JobsWritten.size()){
+        m_NumBlocksRun = m_JobsWritten.size(); 
+      }
+    }
     compileCode();
     
     Stopwatch watch = new Stopwatch();

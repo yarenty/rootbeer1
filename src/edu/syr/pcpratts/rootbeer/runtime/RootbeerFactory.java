@@ -12,7 +12,7 @@ import java.lang.reflect.Constructor;
 public class RootbeerFactory {
 
   //http://java.sun.com/developer/technicalArticles/ALT/Reflection/
-  public IRootbeer create(Rootbeer rootbeer) {
+  public IRootbeerInternal create(Rootbeer rootbeer) {
     try {
       Class c = Class.forName("edu.syr.pcpratts.rootbeer.runtime.ConcreteRootbeer");
       Constructor<ConcreteRootbeer> ctor = c.getConstructor(Rootbeer.class);

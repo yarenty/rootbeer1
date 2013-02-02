@@ -162,6 +162,21 @@ int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId($$__global$$ char 
 }
 
 $$__device__$$ 
+int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadIdxx($$__global$$ char * gc_info, int * exception){
+  return getThreadIdxx();
+}
+
+$$__device__$$ 
+int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getBlockIdxx($$__global$$ char * gc_info, int * exception){
+  return getBlockIdxx();
+}
+
+$$__device__$$ 
+int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getBlockDimx($$__global$$ char * gc_info, int * exception){
+  return getBlockDimx();
+}
+
+$$__device__$$ 
 long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef($$__global$$ char * gc_info, int ref, int * exception){
   return ref;
 }
