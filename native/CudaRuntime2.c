@@ -584,7 +584,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_loadFunction
   (JNIEnv *env, jobject this_obj, jlong heap_end_ptr, jstring filename, jint num_blocks){
 
-  void * cubin_file;
+  void * fatcubin;
   int offset;
   CUresult status;
   char * native_filename;
@@ -592,9 +592,11 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   
   cuCtxPushCurrent(cuContext);
   native_filename = (*env)->GetStringUTFChars(env, filename, 0);
-  status = cuModuleLoad(&cuModule, native_filename);
+  fatcubin = readCubinFile(native_filename);
+  status = cuModuleLoadFatBinary(&cuModule, fatcubin);
   CHECK_STATUS(env, "error in cuModuleLoad", status);
   (*env)->ReleaseStringUTFChars(env, filename, native_filename);
+  free(fatcubin);
 
   status = cuModuleGetFunction(&cuFunction, cuModule, "_Z5entryPcS_PiPxS1_S0_S0_i"); 
   CHECK_STATUS(env,"error in cuModuleGetFunction",status)
