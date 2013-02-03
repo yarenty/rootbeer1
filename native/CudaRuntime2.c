@@ -182,8 +182,8 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
   to_space_size -= gc_space_size;
   to_space_size -= free_space;
   to_space_size -= classMemSize;
-  //leave 2MB for module
-  to_space_size -= 2L*1024L*1024L;
+  //leave 10MB for module
+  to_space_size -= 10L*1024L*1024L;
 
   //to_space_size -= textureMemSize;
   bufferSize = to_space_size;
@@ -271,7 +271,7 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
 
   getBestDevice(env);
 
-  status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
+  status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);
   CHECK_STATUS_RTN(env,"error in cuCtxCreate",status, 0)
   
   status = cuMemGetInfo (&f_mem, &t_mem);
@@ -289,8 +289,8 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
   to_space_size -= (num_blocks * sizeof(jlong));
   to_space_size -= gc_space_size;
   to_space_size -= classMemSize;
-  //leave 2MB for module
-  to_space_size -= 2L*1024L*1024L;
+  //leave 10MB for module
+  to_space_size -= 10L*1024L*1024L;
   
   return to_space_size;
 }
@@ -590,6 +590,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   char * native_filename;
   heapEndPtr = heap_end_ptr;
   
+  cuCtxPushCurrent(cuContext);
   native_filename = (*env)->GetStringUTFChars(env, filename, 0);
   status = cuModuleLoad(&cuModule, native_filename);
   CHECK_STATUS(env, "error in cuModuleLoad", status);
@@ -636,6 +637,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   status = cuParamSeti(cuFunction, offset, num_blocks); 
   CHECK_STATUS(env,"error in cuParamSetv num_blocks",status)
   offset += sizeof(int);
+  cuCtxPopCurrent(&cuContext);
 }
 
 /*
@@ -649,6 +651,7 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   CUresult status;
   jlong * infoSpace = (jlong *) malloc(gc_space_size);
   infoSpace[1] = heapEndPtr;
+  cuCtxPushCurrent(cuContext);
   cuMemcpyHtoD(gcInfoSpace, infoSpace, gc_space_size);
   cuMemcpyHtoD(gpuToSpace, toSpace, heapEndPtr);
   //cuMemcpyHtoD(gpuTexture, textureMemory, textureMemSize);
@@ -684,6 +687,7 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   cuMemcpyDtoH(toSpace, gpuToSpace, heapEndPtr);
   cuMemcpyDtoH(exceptionsMemory, gpuExceptionsMemory, num_blocks * sizeof(jlong));
   free(infoSpace);
+  cuCtxPopCurrent(&cuContext);
   
   return 0;
 }
