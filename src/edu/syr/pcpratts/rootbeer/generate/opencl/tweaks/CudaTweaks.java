@@ -94,7 +94,6 @@ public class CudaTweaks extends Tweaks {
       String gencode_options = options_gen.getOptions();
       if(File.separator.equals("/")){
         command = cuda_path.get() + "/nvcc "+modelString+" "+gencode_options+" -fatbin "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
-        System.out.println(command);
         CompilerRunner runner = new CompilerRunner();
         List<String> errors = runner.run(command);      
         if(errors.isEmpty() == false){
