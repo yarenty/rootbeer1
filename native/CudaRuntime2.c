@@ -43,6 +43,7 @@ static jclass thisRefClass;
 static jlong heapEndPtr;
 static jlong bufferSize;
 static jlong classMemSize;
+static jlong numBlocks;
 static int maxGridDim;
 static int numMultiProcessors;
 
@@ -146,12 +147,12 @@ void savePointers(JNIEnv * env, jobject this_ref){
   setLongField(env, this_ref, "m_ToSpaceSize", (jlong) bufferSize);
   setLongField(env, this_ref, "m_MaxGridDim", (jlong) maxGridDim);
   setLongField(env, this_ref, "m_NumMultiProcessors", (jlong) numMultiProcessors);
+  setLongField(env, this_ref, "m_NumBlocks", (jlong) numBlocks);
 }
 
 void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
 {          
   int status;
-  jint num_blocks;
   int deviceCount = 0;
   size_t f_mem;
   size_t t_mem;
@@ -171,14 +172,14 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
           
   to_space_size = f_mem;
   
-  num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
+  numBlocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
   //space for 100 types in the scene
   classMemSize = sizeof(jint)*100;
   
   gc_space_size = 1024;
-  to_space_size -= (num_blocks * sizeof(jlong));
-  to_space_size -= (num_blocks * sizeof(jlong));
+  to_space_size -= (numBlocks * sizeof(jlong));
+  to_space_size -= (numBlocks * sizeof(jlong));
   to_space_size -= gc_space_size;
   to_space_size -= free_space;
   to_space_size -= classMemSize;
@@ -211,16 +212,16 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
   }
 */
 
-  status = cuMemHostAlloc(&handlesMemory, num_blocks * sizeof(jlong), CU_MEMHOSTALLOC_WRITECOMBINED); 
+  status = cuMemHostAlloc(&handlesMemory, numBlocks * sizeof(jlong), CU_MEMHOSTALLOC_WRITECOMBINED); 
   CHECK_STATUS(env,"handlesMemory memory allocation failed",status)
 
-  status = cuMemAlloc(&gpuHandlesMemory, num_blocks * sizeof(jlong)); 
+  status = cuMemAlloc(&gpuHandlesMemory, numBlocks * sizeof(jlong)); 
   CHECK_STATUS(env,"gpuHandlesMemory memory allocation failed",status)
 
-  status = cuMemHostAlloc(&exceptionsMemory, num_blocks * sizeof(jlong), 0); 
+  status = cuMemHostAlloc(&exceptionsMemory, numBlocks * sizeof(jlong), 0); 
   CHECK_STATUS(env,"exceptionsMemory memory allocation failed",status)
 
-  status = cuMemAlloc(&gpuExceptionsMemory, num_blocks * sizeof(jlong)); 
+  status = cuMemAlloc(&gpuExceptionsMemory, numBlocks * sizeof(jlong)); 
   CHECK_STATUS(env,"gpuExceptionsMemory memory allocation failed",status)
 
   status = cuMemAlloc(&gcInfoSpace, gc_space_size);  
@@ -264,7 +265,6 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
   int deviceCount = 0;
   size_t f_mem;
   size_t t_mem;
-  jint num_blocks;
   
   status = cuDeviceGetCount(&deviceCount);
   CHECK_STATUS_RTN(env,"error in cuDeviceGetCount",status, 0);
@@ -282,11 +282,11 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
   //space for 100 types in the scene
   classMemSize = sizeof(jint)*100;
   
-  num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
+  numBlocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
   gc_space_size = 1024;
-  to_space_size -= (num_blocks * sizeof(jlong));
-  to_space_size -= (num_blocks * sizeof(jlong));
+  to_space_size -= (numBlocks * sizeof(jlong));
+  to_space_size -= (numBlocks * sizeof(jlong));
   to_space_size -= gc_space_size;
   to_space_size -= classMemSize;
   //leave 10MB for module
@@ -311,7 +311,6 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
   jlong i;
   size_t f_mem;
   size_t t_mem;
-  jint num_blocks;
 
   status = cuInit(0);
   CHECK_STATUS(env,"error in cuInit",status)
@@ -319,7 +318,7 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
   printf("automatically determining CUDA reserve space...\n");
   
   to_space_size = initContext(env, max_blocks_per_proc, max_threads_per_block);
-  num_blocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
+  numBlocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
   for(i = 1024L*1024L; i < to_space_size; i += 100L*1024L*1024L){
     temp_size = to_space_size - i;
@@ -347,28 +346,28 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
       continue;
     } 
 
-    status = cuMemHostAlloc(&handlesMemory, num_blocks * sizeof(jlong), 0); 
+    status = cuMemHostAlloc(&handlesMemory, numBlocks * sizeof(jlong), 0); 
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
       initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
-    status = cuMemAlloc(&gpuHandlesMemory, num_blocks * sizeof(jlong)); 
+    status = cuMemAlloc(&gpuHandlesMemory, numBlocks * sizeof(jlong)); 
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
       initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
-    status = cuMemHostAlloc(&exceptionsMemory, num_blocks * sizeof(jlong), 0); 
+    status = cuMemHostAlloc(&exceptionsMemory, numBlocks * sizeof(jlong), 0); 
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
       initContext(env, max_blocks_per_proc, max_threads_per_block);
       continue;
     } 
 
-    status = cuMemAlloc(&gpuExceptionsMemory, num_blocks * sizeof(jlong)); 
+    status = cuMemAlloc(&gpuExceptionsMemory, numBlocks * sizeof(jlong)); 
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
       initContext(env, max_blocks_per_proc, max_threads_per_block);

@@ -41,6 +41,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_Handles_writ
   
   jint int_value;
   
+  printf("writeLong: %d\n", ptr);
   value = value >> 4;
   int_value = (jint) value;
   longHostMemory[ptr] = int_value;

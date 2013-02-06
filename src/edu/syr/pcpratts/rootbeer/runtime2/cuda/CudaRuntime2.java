@@ -32,7 +32,6 @@ public class CudaRuntime2 implements ParallelRuntime {
     return m_Instance;
   }
   
-  private int m_NumBlocks;
   
   private List<Memory> m_ToSpace;
   private List<Memory> m_Texture;
@@ -54,6 +53,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   private long m_MaxGridDim;
   private long m_NumMultiProcessors;
   private long m_reserveMem;
+  private long m_NumBlocks;
   
   private long m_serializationTime;
   private long m_executionTime;
@@ -225,6 +225,9 @@ public class CudaRuntime2 implements ParallelRuntime {
       m_JobsToWrite.add(job);
       if(count + 1 == m_BlockShaper.getMaxThreads(m_NumMultiProcessors))
         break;
+      if(count + 1 == m_NumBlocks){
+        break;
+      }
       count++;
     }
     if(count == 0){
