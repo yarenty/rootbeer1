@@ -26,10 +26,10 @@ public class CmdRunner {
       m_process = Runtime.getRuntime().exec(cmd, new String[0], dir);
       StreamEater out_eater = new StreamEater(m_process.getInputStream());
       StreamEater err_eater = new StreamEater(m_process.getErrorStream());
-      int ret = m_process.waitFor();
-      m_process.destroy();
       m_outputLines = out_eater.get();
       m_errorLines = err_eater.get();
+      int ret = m_process.waitFor();
+      m_process.destroy();
       return ret;
     } catch(Exception ex){
       ex.printStackTrace();
