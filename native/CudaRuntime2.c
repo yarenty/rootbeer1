@@ -719,7 +719,6 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   free(infoSpace);
   cuCtxPopCurrent(&cuContext);
   
-  printf("runBlocks done...\n");
   return 0;
 }
 
