@@ -180,6 +180,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     if(filename.endsWith(".error")){
       return m_Partial;
     }
+    
     calculateShape();
     compileCode();
     
@@ -315,14 +316,16 @@ public class CudaRuntime2 implements ParallelRuntime {
 
   private void compileCode() {
     String filename = m_FirstJob.getCubin();
-    File file = new File(filename);
-    String dest_filename = RootbeerPaths.v().getRootbeerHome()+File.separator+file.getName();
     try {
-      ResourceReader.writeToFile(filename, dest_filename);
+      List<byte[]> buffer = ResourceReader.getResourceArray(filename);
+      int total_len = 0;
+      for(byte[] sub_buffer : buffer){
+        total_len += sub_buffer.length;
+      }
+      loadFunction(getHeapEndPtr(), buffer, buffer.size(), total_len, m_JobsWritten.size());
     } catch(Exception ex){
-      ex.printStackTrace(); 
+      ex.printStackTrace();
     }
-    loadFunction(getHeapEndPtr(), dest_filename, m_JobsWritten.size());
   }
   
   private void runOnGpu(){    
@@ -421,7 +424,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   private native long findReserveMem(int max_blocks, int max_threads);
   private native void setup(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
   public static native void printDeviceInfo();
-  private native void loadFunction(long heap_end_ptr, String filename, int num_blocks);
+  private native void loadFunction(long heap_end_ptr, Object buffer, int size, int total_size, int num_blocks);
   private native void writeClassTypeRef(int[] refs);
   private native int runBlocks(int size, int block_shape, int grid_shape);
   private native void unload();

@@ -87,12 +87,16 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error) {
   (*env)->SetLongField(env,exp,fid, (jint)error);
 
   (*env)->ThrowNew(env,exp,msg);
+  
+  return;
 }
 
 void setLongField(JNIEnv *env, jobject obj, const char * name, jlong value){
 
   jfieldID fid = (*env)->GetFieldID(env, thisRefClass, name, "J");
   (*env)->SetLongField(env, obj, fid, value);
+  
+  return;
 }
 
 void getBestDevice(JNIEnv *env){
@@ -132,6 +136,7 @@ void getBestDevice(JNIEnv *env){
           
   numMultiProcessors = max_multiprocessors;
 
+  return;
 }
 
 void savePointers(JNIEnv * env, jobject this_ref){
@@ -148,6 +153,8 @@ void savePointers(JNIEnv * env, jobject this_ref){
   setLongField(env, this_ref, "m_MaxGridDim", (jlong) maxGridDim);
   setLongField(env, this_ref, "m_NumMultiProcessors", (jlong) numMultiProcessors);
   setLongField(env, this_ref, "m_NumBlocks", (jlong) numBlocks);
+  
+  return;
 }
 
 void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
@@ -234,6 +241,8 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
   CHECK_STATUS(env,"gpuBufferSize memory allocation failed",status)
 
   savePointers(env, this_ref);
+  
+  return;
 }
 
 /*
@@ -256,6 +265,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   cuMemFree(gpuBufferSize);
   cuCtxDestroy(cuContext);
   initDevice(env, this_ref, max_blocks_per_proc, max_threads_per_block, free_space);
+  
+  return;
 }
 
 size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_block)
@@ -313,7 +324,7 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
   size_t t_mem;
 
   status = cuInit(0);
-  CHECK_STATUS(env,"error in cuInit",status)
+  CHECK_STATUS_RTN(env,"error in cuInit",status, 0)
 
   printf("automatically determining CUDA reserve space...\n");
   
@@ -488,6 +499,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
 			
         cuCtxDestroy(cuContext);
     } 
+	
+	return;
 }
 
 /*
@@ -504,6 +517,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   CHECK_STATUS(env,"error in cuInit",status)
 
   initDevice(env, this_ref, max_blocks_per_proc, max_threads_per_block, free_space);
+  
+  return;
 }
 
 void * readCubinFile(const char * filename){
@@ -573,6 +588,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   jint * native_array = (*env)->GetIntArrayElements(env, jarray, 0);
   cuMemcpyHtoD(gpuClassMemory, native_array, classMemSize);
   (*env)->ReleaseIntArrayElements(env, jarray, native_array, 0);
+  
+  return;
 }
 
 /*
@@ -581,7 +598,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_loadFunction
-  (JNIEnv *env, jobject this_obj, jlong heap_end_ptr, jstring filename, jint num_blocks){
+  (JNIEnv *env, jobject this_obj, jlong heap_end_ptr, jobject buffers, jint size, jint total_size, jint num_blocks){
 
   void * fatcubin;
   int offset;
@@ -590,11 +607,9 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   heapEndPtr = heap_end_ptr;
   
   cuCtxPushCurrent(cuContext);
-  native_filename = (*env)->GetStringUTFChars(env, filename, 0);
-  fatcubin = readCubinFile(native_filename);
+  fatcubin = readCubinFileFromBuffers(env, buffers, size, total_size);
   status = cuModuleLoadFatBinary(&cuModule, fatcubin);
   CHECK_STATUS(env, "error in cuModuleLoad", status);
-  (*env)->ReleaseStringUTFChars(env, filename, native_filename);
   free(fatcubin);
 
   status = cuModuleGetFunction(&cuFunction, cuModule, "_Z5entryPcS_PiPxS1_S0_S0_i"); 
@@ -639,6 +654,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   CHECK_STATUS(env,"error in cuParamSetv num_blocks",status)
   offset += sizeof(int);
   cuCtxPopCurrent(&cuContext);
+  
+  return;
 }
 
 /*
@@ -702,6 +719,7 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   free(infoSpace);
   cuCtxPopCurrent(&cuContext);
   
+  printf("runBlocks done...\n");
   return 0;
 }
 
@@ -716,4 +734,5 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   cuModuleUnload(cuModule);
   cuFunction = (CUfunction) 0;  
  
+  return;
 }
