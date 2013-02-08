@@ -31,7 +31,7 @@ public class ExceptionBasicRunOnGpu implements Kernel {
         method3();
       }
     } catch(Throwable ex){
-      throw new RuntimeException(ex);
+      throw new ExceptionTestException(ex);
     } 
   }
 

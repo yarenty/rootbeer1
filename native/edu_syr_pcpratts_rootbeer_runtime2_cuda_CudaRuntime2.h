@@ -37,7 +37,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  * Signature: (JLjava/lang/String;I)V
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_loadFunction
-  (JNIEnv *, jobject, jlong, jstring, jint);
+  (JNIEnv *, jobject, jlong, jobject, jint, jint, jint);
 
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2

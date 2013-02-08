@@ -32,7 +32,6 @@ public class CudaRuntime2 implements ParallelRuntime {
     return m_Instance;
   }
   
-  private int m_NumBlocks;
   
   private List<Memory> m_ToSpace;
   private List<Memory> m_Texture;
@@ -48,12 +47,12 @@ public class CudaRuntime2 implements ParallelRuntime {
   private long m_GpuExceptionsHandlesAddr;
   private long m_ToSpaceSize;
   private int m_NumCores;
-  private int m_NumBlocksRun;
   private int m_BlockShape;
   private int m_GridShape;
   private long m_MaxGridDim;
   private long m_NumMultiProcessors;
   private long m_reserveMem;
+  private long m_NumBlocks;
   
   private long m_serializationTime;
   private long m_executionTime;
@@ -76,9 +75,15 @@ public class CudaRuntime2 implements ParallelRuntime {
   private CpuRunner m_CpuRunner;
   private BlockShaper m_BlockShaper;
   
+  private Stopwatch m_ctorStopwatch;
+  private Stopwatch m_writeBlocksStopwatch;
+  private Stopwatch m_runStopwatch;
+  private Stopwatch m_runOnGpuStopwatch;
+  private Stopwatch m_readBlocksStopwatch;
+  
   private CudaRuntime2(){
-    Stopwatch watch = new Stopwatch();
-    watch.start();    
+    m_ctorStopwatch = new Stopwatch();
+    m_ctorStopwatch.start();
     CudaLoader loader = new CudaLoader();
     loader.load();
         
@@ -91,7 +96,12 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_ToSpace = new ArrayList<Memory>();
     m_Texture = new ArrayList<Memory>();
     m_Readers = new ArrayList<ToSpaceReader>();
-    m_Writers = new ArrayList<ToSpaceWriter>();    
+    m_Writers = new ArrayList<ToSpaceWriter>();
+    
+    m_writeBlocksStopwatch = new Stopwatch();
+    m_runStopwatch = new Stopwatch();
+    m_runOnGpuStopwatch = new Stopwatch();
+    m_readBlocksStopwatch = new Stopwatch();
    
     //there is a bug in the concurrent serializer. setting num_cores to 1 right now.
     //next version of rootbeer should have a faster concurrent serializer anyway
@@ -116,7 +126,8 @@ public class CudaRuntime2 implements ParallelRuntime {
     //this will be overwitten in edu.syr.pcpratts.rootbeer.runtime.Rootbeer.<init>(boolean)
     Configuration.setPrintMem(false);
     
-    m_initTime = watch.elapsedTimeMillis();
+    m_ctorStopwatch.stop();
+    m_initTime = m_ctorStopwatch.elapsedTimeMillis();
   }
   
   private void initNativeModule(){
@@ -157,8 +168,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   
   public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs, Rootbeer rootbeer, ThreadConfig thread_config){
     
-    Stopwatch watch2 = new Stopwatch();
-    watch2.start();
+    m_runStopwatch.start();
     RootbeerGpu.setIsOnGpu(true);
     m_Partial = new PartiallyCompletedParallelJob(jobs);
     
@@ -175,40 +185,51 @@ public class CudaRuntime2 implements ParallelRuntime {
     } else {
       m_BlockShape = thread_config.getBlockShapeX();
       m_GridShape = thread_config.getGridShapeX(); 
-      m_NumBlocksRun = m_GridShape * m_BlockShape;    
-      if(m_NumBlocksRun > m_JobsWritten.size()){
-        m_NumBlocksRun = m_JobsWritten.size(); 
-      }
     }
     compileCode();
     
-    Stopwatch watch = new Stopwatch();
-    watch.start();
-    runOnGpu();
-    watch.stop();
-    m_executionTime = watch.elapsedTimeMillis();
-    
-    readBlocks();
-    unload();
-        
-    runExtraBlocks();
+    Object gpu_thrown = null;
+    try {
+      runOnGpu();
+      readBlocks();
+      unload();
+    } catch(Throwable ex){
+      gpu_thrown = ex;
+    } 
     
     RootbeerGpu.setIsOnGpu(false);
     
-    m_overallTime = watch2.elapsedTimeMillis();
+    m_runStopwatch.stop();
+    m_overallTime = m_runStopwatch.elapsedTimeMillis();
     
     StatsRow stats_row = new StatsRow(m_serializationTime, m_executionTime, 
                                       m_deserializationTime, m_overallTime, 
                                       m_GridShape, m_BlockShape);
     
     rootbeer.addStatsRow(stats_row);
-    return m_Partial;
+    if(gpu_thrown == null){
+      return m_Partial;
+    } else {
+      if(gpu_thrown instanceof NullPointerException){
+        NullPointerException null_ex = (NullPointerException) gpu_thrown;
+        throw null_ex;
+      } else if(gpu_thrown instanceof OutOfMemoryError){
+        OutOfMemoryError no_mem = (OutOfMemoryError) gpu_thrown;
+        throw no_mem;
+      } else if(gpu_thrown instanceof Error){
+        Error error = (Error) gpu_thrown;
+        throw error;
+      } else if(gpu_thrown instanceof RuntimeException){
+        RuntimeException runtime_ex = (RuntimeException) gpu_thrown;
+        throw runtime_ex;
+      } else {
+        throw new RuntimeException("unknown exception type.");
+      }
+    }
   }
 
   public boolean writeBlocks(Iterator<Kernel> iter) {
-        
-    Stopwatch watch = new Stopwatch();
-    watch.start();
+    m_writeBlocksStopwatch.start();
     for(Memory mem : m_ToSpace){
       mem.setAddress(0);
     }
@@ -234,6 +255,9 @@ public class CudaRuntime2 implements ParallelRuntime {
       m_JobsToWrite.add(job);
       if(count + 1 == m_BlockShaper.getMaxThreads(m_NumMultiProcessors))
         break;
+      if(count + 1 == m_NumBlocks){
+        break;
+      }
       count++;
     }
     if(count == 0){
@@ -283,8 +307,8 @@ public class CudaRuntime2 implements ParallelRuntime {
 
     writeClassTypeRef(m_serializers.get(0).getClassRefArray());
     
-    watch.stop();
-    m_serializationTime = watch.elapsedTimeMillis();
+    m_writeBlocksStopwatch.stop();
+    m_serializationTime = m_writeBlocksStopwatch.elapsedTimeMillis();
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
@@ -296,21 +320,28 @@ public class CudaRuntime2 implements ParallelRuntime {
 
   private void compileCode() {
     String filename = m_FirstJob.getCubin();
-    File file = new File(filename);
-    String dest_filename = RootbeerPaths.v().getRootbeerHome()+File.separator+file.getName();
     try {
-      ResourceReader.writeToFile(filename, dest_filename);
+      List<byte[]> buffer = ResourceReader.getResourceArray(filename);
+      int total_len = 0;
+      for(byte[] sub_buffer : buffer){
+        total_len += sub_buffer.length;
+      }
+      loadFunction(getHeapEndPtr(), buffer, buffer.size(), total_len, m_JobsWritten.size());
     } catch(Exception ex){
-      ex.printStackTrace(); 
+      ex.printStackTrace();
     }
-    loadFunction(getHeapEndPtr(), dest_filename, m_NumBlocksRun);
   }
   
   private void runOnGpu(){    
     try {
-      runBlocks(m_NumBlocksRun, m_BlockShape, m_GridShape);
-    } catch(RuntimeException ex){
-      reinit(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), m_reserveMem); 
+      m_runOnGpuStopwatch.start();
+      runBlocks(m_JobsWritten.size(), m_BlockShape, m_GridShape); 
+      m_runOnGpuStopwatch.stop();
+      m_executionTime = m_runOnGpuStopwatch.elapsedTimeMillis();
+    } catch(CudaErrorException ex){
+      reinit(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), m_reserveMem);
+      m_Handles = new Handles(m_HandlesAddr, m_GpuHandlesAddr);
+      m_ExceptionHandles = new Handles(m_ExceptionsHandlesAddr, m_GpuExceptionsHandlesAddr);
       throw ex;
     }
   }  
@@ -319,15 +350,10 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_BlockShaper.run(m_JobsWritten.size(), m_NumMultiProcessors);
     m_GridShape = m_BlockShaper.gridShape();
     m_BlockShape = m_BlockShaper.blockShape();
-    m_NumBlocksRun = m_GridShape * m_BlockShape;    
-    if(m_NumBlocksRun > m_JobsWritten.size()){
-      m_NumBlocksRun = m_JobsWritten.size(); 
-    }
   }
   
   public void readBlocks() {    
-    Stopwatch watch = new Stopwatch();
-    watch.start();
+    m_readBlocksStopwatch.start();
     for(int i = 0; i < m_NumCores; ++i)
       m_ToSpace.get(i).setAddress(0);    
     
@@ -338,7 +364,7 @@ public class CudaRuntime2 implements ParallelRuntime {
       printer.print(m_ToSpace.get(0), 0, 2048);
     }
     
-    for(int i = 0; i < m_NumBlocksRun; ++i){
+    for(int i = 0; i < m_JobsWritten.size(); ++i){
       long ref = m_ExceptionHandles.readLong();
       if(ref != 0){
         long ref_num = ref >> 4;
@@ -364,12 +390,12 @@ public class CudaRuntime2 implements ParallelRuntime {
     //read the statics from the heap
     m_serializers.get(0).readStaticsFromHeap();
     
-    int items_per = m_NumBlocksRun / m_NumCores;
+    int items_per = m_JobsWritten.size() / m_NumCores;
     for(int i = 0; i < m_NumCores; ++i){
       Serializer visitor = m_serializers.get(i);
       int end_index;
       if(i == m_NumCores - 1){
-        end_index = m_NumBlocksRun;
+        end_index = m_JobsWritten.size();
       } else {
         end_index = (i+1)*items_per;
       }
@@ -382,21 +408,8 @@ public class CudaRuntime2 implements ParallelRuntime {
       m_Readers.get(i).join();  
     }
     
-    watch.stop();
-    m_deserializationTime = watch.elapsedTimeMillis();
-  }
-  
-  private void runExtraBlocks(){
-    if(m_NumBlocksRun == m_JobsWritten.size())
-      return;
-    
-    List<Kernel> cpu_jobs = m_JobsWritten.subList(m_NumBlocksRun, m_JobsWritten.size());
-    m_CpuRunner.run(cpu_jobs);   
-    m_CpuRunner.join();
-    
-    for(Kernel job : cpu_jobs){
-      m_Partial.enqueueJob(job);
-    }      
+    m_readBlocksStopwatch.stop();
+    m_deserializationTime = m_readBlocksStopwatch.elapsedTimeMillis();
   }
   
   private long getHeapEndPtr() {
@@ -415,7 +428,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   private native long findReserveMem(int max_blocks, int max_threads);
   private native void setup(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
   public static native void printDeviceInfo();
-  private native void loadFunction(long heap_end_ptr, String filename, int num_blocks);
+  private native void loadFunction(long heap_end_ptr, Object buffer, int size, int total_size, int num_blocks);
   private native void writeClassTypeRef(int[] refs);
   private native int runBlocks(int size, int block_shape, int grid_shape);
   private native void unload();
