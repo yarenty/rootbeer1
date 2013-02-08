@@ -41,7 +41,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_Handles_writ
   
   jint int_value;
   
-  printf("writeLong: %d\n", ptr);
   value = value >> 4;
   int_value = (jint) value;
   longHostMemory[ptr] = int_value;
@@ -56,6 +55,7 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_Handles_writ
 JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_Handles_readLong
   (JNIEnv *env, jobject obj){
 
+  printf("readLong. ptr: %d. longHostMemory: %p.\n", ptr, longHostMemory);
   jint ret = longHostMemory[ptr];
   jlong long_ret = ret;
   long_ret = long_ret << 4;

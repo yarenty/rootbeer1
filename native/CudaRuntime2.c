@@ -675,12 +675,24 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
 */
 
   status = cuFuncSetBlockShape(cuFunction, block_shape, 1, 1);
+  if(status != CUDA_SUCCESS){
+    free(infoSpace);
+    cuCtxPopCurrent(&cuContext);
+  }
   CHECK_STATUS_RTN(env,"error in cuFuncSetBlockShape",status, (jint)status);
 
   status = cuLaunchGrid(cuFunction, grid_shape, 1);
+  if(status != CUDA_SUCCESS){
+    free(infoSpace);
+    cuCtxPopCurrent(&cuContext);
+  }
   CHECK_STATUS_RTN(env,"error in cuLaunchGrid",status, (jint)status)
 
   status = cuCtxSynchronize();  
+  if(status != CUDA_SUCCESS){
+    free(infoSpace);
+    cuCtxPopCurrent(&cuContext);
+  }
   CHECK_STATUS_RTN(env,"error in cuCtxSynchronize",status, (jint)status)
   
   cuMemcpyDtoH(infoSpace, gcInfoSpace, gc_space_size);
@@ -703,4 +715,5 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
 
   cuModuleUnload(cuModule);
   cuFunction = (CUfunction) 0;  
+ 
 }

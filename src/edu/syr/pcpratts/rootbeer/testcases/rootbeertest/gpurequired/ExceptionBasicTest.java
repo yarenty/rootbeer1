@@ -9,7 +9,6 @@ package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 import edu.syr.pcpratts.rootbeer.test.TestException;
-import edu.syr.pcpratts.rootbeer.test.TestSerialization;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class ExceptionBasicTest implements TestException {
   
   @Override
   public boolean catchException(Throwable thrwbl) {
-    if(thrwbl instanceof RuntimeException)
+    if(thrwbl instanceof ExceptionTestException)
       return true;
     return false;
   }
