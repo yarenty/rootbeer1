@@ -159,6 +159,7 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
   size_t to_space_size;
   textureMemSize = 1;
 
+  printf("init device.\n");
   status = cuDeviceGetCount(&deviceCount);
   CHECK_STATUS(env,"error in cuDeviceGetCount",status)
 
@@ -167,7 +168,7 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
   status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
   CHECK_STATUS(env,"error in cuCtxCreate",status)
   
-  status = cuMemGetInfo (&f_mem, &t_mem);
+  status = cuMemGetInfo(&f_mem, &t_mem);
   CHECK_STATUS(env,"error in cuMemGetInfo",status)
           
   to_space_size = f_mem;
@@ -244,6 +245,7 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_reinit
   (JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
 {
+  printf("reinit");
   cuMemFreeHost(toSpace);
   cuMemFree(gpuToSpace);
   cuMemFree(gpuClassMemory);

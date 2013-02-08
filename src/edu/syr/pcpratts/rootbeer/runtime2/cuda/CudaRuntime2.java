@@ -333,6 +333,8 @@ public class CudaRuntime2 implements ParallelRuntime {
       m_executionTime = m_runOnGpuStopwatch.elapsedTimeMillis();
     } catch(CudaErrorException ex){
       reinit(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), m_reserveMem);
+      m_Handles = new Handles(m_HandlesAddr, m_GpuHandlesAddr);
+      m_ExceptionHandles = new Handles(m_ExceptionsHandlesAddr, m_GpuExceptionsHandlesAddr);
       throw ex;
     }
   }  
