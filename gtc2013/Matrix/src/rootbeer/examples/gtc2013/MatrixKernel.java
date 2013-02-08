@@ -1,6 +1,7 @@
 package rootbeer.examples.gtc2013;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
 
 public class MatrixKernel implements Kernel {
 
@@ -17,32 +18,17 @@ public class MatrixKernel implements Kernel {
   }
 
   public void gpuMethod(){
-    int block_row = RootbeerGpu.getBlockIdxy();
-    int block_col = RootbeerGpu.getBlockIdxx();
+    int block_row = RootbeerGpu.getBlockIdxx();
+    //int block_col = RootbeerGpu.getBlockIdxy();
     int row = RootbeerGpu.getThreadIdxx();
-    int col = RootbeerGpu.getThreadIdxy();
+    //int col = RootbeerGpu.getThreadIdxy();
+    int col = 1;
 
     int block_size = m_blockSize;
     
-    RootbeerGpu.setSharedFloat((row*block_size) + col, m_a[row*block_size 
+    RootbeerGpu.setSharedFloat((row*block_size) + col, m_a[row*block_size]); 
   }
-
-  public static int getThreadId() {
-  }
-  
-  public static int getBlockId(){
-  }
-  
-  public static int getBlockSize(){
-  }
-  
-  public static byte getSharedInteger(int index){
-  }
-  
-  public static void setSharedInteger(int index, byte value){
-  }
-  
-
+}
 /*
 __global__ void MatMulKernel(Matrix A, Matrix B, Matrix C) f
 // Block row and column
