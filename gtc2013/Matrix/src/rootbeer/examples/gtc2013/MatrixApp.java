@@ -36,6 +36,7 @@ public class MatrixApp {
   public void cpuRun(){
     int num_cores = Runtime.getRuntime().availableProcessors();
     Stopwatch watch = new Stopwatch();
+    watch.start();
     List<MatrixCpuThread> threads = new ArrayList<MatrixCpuThread>();
     for(int i = 0; i < num_cores; ++i){
       MatrixCpuThread thread = new MatrixCpuThread(m_a, m_b, m_ccpu, i,
@@ -52,6 +53,7 @@ public class MatrixApp {
 
   public void gpuRun(){
     Stopwatch watch = new Stopwatch();
+    watch.start();
     List<Kernel> kernels = new ArrayList<Kernel>();
     for(int i = 0; i < m_blockSize * m_gridSize; ++i){
       kernels.add(new MatrixKernel(m_a, m_b, m_cgpu, m_blockSize));
