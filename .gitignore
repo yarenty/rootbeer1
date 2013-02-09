@@ -50,3 +50,5 @@ examples/QuickSort/QuickSort-GPU.jar
 examples/QuickSort/QuickSort.jar
 examples/RandomDemap/RandomRemapApp-GPU.jar
 examples/RandomDemap/RandomRemapApp.jar
+gtc2013/Matrix/MatrixApp-GPU.jar
+gtc2013/Matrix/MatrixApp.jar
