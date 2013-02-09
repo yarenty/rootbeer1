@@ -28,6 +28,17 @@ public class Rootbeer implements IRootbeer {
     m_threadConfig = new ThreadConfig(block_shape_x, grid_shape_x);
   }
   
+  public void runAll(Kernel job_template){
+    m_stats = new ArrayList<StatsRow>();
+    if(m_threadConfig != null){
+      m_Rootbeer.setThreadConfig(m_threadConfig);
+      m_threadConfig = null;
+    } else {
+      m_Rootbeer.clearThreadConfig();
+    }
+    m_Rootbeer.runAll(job_template);
+  }
+  
   public void runAll(List<Kernel> jobs) {
     if(jobs.isEmpty()){
       m_ranGpu = false;

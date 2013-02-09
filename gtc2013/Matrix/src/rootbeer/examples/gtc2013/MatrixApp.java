@@ -19,7 +19,7 @@ public class MatrixApp {
 
   public MatrixApp(){
     m_blockSize = 64;
-    m_gridSize = 1024;
+    m_gridSize = 64*14;
     m_a = new int[m_blockSize*m_blockSize];
     m_b = new int[m_blockSize*m_blockSize*m_gridSize];
     m_ccpu = new int[m_blockSize*m_blockSize*m_gridSize];
@@ -55,13 +55,9 @@ public class MatrixApp {
   public void gpuRun(){
     Stopwatch watch = new Stopwatch();
     watch.start();
-    List<Kernel> kernels = new ArrayList<Kernel>();
-    for(int i = 0; i < m_blockSize * m_gridSize; ++i){
-      kernels.add(new MatrixKernel(null, null, null, m_blockSize));
-    } 
     Rootbeer rootbeer = new Rootbeer();
     rootbeer.setThreadConfig(m_blockSize, m_gridSize);
-    rootbeer.runAll(kernels);
+    rootbeer.runAll(new MatrixKernel(null, null, null, m_blockSize));
     watch.stop();
     System.out.println("gpu time: "+watch.elapsedTimeMillis()+" ms");
 

@@ -38,6 +38,10 @@ public class ConcreteRootbeer implements IRootbeerInternal {
     }
   }
   
+  public void runAll(Kernel kernel){
+    CudaRuntime2.v().run(kernel, m_rootbeer, m_threadConfig);
+  }
+  
   public Iterator<Kernel> run(Iterator<Kernel> iter) {
     if(Configuration.runtimeInstance().getMode() == Configuration.MODE_NEMU){
       return runOnNativeCpu(iter);

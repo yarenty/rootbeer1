@@ -53,6 +53,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   private long m_NumMultiProcessors;
   private long m_reserveMem;
   private long m_NumBlocks;
+  private int m_NumThreads;
   
   private long m_serializationTime;
   private long m_executionTime;
@@ -166,6 +167,63 @@ public class CudaRuntime2 implements ParallelRuntime {
     test.run(m_ToSpace.get(0));
   }
   
+  public void run(Kernel job_template, Rootbeer rootbeer, ThreadConfig thread_config){
+    m_runStopwatch.start();
+    RootbeerGpu.setIsOnGpu(true);
+    m_FirstJob = (CompiledKernel) job_template;
+    
+    writeSingleBlock(job_template);
+    
+    String filename = m_FirstJob.getCubin();
+    if(filename.endsWith(".error")){
+      return;
+    }
+    if(thread_config == null){
+      calculateShape();
+    } else {
+      m_BlockShape = thread_config.getBlockShapeX();
+      m_GridShape = thread_config.getGridShapeX(); 
+    }
+    compileCode();
+    
+    Object gpu_thrown = null;
+    try {
+      runOnGpu();
+      readSingleBlock(job_template);
+      unload();
+    } catch(Throwable ex){
+      gpu_thrown = ex;
+    } 
+    
+    RootbeerGpu.setIsOnGpu(false);
+    
+    m_runStopwatch.stop();
+    m_overallTime = m_runStopwatch.elapsedTimeMillis();
+    
+    StatsRow stats_row = new StatsRow(m_serializationTime, m_executionTime, 
+                                      m_deserializationTime, m_overallTime, 
+                                      m_GridShape, m_BlockShape);
+    
+    rootbeer.addStatsRow(stats_row);
+    if(gpu_thrown != null){
+      if(gpu_thrown instanceof NullPointerException){
+        NullPointerException null_ex = (NullPointerException) gpu_thrown;
+        throw null_ex;
+      } else if(gpu_thrown instanceof OutOfMemoryError){
+        OutOfMemoryError no_mem = (OutOfMemoryError) gpu_thrown;
+        throw no_mem;
+      } else if(gpu_thrown instanceof Error){
+        Error error = (Error) gpu_thrown;
+        throw error;
+      } else if(gpu_thrown instanceof RuntimeException){
+        RuntimeException runtime_ex = (RuntimeException) gpu_thrown;
+        throw runtime_ex;
+      } else {
+        throw new RuntimeException("unknown exception type.");
+      }
+    }
+  }
+  
   public PartiallyCompletedParallelJob run(Iterator<Kernel> jobs, Rootbeer rootbeer, ThreadConfig thread_config){
     
     m_runStopwatch.start();
@@ -228,6 +286,57 @@ public class CudaRuntime2 implements ParallelRuntime {
     }
   }
 
+  public void writeSingleBlock(Kernel kernel){
+    m_writeBlocksStopwatch.start();
+    for(Memory mem : m_ToSpace){
+      mem.setAddress(0);
+    }
+    m_Handles.activate();
+    m_Handles.resetPointer();
+    m_JobsToWrite.clear();
+    m_JobsWritten.clear();
+    m_HandlesCache.clear();
+    m_NotWritten.clear();
+    m_serializers.clear();
+    
+    ReadOnlyAnalyzer analyzer = null;
+    
+    CompiledKernel compiled_kernel = (CompiledKernel) kernel;
+    Memory mem = m_ToSpace.get(0);
+    Memory texture_mem = m_Texture.get(0);
+    mem.clearHeapEndPtr();
+    texture_mem.clearHeapEndPtr();
+    Serializer visitor = compiled_kernel.getSerializer(mem, texture_mem);
+    visitor.setAnalyzer(analyzer);
+    m_serializers.add(visitor);
+    
+    //write the statics to the heap
+    m_serializers.get(0).writeStaticsToHeap();
+    
+    List<Kernel> items = new ArrayList<Kernel>();
+    items.add(kernel);
+    m_Writers.get(0).write(items, visitor);
+    ToSpaceWriterResult result = m_Writers.get(0).join(); 
+    List<Long> handles = result.getHandles();
+    long handle = handles.get(0);
+    m_HandlesCache.add(handle);
+    for(int i = 0; i < m_NumThreads; ++i){
+      m_Handles.writeLong(handle);
+    }
+
+    m_NumThreads = m_BlockShape * m_GridShape;
+
+    writeClassTypeRef(m_serializers.get(0).getClassRefArray());
+    
+    m_writeBlocksStopwatch.stop();
+    m_serializationTime = m_writeBlocksStopwatch.elapsedTimeMillis();
+    
+    if(Configuration.getPrintMem()){
+      BufferPrinter printer = new BufferPrinter();
+      printer.print(m_ToSpace.get(0), 0, 896);
+    }
+  }
+  
   public boolean writeBlocks(Iterator<Kernel> iter) {
     m_writeBlocksStopwatch.start();
     for(Memory mem : m_ToSpace){
@@ -302,7 +411,7 @@ public class CudaRuntime2 implements ParallelRuntime {
         m_Handles.writeLong(handle);
       }
     }
-    
+    m_NumThreads = m_JobsWritten.size();
     m_Partial.addNotWritten(m_NotWritten);
 
     writeClassTypeRef(m_serializers.get(0).getClassRefArray());
@@ -335,7 +444,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   private void runOnGpu(){    
     try {
       m_runOnGpuStopwatch.start();
-      runBlocks(m_JobsWritten.size(), m_BlockShape, m_GridShape); 
+      runBlocks(m_NumThreads, m_BlockShape, m_GridShape); 
       m_runOnGpuStopwatch.stop();
       m_executionTime = m_runOnGpuStopwatch.elapsedTimeMillis();
     } catch(CudaErrorException ex){
@@ -350,6 +459,57 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_BlockShaper.run(m_JobsWritten.size(), m_NumMultiProcessors);
     m_GridShape = m_BlockShaper.gridShape();
     m_BlockShape = m_BlockShaper.blockShape();
+  }
+  
+  public void readSingleBlock(Kernel kernel){
+    m_readBlocksStopwatch.start();
+    m_ToSpace.get(0).setAddress(0);    
+    
+    m_ExceptionHandles.activate();
+    
+    if(Configuration.getPrintMem()){
+      BufferPrinter printer = new BufferPrinter();
+      printer.print(m_ToSpace.get(0), 0, 2048);
+    }
+    
+    for(int i = 0; i < m_NumThreads; ++i){
+      long ref = m_ExceptionHandles.readLong();
+      if(ref != 0){
+        long ref_num = ref >> 4;
+        if(ref_num == m_FirstJob.getNullPointerNumber()){
+          throw new NullPointerException(); 
+        } else if(ref_num == m_FirstJob.getOutOfMemoryNumber()){
+          throw new OutOfMemoryError();
+        }
+        Memory mem = m_ToSpace.get(0);
+        Memory texture_mem = m_Texture.get(0);
+        Serializer visitor = m_serializers.get(0);
+        mem.setAddress(ref);           
+        Object except = visitor.readFromHeap(null, true, ref);
+        if(except instanceof Error){
+          Error except_th = (Error) except;
+          throw except_th;
+        } else {
+          throw new RuntimeException((Throwable) except);
+        }
+      }
+    }    
+    
+    //read the statics from the heap
+    m_serializers.get(0).readStaticsFromHeap();
+    
+    Serializer visitor = m_serializers.get(0);
+    
+    long handle = m_HandlesCache.get(0);
+    List<Long> handles = new ArrayList<Long>();
+    handles.add(handle);
+    List<Kernel> jobs = new ArrayList<Kernel>();
+    jobs.add(kernel);
+    m_Readers.get(0).read(jobs, handles, visitor);
+    m_Readers.get(0).join();  
+    
+    m_readBlocksStopwatch.stop();
+    m_deserializationTime = m_readBlocksStopwatch.elapsedTimeMillis();
   }
   
   public void readBlocks() {    
