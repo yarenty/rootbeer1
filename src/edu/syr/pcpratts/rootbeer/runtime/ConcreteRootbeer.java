@@ -26,15 +26,27 @@ public class ConcreteRootbeer implements IRootbeerInternal {
   public ConcreteRootbeer(Rootbeer rootbeer){
     m_rootbeer = rootbeer;
     m_GpuWorking = true;
-    if(Configuration.runtimeInstance().getMode() == Configuration.MODE_GPU) {
-      CudaRuntime2.v();
-    }
   }
 
   public void runAll(List<Kernel> list){
-    Iterator<Kernel> iter = run(list.iterator());
+    if(list.isEmpty()){
+      return;
+    }
+    Iterator<Kernel> iter = run(list.iterator(), list.get(0));
     while(iter.hasNext()){
       iter.next();
+    }
+  }
+  
+  private Iterator<Kernel> run(Iterator<Kernel> iter, Kernel first) {
+    if(Configuration.runtimeInstance().getMode() == Configuration.MODE_NEMU){
+      return runOnNativeCpu(iter);
+    } else if(Configuration.runtimeInstance().getMode() == Configuration.MODE_JEMU ||
+      first instanceof CompiledKernel == false){
+      
+      return runOnCpu(iter);
+    } else {
+      return runOnCudaGpu(iter);
     }
   }
   

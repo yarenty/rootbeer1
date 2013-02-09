@@ -8,9 +8,6 @@
 package edu.syr.pcpratts.rootbeer.runtime;
 
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
-import soot.Scene;
-import soot.SootClass;
-import soot.rbclassload.RootbeerClassLoader;
 
 public interface CompiledKernel {
   public String getCodeUnix();
