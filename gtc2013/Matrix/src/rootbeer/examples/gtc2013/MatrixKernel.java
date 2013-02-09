@@ -26,7 +26,7 @@ public class MatrixKernel implements Kernel {
 
     int block_size = m_blockSize;
     
-    RootbeerGpu.setSharedFloat((row*block_size) + col, m_a[row*block_size]); 
+    //RootbeerGpu.setSharedFloat((row*block_size) + col, m_a[row*block_size]); 
   }
 }
 /*
