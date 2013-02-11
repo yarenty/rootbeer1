@@ -13,30 +13,26 @@ import edu.syr.pcpratts.rootbeer.test.TestKernelTemplate;
 
 public class FastMatrixTest implements TestKernelTemplate {
 
-  private int m_a[];
-  private int m_b[];
-  private int m_c[];
-  private int m_blockSize;
-  private int m_gridSize;
-
-  public FastMatrixTest(){
+  int m_blockSize = 64;
+  int m_gridSize = 64*14;
+  public FastMatrixTest(){ 
     m_blockSize = 64;
     m_gridSize = 64*14;
-    m_a = new int[m_blockSize*m_blockSize];
-    m_b = new int[m_blockSize*m_blockSize*m_gridSize];
-    m_c = new int[m_blockSize*m_blockSize*m_gridSize];
-
-    for(int i = 0; i < m_a.length; ++i){
-      m_a[i] = i;
-    }
-
-    for(int i = 0; i < m_b.length; ++i){
-      m_b[i] = i;
-    }
   }
 
   public Kernel create() {
-    Kernel ret = new MatrixKernel(m_a, m_b, m_c, m_blockSize, m_gridSize);
+    int[] a = new int[m_blockSize*m_blockSize];
+    int[] b = new int[m_blockSize*m_blockSize*m_gridSize];
+    int[] c = new int[m_blockSize*m_blockSize*m_gridSize];
+
+    for(int i = 0; i < a.length; ++i){
+      a[i] = i;
+    }
+
+    for(int i = 0; i < b.length; ++i){
+      b[i] = i;
+    }
+    Kernel ret = new MatrixKernel(a, b, c, m_blockSize, m_gridSize);
     return ret;
   }
 
