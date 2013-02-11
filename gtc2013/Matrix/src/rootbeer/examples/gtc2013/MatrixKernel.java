@@ -33,13 +33,9 @@ public class MatrixKernel implements Kernel {
       sum += m_a[i*a_columns+k] + m_b[k*b_columns+j];
     }
     //m_c[i*b_columns+j] = sum;
-    m_c[0] = 10;
+    m_c[i*b_columns+j] = 100;
 
     //RootbeerGpu.setSharedFloat((row*block_size) + col, m_a[row*block_size]); 
-  }
-
-  public int[] getC(){
-    return m_c;
   }
 }
 /*

@@ -59,7 +59,6 @@ public class MatrixApp {
     Rootbeer rootbeer = new Rootbeer();
     rootbeer.setThreadConfig(m_blockSize, m_gridSize);
     rootbeer.runAll(matrix_kernel);
-    m_cgpu = matrix_kernel.getC();
     watch.stop();
     System.out.println("gpu time: "+watch.elapsedTimeMillis()+" ms");
 
@@ -73,6 +72,19 @@ public class MatrixApp {
       System.out.println("    num blocks: "+row.getNumBlocks());
       System.out.println("    num threads: "+row.getNumThreads());
     }
+
+    System.out.println("m_cgpu:");
+    int num = 0;
+    for(int index = 0; index < 64*10; ++index){
+      System.out.print(m_cgpu[index]+" ");
+      if(num == m_blockSize){
+        System.out.println();
+        num = 0;
+      } else {
+        ++num;
+      }
+    }
+    System.out.println();
   }
 
   private void verify(){
