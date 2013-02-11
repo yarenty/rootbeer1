@@ -29,6 +29,12 @@ public class Rootbeer implements IRootbeer {
   }
   
   public void runAll(Kernel job_template){
+    if(job_template instanceof CompiledKernel == false){
+      m_ranGpu = false;
+    }
+    //this must happen above Rootbeer.runAll in case exceptions are thrown
+    m_ranGpu = true;
+      
     m_stats = new ArrayList<StatsRow>();
     if(m_threadConfig != null){
       m_Rootbeer.setThreadConfig(m_threadConfig);
