@@ -44,7 +44,7 @@ public class MatrixCpuThread implements Runnable {
         for(int k = 0; k < a_columns; ++k){
           sum += m_a[i*a_columns+k] + m_b[k*b_columns+j];
         }
-        //m_c[i*b_columns+j] = sum;
+        m_c[i*b_columns+j] = sum;
       } 
     }
   }

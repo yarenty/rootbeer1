@@ -34,7 +34,7 @@ public class MatrixApp {
     }
   }
 
-  public void cpuRun(){
+  private void cpuRun(){
     int num_cores = Runtime.getRuntime().availableProcessors();
     Stopwatch watch = new Stopwatch();
     watch.start();
@@ -52,12 +52,14 @@ public class MatrixApp {
     System.out.println("cpu time: "+watch.elapsedTimeMillis()+" ms");
   }
 
-  public void gpuRun(){
+  private void gpuRun(){
     Stopwatch watch = new Stopwatch();
     watch.start();
+    MatrixKernel matrix_kernel = new MatrixKernel(m_a, m_b, m_cgpu, m_blockSize, m_gridSize);
     Rootbeer rootbeer = new Rootbeer();
     rootbeer.setThreadConfig(m_blockSize, m_gridSize);
-    rootbeer.runAll(new MatrixKernel(null, null, null, m_blockSize));
+    rootbeer.runAll(matrix_kernel);
+    m_cgpu = matrix_kernel.getC();
     watch.stop();
     System.out.println("gpu time: "+watch.elapsedTimeMillis()+" ms");
 
@@ -73,9 +75,25 @@ public class MatrixApp {
     }
   }
 
+  private void verify(){
+    for(int i = 0; i < m_ccpu.length; ++i){
+      int cpu_value = m_ccpu[i];
+      int gpu_value = m_cgpu[i];
+      if(cpu_value != gpu_value){
+        System.out.println("Verify Failed.");
+        System.out.println("  cpu_value: "+cpu_value);
+        System.out.println("  gpu_value: "+gpu_value);
+        System.out.println("  index: "+i);
+        System.exit(1);
+      }
+    }
+    System.out.println("Verify PASSED!");
+  }
+
   public void run(){
     cpuRun();
     gpuRun();
+    verify();
   }
 
   public static void main(String[] args){
