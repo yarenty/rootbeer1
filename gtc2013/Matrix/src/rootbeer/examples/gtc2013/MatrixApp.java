@@ -19,7 +19,7 @@ public class MatrixApp {
 
   public MatrixApp(){
     m_blockSize = 64;
-    m_gridSize = 1024;
+    m_gridSize = 64*14;
     m_a = new int[m_blockSize*m_blockSize];
     m_b = new int[m_blockSize*m_blockSize*m_gridSize];
     m_ccpu = new int[m_blockSize*m_blockSize*m_gridSize];
@@ -34,7 +34,7 @@ public class MatrixApp {
     }
   }
 
-  public void cpuRun(){
+  private void cpuRun(){
     int num_cores = Runtime.getRuntime().availableProcessors();
     Stopwatch watch = new Stopwatch();
     watch.start();
@@ -52,16 +52,13 @@ public class MatrixApp {
     System.out.println("cpu time: "+watch.elapsedTimeMillis()+" ms");
   }
 
-  public void gpuRun(){
+  private void gpuRun(){
     Stopwatch watch = new Stopwatch();
     watch.start();
-    List<Kernel> kernels = new ArrayList<Kernel>();
-    for(int i = 0; i < m_blockSize * m_gridSize; ++i){
-      kernels.add(new MatrixKernel(null, null, null, m_blockSize));
-    } 
+    MatrixKernel matrix_kernel = new MatrixKernel(m_a, m_b, m_cgpu, m_blockSize, m_gridSize);
     Rootbeer rootbeer = new Rootbeer();
     rootbeer.setThreadConfig(m_blockSize, m_gridSize);
-    rootbeer.runAll(kernels);
+    rootbeer.runAll(matrix_kernel);
     watch.stop();
     System.out.println("gpu time: "+watch.elapsedTimeMillis()+" ms");
 
@@ -75,11 +72,40 @@ public class MatrixApp {
       System.out.println("    num blocks: "+row.getNumBlocks());
       System.out.println("    num threads: "+row.getNumThreads());
     }
+
+    System.out.println("m_cgpu:");
+    int num = 0;
+    for(int index = 0; index < 64*10; ++index){
+      System.out.print(m_cgpu[index]+" ");
+      if(num == m_blockSize){
+        System.out.println();
+        num = 0;
+      } else {
+        ++num;
+      }
+    }
+    System.out.println();
+  }
+
+  private void verify(){
+    for(int i = 0; i < m_ccpu.length; ++i){
+      int cpu_value = m_ccpu[i];
+      int gpu_value = m_cgpu[i];
+      if(cpu_value != gpu_value){
+        System.out.println("Verify Failed.");
+        System.out.println("  cpu_value: "+cpu_value);
+        System.out.println("  gpu_value: "+gpu_value);
+        System.out.println("  index: "+i);
+        System.exit(1);
+      }
+    }
+    System.out.println("Verify PASSED!");
   }
 
   public void run(){
     cpuRun();
     gpuRun();
+    verify();
   }
 
   public static void main(String[] args){

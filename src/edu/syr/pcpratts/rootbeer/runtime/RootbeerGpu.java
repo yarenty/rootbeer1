@@ -14,6 +14,8 @@ public class RootbeerGpu {
 
   private static boolean m_isOnGpu;
   private static byte[] m_sharedMem;
+  private static int m_blockIdxx;
+  private static int m_threadIdxx;
   
   static {
     m_isOnGpu = false;
@@ -36,11 +38,19 @@ public class RootbeerGpu {
   }
   
   public static int getThreadIdxx(){
-    return 0;
+    return m_threadIdxx;
   }
   
   public static int getBlockIdxx(){
-    return 0;
+    return m_blockIdxx;
+  }
+  
+  public static void setThreadIdxx(int thread_idxx){
+    m_threadIdxx = thread_idxx;
+  }
+  
+  public static void setBlockIdxx(int block_idxx){
+    m_blockIdxx = block_idxx;
   }
   
   public static int getBlockDimx(){

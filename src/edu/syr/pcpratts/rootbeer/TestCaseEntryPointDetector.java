@@ -34,6 +34,7 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
     m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.baseconversion.");
     m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.");
     m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.");
+    m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.");
     m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.ofcoarse.");
     m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.");
     m_testCasePackages.add("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.");

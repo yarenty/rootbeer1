@@ -19,6 +19,12 @@ public class LoadTestSerialization {
     }
     return factory.getProviders();
   }
+  
+  public List<TestKernelTemplate> loadKernelTemplate(ClassLoader loader, String class_name) throws Exception {
+    Object instance = doLoad(loader, class_name);
+    TestKernelTemplateFactory factory = (TestKernelTemplateFactory) instance;
+    return factory.getProviders();
+  }
 
   public List<TestException> loadException(ClassLoader loader, String class_name) throws Exception {
     Object instance = doLoad(loader, class_name);

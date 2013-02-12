@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface IRootbeerInternal {
 
+  void runAll(Kernel jobs);
   void runAll(List<Kernel> jobs);
   Iterator<Kernel> run(Iterator<Kernel> jobs);
   void setThreadConfig(ThreadConfig thread_config);
