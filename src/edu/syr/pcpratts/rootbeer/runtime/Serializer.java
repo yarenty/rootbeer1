@@ -110,11 +110,6 @@ public abstract class Serializer {
     result = checkWriteCache(o, size, read_only, mMem);
     if(result.m_NeedToWrite == false)
       return result.m_Ref;
-    if(o == null){
-      System.out.println("writing null to heap at: "+result.m_Ref);
-    } else {
-      System.out.println("writing: "+o.toString()+" at: "+result.m_Ref);
-    }
     doWriteToHeap(o, write_data, result.m_Ref, read_only);
     return result.m_Ref;
   }
@@ -131,22 +126,17 @@ public abstract class Serializer {
   }
 
   public Object readFromHeap(Object o, boolean read_data, long address){
-    System.out.println("reading: "+o.toString()+" from: "+address);
     synchronized(mReadFromGpuCache){
       if(mReadFromGpuCache.containsKey(address)){
-        System.out.println("in cache");
         Object ret = mReadFromGpuCache.get(address);  
         return ret;
       }
     }
     long null_ptr_check = address >> 4;
     if(null_ptr_check == -1){
-      System.out.println("null pointer");
       return null;
     }
-    System.out.println("made it");
     Object ret = doReadFromHeap(o, read_data, address);
-    
     return checkCache(address, ret);
   }
 

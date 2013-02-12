@@ -48,6 +48,7 @@ public class ConcreteRootbeer implements IRootbeerInternal {
     } else {
       return runOnCudaGpu(iter);
     }
+  }
 
   public void runAll(Kernel kernel){
     CudaRuntime2.v().run(kernel, m_rootbeer, m_threadConfig);
