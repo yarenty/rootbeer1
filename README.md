@@ -50,11 +50,9 @@ MCB-0746066 to R.D.W. and God is most high.
 You need to have the CUDA Toolkit and CUDA Driver installed to use Rootbeer.
 Download it from http://www.nvidia.com/content/cuda/cuda-downloads.html
 
-## Information about Rootbeer
+## Open Source
 
-Rootbeer announcements are pushed to @rootbeer_gpu
-
-Rootbeer mailing list: [http://chirrup.org/pipermail/rootbeer-dev/](http://chirrup.org/pipermail/rootbeer-dev/)
+We are talking on: https://trifort.campfirenow.com/8c150
 
 ## Clarifications
 
