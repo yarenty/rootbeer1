@@ -52,9 +52,7 @@ Download it from http://www.nvidia.com/content/cuda/cuda-downloads.html
 
 ## Information about Rootbeer
 
-Rootbeer announcements are pushed to @rootbeer_gpu
-
-Rootbeer mailing list: [http://chirrup.org/pipermail/rootbeer-dev/](http://chirrup.org/pipermail/rootbeer-dev/)
++ [irc.freenode.net / #rootbeer_gpu].
 
 ## Clarifications
 
