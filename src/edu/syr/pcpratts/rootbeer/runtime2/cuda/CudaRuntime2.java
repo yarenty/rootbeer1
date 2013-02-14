@@ -13,6 +13,8 @@ import edu.syr.pcpratts.rootbeer.runtime.*;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
 import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.FastMatrixTest;
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.MatrixKernel;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
 import java.io.*;
 import java.util.ArrayList;
@@ -169,6 +171,11 @@ public class CudaRuntime2 implements ParallelRuntime {
     RootbeerGpu.setIsOnGpu(true);
     m_FirstJob = (CompiledKernel) job_template;
     
+    if(thread_config != null){
+      m_BlockShape = thread_config.getBlockShapeX();
+      m_GridShape = thread_config.getGridShapeX(); 
+      m_NumThreads = m_BlockShape * m_GridShape;
+    }
     writeSingleBlock(job_template);
     
     String filename = m_FirstJob.getCubin();
@@ -177,10 +184,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     }
     if(thread_config == null){
       calculateShape();
-    } else {
-      m_BlockShape = thread_config.getBlockShapeX();
-      m_GridShape = thread_config.getGridShapeX(); 
-    }
+    } 
     compileCode();
     
     Object gpu_thrown = null;
@@ -240,6 +244,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     } else {
       m_BlockShape = thread_config.getBlockShapeX();
       m_GridShape = thread_config.getGridShapeX(); 
+      m_NumThreads = m_BlockShape * m_GridShape;
     }
     compileCode();
     
@@ -320,9 +325,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     for(int i = 0; i < m_NumThreads; ++i){
       m_Handles.writeLong(handle);
     }
-
-    m_NumThreads = m_BlockShape * m_GridShape;
-
+    
     writeClassTypeRef(m_serializers.get(0).getClassRefArray());
     
     m_writeBlocksStopwatch.stop();
@@ -432,7 +435,7 @@ public class CudaRuntime2 implements ParallelRuntime {
       for(byte[] sub_buffer : buffer){
         total_len += sub_buffer.length;
       }
-      loadFunction(getHeapEndPtr(), buffer, buffer.size(), total_len, m_JobsWritten.size());
+      loadFunction(getHeapEndPtr(), buffer, buffer.size(), total_len, m_NumThreads);
     } catch(Exception ex){
       ex.printStackTrace();
     }
@@ -517,11 +520,8 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_ExceptionHandles.activate();
     
     if(Configuration.getPrintMem()){
-      System.out.println("printing mem");
       BufferPrinter printer = new BufferPrinter();
       printer.print(m_ToSpace.get(0), 0, 2048);
-    } else {
-      System.out.println("not printing mem");
     }
     
     for(int i = 0; i < m_JobsWritten.size(); ++i){
