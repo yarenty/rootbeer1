@@ -41,6 +41,10 @@ public class Configuration {
   private static boolean m_printMem;
   private boolean m_remapAll;
   
+  static {
+    m_printMem = false;
+  }
+  
   private Configuration(){
     m_compilerInstance = true;
     m_remapAll = true;

@@ -123,10 +123,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_Handles = new Handles(m_HandlesAddr, m_GpuHandlesAddr);
     m_ExceptionHandles = new Handles(m_ExceptionsHandlesAddr, m_GpuExceptionsHandlesAddr);
     m_CpuRunner = new CpuRunner();
-    
-    //this will be overwitten in edu.syr.pcpratts.rootbeer.runtime.Rootbeer.<init>(boolean)
-    Configuration.setPrintMem(false);
-    
+        
     m_ctorStopwatch.stop();
     m_initTime = m_ctorStopwatch.elapsedTimeMillis();
   }
@@ -520,8 +517,11 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_ExceptionHandles.activate();
     
     if(Configuration.getPrintMem()){
+      System.out.println("printing mem");
       BufferPrinter printer = new BufferPrinter();
       printer.print(m_ToSpace.get(0), 0, 2048);
+    } else {
+      System.out.println("not printing mem");
     }
     
     for(int i = 0; i < m_JobsWritten.size(); ++i){

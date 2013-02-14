@@ -210,6 +210,7 @@ public class RootbeerTestAgent {
     try {      
       Rootbeer rootbeer = new Rootbeer();
       Configuration.setPrintMem(print_mem);
+      System.out.println("print_mem: "+print_mem);
       Kernel known_good_item = creator.create();
       Kernel testing_item = creator.create();
       ThreadConfig thread_config = creator.getThreadConfig();
