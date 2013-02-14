@@ -18,8 +18,8 @@ public class MatrixApp {
   private int m_gridSize;
 
   public MatrixApp(){
-    m_blockSize = 64;
-    m_gridSize = 64*14;
+    m_blockSize = 128;
+    m_gridSize = 128*14;
     m_a = new int[m_blockSize*m_blockSize];
     m_b = new int[m_blockSize*m_blockSize*m_gridSize];
     m_ccpu = new int[m_blockSize*m_blockSize*m_gridSize];
@@ -72,19 +72,6 @@ public class MatrixApp {
       System.out.println("    num blocks: "+row.getNumBlocks());
       System.out.println("    num threads: "+row.getNumThreads());
     }
-
-    System.out.println("m_cgpu:");
-    int num = 0;
-    for(int index = 0; index < 64*10; ++index){
-      System.out.print(m_cgpu[index]+" ");
-      if(num == m_blockSize){
-        System.out.println();
-        num = 0;
-      } else {
-        ++num;
-      }
-    }
-    System.out.println();
   }
 
   private void verify(){
@@ -109,8 +96,7 @@ public class MatrixApp {
   }
 
   public static void main(String[] args){
-    //initialize CudaRuntime2.v()
-    Rootbeer rootbeer = new Rootbeer();
+    Rootbeer.init();
 
     MatrixApp app = new MatrixApp();
     app.run();
