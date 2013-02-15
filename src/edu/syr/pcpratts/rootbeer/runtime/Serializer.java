@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.runtime;
 
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
+import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.MatrixKernel;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -111,7 +112,15 @@ public abstract class Serializer {
     result = checkWriteCache(o, size, read_only, mMem);
     if(result.m_NeedToWrite == false)
       return result.m_Ref;
+    Stopwatch watch = new Stopwatch();
+    watch.start();
     doWriteToHeap(o, write_data, result.m_Ref, read_only);
+    watch.stop();
+    if(o != null){
+      System.out.println("writeToHeap: "+o.toString()+" "+watch.elapsedTimeMillis()+"ms");
+    } else {
+      System.out.println("writeToHeap: null "+watch.elapsedTimeMillis()+"ms");  
+    }
     return result.m_Ref;
   }
   
