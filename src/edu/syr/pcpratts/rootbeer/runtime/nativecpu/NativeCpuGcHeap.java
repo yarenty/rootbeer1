@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.runtime.nativecpu;
 
+import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 import edu.syr.pcpratts.rootbeer.runtime.Serializer;
 import edu.syr.pcpratts.rootbeer.runtime.gpu.GcHeap;
 import edu.syr.pcpratts.rootbeer.runtime.gpu.GpuDevice;

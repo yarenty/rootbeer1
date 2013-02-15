@@ -93,6 +93,7 @@ public abstract class GcHeap {
     mBlocks.add(block);
     long ref = mGcObjectVisitor.writeToHeap(block, true);
     mHandlesMemory.writeLong(ref);
+    
     m_HandlesList.add(ref);
     if(mUsingGarbageCollector){
       long to_handle_map_memory_address = ref*4;
@@ -114,6 +115,59 @@ public abstract class GcHeap {
     return (CompiledKernel) job;
   }
 
+  public int writeRuntimeBasicBlock(Kernel kernel_template, int num_threads){
+    Stopwatch watch = new Stopwatch();
+    watch.start();
+    
+    mBlocks = new ArrayList<CompiledKernel>();
+    m_HandlesList.clear();
+    
+    CompiledKernel first_block = (CompiledKernel) kernel_template;
+    
+    //mUsingGarbageCollector = first_block.isUsingGarbageCollector();
+    mUsingGarbageCollector = false;
+    mGcObjectVisitor = first_block.getSerializer(mToSpaceMemory, mTextureMemory);
+
+    mHeapEndPtrMemory.setAddress(0);
+    mHandlesMemory.setAddress(0);
+    mToSpaceMemory.setAddress(0);
+    mToSpaceMemory.clearHeapEndPtr();
+    
+    if(mUsingGarbageCollector){
+      makeSureReadyForUsingGarbageCollector();
+    }
+
+    //write statics
+    mGcObjectVisitor.writeStaticsToHeap();
+    
+    m_PreviousRef = 0;
+    m_PreviousSize = 0;
+    m_CountWritten = 1;
+    mMaxToHandleMapAddress = -1;
+
+    writeOneRuntimeBasicBlock(first_block);
+    for(int i = 1; i < num_threads; ++i){
+      m_HandlesList.add(m_PreviousRef);
+    }
+    
+    long heap_end_ptr = mToSpaceMemory.getHeapEndPtr();
+    mHeapEndPtrMemory.writeLong(heap_end_ptr);
+    
+    mToSpaceMemory.finishCopy(mToSpaceMemory.getHeapEndPtr());    
+    
+    mHandlesMemory.finishCopy(m_CountWritten*8); //8 is sizeof long
+    if(mUsingGarbageCollector){
+      mToHandleMapMemory.finishCopy(mMaxToHandleMapAddress);
+    }
+    mHeapEndPtrMemory.finishCopy(8);    
+       
+    if(Configuration.getPrintMem()){
+      BufferPrinter printer = new BufferPrinter();
+      printer.print(mToSpaceMemory, 0, 1024);
+    }
+    return m_CountWritten;
+  }
+  
   public int writeRuntimeBasicBlocks(Iterator<Kernel> jobs){
     Stopwatch watch = new Stopwatch();
     watch.start();
@@ -178,6 +232,49 @@ public abstract class GcHeap {
 
   protected abstract void allocateMemory();
 
+
+  public void readRuntimeBasicBlock(Kernel kernel_template) {
+    if(Configuration.getPrintMem()){
+      BufferPrinter printer1 = new BufferPrinter();
+      printer1.print(mToSpaceMemory, 0, 1024);
+    }
+    
+    CompiledKernel first_block = (CompiledKernel) kernel_template;
+    
+    Stopwatch watch = new Stopwatch();
+    watch.start();
+    
+    mHandlesMemory.setAddress(0);
+
+    //read statics
+    mToSpaceMemory.setAddress(0);    
+        
+    mGcObjectVisitor.readStaticsFromHeap();
+    
+    mExceptionsMemory.setAddress(0);
+    for(int i = 0; i < m_CountWritten; ++i){
+      int reference = mExceptionsMemory.readInt();
+      if(reference == first_block.getNullPointerNumber()){
+        throw new NullPointerException();
+      }
+      if(reference != 0){
+        mToSpaceMemory.setAddress(reference);
+        Object o = mGcObjectVisitor.readFromHeap(null, true, reference);
+        throw new RuntimeException((Throwable) o);
+      }
+    }
+    
+    long reference = m_HandlesList.get(0);
+    mToSpaceMemory.setAddress(reference);
+    mGcObjectVisitor.readFromHeap(kernel_template, true, reference);
+        
+    mHandlesMemory.finishRead();
+    mToSpaceMemory.finishRead();
+    if(mUsingGarbageCollector){
+      mToHandleMapMemory.finishRead();
+    }
+  }
+  
   public PartiallyCompletedParallelJob readRuntimeBasicBlocks(){    
     if(Configuration.getPrintMem()){
       BufferPrinter printer1 = new BufferPrinter();

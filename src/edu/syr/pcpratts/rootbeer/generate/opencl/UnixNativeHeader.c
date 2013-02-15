@@ -6,6 +6,8 @@
 #include <pthread.h>
 
 pthread_key_t threadIdKey = 0;
+pthread_key_t threadIdxxKey = 0;
+pthread_key_t blockIdxxKey = 0;
 pthread_mutex_t atom_add_mutex;
 pthread_mutex_t thread_id_mutex;
 pthread_attr_t attr;
@@ -28,6 +30,14 @@ void unlock_thread_id(){
 
 int getThreadId(){
   return (int) pthread_getspecific(threadIdKey);
+}
+
+int getThreadIdxx(){
+  return (int) pthread_getspecific(threadIdxxKey);
+}
+
+int getBlockIdxx(){
+  return (int) pthread_getspecific(blockIdxxKey);
 }
 
 long long java_lang_System_nanoTime(char * gc_info, int * exception){

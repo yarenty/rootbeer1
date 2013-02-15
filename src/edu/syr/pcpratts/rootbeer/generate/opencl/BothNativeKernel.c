@@ -2,6 +2,8 @@
 char * global_gc_info;
 long long * global_handles;
 int thread_id;
+int global_block_shape;
+int global_thread_shape;
 int global_num_threads;
 long long * global_exceptions;
 int * global_class_refs;

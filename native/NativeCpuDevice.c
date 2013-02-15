@@ -24,7 +24,7 @@ jbyteArray array_get(JNIEnv * env, jobject array, int index){
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCpuDevice_runOnCpu
   (JNIEnv * env, jobject this_ptr, jobject to_space_array, jint to_space_count, 
    jbyteArray handles, jbyteArray heap_end_ptr, jbyteArray gc_info, jbyteArray exceptions, jintArray java_lang_class_refs, 
-   jint num_threads, jstring lib_name){
+   jint num_threads, jint block_shape, jint thread_shape, jstring lib_name){
 
   int i;
   jbyte * nhandles;
@@ -37,7 +37,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   jbyteArray curr_to_space;
 
   void (*entry)(char * gc_info_space, jlong * to_space, jlong * handles, 
-    jlong * to_space_free_ptr, jlong * exceptions, jint * class_refs, jlong space_size, int num_threads);
+    jlong * to_space_free_ptr, jlong * exceptions, jint * class_refs, 
+    jlong space_size, int num_threads, int block_shape, int thread_shape);
   
 #if (defined linux || defined __APPLE_CC__)  
   void * lib_handle;
@@ -73,7 +74,9 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   entry = GetProcAddress(lib_handle, "entry");
 #endif
   
-  (*entry)((char *) ngc_info, to_space, (jlong *) nhandles, (jlong *) nheap_end_ptr, (jlong *) nexceptions, (jint *) nclass_refs, 100*1024*1024, num_threads);  
+  (*entry)((char *) ngc_info, to_space, (jlong *) nhandles, (jlong *) nheap_end_ptr,
+    (jlong *) nexceptions, (jint *) nclass_refs, 100*1024*1024, num_threads,
+    block_shape, thread_shape);  
 
 #if (defined linux || defined __APPLE_CC__)  
   dlclose(lib_handle);

@@ -13,10 +13,12 @@ import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 import edu.syr.pcpratts.rootbeer.runtime.CompiledKernel;
 import edu.syr.pcpratts.rootbeer.runtime.Serializer;
+import edu.syr.pcpratts.rootbeer.runtime.ThreadConfig;
 import edu.syr.pcpratts.rootbeer.runtime.gpu.GcHeap;
 import edu.syr.pcpratts.rootbeer.runtime.gpu.GpuDevice;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BasicMemory;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
+import edu.syr.pcpratts.rootbeer.runtime2.cuda.BlockShaper;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
 import java.io.File;
 import java.io.PrintWriter;
@@ -27,9 +29,11 @@ public class NativeCpuDevice implements GpuDevice {
   
   private List<CompiledKernel> m_Blocks;
   private boolean m_nativeCpuInitialized;
+  private BlockShaper m_blockShaper;
   
   public NativeCpuDevice(){
     m_nativeCpuInitialized = false;
+    m_blockShaper = new BlockShaper();
   }
   
   public GcHeap CreateHeap() {
@@ -42,6 +46,32 @@ public class NativeCpuDevice implements GpuDevice {
 
   public void flushQueue() {
     
+  }
+  
+  public void run(Kernel kernel_template, ThreadConfig thread_config){
+    int block_shape = thread_config.getGridShapeX();
+    int thread_shape = thread_config.getBlockShapeX();
+    int num_threads = block_shape * thread_shape;
+    NativeCpuGcHeap heap = new NativeCpuGcHeap(this);
+    int size = heap.writeRuntimeBasicBlock(kernel_template, num_threads);
+    m_Blocks = heap.getBlocks();
+    
+    List<Memory> mems = heap.getMemory();    
+    String lib_name = compileNativeCpuDev();
+    BasicMemory to_space = (BasicMemory) mems.get(0);
+    BasicMemory handles = (BasicMemory) mems.get(1);
+    BasicMemory heap_end_ptr = (BasicMemory) mems.get(2);
+    BasicMemory gc_info = (BasicMemory) mems.get(3);
+    BasicMemory exceptions = (BasicMemory) mems.get(4);
+    
+    Serializer serializer = heap.getSerializer();
+    runOnCpu(to_space.getBuffer(), to_space.getBuffer().size(), 
+      handles.getBuffer().get(0), heap_end_ptr.getBuffer().get(0),
+      gc_info.getBuffer().get(0), exceptions.getBuffer().get(0), 
+      serializer.getClassRefArray(), size, block_shape, thread_shape, 
+      lib_name);
+    
+    heap.readRuntimeBasicBlock(kernel_template);
   }
 
   public PartiallyCompletedParallelJob run(Iterator<Kernel> blocks) {
@@ -57,9 +87,15 @@ public class NativeCpuDevice implements GpuDevice {
     BasicMemory gc_info = (BasicMemory) mems.get(3);
     BasicMemory exceptions = (BasicMemory) mems.get(4);
     
+    m_blockShaper.run(m_Blocks.size(), 14);
+    int block_shape = m_blockShaper.gridShape();
+    int thread_shape = m_blockShaper.blockShape();
+    
     Serializer serializer = heap.getSerializer();
-    runOnCpu(to_space.getBuffer(), to_space.getBuffer().size(), handles.getBuffer().get(0), heap_end_ptr.getBuffer().get(0),
-      gc_info.getBuffer().get(0), exceptions.getBuffer().get(0), serializer.getClassRefArray(), size, lib_name);
+    runOnCpu(to_space.getBuffer(), to_space.getBuffer().size(), 
+      handles.getBuffer().get(0), heap_end_ptr.getBuffer().get(0),
+      gc_info.getBuffer().get(0), exceptions.getBuffer().get(0), 
+      serializer.getClassRefArray(), size, block_shape, thread_shape, lib_name);
     
     PartiallyCompletedParallelJob ret = heap.readRuntimeBasicBlocks();    
     return ret;
@@ -67,7 +103,8 @@ public class NativeCpuDevice implements GpuDevice {
   
   private native void runOnCpu(List<byte[]> to_space, int to_space_size, 
     byte[] handles, byte[] heap_end_ptr, byte[] gc_info, byte[] exceptions, 
-    int[] java_lang_class_refs, int num_threads, String library_name);
+    int[] java_lang_class_refs, int num_threads, int block_shape, 
+    int thread_shape, String library_name);
 
   public long getMaxMemoryAllocSize() {
     return 1024*1024*1024;

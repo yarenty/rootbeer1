@@ -33,6 +33,10 @@ public class NativeCpuRuntime implements ParallelRuntime {
   public PartiallyCompletedParallelJob run(Iterator<Kernel> blocks, Rootbeer rootbeer, ThreadConfig thread_config) {
     return m_Device.run(blocks);
   }
+  
+  public void run(Kernel kernel_template, Rootbeer rootbeer, ThreadConfig thread_config) {
+    m_Device.run(kernel_template, thread_config);
+  }
 
   public boolean isGpuPresent() {
     return true;
