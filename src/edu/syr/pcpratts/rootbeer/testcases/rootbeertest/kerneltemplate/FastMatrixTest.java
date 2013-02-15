@@ -13,8 +13,8 @@ import edu.syr.pcpratts.rootbeer.test.TestKernelTemplate;
 
 public class FastMatrixTest implements TestKernelTemplate {
 
-  int m_blockSize = 64;
-  int m_gridSize = 64*14;
+  private int m_blockSize;
+  private int m_gridSize;
   public FastMatrixTest(){ 
     m_blockSize = 64;
     m_gridSize = 64*14;

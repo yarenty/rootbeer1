@@ -184,6 +184,9 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
   }
 
   private void writeType(Type type) {
+    if(RootbeerClassLoader.v().getDfsInfo().reachesJavaLangClass() == false){
+      return;
+    }
     int number = RootbeerClassLoader.v().getDfsInfo().getClassNumber(type);
     Local gc_visit = m_gcObjVisitor.top();
     Local class_obj = null;

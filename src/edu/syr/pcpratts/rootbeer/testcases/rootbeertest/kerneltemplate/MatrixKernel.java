@@ -40,9 +40,7 @@ public class MatrixKernel implements Kernel {
     for(int k = 0; k < a_columns; ++k){
       sum += m_a[i*a_columns+k] + m_b[k*b_columns+j];
     }
-    //m_c[i*b_columns+j] = sum;
-    m_c[0] = 10;
-
+    m_c[i*b_columns+j] = sum;
     //RootbeerGpu.setSharedFloat((row*block_size) + col, m_a[row*block_size]); 
   }
 
@@ -54,7 +52,7 @@ public class MatrixKernel implements Kernel {
       System.out.println("length");
       return false;
     }
-    
+        
     for(int i = 0; i < lhs_c.length; ++i){
       int lhs_value = lhs_c[i];
       int rhs_value = rhs_c[i];

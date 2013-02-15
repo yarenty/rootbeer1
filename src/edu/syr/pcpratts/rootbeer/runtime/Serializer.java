@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.runtime;
 
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.MatrixKernel;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.IdentityHashMap;

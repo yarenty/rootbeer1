@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer4Test;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.*;
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.FastMatrixTest;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.RemapTest;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.*;
 

@@ -8,6 +8,9 @@
 package edu.syr.pcpratts.rootbeer.runtime;
 
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
+import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaRuntime2;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +25,16 @@ public class Rootbeer implements IRootbeer {
   public Rootbeer(){
     RootbeerFactory factory = new RootbeerFactory();
     m_Rootbeer = factory.create(this);
+  }
+  
+  public static void init(){
+    try {
+      Class c = Class.forName("edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaRuntime2");
+      Method v_method = c.getMethod("v");
+      v_method.invoke(null);
+    } catch(Exception ex){
+      //ignore
+    }
   }
   
   public void setThreadConfig(int block_shape_x, int grid_shape_x){
