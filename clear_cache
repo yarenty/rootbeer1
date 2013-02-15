@@ -1,0 +1,9 @@
+#!/bin/sh
+
+rm -rf ~/.soot/
+mkdir ~/.rootbeer_config/
+cp ~/.rootbeer/config ~/.rootbeer_config/
+rm -rf ~/.rootbeer/
+mkdir ~/.rootbeer/
+cp ~/.rootbeer_config/config ~/.rootbeer/
+rm -rf ~/.rootbeer_config/
