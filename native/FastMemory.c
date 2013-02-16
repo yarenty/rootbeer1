@@ -202,6 +202,18 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_d
   (*env)->GetIntArrayRegion(env, array, 0, len, dest);
 }
 
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime_memory_GpuMemoryStorage
+ * Method:    doWriteIntArray
+ * Signature: ([IJ)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadIntArray
+  (JNIEnv *env, jobject this_obj, jintArray array, jlong ref, jint len, jlong buffer){
+
+  int * dest = (int *) ref;
+  (*env)->SetIntArrayRegion(env, array, 0, len, dest);
+}
+
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteIntArrayEx
   (JNIEnv *env, jobject this_obj, jintArray array, jlong ref, jint start, jint stop){
 

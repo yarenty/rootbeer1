@@ -168,6 +168,20 @@ public class VisitorReadGen extends AbstractVisitorGen {
     
     Local previous_size = bcl.lengthof(object_to_read_from);
     
+    //trying optimization where we use JNI memcpy for single
+    //dimenisonal arrays
+    if(type.baseType.equals(IntType.v()) && type.numDimensions == 1){
+      bcl.pushMethod(m_currMem.top(), "readArray", VoidType.v(), type);
+      bcl.invokeMethodNoRet(m_currMem.top(), object_to_read_from);
+      Local element_size = bcl.local(IntType.v());
+      bcl.assign(element_size, IntConstant.v(4));
+      bcl.mult(element_size, previous_size);
+      bcl_mem.incrementAddress(element_size);
+      
+      return object_to_read_from;
+    }
+    
+    
     String label_new_float = getNextLabel();
     String label_after_new_float = getNextLabel();
     

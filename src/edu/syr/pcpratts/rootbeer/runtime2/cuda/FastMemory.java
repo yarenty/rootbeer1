@@ -170,7 +170,12 @@ public class FastMemory extends Memory {
     */
   }
     
-  private native long init();
+  @Override
+  public void readArray(int[] array){
+    doReadIntArray(array, m_CpuBase+currPointer(), array.length);  
+  }
+  
+  private native void doReadIntArray(int[] array, long addr, int len);
   private native void doWriteIntArray(int[] array, long addr, int len);
   public native void doWriteIntArrayEx(int[] array, long addr, int start, int stop);
   

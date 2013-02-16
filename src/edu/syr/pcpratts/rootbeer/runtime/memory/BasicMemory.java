@@ -120,6 +120,10 @@ public abstract class BasicMemory extends Memory {
     incPointer(8);
     return value;
   }
+  
+  public void readArray(int[] array){
+    throw new UnsupportedOperationException();
+  }
 
   public void writeByte(byte value){
     long ptr = getPointer();

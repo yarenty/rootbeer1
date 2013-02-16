@@ -136,6 +136,7 @@ public abstract class Memory {
   public abstract double readDouble();
   public abstract long readLong();
   public abstract long readRef();
+  public abstract void readArray(int[] array);
 
   public abstract void writeByte(byte value);
   public abstract void writeBoolean(boolean value);
