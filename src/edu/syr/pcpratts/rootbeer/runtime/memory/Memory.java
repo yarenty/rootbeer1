@@ -145,6 +145,7 @@ public abstract class Memory {
   public abstract void writeDouble(double value);
   public abstract void writeLong(long value);
   public abstract void writeRef(long value);
+  public abstract void writeArray(int[] array);
 
   public abstract void setAddress(long address);
   public abstract void incrementAddress(int offset);

@@ -172,6 +172,10 @@ public abstract class BasicMemory extends Memory {
     mData.set(ptr+loffset7, (byte) ((int) (value >> 56) & 0xff));
     incPointer(8);
   }
+  
+  public void writeArray(int[] array){
+    throw new UnsupportedOperationException();
+  }
 
   public void setAddress(long address){
     setPointer(address);

@@ -119,6 +119,12 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_d
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteLong
   (JNIEnv *, jobject, jlong, jlong, jlong);
 
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteIntArray
+  (JNIEnv *, jobject, jintArray, jlong, jint, jlong);
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteIntArrayEx
+  (JNIEnv *, jobject, jintArray, jlong, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif

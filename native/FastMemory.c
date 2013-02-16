@@ -1,5 +1,6 @@
 #include "edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory.h"
 #include <cuda.h>
+#include <stdlib.h>
 
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
@@ -179,4 +180,36 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_d
 
   jlong * longHostMemory = (jlong *) cpu_base;
   longHostMemory[ptr / 8] = value;
+}
+
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime_memory_GpuMemoryStorage
+ * Method:    doWriteIntArray
+ * Signature: ([IJ)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteIntArray
+  (JNIEnv *env, jobject this_obj, jintArray array, jlong ref, jint len, jlong buffer){
+
+  //int i;
+  //char * dest = (char *) ref;
+  //jboolean is_pinned = JNI_TRUE;
+  //jint * narray = (*env)->GetIntArrayElements(env, array, &is_pinned);
+  //memcpy(dest, narray, len*sizeof(jint));
+  //(*env)->ReleaseIntArrayElements(env, array, narray, JNI_ABORT);
+  
+  int * dest = (int *) ref;
+  (*env)->GetIntArrayRegion(env, array, 0, len, dest);
+}
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteIntArrayEx
+  (JNIEnv *env, jobject this_obj, jintArray array, jlong ref, jint start, jint stop){
+
+  int i;
+  int len;
+  char * dest = (char *) (ref + start);
+  len = stop - start;
+  jint * narray = (jint *) malloc(sizeof(jint)*len);
+  (*env)->GetIntArrayRegion(env, array, start, len, narray);
+  memcpy(dest, narray, len*sizeof(jint));
 }

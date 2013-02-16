@@ -35,11 +35,14 @@ public class MatrixKernel implements Kernel {
     int[] b = m_b;
     int[] c = m_c;
 
+    //test deserialization
+    c[0] = 1000;
+
     //System.out.println("block_idxx: "+block_idxx+" thread_idxx: "+thread_idxx);
 
-    for(int block_i = 0; block_i < 2; ++block_i){
-      for(int block_j = 0; block_j < 2; ++block_j){
-        for(int m = 0; m < 2; ++m){
+    for(int block_i = 0; block_i < 8; ++block_i){
+      for(int block_j = 0; block_j < 8; ++block_j){
+        for(int m = 0; m < 8; ++m){
           int bc_col_start = 32 * 32 * block_idxx;
 
           int start_row = 32 * block_i;
@@ -52,15 +55,15 @@ public class MatrixKernel implements Kernel {
           float a_value = a[src_row * a_columns + src_col_a];
           float b_value = b[src_row * bc_columns + src_col_bc];
 
-          //RootbeerGpu.setSharedFloat(thread_idxx, a_value);
-          //RootbeerGpu.setSharedFloat(64 * 64 + thread_idxx, b_value);
+          RootbeerGpu.setSharedFloat(thread_idxx, a_value);
+          RootbeerGpu.setSharedFloat(64 * 64 + thread_idxx, b_value);
 
           RootbeerGpu.synchthreads();
 
           int sum = 0;
           for(int k = 0; k < 32; ++k){
-            //a_value = RootbeerGpu.getSharedFloat(thread_row * 64 + k);
-            //b_value = RootbeerGpu.getSharedFloat(64 * 64 + thread_col * 64 + k);
+            a_value = RootbeerGpu.getSharedFloat(thread_row * 64 + k);
+            b_value = RootbeerGpu.getSharedFloat(64 * 64 + thread_col * 64 + k);
             a_value = 2;
             b_value = 2;
             sum += a_value * b_value;

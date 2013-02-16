@@ -159,6 +159,17 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   }
   
   private void makeWriteToHeapBodyForArrayType(ArrayType type) {
+    //trying optimization where we use JNI memcpy for single
+    //dimenisonal arrays
+    if(type.baseType.equals(IntType.v()) && type.numDimensions == 1){
+      BytecodeLanguage bcl = m_bcl.top();
+      
+      Local object_to_write_from = bcl.cast(type, m_Param0);
+      bcl.pushMethod(m_CurrentMem.top(), "writeArray", VoidType.v(), type);
+      bcl.invokeMethodNoRet(m_CurrentMem.top(), object_to_write_from);
+      return;
+    }
+    
     BytecodeLanguage bcl = m_bcl.top();
     Local object_to_write_from = bcl.cast(type, m_Param0);
 

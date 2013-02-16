@@ -7,7 +7,9 @@
 
 package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
+import edu.syr.pcpratts.rootbeer.generate.bytecode.Constants;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,6 +21,8 @@ public class FastMemory extends Memory {
   private MemPointer m_StaticMemPointer;
   private MemPointer m_InstanceMemPointer;
   private MemPointer m_CurrMemPointer;
+  
+  private List<FastMemoryThread> m_threads;
     
   public FastMemory(long cpu_base_address, AtomicLong instance_pointer, 
     AtomicLong static_pointer, long space_size){
@@ -29,6 +33,12 @@ public class FastMemory extends Memory {
     m_StaticMemPointer = new MemPointer(static_pointer);
     m_CurrMemPointer = m_InstanceMemPointer;
     m_Reserve = 1024;
+    
+    m_threads = new ArrayList<FastMemoryThread>();
+    int num_cores = Runtime.getRuntime().availableProcessors() / 2;
+    for(int i = 0; i < num_cores; ++i){
+      m_threads.add(new FastMemoryThread());
+    }
   }    
   
   private long currPointer(){
@@ -139,6 +149,30 @@ public class FastMemory extends Memory {
     doWriteLong(currPointer(), value, m_CpuBase);
     incrementAddress(8);
   }
+    
+  @Override
+  public void writeArray(int[] array){
+    doWriteIntArray(array, m_CpuBase+currPointer()+Constants.ArrayOffsetSize, array.length);
+    
+    /*
+    int num_each = array.length / m_threads.size();
+    for(int i = 0; i < m_threads.size(); ++i){
+      int start = i * num_each;
+      int stop = (i + 1) * num_each;
+      if(i == m_threads.size() - 1){
+        stop = array.length;
+      }
+      m_threads.get(i).writeArray(this, array, m_CpuBase+currPointer()+Constants.ArrayOffsetSize, start, stop);
+    }
+    for(int i = 0; i < m_threads.size(); ++i){
+      m_threads.get(i).join();
+    }
+    */
+  }
+    
+  private native long init();
+  private native void doWriteIntArray(int[] array, long addr, int len);
+  public native void doWriteIntArrayEx(int[] array, long addr, int start, int stop);
   
   public native byte doReadByte(long ptr, long cpu_base);
   public native boolean doReadBoolean(long ptr, long cpu_base);
