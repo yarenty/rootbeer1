@@ -122,7 +122,9 @@ public abstract class BasicMemory extends Memory {
   }
   
   public void readArray(int[] array){
-    throw new UnsupportedOperationException();
+    for(int i = 0; i < array.length; ++i){
+      array[i] = readInt();
+    }
   }
 
   public void writeByte(byte value){
@@ -178,7 +180,9 @@ public abstract class BasicMemory extends Memory {
   }
   
   public void writeArray(int[] array){
-    throw new UnsupportedOperationException();
+    for(int value : array){
+      writeInt(value);
+    }
   }
 
   public void setAddress(long address){
