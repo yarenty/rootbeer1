@@ -585,6 +585,11 @@ public class CudaRuntime2 implements ParallelRuntime {
     return true;
   }
   
+  public void printMem(int start, int len) {
+    BufferPrinter printer = new BufferPrinter();
+    printer.print(m_ToSpace.get(0), start, len);
+  }
+  
   private native long findReserveMem(int max_blocks, int max_threads);
   private native void setup(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
   public static native void printDeviceInfo();

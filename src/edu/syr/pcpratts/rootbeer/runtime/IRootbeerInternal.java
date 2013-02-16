@@ -11,10 +11,10 @@ import java.util.Iterator;
 import java.util.List;
 
 public interface IRootbeerInternal {
-
-  void runAll(Kernel jobs);
-  void runAll(List<Kernel> jobs);
-  Iterator<Kernel> run(Iterator<Kernel> jobs);
-  void setThreadConfig(ThreadConfig thread_config);
-  void clearThreadConfig();
+  public void runAll(Kernel jobs);
+  public void runAll(List<Kernel> jobs);
+  public Iterator<Kernel> run(Iterator<Kernel> jobs);
+  public void setThreadConfig(ThreadConfig thread_config);
+  public void clearThreadConfig();
+  public void printMem(int start, int len);
 }

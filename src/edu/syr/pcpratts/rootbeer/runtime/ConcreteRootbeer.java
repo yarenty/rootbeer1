@@ -116,4 +116,8 @@ public class ConcreteRootbeer implements IRootbeerInternal {
       }
     }
   }
+
+  public void printMem(int start, int len) {
+    CudaRuntime2.v().printMem(start, len);
+  }
 }

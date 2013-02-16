@@ -159,17 +159,6 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   }
   
   private void makeWriteToHeapBodyForArrayType(ArrayType type) {
-    //trying optimization where we use JNI memcpy for single
-    //dimenisonal arrays
-    if(type.baseType.equals(IntType.v()) && type.numDimensions == 1){
-      BytecodeLanguage bcl = m_bcl.top();
-      
-      Local object_to_write_from = bcl.cast(type, m_Param0);
-      bcl.pushMethod(m_CurrentMem.top(), "writeArray", VoidType.v(), type);
-      bcl.invokeMethodNoRet(m_CurrentMem.top(), object_to_write_from);
-      return;
-    }
-    
     BytecodeLanguage bcl = m_bcl.top();
     Local object_to_write_from = bcl.cast(type, m_Param0);
 
@@ -198,6 +187,16 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     bcl_mem.writeInt(length);    
     bcl_mem.writeInt(-1);
 
+    //trying optimization where we use JNI memcpy for single
+    //dimenisonal arrays
+    if(type.baseType.equals(IntType.v()) && type.numDimensions == 1){
+      bcl.pushMethod(m_CurrentMem.top(), "writeArray", VoidType.v(), type);
+      bcl.invokeMethodNoRet(m_CurrentMem.top(), object_to_write_from);
+      bcl_mem.incrementAddress(element_size);
+      bcl.returnVoid();
+      return;
+    }
+    
     Local space_for_elements = bcl.local(IntType.v());
     bcl.assign(space_for_elements, length);
     bcl.mult(space_for_elements, IntConstant.v(4));

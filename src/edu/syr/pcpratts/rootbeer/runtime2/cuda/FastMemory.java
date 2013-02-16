@@ -152,7 +152,7 @@ public class FastMemory extends Memory {
     
   @Override
   public void writeArray(int[] array){
-    doWriteIntArray(array, m_CpuBase+currPointer()+Constants.ArrayOffsetSize, array.length);
+    doWriteIntArray(array, m_CpuBase+currPointer(), array.length);
     
     /*
     int num_each = array.length / m_threads.size();

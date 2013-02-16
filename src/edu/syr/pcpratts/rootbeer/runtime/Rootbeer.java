@@ -82,6 +82,10 @@ public class Rootbeer implements IRootbeer {
       m_Rootbeer.runAll(jobs);
     }
   }
+  
+  public void printMem(int start, int len){
+    m_Rootbeer.printMem(start, len);
+  }
 
   public boolean getRanGpu(){
     return m_ranGpu;  

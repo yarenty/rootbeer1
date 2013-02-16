@@ -116,11 +116,6 @@ public abstract class Serializer {
     watch.start();
     doWriteToHeap(o, write_data, result.m_Ref, read_only);
     watch.stop();
-    if(o != null){
-      System.out.println("writeToHeap: "+o.toString()+" "+watch.elapsedTimeMillis()+"ms");
-    } else {
-      System.out.println("writeToHeap: null "+watch.elapsedTimeMillis()+"ms");  
-    }
     return result.m_Ref;
   }
   
