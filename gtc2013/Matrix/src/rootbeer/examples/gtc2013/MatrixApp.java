@@ -18,10 +18,10 @@ public class MatrixApp {
   private int m_gridSize;
 
   public MatrixApp(){
-    //m_blockSize = 256;
-    //m_gridSize = 256*14;
-    m_blockSize = 64;
+    m_blockSize = 256;
     m_gridSize = 14;
+    //m_blockSize = 64;
+    //m_gridSize = 14;
     m_a = new int[m_blockSize*m_blockSize];
     m_b = new int[m_blockSize*m_blockSize*m_gridSize];
     m_ccpu = new int[m_blockSize*m_blockSize*m_gridSize];
