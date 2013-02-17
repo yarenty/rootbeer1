@@ -21,8 +21,6 @@ public class FastMemory extends Memory {
   private MemPointer m_StaticMemPointer;
   private MemPointer m_InstanceMemPointer;
   private MemPointer m_CurrMemPointer;
-  
-  private List<FastMemoryThread> m_threads;
     
   public FastMemory(long cpu_base_address, AtomicLong instance_pointer, 
     AtomicLong static_pointer, long space_size){
@@ -33,13 +31,7 @@ public class FastMemory extends Memory {
     m_StaticMemPointer = new MemPointer(static_pointer);
     m_CurrMemPointer = m_InstanceMemPointer;
     m_Reserve = 1024;
-    
-    m_threads = new ArrayList<FastMemoryThread>();
-    int num_cores = Runtime.getRuntime().availableProcessors();
-    for(int i = 0; i < num_cores; ++i){
-      m_threads.add(new FastMemoryThread());
-    }
-  }    
+  }
   
   private long currPointer(){
     return m_CurrMemPointer.m_Pointer;
