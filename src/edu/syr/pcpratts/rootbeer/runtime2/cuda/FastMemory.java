@@ -35,7 +35,7 @@ public class FastMemory extends Memory {
     m_Reserve = 1024;
     
     m_threads = new ArrayList<FastMemoryThread>();
-    int num_cores = Runtime.getRuntime().availableProcessors() / 2;
+    int num_cores = Runtime.getRuntime().availableProcessors();
     for(int i = 0; i < num_cores; ++i){
       m_threads.add(new FastMemoryThread());
     }
@@ -152,32 +152,16 @@ public class FastMemory extends Memory {
     
   @Override
   public void writeArray(int[] array){
-    doWriteIntArray(array, m_CpuBase+currPointer(), array.length);
-    
-    /*
-    int num_each = array.length / m_threads.size();
-    for(int i = 0; i < m_threads.size(); ++i){
-      int start = i * num_each;
-      int stop = (i + 1) * num_each;
-      if(i == m_threads.size() - 1){
-        stop = array.length;
-      }
-      m_threads.get(i).writeArray(this, array, m_CpuBase+currPointer()+Constants.ArrayOffsetSize, start, stop);
-    }
-    for(int i = 0; i < m_threads.size(); ++i){
-      m_threads.get(i).join();
-    }
-    */
+    doWriteIntArray(array, m_CpuBase+currPointer(), 0, array.length);
   }
     
   @Override
   public void readArray(int[] array){
-    doReadIntArray(array, m_CpuBase+currPointer(), array.length);  
+    doReadIntArray(array, m_CpuBase+currPointer(), 0, array.length);  
   }
   
-  private native void doReadIntArray(int[] array, long addr, int len);
-  private native void doWriteIntArray(int[] array, long addr, int len);
-  public native void doWriteIntArrayEx(int[] array, long addr, int start, int stop);
+  public native void doReadIntArray(int[] array, long addr, int start, int len);
+  public native void doWriteIntArray(int[] array, long addr, int start, int len);
   
   public native byte doReadByte(long ptr, long cpu_base);
   public native boolean doReadBoolean(long ptr, long cpu_base);
