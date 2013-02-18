@@ -6,4 +6,4 @@ ant jar
 
 cd gtc2013/Matrix/
 ant jar
-java -jar ../../Rootbeer.jar MatrixApp.jar MatrixApp-GPU.jar
+java -jar ../../Rootbeer.jar MatrixApp.jar MatrixApp-GPU.jar -maxrregcount 32

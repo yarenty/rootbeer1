@@ -227,8 +227,7 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedShort($$__global$$ c
 
 $$__device__$$
 int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedInteger($$__global$$ char * gc_info, int index, int * exception){
-  int ret = 0;
-  ret |= m_shared[index] & 0x000000ff;
+  int ret = m_shared[index] & 0x000000ff;
   ret |= (m_shared[index + 1] << 8)  & 0x0000ff00;
   ret |= (m_shared[index + 2] << 16) & 0x00ff0000;
   ret |= (m_shared[index + 3] << 24) & 0xff000000;

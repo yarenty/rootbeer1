@@ -10,6 +10,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl.tweaks;
 import edu.syr.pcpratts.rootbeer.util.WindowsCompile;
 import edu.syr.pcpratts.compressor.Compressor;
 import edu.syr.pcpratts.deadmethods.DeadMethods;
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.util.CompilerRunner;
 import edu.syr.pcpratts.rootbeer.util.CudaPath;
@@ -92,8 +93,13 @@ public class CudaTweaks extends Tweaks {
       CudaPath cuda_path = new CudaPath();
       GencodeOptions options_gen = new GencodeOptions();
       String gencode_options = options_gen.getOptions();
+      
+      String max_reg_count = "";
+      if(Configuration.compilerInstance().isMaxRegCountSet()){
+        max_reg_count = "--maxrregcount "+Configuration.compilerInstance().getMaxRegCount();
+      } 
       if(File.separator.equals("/")){
-        command = cuda_path.get() + "/nvcc "+modelString+" "+gencode_options+" -fatbin "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
+        command = cuda_path.get() + "nvcc "+modelString+" "+max_reg_count+" "+gencode_options+" -fatbin "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
         CompilerRunner runner = new CompilerRunner();
         List<String> errors = runner.run(command);      
         if(errors.isEmpty() == false){
@@ -102,7 +108,7 @@ public class CudaTweaks extends Tweaks {
       } else {
         WindowsCompile compile = new WindowsCompile();
         String nvidia_path = cuda_path.get();
-        command = "\""+nvidia_path+"\" "+gencode_options+" -fatbin \""+generated.getAbsolutePath()+"\" -o \""+code_file.getAbsolutePath()+"\""+compile.endl();
+        command = "\""+nvidia_path+"\" "+modelString+" "+max_reg_count+" "+gencode_options+" -fatbin \""+generated.getAbsolutePath()+"\" -o \""+code_file.getAbsolutePath()+"\""+compile.endl();
         List<String> errors = compile.compile(command);
         if(errors.isEmpty() == false){
           return new CompileResult(null, errors);

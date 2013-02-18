@@ -85,6 +85,10 @@ public class Main {
         m_disableClassRemapping = true;
       } else if(arg.equals("-large-mem-tests")){
         m_largeMemTests = true;
+      } else if(arg.equals("-maxrregcount")){
+        String count = safeGet(args, i+1, "-maxrregcount");
+        ++i;
+        Configuration.compilerInstance().setMaxRegCount(Integer.parseInt(count));
       } else if(m_simpleCompile == false){      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);

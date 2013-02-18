@@ -26,7 +26,7 @@ public class MatrixApp {
   }
 
   public void init(){
-    m_blockIters = 4;
+    m_blockIters = 64;
     m_blockSize = 64;
     m_gridSize = 14;
     m_a = new int[m_blockSize*m_blockSize];

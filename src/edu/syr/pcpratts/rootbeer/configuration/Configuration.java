@@ -40,6 +40,8 @@ public class Configuration {
   private static boolean m_runAll;
   private static boolean m_printMem;
   private boolean m_remapAll;
+  private boolean m_maxRegCountSet;
+  private int m_maxRegCount;
   
   static {
     m_printMem = false;
@@ -48,6 +50,7 @@ public class Configuration {
   private Configuration(){
     m_compilerInstance = true;
     m_remapAll = true;
+    m_maxRegCountSet = false;
   }
 
   private Configuration(boolean load) {
@@ -91,5 +94,18 @@ public class Configuration {
   
   public static void setPrintMem(boolean print){
     m_printMem = print;
+  }
+
+  public void setMaxRegCount(int value) {
+    m_maxRegCount = value;
+    m_maxRegCountSet = true;
+  }
+  
+  public boolean isMaxRegCountSet(){
+    return m_maxRegCountSet;
+  }
+  
+  public int getMaxRegCount(){
+    return m_maxRegCount;
   }
 }
