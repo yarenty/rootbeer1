@@ -11,6 +11,10 @@ public class MatrixKernel implements Kernel {
   private int m_blockSize;
   private int m_gridSize;
   private int m_blockIters;
+  public boolean m_invalidRead;
+  public int m_invalidIndexK;
+  public int m_invalidIndexCol;
+  public int m_invalidBValue;
 
   public MatrixKernel(int[] a, int[] b, int[] c, int block_size, int grid_size,
     int block_iters){
@@ -20,6 +24,7 @@ public class MatrixKernel implements Kernel {
     m_blockSize = block_size;
     m_gridSize = grid_size;
     m_blockIters = block_iters;
+    m_invalidRead = false;
   }
 
   public void gpuMethod(){
@@ -64,8 +69,13 @@ public class MatrixKernel implements Kernel {
 
           for(int k = 0; k < 32; ++k){
             a_value = RootbeerGpu.getSharedInteger((thread_row * 32 + k) * 4);
-            b_value = RootbeerGpu.getSharedInteger((1024 + thread_col * 32 + k) + 4);    
-            b_value = 2;     
+            b_value = RootbeerGpu.getSharedInteger((1024 + k * 32 + thread_col) * 4);   
+            if(b_value != 2 && m_invalidRead == false){
+              m_invalidRead = true;
+              m_invalidIndexK = k;
+              m_invalidIndexCol = thread_col;
+              m_invalidBValue = b_value;
+            } 
             sum += a_value * b_value;
           }
 
