@@ -53,3 +53,8 @@ examples/RandomDemap/RandomRemapApp.jar
 gtc2013/Matrix/MatrixApp-GPU.jar
 gtc2013/Matrix/MatrixApp.jar
 native/cudaruntime.dylib
+MegaMandel2-GPU.jar
+MegaMandel2-CPU.jar
+MegaMandel2-Packed.jar
+MegaMandel2.jar
+mandellib.jar
