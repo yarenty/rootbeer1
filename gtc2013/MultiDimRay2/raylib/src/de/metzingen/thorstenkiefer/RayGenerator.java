@@ -20,20 +20,12 @@ public class RayGenerator {
     public static void generate(
             int w, int h, double minx, double maxx, double miny, double maxy,
             int[] pixels, double[][] spheres, double[] light, double[] observer,
-            double radius, double[] vx, double[] vy,int numDimensions) {
-        List<MyKernel> myKernels = new ArrayList<MyKernel>(w * h);
-
-        for (int x = 0; x < w; ++x) {
-            for (int y = 0; y < h; ++y) {
-                myKernels.add(new MyKernel(pixels, minx, maxx, miny, maxy,
-                        w, h, spheres, light, observer, vx, vy, x, y, radius,
-                        numDimensions));
-            }
-        }
-        List<Kernel> kernels = new ArrayList<Kernel>(w * h);
-        kernels.addAll(myKernels);
-        rb.runAll(kernels);
-
+            double radius, double[] vx, double[] vy, int numDimensions) {
+        rb.setThreadConfig(w, h);
+        MyKernel myKernel = new MyKernel(pixels, minx, maxx, miny, maxy,
+                w, h, spheres, light, observer, vx, vy, radius,
+                numDimensions);
+        rb.runAll(myKernel);
         //System.err.println(rb.getStats().size());
     }
 }
