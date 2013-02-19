@@ -21,7 +21,7 @@ public class RayGenerator {
             int w, int h, double minx, double maxx, double miny, double maxy,
             int[] pixels, double[][] spheres, double[] light, double[] observer,
             double radius, double[] vx, double[] vy,int numDimensions) {
-        List<MyKernel> myKernels = new ArrayList<>(w * h);
+        List<MyKernel> myKernels = new ArrayList<MyKernel>(w * h);
 
         for (int x = 0; x < w; ++x) {
             for (int y = 0; y < h; ++y) {
@@ -30,7 +30,7 @@ public class RayGenerator {
                         numDimensions));
             }
         }
-        List<Kernel> kernels = new ArrayList<>(w * h);
+        List<Kernel> kernels = new ArrayList<Kernel>(w * h);
         kernels.addAll(myKernels);
         rb.runAll(kernels);
 

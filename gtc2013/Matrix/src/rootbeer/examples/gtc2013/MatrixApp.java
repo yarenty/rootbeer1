@@ -41,6 +41,39 @@ public class MatrixApp {
     for(int i = 0; i < m_b.length; ++i){
       m_b[i] = i % 3;
     }
+
+    printMatrix(m_a, m_blockSize);
+    printRow(m_a, m_blockSize, 0);
+    printCol(m_a, m_blockSize, 32);
+  }
+
+  private void printMatrix(int[] matrix, int block_size){
+    int row_count = 0;
+    for(int i = 0; i < matrix.length; ++i){
+      System.out.print(matrix[i]+" ");
+      row_count++;
+      if(row_count == block_size){
+        row_count = 0;
+        System.out.println();
+      }
+    } 
+  }
+
+  private void printRow(int[] matrix, int block_size, int row){
+    System.out.println("row: "+row);
+    int start = row * block_size;
+    for(int i = 0; i < block_size; ++i){
+      System.out.print(matrix[start+i]);
+    }
+    System.out.println();
+  }
+
+  private void printCol(int[] matrix, int block_size, int col){
+    System.out.println("col: "+col);
+    for(int i = 0; i < block_size; ++i){
+      System.out.print(matrix[(i * block_size) + col]);
+    }
+    System.out.println();
   }
 
   private void cpuRun(){
@@ -65,7 +98,7 @@ public class MatrixApp {
     MatrixKernel matrix_kernel = new MatrixKernel(m_a, m_b, m_cgpu, m_blockSize, 
       m_gridSize, m_blockIters);
     Rootbeer rootbeer = new Rootbeer();
-    rootbeer.setThreadConfig(1024, 14);
+    rootbeer.setThreadConfig(1024, m_gridSize);
     rootbeer.runAll(matrix_kernel);
     m_gpuWatch.stop();
     System.out.println("avg gpu time: "+m_gpuWatch.getAverageTime()+" ms");
@@ -73,9 +106,36 @@ public class MatrixApp {
     if(matrix_kernel.m_invalidRead){
       System.out.println("  Invalid READ!");
       System.out.println("    k: "+matrix_kernel.m_invalidIndexK);
-      System.out.println("    col: "+matrix_kernel.m_invalidIndexCol);
+      System.out.println("    thread_row: "+matrix_kernel.m_invalidIndexRow);
+      System.out.println("    thread_col: "+matrix_kernel.m_invalidIndexCol);
+      System.out.println("    a_value: "+matrix_kernel.m_invalidAValue);
       System.out.println("    b_value: "+matrix_kernel.m_invalidBValue);
+      System.out.println("    prev_a: "+matrix_kernel.m_invalidPrevA);
+      System.out.println("    prev_b: "+matrix_kernel.m_invalidPrevB);
+      System.out.println("    m: "+matrix_kernel.m_invalidIndexM);
+      System.out.println("    sub_matrix_row: "+matrix_kernel.m_invalidSubMatrixRow);
+      System.out.println("    sub_matrix_col: "+matrix_kernel.m_invalidSubMatrixCol);
     }
+
+    int sum = 0;
+    for(Calculation calc : matrix_kernel.m_calcs){
+      if(calc == null){
+        continue;
+      }
+      System.out.println("  calc:");
+      System.out.println("    k: "+calc.m_invalidIndexK);
+      System.out.println("    row: "+calc.m_invalidIndexRow);
+      System.out.println("    col: "+calc.m_invalidIndexCol);
+      System.out.println("    a_value: "+calc.m_invalidAValue);
+      System.out.println("    b_value: "+calc.m_invalidBValue);
+      System.out.println("    prev_a: "+calc.m_invalidPrevA);
+      System.out.println("    prev_b: "+calc.m_invalidPrevB);
+      System.out.println("    m: "+calc.m_invalidIndexM);
+      System.out.println("    sub_matrix_row: "+calc.m_invalidSubMatrixRow);
+      System.out.println("    sub_matrix_col: "+calc.m_invalidSubMatrixCol);
+      sum += (calc.m_invalidAValue * calc.m_invalidBValue);
+    }
+    System.out.println("SUM: "+sum);
 
     List<StatsRow> stats = rootbeer.getStats();
     for(StatsRow row : stats){

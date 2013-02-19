@@ -34,8 +34,8 @@ public class NewJPanel extends javax.swing.JPanel {
 
     private static class HyperCube {
 
-        public List<double[]> points = new ArrayList<>();
-        public List<double[]> lines = new ArrayList<>();
+        public List<double[]> points = new ArrayList<double[]>();
+        public List<double[]> lines = new ArrayList<double[]>();
     }
 
     private static HyperCube hypercube(int i, int n, double pos) {
@@ -87,7 +87,7 @@ public class NewJPanel extends javax.swing.JPanel {
         img = new BufferedImage(10, 10, BufferedImage.TYPE_3BYTE_BGR);
 
         HyperCube hc = hypercube(3, 4, 2.5);
-        ArrayList<double[]> xs = new ArrayList<>();
+        ArrayList<double[]> xs = new ArrayList<double[]>();
         xs.addAll(hc.points);
         xs.addAll(hc.lines);
         System.err.println(xs.size());
