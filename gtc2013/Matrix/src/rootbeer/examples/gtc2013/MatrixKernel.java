@@ -3,6 +3,9 @@ package rootbeer.examples.gtc2013;
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class MatrixKernel implements Kernel {
 
   private int[] m_a;
@@ -13,8 +16,17 @@ public class MatrixKernel implements Kernel {
   private int m_blockIters;
   public boolean m_invalidRead;
   public int m_invalidIndexK;
+  public int m_invalidIndexRow;
   public int m_invalidIndexCol;
+  public int m_invalidAValue;
   public int m_invalidBValue;
+  public int m_invalidPrevA;
+  public int m_invalidPrevB;
+  public int m_invalidIndexM;
+  public int m_invalidSubMatrixRow;
+  public int m_invalidSubMatrixCol;
+
+  public Calculation[] m_calcs;
 
   public MatrixKernel(int[] a, int[] b, int[] c, int block_size, int grid_size,
     int block_iters){
@@ -25,6 +37,8 @@ public class MatrixKernel implements Kernel {
     m_gridSize = grid_size;
     m_blockIters = block_iters;
     m_invalidRead = false;
+
+    m_calcs = new Calculation[1024];
   }
 
   public void gpuMethod(){
@@ -53,39 +67,60 @@ public class MatrixKernel implements Kernel {
         int sum = 0;
         int sub_matrix_row = sub_matrix / 2;
         int sub_matrix_col = sub_matrix % 2;
+
+        int dest_row = (block_size / 2 * sub_matrix_row) + thread_row;
+        int dest_col = (block_size / 2 * sub_matrix_col) + thread_col;
+
+        int dest_index = (block_iter * block_size * block_size * grid_size) + (block_idxx * block_size * block_size) + dest_row * block_size + dest_col;   
+     
         for(int m = 0; m < m_size; ++m){
           int a_src_row = (sub_matrix_row * 32) + thread_row;
           int a_src_col = (m * 32) + thread_col;
           int a_src = (a_src_row * block_size) + a_src_col;
 
           int b_src_row = (m * 32) + thread_col;
-          int b_src_col = (sub_matrix_row * 32) + thread_row;
+          int b_src_col = (sub_matrix_col * 32) + thread_row;
           int b_src = (b_src_row * block_size) + b_src_col;
-            
+
           int a_value = a[a_src];
           int b_value = b[b_src];
-          
+
           RootbeerGpu.setSharedInteger(thread_idxx * 4, a_value);
           RootbeerGpu.setSharedInteger((1024 + thread_idxx) * 4, b_value);
           RootbeerGpu.synchthreads();
 
+          int prev_a = 2;
+          int prev_b = 2;
+
           for(int k = 0; k < 32; ++k){
             a_value = RootbeerGpu.getSharedInteger((thread_row * 32 + k) * 4);
             b_value = RootbeerGpu.getSharedInteger((1024 + k * 32 + thread_col) * 4);   
-            /*
-            if(b_value != 2 && m_invalidRead == false){
-              m_invalidRead = true;
-              m_invalidIndexK = k;
-              m_invalidIndexCol = thread_col;
-              m_invalidBValue = b_value;
-            } 
-            */
+            
+            boolean invalid_read = false;
+
+            if(dest_index == 32){
+              Calculation calc = new Calculation();
+              calc.m_invalidIndexK = k;
+              calc.m_invalidIndexM = m;
+              calc.m_invalidSubMatrixRow = sub_matrix_row;
+              calc.m_invalidSubMatrixCol = sub_matrix_col;
+              calc.m_invalidIndexRow = thread_row;
+              calc.m_invalidIndexCol = thread_col;
+              calc.m_invalidAValue = a_value;
+              calc.m_invalidBValue = b_value;
+              calc.m_invalidPrevA = prev_a;
+              calc.m_invalidPrevB = prev_b;
+              m_calcs[(m * 32) + k] = calc;
+            }
             sum += a_value * b_value;
+
+            prev_a = a_value;
+            prev_b = b_value;
           }
 
           RootbeerGpu.synchthreads();
         }
-        int dest_index = (block_iter * block_size * block_size * grid_size) + (block_idxx * block_size * block_size) + (1024 * sub_matrix) + thread_idxx;
+
         c[dest_index] += sum;
       }
     }
