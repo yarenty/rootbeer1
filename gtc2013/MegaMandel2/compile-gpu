@@ -9,5 +9,5 @@ ant jar
 cd ../MegaMandel2/
 ant jar
 cd ..
-java -jar ../../lib/pack.jar -mainjar MegaMandel2.jar -libjar mandellib.jar -destjar MegaMandel2-Packed.jar
-java -jar ../../Rootbeer.jar MegaMandel2-Packed.jar MegaMandel2-GPU.jar
+java -jar ../../Rootbeer.jar mandellib.jar mandellib-GPU.jar
+java -jar ../../lib/pack.jar -mainjar MegaMandel2.jar -libjar mandellib-GPU.jar -destjar MegaMandel2-GPU.jar
