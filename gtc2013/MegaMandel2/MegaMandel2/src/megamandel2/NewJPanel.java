@@ -4,15 +4,11 @@
  */
 package megamandel2;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Timer;
 import mandellib.MandelGenerator;
 
 /**
@@ -46,12 +42,12 @@ public class NewJPanel extends javax.swing.JPanel {
                 while (true) {
                     BufferedImage im = img;
 
-                    int width = getWidth();
-                    int height = getHeight();
-                    int[] ps = new int[width*height*3];
+                    int width = im.getWidth();
+                    int height = im.getHeight();
+                    int[] ps = new int[width*height];
                     MandelGenerator.generate(width, height, minx, maxx, miny, maxy, maxdepth, ps);
 
-                    im.setRGB(0, 0, width, height, ps, 0, width*3);
+                    im.setRGB(0, 0, width, height, ps, 0, width);
 
                     float dfx = (maxx - minx) * fx;
                     float dfy = (maxy - miny) * fy;
