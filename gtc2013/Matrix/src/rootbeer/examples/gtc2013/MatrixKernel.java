@@ -58,7 +58,9 @@ public class MatrixKernel implements Kernel {
           int a_src_col = (m * 32) + thread_col;
           int a_src = (a_src_row * block_size) + a_src_col;
 
-          int b_src = a_src;
+          int b_src_row = (m * 32) + thread_col;
+          int b_src_col = (sub_matrix_row * 32) + thread_row;
+          int b_src = (b_src_row * block_size) + b_src_col;
             
           int a_value = a[a_src];
           int b_value = b[b_src];
@@ -70,12 +72,14 @@ public class MatrixKernel implements Kernel {
           for(int k = 0; k < 32; ++k){
             a_value = RootbeerGpu.getSharedInteger((thread_row * 32 + k) * 4);
             b_value = RootbeerGpu.getSharedInteger((1024 + k * 32 + thread_col) * 4);   
+            /*
             if(b_value != 2 && m_invalidRead == false){
               m_invalidRead = true;
               m_invalidIndexK = k;
               m_invalidIndexCol = thread_col;
               m_invalidBValue = b_value;
             } 
+            */
             sum += a_value * b_value;
           }
 
