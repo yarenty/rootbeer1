@@ -5,6 +5,7 @@
 package de.metzingen.thorstenkiefer;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
 
 /**
  *
@@ -27,8 +28,6 @@ public class MyKernel implements Kernel {
     private double[][] regs;
     private double[] intersections = new double[100];
     private double[][] intersectionso = new double[100][];
-    private int xpixel;
-    private int ypixel;
     private double[] vx;
     private double[] vy;
     private double radius;
@@ -36,7 +35,7 @@ public class MyKernel implements Kernel {
 
     public MyKernel(int[] result, double minx, double maxx, double miny,
             double maxy, int w, int h, double[][] spheres, double[] light,
-            double[] observer, double[] vx, double[] vy, int x, int y,
+            double[] observer, double[] vx, double[] vy,
             double radius, int numDimensions) {
         this.result = result;
         this.minx = minx;
@@ -48,8 +47,6 @@ public class MyKernel implements Kernel {
         this.spheres = spheres;
         this.light = light;
         this.observer = observer;
-        this.xpixel = x;
-        this.ypixel = y;
         this.radius = radius;
         this.vx = vx;
         this.vy = vy;
@@ -154,6 +151,13 @@ public class MyKernel implements Kernel {
 
     @Override
     public void gpuMethod() {
+        int xpixel = RootbeerGpu.getBlockIdxx();
+        int ypixel = RootbeerGpu.getThreadIdxx();
+
+        if (xpixel >= w || ypixel >= h) {
+            return;
+        }
+
         mul(vx, (maxx - minx) * xpixel / w + minx, regs[0]);
         mul(vy, (maxy - miny) * ypixel / h + miny, regs[1]);
         add(regs[0], regs[1], regs[0]);
