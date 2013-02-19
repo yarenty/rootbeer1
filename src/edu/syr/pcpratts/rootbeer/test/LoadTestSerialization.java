@@ -37,4 +37,10 @@ public class LoadTestSerialization {
     Object instance = classToLoad.newInstance();
     return instance;
   }
+
+  List<TestApplication> loadApplication(ClassLoader loader, String class_name) throws Exception {
+    Object instance = doLoad(loader, class_name);
+    TestApplicationFactory factory = (TestApplicationFactory) instance;
+    return factory.getProviders();
+  }
 }
