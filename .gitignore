@@ -58,3 +58,8 @@ MegaMandel2-CPU.jar
 MegaMandel2-Packed.jar
 MegaMandel2.jar
 mandellib.jar
+MultiDimRay2-GPU.jar
+MultiDimRay2-CPU.jar
+MultiDimRay2-Packed.jar
+MultiDimRay2.jar
+raylib.jar
