@@ -56,9 +56,9 @@ public class MyKernel implements Kernel {
                 break;
             }
         }
-        int r = (int) (0xff * (Math.sin((double) (0.01 * d + 0) + 1)) / 2);
-        int g = (int) (0xff * (Math.sin((double) (0.02 * d + 0.01) + 1)) / 2);
-        int b = (int) (0xff * (Math.sin((double) (0.04 * d + 0.1) + 1)) / 2);
+        int r = (int) (0xff * (RootbeerGpu.sin((double) (0.01 * d + 0) + 1)) / 2);
+        int g = (int) (0xff * (RootbeerGpu.sin((double) (0.02 * d + 0.01) + 1)) / 2);
+        int b = (int) (0xff * (RootbeerGpu.sin((double) (0.04 * d + 0.1) + 1)) / 2);
         int dest_index = j * w + i;
 
         //result[dest_index] = r;  

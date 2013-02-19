@@ -292,6 +292,11 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedDouble($$__global$$ 
   edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedLong(gc_info, index, long_value, exception);
 }
 
+$$__device__$$
+double edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_sin($$__global$$ char * gc_info, double value, int * exception){
+  return sin(value);
+}
+
 $$__device__$$ 
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_synchthreads($$__global$$ char * gc_info, int * exception){
   synchthreads();

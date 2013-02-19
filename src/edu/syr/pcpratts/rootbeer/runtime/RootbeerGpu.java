@@ -174,5 +174,8 @@ public class RootbeerGpu {
     setSharedLong(index, value_long);
   }
   
+  public static double sin(double value){
+    return 0;
+  }
   
 }
