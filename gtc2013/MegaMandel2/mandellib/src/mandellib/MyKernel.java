@@ -11,14 +11,14 @@ import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
  *
  * @author thorsten
  */
-public class MyKernel implements Kernel{
+public class MyKernel implements Kernel {
 
     public int[] result;
     public int maxdepth;
     public int w;
     public int h;
-    public double maxx,minx;
-    public double maxy,miny;
+    public double maxx, minx;
+    public double maxy, miny;
 
     public MyKernel(int[] result, int maxdepth, int w, int h, double maxx, double minx, double maxy, double miny) {
         this.result = result;
@@ -37,6 +37,9 @@ public class MyKernel implements Kernel{
         double xi = 0;
         int i = RootbeerGpu.getBlockIdxx();
         int j = RootbeerGpu.getThreadIdxx();
+        if (i >= w || j >= h) {
+            return;
+        }
         double cr = (maxx - minx) * i / w + minx;
         double ci = (maxy - miny) * j / h + miny;
         int d = 0;
@@ -53,18 +56,17 @@ public class MyKernel implements Kernel{
                 break;
             }
         }
-        int r = (int)(0xff * (Math.sin((double)(0.01 * d + 0) + 1)) / 2);
-        int g = (int)(0xff * (Math.sin((double)(0.02 * d + 0.01) + 1)) / 2);
-        int b = (int)(0xff * (Math.sin((double)(0.04 * d + 0.1) + 1)) / 2);
-        int dest_index = (j * h + i) * 3;
-        result[dest_index + 0] = r;  
-        result[dest_index + 1] = g;
-        result[dest_index + 2] = b;      
-        /*        
-        result[dest_index] = 
-                (int)((0xff * (0.01 * d + 0) + 1) / 2) << 16
-                | (int)((0xff * (0.02 * d + 0.01) + 1) / 2) << 8
-                | (int)((0xff * (0.04 * d + 0.1) + 1) / 2);
-        */
+        int r = (int) (0xff * (Math.sin((double) (0.01 * d + 0) + 1)) / 2);
+        int g = (int) (0xff * (Math.sin((double) (0.02 * d + 0.01) + 1)) / 2);
+        int b = (int) (0xff * (Math.sin((double) (0.04 * d + 0.1) + 1)) / 2);
+        int dest_index = j * w + i;
+
+        //result[dest_index] = r;  
+        //result[dest_index] = g;
+        //result[dest_index] = b;      
+        result[dest_index] =
+                (int) ((0xff * (0.01 * d + 0) + 1) / 2) << 16
+                | (int) ((0xff * (0.02 * d + 0.01) + 1) / 2) << 8
+                | (int) ((0xff * (0.04 * d + 0.1) + 1) / 2);
     }
 }
