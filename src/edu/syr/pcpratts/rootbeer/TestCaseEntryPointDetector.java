@@ -12,7 +12,11 @@ import java.util.Iterator;
 import java.util.List;
 import soot.*;
 import soot.jimple.InvokeExpr;
+import soot.jimple.Jimple;
+import soot.jimple.ReturnStmt;
+import soot.jimple.StringConstant;
 import soot.rbclassload.EntryPointDetector;
+import soot.rbclassload.MethodSignatureUtil;
 
 public class TestCaseEntryPointDetector implements EntryPointDetector {
 
@@ -55,10 +59,19 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
     }
     m_provider = m_testCase;
     
-    SootClass prov_class = Scene.v().getSootClass(m_provider);
-    SootMethod method = prov_class.getMethodByName("create");
-    SootClass kernel_class = searchMethod(method);
-    SootMethod gpu_method = kernel_class.getMethodByName("gpuMethod");
+    SootMethod gpu_method = null;
+    
+    if(isApplication()){
+      SootClass prov_class = Scene.v().getSootClass(m_provider);
+      SootMethod get_entry_sig = prov_class.getMethod("java.lang.String getEntrySignature()");
+      gpu_method = execGetEntrySig(get_entry_sig);
+    } else {      
+      SootClass prov_class = Scene.v().getSootClass(m_provider);
+      SootMethod method = prov_class.getMethodByName("create");
+      SootClass kernel_class = searchMethod(method);
+      gpu_method = kernel_class.getMethodByName("gpuMethod");
+    }
+    
     m_signature = gpu_method.getSignature();
     m_initialized = true;
   }
@@ -87,6 +100,19 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
     return null;
   }
 
+  private SootMethod execGetEntrySig(SootMethod method) {
+    Body body = method.retrieveActiveBody();
+    PatchingChain<Unit> units = body.getUnits();
+    Unit last = units.getLast();
+    ReturnStmt ret_stmt = (ReturnStmt) last;
+    Value op = ret_stmt.getOp();
+    StringConstant string_constant = (StringConstant) op;
+    String signature = string_constant.value;
+    MethodSignatureUtil util = new MethodSignatureUtil();
+    util.parse(signature);
+    return util.getSootMethod();
+  }
+  
   private String findTestCaseClass(String test_case) {
     for(String pkg : m_testCasePackages){
       String name = pkg + test_case;
@@ -108,5 +134,12 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
 
   public List<String> getEntryPoints() {
     return m_entryPoints;
+  }
+
+  private boolean isApplication() {
+    if(m_provider.startsWith("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.apps.")){
+      return true;
+    }
+    return false;
   }
 }

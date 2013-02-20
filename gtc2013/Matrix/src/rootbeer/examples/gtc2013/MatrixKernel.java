@@ -26,8 +26,6 @@ public class MatrixKernel implements Kernel {
   public int m_invalidSubMatrixRow;
   public int m_invalidSubMatrixCol;
 
-  public Calculation[] m_calcs;
-
   public MatrixKernel(int[] a, int[] b, int[] c, int block_size, int grid_size,
     int block_iters){
     m_a = a;
@@ -37,8 +35,6 @@ public class MatrixKernel implements Kernel {
     m_gridSize = grid_size;
     m_blockIters = block_iters;
     m_invalidRead = false;
-
-    m_calcs = new Calculation[1024];
   }
 
   public void gpuMethod(){
@@ -89,33 +85,10 @@ public class MatrixKernel implements Kernel {
           RootbeerGpu.setSharedInteger((1024 + thread_idxx) * 4, b_value);
           RootbeerGpu.synchthreads();
 
-          int prev_a = 2;
-          int prev_b = 2;
-
           for(int k = 0; k < 32; ++k){
             a_value = RootbeerGpu.getSharedInteger((thread_row * 32 + k) * 4);
-            b_value = RootbeerGpu.getSharedInteger((1024 + k * 32 + thread_col) * 4);   
-            
-            boolean invalid_read = false;
-
-            if(dest_index == 32){
-              Calculation calc = new Calculation();
-              calc.m_invalidIndexK = k;
-              calc.m_invalidIndexM = m;
-              calc.m_invalidSubMatrixRow = sub_matrix_row;
-              calc.m_invalidSubMatrixCol = sub_matrix_col;
-              calc.m_invalidIndexRow = thread_row;
-              calc.m_invalidIndexCol = thread_col;
-              calc.m_invalidAValue = a_value;
-              calc.m_invalidBValue = b_value;
-              calc.m_invalidPrevA = prev_a;
-              calc.m_invalidPrevB = prev_b;
-              m_calcs[(m * 32) + k] = calc;
-            }
+            b_value = RootbeerGpu.getSharedInteger((1024 + k * 32 + thread_col) * 4);
             sum += a_value * b_value;
-
-            prev_a = a_value;
-            prev_b = b_value;
           }
 
           RootbeerGpu.synchthreads();

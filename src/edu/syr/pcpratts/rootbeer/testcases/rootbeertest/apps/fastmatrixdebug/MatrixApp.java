@@ -1,4 +1,4 @@
-package rootbeer.examples.gtc2013;
+package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.apps.fastmatrixdebug;
 
 import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
 import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
@@ -104,7 +104,6 @@ public class MatrixApp implements TestApplication {
     m_gpuWatch.stop();
     System.out.println("avg gpu time: "+m_gpuWatch.getAverageTime()+" ms");
 
-/*
     int sum = 0;
     for(Calculation calc : matrix_kernel.m_calcs){
       if(calc == null){
@@ -124,7 +123,6 @@ public class MatrixApp implements TestApplication {
       sum += (calc.m_invalidAValue * calc.m_invalidBValue);
     }
     System.out.println("SUM: "+sum);
-*/
 
     List<StatsRow> stats = rootbeer.getStats();
     for(StatsRow row : stats){
@@ -170,5 +168,9 @@ public class MatrixApp implements TestApplication {
 
   public String errorMessage() {
     return m_errorMessage;
+  }
+
+  public String getEntrySignature() {
+    return "<edu.syr.pcpratts.rootbeer.testcases.rootbeertest.apps.fastmatrixdebug.MatrixKernel: void gpuMethod()>";            
   }
 }

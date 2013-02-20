@@ -26,9 +26,9 @@ public class MatrixApp {
   }
 
   public void init(){
-    m_blockIters = 1;
-    m_blockSize = 64;
-    m_gridSize = 1;
+    m_blockIters = 14;
+    m_blockSize = 256;
+    m_gridSize = 256;
     m_a = new int[m_blockSize*m_blockSize];
     m_b = new int[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
     m_ccpu = new int[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
@@ -42,9 +42,9 @@ public class MatrixApp {
       m_b[i] = i % 3;
     }
 
-    printMatrix(m_a, m_blockSize);
-    printRow(m_a, m_blockSize, 0);
-    printCol(m_a, m_blockSize, 32);
+    //printMatrix(m_a, m_blockSize);
+    //printRow(m_a, m_blockSize, 0);
+    //printCol(m_a, m_blockSize, 32);
   }
 
   private void printMatrix(int[] matrix, int block_size){
@@ -103,20 +103,7 @@ public class MatrixApp {
     m_gpuWatch.stop();
     System.out.println("avg gpu time: "+m_gpuWatch.getAverageTime()+" ms");
 
-    if(matrix_kernel.m_invalidRead){
-      System.out.println("  Invalid READ!");
-      System.out.println("    k: "+matrix_kernel.m_invalidIndexK);
-      System.out.println("    thread_row: "+matrix_kernel.m_invalidIndexRow);
-      System.out.println("    thread_col: "+matrix_kernel.m_invalidIndexCol);
-      System.out.println("    a_value: "+matrix_kernel.m_invalidAValue);
-      System.out.println("    b_value: "+matrix_kernel.m_invalidBValue);
-      System.out.println("    prev_a: "+matrix_kernel.m_invalidPrevA);
-      System.out.println("    prev_b: "+matrix_kernel.m_invalidPrevB);
-      System.out.println("    m: "+matrix_kernel.m_invalidIndexM);
-      System.out.println("    sub_matrix_row: "+matrix_kernel.m_invalidSubMatrixRow);
-      System.out.println("    sub_matrix_col: "+matrix_kernel.m_invalidSubMatrixCol);
-    }
-
+/*
     int sum = 0;
     for(Calculation calc : matrix_kernel.m_calcs){
       if(calc == null){
@@ -136,6 +123,7 @@ public class MatrixApp {
       sum += (calc.m_invalidAValue * calc.m_invalidBValue);
     }
     System.out.println("SUM: "+sum);
+*/
 
     List<StatsRow> stats = rootbeer.getStats();
     for(StatsRow row : stats){

@@ -114,6 +114,7 @@ public class RootbeerCompiler {
       RootbeerClassLoader.v().addTestCasePackage("edu.syr.pcpratts.rootbeer.testcases.");
       RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.test."); 
     }
+    
     RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime.");
     RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime2.");
     RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.configuration.");
@@ -135,6 +136,8 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestExceptionFactory");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestKernelTemplate");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestKernelTemplateFactory");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestApplication");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestApplicationFactory");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.PrivateFields");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.util.IntStack");

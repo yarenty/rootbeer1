@@ -7,9 +7,9 @@
 
 package edu.syr.pcpratts.rootbeer.test;
 
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.apps.fastmatrixdebug.MatrixApp;
 import java.util.ArrayList;
 import java.util.List;
-import rootbeer.examples.gtc2013.MatrixApp;
 
 public class ApplicationMain implements TestApplicationFactory {
 

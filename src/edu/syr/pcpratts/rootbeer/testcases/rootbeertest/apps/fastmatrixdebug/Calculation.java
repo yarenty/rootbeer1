@@ -1,4 +1,4 @@
-package rootbeer.examples.gtc2013;
+package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.apps.fastmatrixdebug;
 
 public class Calculation {
 

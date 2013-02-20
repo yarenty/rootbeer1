@@ -1,4 +1,4 @@
-package rootbeer.examples.gtc2013;
+package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.apps.fastmatrixdebug;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;

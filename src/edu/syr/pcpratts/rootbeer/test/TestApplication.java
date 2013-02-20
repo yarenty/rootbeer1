@@ -11,5 +11,6 @@ public interface TestApplication {
 
   public boolean test();
   public String errorMessage();
+  public String getEntrySignature();
   
 }
