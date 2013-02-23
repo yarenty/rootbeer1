@@ -26,34 +26,38 @@ public class MatrixApp {
   }
 
   public void init(){
-    m_blockIters = 14;
-    m_blockSize = 256;
-    m_gridSize = 256;
+    m_blockIters = 1;
+    m_blockSize = 128;
+    m_gridSize = 1;
     m_a = new int[m_blockSize*m_blockSize];
     m_b = new int[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
     m_ccpu = new int[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
     m_cgpu = new int[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
 
     for(int i = 0; i < m_a.length; ++i){
-      m_a[i] = i % 3;
+      m_a[i] = i %2;
     }
 
     for(int i = 0; i < m_b.length; ++i){
-      m_b[i] = i % 3;
+      m_b[i] = i % 2;
     }
 
     //printMatrix(m_a, m_blockSize);
-    //printRow(m_a, m_blockSize, 0);
-    //printCol(m_a, m_blockSize, 32);
+    //printRow(m_a, m_blockSize, 65 / 64);
+    //printCol(m_a, m_blockSize, 65 % 64);
   }
 
-  private void printMatrix(int[] matrix, int block_size){
+  private void printMatrix(int[] matrix, int block_size, String heading){
+    System.out.println(heading);
     int row_count = 0;
     for(int i = 0; i < matrix.length; ++i){
       System.out.print(matrix[i]+" ");
       row_count++;
-      if(row_count == block_size){
+      if(row_count == block_size / 2){
+        System.out.println();
+      } else if(row_count == block_size){
         row_count = 0;
+        System.out.println();
         System.out.println();
       }
     } 
@@ -103,27 +107,23 @@ public class MatrixApp {
     m_gpuWatch.stop();
     System.out.println("avg gpu time: "+m_gpuWatch.getAverageTime()+" ms");
 
-/*
     int sum = 0;
-    for(Calculation calc : matrix_kernel.m_calcs){
-      if(calc == null){
-        continue;
+    for(int i = 0; i < matrix_kernel.m_calcz.length; ++i){
+      Calculation calc = matrix_kernel.m_calcz[i];
+      if(calc != null){
+        System.out.println("  calc:");
+        System.out.println("    sub_matrix_row: "+calc.sub_matrix_row);
+        System.out.println("    sub_matrix_col: "+calc.sub_matrix_col);
+        System.out.println("    sub_matrix: "+calc.sub_matrix);
+        System.out.println("    m_size: "+calc.m_size);
+        System.out.println("    thread_row: "+calc.thread_row);
+        System.out.println("    thread_col: "+calc.thread_col);
+        System.out.println("    dest_row: "+calc.dest_row);
+        System.out.println("    dest_col: "+calc.dest_col);
+        System.out.println("    block_size: "+calc.block_size);
+        System.out.println("    dest_index: "+calc.dest_index);
       }
-      System.out.println("  calc:");
-      System.out.println("    k: "+calc.m_invalidIndexK);
-      System.out.println("    row: "+calc.m_invalidIndexRow);
-      System.out.println("    col: "+calc.m_invalidIndexCol);
-      System.out.println("    a_value: "+calc.m_invalidAValue);
-      System.out.println("    b_value: "+calc.m_invalidBValue);
-      System.out.println("    prev_a: "+calc.m_invalidPrevA);
-      System.out.println("    prev_b: "+calc.m_invalidPrevB);
-      System.out.println("    m: "+calc.m_invalidIndexM);
-      System.out.println("    sub_matrix_row: "+calc.m_invalidSubMatrixRow);
-      System.out.println("    sub_matrix_col: "+calc.m_invalidSubMatrixCol);
-      sum += (calc.m_invalidAValue * calc.m_invalidBValue);
     }
-    System.out.println("SUM: "+sum);
-*/
 
     List<StatsRow> stats = rootbeer.getStats();
     for(StatsRow row : stats){
@@ -146,6 +146,11 @@ public class MatrixApp {
         System.out.println("  cpu_value: "+cpu_value);
         System.out.println("  gpu_value: "+gpu_value);
         System.out.println("  index: "+i);
+        
+        //printMatrix(m_a, m_blockSize, "m_a");
+        //printMatrix(m_b, m_blockSize, "m_b");
+        //printMatrix(m_ccpu, m_blockSize, "m_ccpu");
+        //printMatrix(m_cgpu, m_blockSize, "m_cgpu");
         System.exit(1);
         return;
       }

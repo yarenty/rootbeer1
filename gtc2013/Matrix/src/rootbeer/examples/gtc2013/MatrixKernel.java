@@ -2,6 +2,7 @@ package rootbeer.examples.gtc2013;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
+import edu.syr.pcpratts.rootbeer.runtimegpu.GpuException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -14,17 +15,9 @@ public class MatrixKernel implements Kernel {
   private int m_blockSize;
   private int m_gridSize;
   private int m_blockIters;
-  public boolean m_invalidRead;
-  public int m_invalidIndexK;
-  public int m_invalidIndexRow;
-  public int m_invalidIndexCol;
-  public int m_invalidAValue;
-  public int m_invalidBValue;
-  public int m_invalidPrevA;
-  public int m_invalidPrevB;
-  public int m_invalidIndexM;
-  public int m_invalidSubMatrixRow;
-  public int m_invalidSubMatrixCol;
+
+  public Calculation m_calcz[];
+  public GpuException m_except;
 
   public MatrixKernel(int[] a, int[] b, int[] c, int block_size, int grid_size,
     int block_iters){
@@ -34,7 +27,7 @@ public class MatrixKernel implements Kernel {
     m_blockSize = block_size;
     m_gridSize = grid_size;
     m_blockIters = block_iters;
-    m_invalidRead = false;
+    m_calcz = new Calculation[8192000];
   }
 
   public void gpuMethod(){
@@ -61,14 +54,16 @@ public class MatrixKernel implements Kernel {
     for(int block_iter = 0; block_iter < block_iters; ++block_iter){ 
       for(int sub_matrix = 0; sub_matrix < sub_matrix_size; ++sub_matrix){
         int sum = 0;
-        int sub_matrix_row = sub_matrix / 2;
-        int sub_matrix_col = sub_matrix % 2;
+        int sub_matrix_row = sub_matrix / m_size;
+        int sub_matrix_col = sub_matrix % m_size;
 
-        int dest_row = (block_size / 2 * sub_matrix_row) + thread_row;
-        int dest_col = (block_size / 2 * sub_matrix_col) + thread_col;
+        int dest_row = (32 * sub_matrix_row) + thread_row;
+        int dest_col = (32 * sub_matrix_col) + thread_col;
 
-        int dest_index = (block_iter * block_size * block_size * grid_size) + (block_idxx * block_size * block_size) + dest_row * block_size + dest_col;   
-     
+        //int dest_index = (block_iter * block_size * block_size * grid_size) + (block_idxx * block_size * block_size) + dest_row * block_size + dest_col;   
+  
+        int dest_index = dest_row * block_size + dest_col;
+
         for(int m = 0; m < m_size; ++m){
           int a_src_row = (sub_matrix_row * 32) + thread_row;
           int a_src_col = (m * 32) + thread_col;
@@ -93,7 +88,20 @@ public class MatrixKernel implements Kernel {
 
           RootbeerGpu.synchthreads();
         }
-
+/*
+        Calculation calc = new Calculation();          
+        calc.sub_matrix_row = sub_matrix_row;
+        calc.sub_matrix_col = sub_matrix_col;
+        calc.sub_matrix = sub_matrix;
+        calc.m_size = m_size;
+        calc.thread_row = thread_row;
+        calc.thread_col = thread_col;
+        calc.dest_row = dest_row;
+        calc.dest_col = dest_col;
+        calc.block_size = block_size;
+        calc.dest_index = dest_index;
+        m_calcz[dest_index] = calc;
+*/
         c[dest_index] += sum;
       }
     }

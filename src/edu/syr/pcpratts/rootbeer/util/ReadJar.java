@@ -7,7 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.util;
 
-import edu.syr.pcpratts.rootbeer.RootbeerCompiler;
+import edu.syr.pcpratts.rootbeer.entry.RootbeerCompiler;
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.util.JarEntryHelp;
 import java.io.File;

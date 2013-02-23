@@ -35,7 +35,6 @@ public class MatrixCpuThread implements Runnable {
     if(m_index == m_numCores - 1){
       stop_row = m_blockSize;
     }
-
     int b_columns = m_blockSize * m_gridSize;
     int a_columns = m_blockSize;
     for(int i = start_row; i < stop_row; ++i){
@@ -43,9 +42,61 @@ public class MatrixCpuThread implements Runnable {
         int sum = 0;
         int dest_index = i*b_columns+j;
         for(int k = 0; k < a_columns; ++k){
-          sum += m_a[i*a_columns+k] * m_b[k*b_columns+j];
+          int a_src = i*a_columns+k;
+          int b_src = k*b_columns+j;
+          int a_value = m_a[a_src];
+          int b_value = m_b[b_src];
+          sum += a_value * b_value;
+          if(dest_index == 0){
+            System.out.println("calc rowz");
+            System.out.println("  k: "+k);
+            System.out.println("  i: "+i);
+            System.out.println("  j: "+j);
+            System.out.println("  a_columns: "+a_columns);
+            System.out.println("  b_columns: "+b_columns);
+            System.out.println("  a_src: "+a_src);
+            System.out.println("  b_src: "+b_src);
+            System.out.println("  a_value: "+a_value);
+            System.out.println("  b_value: "+b_value);
+            System.out.println("  dest_index: "+dest_index);
+          }
         }
-        m_c[i*b_columns+j] = sum;
+/*
+calc rowz
+  k: 0
+  i: 0
+  j: 0
+  a_columns: 128
+  b_columns: 128
+  a_src: 0
+  b_src: 0
+  a_value: 0
+  b_value: 0
+  dest_index: 0
+calc rowz
+  k: 1
+  i: 0
+  j: 0
+  a_columns: 128
+  b_columns: 128
+  a_src: 1
+  b_src: 128
+  a_value: 1
+  b_value: 0
+  dest_index: 0
+calc rowz
+  k: 2
+  i: 0
+  j: 0
+  a_columns: 128
+  b_columns: 128
+  a_src: 2
+  b_src: 256
+  a_value: 0
+  b_value: 0
+  dest_index: 0
+*/
+        m_c[dest_index] = sum;
       } 
     }
   }

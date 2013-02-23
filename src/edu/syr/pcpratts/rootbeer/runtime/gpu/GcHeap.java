@@ -7,7 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.runtime.gpu;
 
-import edu.syr.pcpratts.rootbeer.Aug4th2011PerformanceStudy;
+import edu.syr.pcpratts.rootbeer.entry.Aug4th2011PerformanceStudy;
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.runtime.Serializer;
 import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
@@ -16,6 +16,7 @@ import edu.syr.pcpratts.rootbeer.runtime.CompiledKernel;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
 import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
+import edu.syr.pcpratts.rootbeer.runtimegpu.GpuException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -269,6 +270,12 @@ public abstract class GcHeap {
         } else if(except instanceof RuntimeException){ 
           RuntimeException runtime_ex = (RuntimeException) except;
           throw runtime_ex;
+        } else if(except instanceof GpuException){
+          GpuException gpu_except = (GpuException) except;
+          System.out.println("array: "+gpu_except.m_array);
+          System.out.println("index: "+gpu_except.m_arrayIndex);
+          System.out.println("length: "+gpu_except.m_arrayLength);
+          System.exit(1);
         } else {
           throw new RuntimeException((Throwable) except);
         }

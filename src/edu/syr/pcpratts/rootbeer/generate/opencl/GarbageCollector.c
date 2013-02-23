@@ -526,7 +526,8 @@ edu_syr_pcpratts_array_length($$__global$$ char * gc_info, int thisref){
   //  return edu_syr_pcpratts_cache_get_int(thisref);
   //} else {
     $$__global$$ char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
-    return edu_syr_pcpratts_getint(thisref_deref, 8);
+    int ret = edu_syr_pcpratts_getint(thisref_deref, 8);
+    return ret;
   //}
 }
 

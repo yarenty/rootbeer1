@@ -13,6 +13,7 @@ import edu.syr.pcpratts.rootbeer.runtime.*;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
 import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
+import edu.syr.pcpratts.rootbeer.runtimegpu.GpuException;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.FastMatrixTest;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.MatrixKernel;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
@@ -489,6 +490,12 @@ public class CudaRuntime2 implements ParallelRuntime {
         if(except instanceof Error){
           Error except_th = (Error) except;
           throw except_th;
+        } else if(except instanceof GpuException){
+          GpuException gpu_except = (GpuException) except;
+          System.out.println("array: "+gpu_except.m_array);
+          System.out.println("index: "+gpu_except.m_arrayIndex);
+          System.out.println("length: "+gpu_except.m_arrayLength);
+          System.exit(1);
         } else {
           throw new RuntimeException((Throwable) except);
         }

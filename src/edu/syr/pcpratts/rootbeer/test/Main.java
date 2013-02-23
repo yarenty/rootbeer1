@@ -78,6 +78,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new ChangeThreadTest());
     ret.add(new ShiftTest());
     ret.add(new ArrayListTest());
+    ret.add(new ArrayLengthTest());
             
     if(m_hardTests){
       ret.add(new SimpleSynchronizedTest());
@@ -88,7 +89,7 @@ public class Main implements TestSerializationFactory {
       ret.add(new SynchronizedObjectTest());
     }
     
-    if(edu.syr.pcpratts.rootbeer.Main.largeMemTests()){
+    if(edu.syr.pcpratts.rootbeer.entry.Main.largeMemTests()){
       ret.add(new LargeMemTest());
     }
     

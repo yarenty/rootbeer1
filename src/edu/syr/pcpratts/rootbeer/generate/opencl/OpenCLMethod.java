@@ -526,7 +526,7 @@ public class OpenCLMethod {
     m_dontMangleMethods.add("<java.lang.Throwable: java.lang.StackTraceElement getStackTraceElement(int)>");
     m_dontMangleMethods.add("<java.lang.Object: java.lang.Object clone()>");
     m_dontMangleMethods.add("<java.lang.Object: int hashCode()>");
-    m_dontMangleMethods.add("<java.lang.OutOfMemoryError: void <init>()>");
+    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
     m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: boolean isOnGpu()>");
     m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadId()>"); 
     m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadIdxx()>");
@@ -556,10 +556,16 @@ public class OpenCLMethod {
     m_dontMangleMethods.add("<java.lang.Object: java.lang.Class getClass()>");
     m_dontMangleMethods.add("<java.lang.StringValue: char[] from(char[])");
     m_dontMangleMethods.add("<java.lang.String: void <init>(char[])>");
+    
     m_emitUnmangled.add("<java.lang.String: void <init>(char[])>");
+    m_emitUnmangled.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
   }
 
   public String getSignature() {
     return m_sootMethod.getSignature();
+  }
+
+  public SootMethod getSootMethod() {
+    return m_sootMethod;
   }
 }

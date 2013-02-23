@@ -42,6 +42,7 @@ public class Configuration {
   private boolean m_remapAll;
   private boolean m_maxRegCountSet;
   private int m_maxRegCount;
+  private boolean m_arrayChecks;
   
   static {
     m_printMem = false;
@@ -51,6 +52,7 @@ public class Configuration {
     m_compilerInstance = true;
     m_remapAll = true;
     m_maxRegCountSet = false;
+    m_arrayChecks = true;
   }
 
   private Configuration(boolean load) {
@@ -107,5 +109,13 @@ public class Configuration {
   
   public int getMaxRegCount(){
     return m_maxRegCount;
+  }
+
+  public void setArrayChecks(boolean value) {
+    m_arrayChecks = value;
+  }
+  
+  public boolean getArrayChecks(){
+    return m_arrayChecks;
   }
 }

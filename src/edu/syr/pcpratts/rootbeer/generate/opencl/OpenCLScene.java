@@ -191,7 +191,7 @@ public class OpenCLScene {
     List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedTypes();
     writeTypesToFile(types);
     
-    Set<String> methods = RootbeerClassLoader.v().getDfsInfo().getMethods();
+    Set<String> methods = RootbeerClassLoader.v().getDfsInfo().getMethods();  
     MethodSignatureUtil util = new MethodSignatureUtil();
     for(String method_sig : methods){
       util.parse(method_sig);
@@ -359,8 +359,11 @@ public class OpenCLScene {
     //a set is used so duplicates get filtered out
     Set<String> bodies = new HashSet<String>();
     
+    ArrayCopyTypeReduction reduction = new ArrayCopyTypeReduction();
+    Set<OpenCLArrayType> new_types = reduction.run(m_arrayTypes, m_methodHierarchies);
+    
     ArrayCopyGenerate arr_generate = new ArrayCopyGenerate();
-    bodies.add(arr_generate.get(m_arrayTypes));
+    bodies.add(arr_generate.get(new_types));
     
     ObjectCloneGenerate clone_generate = new ObjectCloneGenerate();
     bodies.add(clone_generate.get(m_arrayTypes, m_classes, m_oclToSoot));
