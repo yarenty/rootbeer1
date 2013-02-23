@@ -12,5 +12,13 @@ public class Calculation {
   public int dest_col;
   public int block_size;
   public int dest_index;
+  public int m;
+  public int k;
+  public int a_src_row;
+  public int a_src_col;
+  public int b_src_row;
+  public int b_src_col;
+  public int a_value;
+  public int b_value;
 
 }

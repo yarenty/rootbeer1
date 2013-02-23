@@ -84,26 +84,76 @@ public class MatrixKernel implements Kernel {
             a_value = RootbeerGpu.getSharedInteger((thread_row * 32 + k) * 4);
             b_value = RootbeerGpu.getSharedInteger((1024 + k * 32 + thread_col) * 4);
             sum += a_value * b_value;
+
+            if(dest_index == 0){
+              Calculation calc = new Calculation();          
+              calc.sub_matrix_row = sub_matrix_row;
+              calc.sub_matrix_col = sub_matrix_col;
+              calc.sub_matrix = sub_matrix;
+              calc.m_size = m_size;
+              calc.thread_row = thread_row;
+              calc.thread_col = thread_col;
+              calc.dest_row = dest_row;
+              calc.dest_col = dest_col;
+              calc.block_size = block_size;
+              calc.dest_index = dest_index;
+              calc.m = m;
+              calc.k = k;
+              calc.a_src_row = a_src_row;
+              calc.a_src_col = a_src_col;
+              calc.b_src_row = b_src_row;
+              calc.b_src_col = b_src_col;
+              calc.a_value = a_value;
+              calc.b_value = b_value;
+              m_calcz[(m * 32) + k] = calc;
+            }
           }
 
           RootbeerGpu.synchthreads();
         }
-/*
-        Calculation calc = new Calculation();          
-        calc.sub_matrix_row = sub_matrix_row;
-        calc.sub_matrix_col = sub_matrix_col;
-        calc.sub_matrix = sub_matrix;
-        calc.m_size = m_size;
-        calc.thread_row = thread_row;
-        calc.thread_col = thread_col;
-        calc.dest_row = dest_row;
-        calc.dest_col = dest_col;
-        calc.block_size = block_size;
-        calc.dest_index = dest_index;
-        m_calcz[dest_index] = calc;
-*/
         c[dest_index] += sum;
       }
     }
   }
 }
+
+/*
+  calc:
+    sub_matrix_row: 0
+    sub_matrix_col: 0
+    sub_matrix: 0
+    m_size: 4
+    thread_row: 0
+    thread_col: 0
+    dest_row: 0
+    dest_col: 0
+    block_size: 128
+    dest_index: 0
+    m: 0
+    k: 0
+    a_src_row: 0
+    a_src_col: 0
+    b_src_row: 0
+    b_src_col: 0
+    a_value: 0
+    b_value: 0
+  calc:
+    sub_matrix_row: 0
+    sub_matrix_col: 0
+    sub_matrix: 0
+    m_size: 4
+    thread_row: 0
+    thread_col: 0
+    dest_row: 0
+    dest_col: 0
+    block_size: 128
+    dest_index: 0
+    m: 0
+    k: 1
+    a_src_row: 0
+    a_src_col: 0
+    b_src_row: 0
+    b_src_col: 0
+    a_value: 1
+    b_value: 1
+*/

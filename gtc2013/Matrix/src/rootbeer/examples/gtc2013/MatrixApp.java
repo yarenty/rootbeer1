@@ -43,8 +43,8 @@ public class MatrixApp {
     }
 
     //printMatrix(m_a, m_blockSize);
-    //printRow(m_a, m_blockSize, 65 / 64);
-    //printCol(m_a, m_blockSize, 65 % 64);
+    printRow(m_a, m_blockSize, 0);
+    printCol(m_b, m_blockSize, 0);
   }
 
   private void printMatrix(int[] matrix, int block_size, String heading){
@@ -122,6 +122,14 @@ public class MatrixApp {
         System.out.println("    dest_col: "+calc.dest_col);
         System.out.println("    block_size: "+calc.block_size);
         System.out.println("    dest_index: "+calc.dest_index);
+        System.out.println("    m: "+calc.m);
+        System.out.println("    k: "+calc.k);
+        System.out.println("    a_src_row: "+calc.a_src_row);
+        System.out.println("    a_src_col: "+calc.a_src_col);
+        System.out.println("    b_src_row: "+calc.b_src_row);
+        System.out.println("    b_src_col: "+calc.b_src_col);
+        System.out.println("    a_value: "+calc.a_value);
+        System.out.println("    b_value: "+calc.b_value);
       }
     }
 
