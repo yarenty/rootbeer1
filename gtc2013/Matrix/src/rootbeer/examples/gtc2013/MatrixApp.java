@@ -10,41 +10,54 @@ import java.util.ArrayList;
 //see: http://www.shodor.org/media/content//petascale/materials/UPModules/matrixMultiplication/moduleDocument.pdf
 public class MatrixApp {
 
-  private int m_a[];
-  private int m_b[];
-  private int m_cgpu[];
-  private int m_ccpu[];
+  private float m_a[];
+  private float m_bgpu[];
+  private float m_bcpu[];
+  private float m_cgpu[];
+  private float m_ccpu[];
   private int m_blockSize;
   private int m_gridSize;
   private int m_blockIters;
   private Stopwatch m_cpuWatch;
   private Stopwatch m_gpuWatch;
+  private Stopwatch m_transposeWatch;
 
   public MatrixApp(){
     m_cpuWatch = new Stopwatch();
     m_gpuWatch = new Stopwatch();
+    m_transposeWatch = new Stopwatch();
   }
 
   public void init(){
-    m_blockIters = 1;
-    m_blockSize = 128;
-    m_gridSize = 1;
-    m_a = new int[m_blockSize*m_blockSize];
-    m_b = new int[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
-    m_ccpu = new int[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
-    m_cgpu = new int[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
+    m_blockIters = 256;
+    m_blockSize = 256;
+    m_gridSize = 14;
+    m_a = new float[m_blockSize*m_blockSize];
+    m_bcpu = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
+    m_bgpu = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
+    m_ccpu = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
+    m_cgpu = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
 
     for(int i = 0; i < m_a.length; ++i){
-      m_a[i] = i %2;
+      m_a[i] = i % 3;
     }
 
-    for(int i = 0; i < m_b.length; ++i){
-      m_b[i] = i % 2;
+    for(int i = 0; i < m_bgpu.length; ++i){
+      m_bgpu[i] = i % 3;
+      m_bcpu[i] = i % 3;
     }
 
-    //printMatrix(m_a, m_blockSize);
-    printRow(m_a, m_blockSize, 0);
-    printCol(m_b, m_blockSize, 0);
+/*
+    m_transposeWatch.start();
+    for(int i = 0; i < m_bgpu.length; ++i){
+      int row = i / (m_blockSize*m_gridSize*m_blockIters);
+      int col = i % (m_blockSize*m_gridSize*m_blockIters);
+
+      m_bcpu[col * m_blockSize + row] = m_bgpu[i];
+    }
+    m_transposeWatch.stop();
+    System.out.println("transpose time: "+m_transposeWatch.getAverageTime()+" ms");
+*/
   }
 
   private void printMatrix(int[] matrix, int block_size, String heading){
@@ -53,11 +66,8 @@ public class MatrixApp {
     for(int i = 0; i < matrix.length; ++i){
       System.out.print(matrix[i]+" ");
       row_count++;
-      if(row_count == block_size / 2){
-        System.out.println();
-      } else if(row_count == block_size){
+      if(row_count == block_size){
         row_count = 0;
-        System.out.println();
         System.out.println();
       }
     } 
@@ -85,7 +95,7 @@ public class MatrixApp {
     m_cpuWatch.start();
     List<MatrixCpuThread> threads = new ArrayList<MatrixCpuThread>();
     for(int i = 0; i < num_cores; ++i){
-      MatrixCpuThread thread = new MatrixCpuThread(m_a, m_b, m_ccpu, i,
+      MatrixCpuThread thread = new MatrixCpuThread(m_a, m_bcpu, m_ccpu, i,
         m_blockSize, m_gridSize*m_blockIters, num_cores);
       threads.add(thread);
     }
@@ -99,39 +109,13 @@ public class MatrixApp {
 
   private void gpuRun(){
     m_gpuWatch.start();
-    MatrixKernel matrix_kernel = new MatrixKernel(m_a, m_b, m_cgpu, m_blockSize, 
+    MatrixKernel matrix_kernel = new MatrixKernel(m_a, m_bgpu, m_cgpu, m_blockSize, 
       m_gridSize, m_blockIters);
     Rootbeer rootbeer = new Rootbeer();
     rootbeer.setThreadConfig(1024, m_gridSize);
     rootbeer.runAll(matrix_kernel);
     m_gpuWatch.stop();
     System.out.println("avg gpu time: "+m_gpuWatch.getAverageTime()+" ms");
-
-    int sum = 0;
-    for(int i = 0; i < matrix_kernel.m_calcz.length; ++i){
-      Calculation calc = matrix_kernel.m_calcz[i];
-      if(calc != null){
-        System.out.println("  calc:");
-        System.out.println("    sub_matrix_row: "+calc.sub_matrix_row);
-        System.out.println("    sub_matrix_col: "+calc.sub_matrix_col);
-        System.out.println("    sub_matrix: "+calc.sub_matrix);
-        System.out.println("    m_size: "+calc.m_size);
-        System.out.println("    thread_row: "+calc.thread_row);
-        System.out.println("    thread_col: "+calc.thread_col);
-        System.out.println("    dest_row: "+calc.dest_row);
-        System.out.println("    dest_col: "+calc.dest_col);
-        System.out.println("    block_size: "+calc.block_size);
-        System.out.println("    dest_index: "+calc.dest_index);
-        System.out.println("    m: "+calc.m);
-        System.out.println("    k: "+calc.k);
-        System.out.println("    a_src_row: "+calc.a_src_row);
-        System.out.println("    a_src_col: "+calc.a_src_col);
-        System.out.println("    b_src_row: "+calc.b_src_row);
-        System.out.println("    b_src_col: "+calc.b_src_col);
-        System.out.println("    a_value: "+calc.a_value);
-        System.out.println("    b_value: "+calc.b_value);
-      }
-    }
 
     List<StatsRow> stats = rootbeer.getStats();
     for(StatsRow row : stats){
@@ -147,18 +131,13 @@ public class MatrixApp {
 
   private void verify(){
     for(int i = 0; i < m_ccpu.length; ++i){
-      int cpu_value = m_ccpu[i];
-      int gpu_value = m_cgpu[i];
+      float cpu_value = m_ccpu[i];
+      float gpu_value = m_cgpu[i];
       if(cpu_value != gpu_value){
         System.out.println("Verify Failed.");
         System.out.println("  cpu_value: "+cpu_value);
         System.out.println("  gpu_value: "+gpu_value);
         System.out.println("  index: "+i);
-        
-        //printMatrix(m_a, m_blockSize, "m_a");
-        //printMatrix(m_b, m_blockSize, "m_b");
-        //printMatrix(m_ccpu, m_blockSize, "m_ccpu");
-        //printMatrix(m_cgpu, m_blockSize, "m_cgpu");
         System.exit(1);
         return;
       }

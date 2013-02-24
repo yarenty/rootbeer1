@@ -2,16 +2,16 @@ package rootbeer.examples.gtc2013;
 
 public class MatrixCpuThread implements Runnable {
 
-  private int[] m_a;
-  private int[] m_b;
-  private int[] m_c;
+  private float[] m_a;
+  private float[] m_b;
+  private float[] m_c;
   private int m_index;
   private int m_blockSize;
   private int m_gridSize;
   private int m_numCores;
   private Thread m_thread;  
 
-  public MatrixCpuThread(int[] a, int[] b, int[] c, int index, int block_size, 
+  public MatrixCpuThread(float[] a, float[] b, float[] c, int index, int block_size, 
     int grid_size, int num_cores){
 
     m_a = a;
@@ -39,15 +39,16 @@ public class MatrixCpuThread implements Runnable {
     int a_columns = m_blockSize;
     for(int i = start_row; i < stop_row; ++i){
       for(int j = 0; j < b_columns; ++j){
-        int sum = 0;
+        float sum = 0;
         int dest_index = i*b_columns+j;
         for(int k = 0; k < a_columns; ++k){
           int a_src = i*a_columns+k;
           int b_src = k*b_columns+j;
-          int a_value = m_a[a_src];
-          int b_value = m_b[b_src];
+          float a_value = m_a[a_src];
+          float b_value = m_b[b_src];
           sum += a_value * b_value;
-          if(dest_index == 0){
+/*
+          if(dest_index == 256){
             System.out.println("calc rowz");
             System.out.println("  k: "+k);
             System.out.println("  i: "+i);
@@ -60,42 +61,8 @@ public class MatrixCpuThread implements Runnable {
             System.out.println("  b_value: "+b_value);
             System.out.println("  dest_index: "+dest_index);
           }
-        }
-/*
-calc rowz
-  k: 0
-  i: 0
-  j: 0
-  a_columns: 128
-  b_columns: 128
-  a_src: 0
-  b_src: 0
-  a_value: 0
-  b_value: 0
-  dest_index: 0
-calc rowz
-  k: 1
-  i: 0
-  j: 0
-  a_columns: 128
-  b_columns: 128
-  a_src: 1
-  b_src: 128
-  a_value: 1
-  b_value: 0
-  dest_index: 0
-calc rowz
-  k: 2
-  i: 0
-  j: 0
-  a_columns: 128
-  b_columns: 128
-  a_src: 2
-  b_src: 256
-  a_value: 0
-  b_value: 0
-  dest_index: 0
 */
+        }
         m_c[dest_index] = sum;
       } 
     }
