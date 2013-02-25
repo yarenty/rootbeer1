@@ -15,7 +15,7 @@ public class KernelTemplateMain implements TestKernelTemplateFactory {
 
   public List<TestKernelTemplate> getProviders() {
     List<TestKernelTemplate> ret = new ArrayList<TestKernelTemplate>();
-    ret.add(new FastMatrixTest());
+    //ret.add(new FastMatrixTest());
     return ret;
   }
 
