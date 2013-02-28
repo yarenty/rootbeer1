@@ -72,7 +72,8 @@ public class ToSpaceWriter {
             not_written.remove(0);
           }     
         } catch(OutOfMemoryError ex){
-          //
+          ex.printStackTrace();
+          System.exit(1);
         } finally {
           m_OutputQueue.put(new ToSpaceWriterResult(handles, items, not_written));     
         }

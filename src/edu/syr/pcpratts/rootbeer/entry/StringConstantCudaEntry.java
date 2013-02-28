@@ -31,6 +31,11 @@ public class StringConstantCudaEntry extends ConditionalCudaEntry {
       MethodSignatureUtil util = new MethodSignatureUtil();
       util.parse(method);
       SootMethod soot_method = util.getSootMethod();
+      
+      if(soot_method.isConcrete() == false){
+        continue;
+      }
+      
       Body body = soot_method.retrieveActiveBody();
       List<ValueBox> boxes = body.getUseAndDefBoxes();
       for(ValueBox box : boxes){

@@ -14,6 +14,9 @@ import soot.*;
 public class IsPolyMorphic {
 
   public boolean isPoly(SootMethod soot_method, List<Type> hierarchy){ 
+    if(soot_method.isConcrete() == false){
+      return true;
+    }
     hierarchy = trimNonConcrete(soot_method, hierarchy);
     if(hierarchy.size() > 2){
       return true;
