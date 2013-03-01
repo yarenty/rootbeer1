@@ -52,7 +52,7 @@ Download it from http://www.nvidia.com/content/cuda/cuda-downloads.html
 
 ## Open Source
 
-We are talking on: https://trifort.campfirenow.com/8c150
+We are talking on: https://trifort.campfirenow.com/c1ac1
 
 ## Clarifications
 
