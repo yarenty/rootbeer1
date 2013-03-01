@@ -20,8 +20,8 @@ public class ArrayMultApp {
   
   public static void main(String[] args){
     ArrayMultApp app = new ArrayMultApp();
-    int[] array = new int[14];
-    for(int i = 0; i < 14; ++i){
+    int[] array = new int[10];
+    for(int i = 0; i < array.length; ++i){
       array[i] = i;
     }
     for(int i = 0; i < array.length; ++i){
