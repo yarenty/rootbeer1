@@ -8,12 +8,19 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import soot.*;
 
 public class IsPolyMorphic {
 
   public boolean isPoly(SootMethod soot_method, List<Type> hierarchy){ 
+    String name = soot_method.getName();
+    if(name.equals("<init>") || name.equals("<clinit>")){
+      return false;
+    }
     if(soot_method.isConcrete() == false){
       return true;
     }
@@ -43,7 +50,7 @@ public class IsPolyMorphic {
   }
 
   private List<Type> trimNonConcrete(SootMethod soot_method, List<Type> hierarchy) {
-    List<Type> ret = new ArrayList<Type>();
+    Set<Type> ret_set = new HashSet<Type>();
     for(Type type : hierarchy){
       if(type instanceof RefType){
         RefType ref_type = (RefType) type;
@@ -52,13 +59,15 @@ public class IsPolyMorphic {
         if(soot_class.declaresMethod(subsig)){
           SootMethod curr_method = soot_class.getMethod(subsig);
           if(curr_method.isConcrete()){
-            ret.add(type);
+            ret_set.add(type);
           }
         }
       } else {
-        ret.add(type);
+        ret_set.add(type);
       }
     }
+    List<Type> ret = new ArrayList<Type>();
+    ret.addAll(ret_set);
     return ret;
   }
 }

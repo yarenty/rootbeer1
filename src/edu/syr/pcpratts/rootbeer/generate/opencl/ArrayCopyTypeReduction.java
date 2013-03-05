@@ -20,8 +20,10 @@ public class ArrayCopyTypeReduction {
     Set<OpenCLArrayType> ret = new HashSet<OpenCLArrayType>();
     for(OpenCLMethod method : hierarchies.getMethods()){
       SootMethod soot_method = method.getSootMethod();
-      Body body = soot_method.retrieveActiveBody();
-      ret.addAll(findTypes(body, array_types));
+      if(soot_method.isConcrete()){
+        Body body = soot_method.retrieveActiveBody();
+        ret.addAll(findTypes(body, array_types));
+      }
     }
     return ret;
   }

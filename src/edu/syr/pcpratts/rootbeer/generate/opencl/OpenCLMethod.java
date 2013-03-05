@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.entry.DontDfsMethods;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.OpenCLBody;
@@ -223,7 +224,13 @@ public class OpenCLMethod {
           if(isSynchronized()){
             ret.append(synchronizedEnter()); 
           }
+          try {
           ret.append(ocl_body.getBodyNoLocals());
+          } catch(Exception ex){
+            ex.printStackTrace();
+            System.out.println("soot_method: "+m_sootMethod.getSignature());
+            System.exit(1);
+          }
           if(isSynchronized()){
             if(isLinux()){
               ret.append("  } else {");
@@ -307,6 +314,11 @@ public class OpenCLMethod {
       hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(ref_type.getSootClass());
     } else {
       throw new UnsupportedOperationException("how do we handle this case?");
+    }
+    
+    if(hierarchy == null){
+      System.out.println("base_type: "+base_type);
+      throw new RuntimeException("hello");
     }
     
     IsPolyMorphic poly_checker = new IsPolyMorphic();    
@@ -427,7 +439,7 @@ public class OpenCLMethod {
     //if we are here and a method is not concrete, it is the case where a 
     //invoke expresion is to an interface pointer and the method is not polymorphic
     if(m_sootMethod.isConcrete() == false){
-      Set<String> virtual_signatures = RootbeerClassLoader.v().getVirtualSignaturesDown(m_sootMethod);
+      Set<String> virtual_signatures = RootbeerClassLoader.v().getVirtualSignaturesDown(m_sootMethod, null);
       //double check that we are safe to do the interface remapping
       if(virtual_signatures.size() != 1){
         //not safe, go back to normal method
@@ -496,67 +508,14 @@ public class OpenCLMethod {
   private void createDontMangleMethods() {
     m_dontMangleMethods = new HashSet<String>();
     m_emitUnmangled = new HashSet<String>();
-    m_dontMangleMethods.add("<java.lang.StrictMath: double exp(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double log(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double log10(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double log(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double sqrt(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double cbrt(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double IEEEremainder(double,double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double ceil(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double floor(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double sin(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double cos(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double tan(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double asin(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double acos(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double atan(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double atan2(double,double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double pow(double,double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double sinh(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double cosh(double)>");
-    m_dontMangleMethods.add("<java.lang.StrictMath: double tanh(double)>");
-    m_dontMangleMethods.add("<java.lang.Double: long doubleToLongBits(double)>");
-    m_dontMangleMethods.add("<java.lang.Double: double longBitsToDouble(long)>");
-    m_dontMangleMethods.add("<java.lang.Float: int floatToIntBits(float)>");
-    m_dontMangleMethods.add("<java.lang.Float: float intBitsToFloat(int)>");
-    m_dontMangleMethods.add("<java.lang.System: void arraycopy(java.lang.Object,int,java.lang.Object,int,int)>");
-    m_dontMangleMethods.add("<java.lang.Throwable: java.lang.Throwable fillInStackTrace()>");
-    m_dontMangleMethods.add("<java.lang.Throwable: int getStackTraceDepth()>");
-    m_dontMangleMethods.add("<java.lang.Throwable: java.lang.StackTraceElement getStackTraceElement(int)>");
-    m_dontMangleMethods.add("<java.lang.Object: java.lang.Object clone()>");
-    m_dontMangleMethods.add("<java.lang.Object: int hashCode()>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: boolean isOnGpu()>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadId()>"); 
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadIdxx()>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getBlockIdxx()>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getBlockDimx()>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: long getRef(java.lang.Object)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void synchthreads()>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: byte getSharedByte(int)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void setSharedByte(int,byte)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: char getSharedChar(int)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void setSharedChar(int,char)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: boolean getSharedBoolean(int)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void setSharedBoolean(int,boolean)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: short getSharedShort(int)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void setSharedShort(int,short)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getSharedInteger(int)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void setSharedInteger(int,int)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: long getSharedLong(int)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void setSharedLong(int,long)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: float getSharedFloat(int)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void setSharedFloat(int,float)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: double getSharedDouble(int)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void setSharedDouble(int,double)>");
-    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: double sin(double)>");
-    m_dontMangleMethods.add("<java.lang.System: long nanoTime()>");
-    m_dontMangleMethods.add("<java.lang.Class: java.lang.String getName()>");
-    m_dontMangleMethods.add("<java.lang.Object: java.lang.Class getClass()>");
-    m_dontMangleMethods.add("<java.lang.StringValue: char[] from(char[])");
-    m_dontMangleMethods.add("<java.lang.String: void <init>(char[])>");
     
+    DontDfsMethods dont_dfs_methods = new DontDfsMethods();
+    for(String dont_dfs : dont_dfs_methods.get()){
+      m_dontMangleMethods.add(dont_dfs);
+    }
+    m_dontMangleMethods.add("<java.lang.String: void <init>(char[])>");
+    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
+  
     m_emitUnmangled.add("<java.lang.String: void <init>(char[])>");
     m_emitUnmangled.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
   }

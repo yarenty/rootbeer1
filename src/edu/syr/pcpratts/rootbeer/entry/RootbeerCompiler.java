@@ -159,6 +159,12 @@ public class RootbeerCompiler {
     
     RootbeerClassLoader.v().addConditionalCudaEntry(new StringConstantCudaEntry());
     
+    DontDfsMethods dont_dfs_methods = new DontDfsMethods();
+    Set<String> dont_dfs_set = dont_dfs_methods.get();
+    for(String dont_dfs : dont_dfs_set){
+      RootbeerClassLoader.v().addDontDfsMethod(dont_dfs);
+    }
+    
     List<String> cuda_fields = new ArrayList<String>();
     cuda_fields.add("<java.lang.Class: java.lang.String name>");
     RootbeerClassLoader.v().setCudaFields(cuda_fields);
@@ -209,9 +215,7 @@ public class RootbeerCompiler {
       transform2.run(soot_class.getName());
     }
     
-    
     System.out.println("writing classes out...");
-    
     RootbeerClassLoader.v().setLoaded();
     
     List<String> all_classes = RootbeerClassLoader.v().getClassesToOutput();

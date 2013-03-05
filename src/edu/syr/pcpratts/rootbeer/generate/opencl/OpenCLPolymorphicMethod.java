@@ -54,6 +54,9 @@ public class OpenCLPolymorphicMethod {
   public String getMethodBody(){
     if(m_sootMethod.getName().equals("<init>"))
       return "";
+    if(m_sootMethod.isConcrete() == false){
+      return "";
+    }
     List<Type> hierarchy = getHierarchy();
     Type first_type = hierarchy.get(0);
     if(first_type instanceof RefType == false){

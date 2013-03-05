@@ -32,6 +32,8 @@ public class ArrayListRunOnGpu implements Kernel {
     
     if(lhs_list.size() != rhs_list.size()){
       System.out.println("size");
+      System.out.println("lhs: "+lhs_list.size());
+      System.out.println("rhs: "+rhs_list.size());
       return false;
     }
     

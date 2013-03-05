@@ -638,3 +638,39 @@ java_lang_StringValue_from( char * gc_info , int thisref, int * exception ) {
   
   return new_ref;
 }
+
+$$__device__$$ int
+java_util_Arrays_copyOf(char * gc_info, int object_array, int new_size, int * exception ){
+  int ret;
+  char * ret_deref;
+  char * object_array_deref;
+  int length;
+  int i;
+  
+  ret = edu_syr_pcpratts_gc_malloc(gc_info, 16 + (4 * new_size));
+  ret_deref = edu_syr_pcpratts_gc_deref(gc_info, ret);
+  object_array_deref = edu_syr_pcpratts_gc_deref(gc_info, object_array);
+    
+  for(i = 0; i < 16; ++i){
+    ret_deref[i] = object_array_deref[i];
+  }
+  
+  length = edu_syr_pcpratts_getint(object_array_deref, 8);
+  
+  edu_syr_pcpratts_setint(ret_deref, 8, new_size);
+  
+  if(length < new_size){
+    for(i = 0; i < length * 4; ++i){
+      ret_deref[16+i], object_array_deref[16+i];
+    }
+    int diff = new_size - length;
+    for(i = 0; i < diff; ++i){
+      * ((int *) ret_deref[16 + (length * 4) + (i * 4)]) = -1;
+    }
+  } else {
+    for(i = 0; i < new_size * 4; ++i){
+      ret_deref[16+i], object_array_deref[16+i];
+    }
+  }
+  return ret; 
+}
