@@ -14,7 +14,8 @@ public interface CompiledKernel {
   public String getCodeWindows();
   public int getNullPointerNumber();
   public int getOutOfMemoryNumber();
-  public String getCubin();
+  public String getCubin32();
+  public String getCubin64();
   public Serializer getSerializer(Memory mem, Memory texture_mem);
   public boolean isUsingGarbageCollector();
 }
