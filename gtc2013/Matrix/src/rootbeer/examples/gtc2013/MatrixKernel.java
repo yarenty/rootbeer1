@@ -82,7 +82,7 @@ public class MatrixKernel implements Kernel {
             b_value = RootbeerGpu.getSharedFloat((1024 + k * 32 + thread_col) * 4);
             sum += a_value * b_value;
 
-            if(dest_index == 0){
+            if(dest_index == 1){
               Calculation calc = new Calculation();          
               calc.sub_matrix_row = sub_matrix_row;
               calc.sub_matrix_col = sub_matrix_col;

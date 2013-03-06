@@ -13,8 +13,10 @@ public class MatrixApp {
   private float m_a[];
   private float m_bgpu[];
   private float m_bcpu[];
+  private float m_bcpu2[];
   private float m_cgpu[];
   private float m_ccpu[];
+  private float m_ccpu2[];
   private int m_blockSize;
   private int m_gridSize;
   private int m_blockIters;
@@ -29,13 +31,15 @@ public class MatrixApp {
   }
 
   public void init(){
-    m_blockIters = 256;
-    m_blockSize = 256;
-    m_gridSize = 14;
+    m_blockIters = 32;
+    m_blockSize = 32;
+    m_gridSize = 2;
     m_a = new float[m_blockSize*m_blockSize];
     m_bcpu = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
+    m_bcpu2 = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
     m_bgpu = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
     m_ccpu = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
+    m_ccpu2 = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
     m_cgpu = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
 
     for(int i = 0; i < m_a.length; ++i){
@@ -44,23 +48,17 @@ public class MatrixApp {
 
     for(int i = 0; i < m_bgpu.length; ++i){
       m_bgpu[i] = i % 3;
-      m_bcpu[i] = i % 3;
+      m_bcpu2[i] = i % 3;
     }
 
     m_transposeWatch.start();
     for(int i = 0; i < m_bgpu.length; ++i){
       int row = i / (m_blockSize*m_gridSize*m_blockIters);
       int col = i % (m_blockSize*m_gridSize*m_blockIters);
-
-      System.out.println("transpose");
-      System.out.println("  i: "+i);
-      System.out.println("  row: "+row);
-      System.out.println("  col: "+col);
-      m_bcpu[col * m_blockSize + row] = m_bgpu[i];
-      if(i == 10){
-        System.exit(0);
-      }
+      int dest = col * m_blockSize + row;
+      m_bcpu[dest] = m_bgpu[i];
     }
+
     m_transposeWatch.stop();
     System.out.println("transpose time: "+m_transposeWatch.getAverageTime()+" ms");
   }
@@ -101,7 +99,7 @@ public class MatrixApp {
     List<MatrixCpuThread> threads = new ArrayList<MatrixCpuThread>();
     for(int i = 0; i < num_cores; ++i){
       MatrixCpuThread thread = new MatrixCpuThread(m_a, m_bcpu, m_ccpu, i,
-        m_blockSize, m_gridSize*m_blockIters, num_cores);
+        m_blockSize, m_gridSize*m_blockIters, num_cores, true);
       threads.add(thread);
     }
     for(int i = 0; i < num_cores; ++i){
@@ -110,6 +108,17 @@ public class MatrixApp {
     }
     m_cpuWatch.stop();
     System.out.println("avg cpu time: "+m_cpuWatch.getAverageTime()+" ms");
+    
+    threads = new ArrayList<MatrixCpuThread>();
+    for(int i = 0; i < num_cores; ++i){
+      MatrixCpuThread thread = new MatrixCpuThread(m_a, m_bcpu2, m_ccpu2, i,
+        m_blockSize, m_gridSize*m_blockIters, num_cores, false);
+      threads.add(thread);
+    }
+    for(int i = 0; i < num_cores; ++i){
+      MatrixCpuThread thread = threads.get(i);
+      thread.join();
+    }
   }
 
   private void gpuRun(){
@@ -142,6 +151,22 @@ public class MatrixApp {
     }
   }
 
+  private void verifyCpuTranspose(){
+    for(int i = 0; i < m_ccpu.length; ++i){
+      float cpu_value = m_ccpu[i];
+      float cpu_value2 = m_ccpu2[i];
+      if(cpu_value != cpu_value2){
+        System.out.println("Verify Failed.");
+        System.out.println("  cpu_value: "+cpu_value);
+        System.out.println("  cpu_value2: "+cpu_value2);
+        System.out.println("  index: "+i);
+        System.exit(1);
+        return;
+      }
+    }
+    System.out.println("Verify PASSED!");
+  }
+
   private void verify(){
     for(int i = 0; i < m_ccpu.length; ++i){
       float cpu_value = m_ccpu[i];
@@ -162,8 +187,9 @@ public class MatrixApp {
     for(int i = 0; i < 50; ++i){
       init();
       cpuRun();
-      gpuRun();
-      verify();
+      verifyCpuTranspose();
+      //gpuRun();
+      //verify();
     }
   }
 
