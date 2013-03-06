@@ -182,26 +182,30 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_d
   longHostMemory[ptr / 8] = value;
 }
 
-
-/*
- * Class:     edu_syr_pcpratts_rootbeer_runtime_memory_GpuMemoryStorage
- * Method:    doWriteIntArray
- * Signature: ([IJ)V
- */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteIntArray
   (JNIEnv *env, jobject this_obj, jintArray array, jlong ref, jint start, jint len){
   int * dest = (int *) (ref + start);
   (*env)->GetIntArrayRegion(env, array, start, len, dest);
 }
 
-/*
- * Class:     edu_syr_pcpratts_rootbeer_runtime_memory_GpuMemoryStorage
- * Method:    doWriteIntArray
- * Signature: ([IJ)V
- */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadIntArray
   (JNIEnv *env, jobject this_obj, jintArray array, jlong ref, jint start, jint len){
 
   int * dest = (int *) (ref + start);
   (*env)->SetIntArrayRegion(env, array, start, len, dest);
 }
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteFloatArray
+  (JNIEnv *env, jobject this_obj, jfloatArray array, jlong ref, jint start, jint len){
+  
+  float * dest = (float *) (ref + start);
+  (*env)->GetFloatArrayRegion(env, array, start, len, dest);
+}
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadFloatArray
+  (JNIEnv *env, jobject this_obj, jfloatArray array, jlong ref, jint start, jint len){
+
+  float * dest = (float *) (ref + start);
+  (*env)->SetFloatArrayRegion(env, array, start, len, dest);
+}
+

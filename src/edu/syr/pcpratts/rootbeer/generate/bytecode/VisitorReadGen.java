@@ -170,7 +170,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     
     //trying optimization where we use JNI memcpy for single
     //dimenisonal arrays
-    if(type.baseType.equals(IntType.v()) && type.numDimensions == 1){
+    if((type.baseType.equals(IntType.v()) || type.baseType.equals(FloatType.v()))
+      && type.numDimensions == 1){
       bcl.pushMethod(m_currMem.top(), "readArray", VoidType.v(), type);
       bcl.invokeMethodNoRet(m_currMem.top(), object_to_read_from);
       Local element_size = bcl.local(IntType.v());

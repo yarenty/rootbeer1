@@ -137,6 +137,7 @@ public abstract class Memory {
   public abstract long readLong();
   public abstract long readRef();
   public abstract void readArray(int[] array);
+  public abstract void readArray(float[] array);
 
   public abstract void writeByte(byte value);
   public abstract void writeBoolean(boolean value);
@@ -147,6 +148,7 @@ public abstract class Memory {
   public abstract void writeLong(long value);
   public abstract void writeRef(long value);
   public abstract void writeArray(int[] array);
+  public abstract void writeArray(float[] array);
 
   public abstract void setAddress(long address);
   public abstract void incrementAddress(int offset);

@@ -189,7 +189,8 @@ public class VisitorWriteGen extends AbstractVisitorGen {
 
     //trying optimization where we use JNI memcpy for single
     //dimenisonal arrays
-    if(type.baseType.equals(IntType.v()) && type.numDimensions == 1){
+    if((type.baseType.equals(IntType.v()) || type.baseType.equals(FloatType.v()))
+      && type.numDimensions == 1){
       bcl.pushMethod(m_CurrentMem.top(), "writeArray", VoidType.v(), type);
       bcl.invokeMethodNoRet(m_CurrentMem.top(), object_to_write_from);
       bcl_mem.incrementAddress(element_size);

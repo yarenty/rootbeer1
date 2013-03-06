@@ -152,8 +152,20 @@ public class FastMemory extends Memory {
     doReadIntArray(array, m_CpuBase+currPointer(), 0, array.length);  
   }
   
+  @Override
+  public void writeArray(float[] array){
+    doWriteFloatArray(array, m_CpuBase+currPointer(), 0, array.length);
+  }
+    
+  @Override
+  public void readArray(float[] array){
+    doReadFloatArray(array, m_CpuBase+currPointer(), 0, array.length);  
+  }
+  
   public native void doReadIntArray(int[] array, long addr, int start, int len);
   public native void doWriteIntArray(int[] array, long addr, int start, int len);
+  public native void doReadFloatArray(float[] array, long addr, int start, int len);
+  public native void doWriteFloatArray(float[] array, long addr, int start, int len);
   
   public native byte doReadByte(long ptr, long cpu_base);
   public native boolean doReadBoolean(long ptr, long cpu_base);

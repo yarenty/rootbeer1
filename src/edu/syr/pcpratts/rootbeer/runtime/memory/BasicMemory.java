@@ -127,6 +127,12 @@ public abstract class BasicMemory extends Memory {
     }
   }
 
+  public void readArray(float[] array){
+    for(int i = 0; i < array.length; ++i){
+      array[i] = readFloat();
+    }
+  }
+  
   public void writeByte(byte value){
     long ptr = getPointer();
     mData.set(ptr, value);
@@ -182,6 +188,12 @@ public abstract class BasicMemory extends Memory {
   public void writeArray(int[] array){
     for(int value : array){
       writeInt(value);
+    }
+  }
+  
+  public void writeArray(float[] array){
+    for(float value : array){
+      writeFloat(value);
     }
   }
 
