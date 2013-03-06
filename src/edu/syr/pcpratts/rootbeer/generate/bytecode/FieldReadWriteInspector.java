@@ -9,28 +9,11 @@ package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import soot.ArrayType;
-import soot.Body;
-import soot.Local;
-import soot.PatchingChain;
-import soot.RefType;
-import soot.Scene;
-import soot.SootClass;
-import soot.SootField;
-import soot.SootMethod;
-import soot.Type;
-import soot.Unit;
-import soot.Value;
-import soot.ValueBox;
-import soot.jimple.ArrayRef;
-import soot.jimple.AssignStmt;
-import soot.jimple.FieldRef;
-import soot.jimple.InvokeExpr;
+import java.util.*;
+import soot.*;
+import soot.jimple.*;
 import soot.rbclassload.DfsInfo;
+import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.util.Chain;
 
@@ -180,62 +163,85 @@ public class FieldReadWriteInspector {
     return null;
   }
 
-  private void inspectMethod(SootMethod method) {
-    if(mMethodsInspected.contains(method))
+  private void inspectMethod(SootMethod root) {
+    if (mMethodsInspected.contains(root))
       return;
-    mMethodsInspected.add(method);
-
-    Body body;
-    try {
-      body = method.retrieveActiveBody();
-    } catch(RuntimeException ex){
-      //no body for method...
-      System.out.println("no body for method: "+method.toString());
-      return;
-    }
-
-    List<ValueBox> use_boxes = body.getUseBoxes();
-    for(ValueBox use_box : use_boxes){
-      Value use = use_box.getValue();
-      if(use instanceof FieldRef){
-        FieldRef field_ref = (FieldRef) use;
-        SootField field = field_ref.getField();
-        mAllFields.add(field);
-        if(field.getType() instanceof ArrayType){
-          if(!arrayIsReadFrom(body, use))
-            continue;
-        }
-        addReadField(field_ref.getField());
+    // work list to reduce recursion
+    ArrayDeque<SootMethod> worklist = new ArrayDeque<SootMethod>(1);
+    worklist.add(root);
+    while (!worklist.isEmpty()) {
+      SootMethod method = worklist.pop();
+      Body body;
+      try {
+        body = method.retrieveActiveBody();
+      } catch (RuntimeException ex) {
+        //no body for method...
+        System.out.println("no body for method: "+method.toString());
+        continue;
       }
-    }
 
-    List<ValueBox> def_boxes = body.getDefBoxes();
-    for(ValueBox def_box : def_boxes){
-      Value def = def_box.getValue();
-      if(def instanceof FieldRef){
-        FieldRef field_ref = (FieldRef) def;
-        SootField field = field_ref.getField();
-        addWriteField(field);
-        mAllFields.add(field);
-      } else if (def instanceof ArrayRef){
-        ArrayRef array_ref = (ArrayRef) def;
-        SootField field = findFieldMakingArray(body, array_ref.getBase());
-        if(field != null){
+      List<ValueBox> use_boxes = body.getUseBoxes();
+      for(ValueBox use_box : use_boxes){
+        Value use = use_box.getValue();
+        if(use instanceof FieldRef){
+          FieldRef field_ref = (FieldRef) use;
+          SootField field = field_ref.getField();
+          mAllFields.add(field);
+          if(field.getType() instanceof ArrayType){
+            if(!arrayIsReadFrom(body, use))
+              continue;
+          }
+          addReadField(field_ref.getField());
+        }
+      }
+
+      List<ValueBox> def_boxes = body.getDefBoxes();
+      for(ValueBox def_box : def_boxes){
+        Value def = def_box.getValue();
+        if(def instanceof FieldRef){
+          FieldRef field_ref = (FieldRef) def;
+          SootField field = field_ref.getField();
           addWriteField(field);
-          Value base = array_ref.getBase();
-          if(base instanceof Local){
-            Local local_base = (Local) base;
-            mWrittenOnGpuArrayLocals.add(local_base);
+          mAllFields.add(field);
+        } else if (def instanceof ArrayRef){
+          ArrayRef array_ref = (ArrayRef) def;
+          SootField field = findFieldMakingArray(body, array_ref.getBase());
+          if(field != null){
+            addWriteField(field);
+            Value base = array_ref.getBase();
+            if(base instanceof Local){
+              Local local_base = (Local) base;
+              mWrittenOnGpuArrayLocals.add(local_base);
+            }
           }
         }
       }
-    }
-
-    for(ValueBox use_box : use_boxes){
-      Value use = use_box.getValue();
-      if(use instanceof InvokeExpr){
-        InvokeExpr invoke_expr = (InvokeExpr) use;
-        inspectMethod(invoke_expr.getMethod());
+      
+      for(ValueBox use_box : use_boxes){
+        Value use = use_box.getValue();
+        if(use instanceof InvokeExpr) {
+          SootMethod invoke = ((InvokeExpr) use).getMethod();
+          if (!invoke.isAbstract() && !invoke.isNative() && mMethodsInspected.add(invoke))
+            worklist.add(invoke);
+          // ignore immutable members
+          if (!invoke.isStatic() && !invoke.isFinal() && !invoke.getDeclaringClass().isFinal()) {
+            SootClass declClass = invoke.getDeclaringClass();
+            FastHierarchy fa = Scene.v().getOrMakeFastHierarchy();
+            Collection<SootClass> subClasses = declClass.isInterface() ?
+                    fa.getAllImplementersOfInterface(declClass) :
+                    fa.getSubclassesOf(declClass);
+            String name = invoke.getName();
+            List<Type> paramTypes = invoke.getParameterTypes();
+            Type returnType = invoke.getReturnType();
+            for (SootClass subClass : subClasses) {
+              if (!subClass.declaresMethod(name, paramTypes))
+                continue;
+              SootMethod meth = subClass.getMethod(name, paramTypes, returnType);
+              if (!meth.isNative() && !meth.isAbstract() && mMethodsInspected.add(meth))
+                worklist.add(meth);
+            }
+          }
+        }
       }
     }
   }
