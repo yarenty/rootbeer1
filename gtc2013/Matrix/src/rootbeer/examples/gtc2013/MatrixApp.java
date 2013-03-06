@@ -47,17 +47,22 @@ public class MatrixApp {
       m_bcpu[i] = i % 3;
     }
 
-/*
     m_transposeWatch.start();
     for(int i = 0; i < m_bgpu.length; ++i){
       int row = i / (m_blockSize*m_gridSize*m_blockIters);
       int col = i % (m_blockSize*m_gridSize*m_blockIters);
 
+      System.out.println("transpose");
+      System.out.println("  i: "+i);
+      System.out.println("  row: "+row);
+      System.out.println("  col: "+col);
       m_bcpu[col * m_blockSize + row] = m_bgpu[i];
+      if(i == 10){
+        System.exit(0);
+      }
     }
     m_transposeWatch.stop();
     System.out.println("transpose time: "+m_transposeWatch.getAverageTime()+" ms");
-*/
   }
 
   private void printMatrix(int[] matrix, int block_size, String heading){
@@ -116,6 +121,14 @@ public class MatrixApp {
     rootbeer.runAll(matrix_kernel);
     m_gpuWatch.stop();
     System.out.println("avg gpu time: "+m_gpuWatch.getAverageTime()+" ms");
+
+    List<Calculation> calc_list = matrix_kernel.m_calcList.getList();
+    for(Calculation calc : calc_list){
+      if(calc == null){
+        continue;
+      }
+      System.out.println(calc.toString());
+    }
 
     List<StatsRow> stats = rootbeer.getStats();
     for(StatsRow row : stats){

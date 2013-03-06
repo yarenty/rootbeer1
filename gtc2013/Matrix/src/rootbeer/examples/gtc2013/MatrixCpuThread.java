@@ -43,25 +43,20 @@ public class MatrixCpuThread implements Runnable {
         int dest_index = i*b_columns+j;
         for(int k = 0; k < a_columns; ++k){
           int a_src = i*a_columns+k;
-          int b_src = k*b_columns+j;
+          int b_src = i*a_columns+k;
           float a_value = m_a[a_src];
           float b_value = m_b[b_src];
-          sum += a_value * b_value;
-/*
-          if(dest_index == 256){
-            System.out.println("calc rowz");
-            System.out.println("  k: "+k);
+          if(dest_index == 0){
+            System.out.println("cpu row: ");
             System.out.println("  i: "+i);
             System.out.println("  j: "+j);
-            System.out.println("  a_columns: "+a_columns);
-            System.out.println("  b_columns: "+b_columns);
+            System.out.println("  k: "+k);
             System.out.println("  a_src: "+a_src);
             System.out.println("  b_src: "+b_src);
             System.out.println("  a_value: "+a_value);
             System.out.println("  b_value: "+b_value);
-            System.out.println("  dest_index: "+dest_index);
           }
-*/
+          sum += a_value * b_value;
         }
         m_c[dest_index] = sum;
       } 
