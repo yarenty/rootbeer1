@@ -47,7 +47,7 @@ public class MatrixCpuThread implements Runnable {
           int a_src = i*a_columns+k;
           int b_src;
           if(m_transpose){
-            b_src = i*a_columns+k;
+            b_src = j*a_columns+k;
           } else {
             b_src = k*b_columns+j;
           }
