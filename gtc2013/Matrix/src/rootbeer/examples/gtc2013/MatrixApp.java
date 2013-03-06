@@ -31,9 +31,9 @@ public class MatrixApp {
   }
 
   public void init(){
-    m_blockIters = 32;
-    m_blockSize = 32;
-    m_gridSize = 2;
+    m_blockIters = 256;
+    m_blockSize = 256;
+    m_gridSize = 14;
     m_a = new float[m_blockSize*m_blockSize];
     m_bcpu = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
     m_bcpu2 = new float[m_blockSize*m_blockSize*m_gridSize*m_blockIters];
@@ -109,16 +109,17 @@ public class MatrixApp {
     m_cpuWatch.stop();
     System.out.println("avg cpu time: "+m_cpuWatch.getAverageTime()+" ms");
     
-    threads = new ArrayList<MatrixCpuThread>();
-    for(int i = 0; i < num_cores; ++i){
-      MatrixCpuThread thread = new MatrixCpuThread(m_a, m_bcpu2, m_ccpu2, i,
-        m_blockSize, m_gridSize*m_blockIters, num_cores, false);
-      threads.add(thread);
-    }
-    for(int i = 0; i < num_cores; ++i){
-      MatrixCpuThread thread = threads.get(i);
-      thread.join();
-    }
+    //runs on cpu without transpose
+    //threads = new ArrayList<MatrixCpuThread>();
+    //for(int i = 0; i < num_cores; ++i){
+    //  MatrixCpuThread thread = new MatrixCpuThread(m_a, m_bcpu2, m_ccpu2, i,
+    //    m_blockSize, m_gridSize*m_blockIters, num_cores, false);
+    //  threads.add(thread);
+    //}
+    //for(int i = 0; i < num_cores; ++i){
+    //  MatrixCpuThread thread = threads.get(i);
+    //  thread.join();
+    //}
   }
 
   private void gpuRun(){
@@ -187,9 +188,9 @@ public class MatrixApp {
     for(int i = 0; i < 50; ++i){
       init();
       cpuRun();
-      verifyCpuTranspose();
-      //gpuRun();
-      //verify();
+      //verifyCpuTranspose();
+      gpuRun();
+      verify();
     }
   }
 
