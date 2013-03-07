@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
+import java.util.ArrayList;
 import java.util.List;
 import soot.*;
 import soot.rbclassload.RootbeerClassLoader;
@@ -191,7 +192,20 @@ public class OpenCLPolymorphicMethod {
 
   private List<Type> getHierarchy(){
     SootClass soot_class = m_sootMethod.getDeclaringClass();
-    return RootbeerClassLoader.v().getDfsInfo().getHierarchy(soot_class);
+    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getHierarchy(soot_class);
+    List<Type> ret = new ArrayList<Type>();
+    for(Type type : types){
+      if(type instanceof RefType){
+        RefType ref_type = (RefType) type;
+        SootClass hierarchy_class = ref_type.getSootClass();
+        if(hierarchy_class.isAbstract() == false){
+          ret.add(type);
+        }
+      } else {
+        ret.add(type);
+      }
+    }
+    return ret;
   }
 
   @Override
