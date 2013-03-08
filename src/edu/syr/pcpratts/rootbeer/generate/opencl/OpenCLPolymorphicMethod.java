@@ -9,7 +9,9 @@ package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import soot.*;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -199,10 +201,14 @@ public class OpenCLPolymorphicMethod {
         RefType ref_type = (RefType) type;
         SootClass hierarchy_class = ref_type.getSootClass();
         if(hierarchy_class.isAbstract() == false){
-          ret.add(type);
+          if(ret.contains(type) == false){
+            ret.add(type);
+          }
         }
       } else {
-        ret.add(type);
+        if(ret.contains(type) == false){
+          ret.add(type);
+        }
       }
     }
     return ret;

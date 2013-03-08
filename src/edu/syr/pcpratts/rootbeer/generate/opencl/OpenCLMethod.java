@@ -302,6 +302,7 @@ public class OpenCLMethod {
   }
 
   public String getInstanceInvokeString(InstanceInvokeExpr arg0){
+    System.out.println("instance_invoke: "+arg0.toString());
     Value base = arg0.getBase();
     Type base_type = base.getType();
     List<Type> hierarchy;
@@ -320,7 +321,7 @@ public class OpenCLMethod {
       System.out.println("base_type: "+base_type);
       throw new RuntimeException("hello");
     }
-    
+        
     IsPolyMorphic poly_checker = new IsPolyMorphic();    
     if(poly_checker.isPoly(m_sootMethod, hierarchy) == false || isConstructor() || arg0 instanceof SpecialInvokeExpr){
       return writeInstanceInvoke(arg0, "", m_sootClass.getType());

@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,8 +45,10 @@ public class MethodHierarchies {
     //for each method    
     for(MethodHierarchy method_hierarchy : m_hierarchies){
       //get the list of classes in the hierarchy
+      System.out.println("MethodHierarchy: "+method_hierarchy.toString());
       List<OpenCLMethod> methods = method_hierarchy.getMethods();
       for(OpenCLMethod method : methods){ 
+        System.out.println("  method: "+method.getSignature());
         ret.add(method);
       }
     }   
@@ -78,6 +81,7 @@ public class MethodHierarchies {
       List<OpenCLMethod> ret = new ArrayList<OpenCLMethod>();
       //List<Type> class_hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
       Set<Type> class_hierarchy = RootbeerClassLoader.v().getDfsInfo().getPointsTo(m_sootMethod.getSignature());
+      Set<SootClass> valid_hierarchy_classes = RootbeerClassLoader.v().getValidHierarchyClasses();
       if(class_hierarchy == null || m_sootMethod.isConstructor()){
         OpenCLMethod method = new OpenCLMethod(m_sootMethod, m_sootMethod.getDeclaringClass());
         ret.add(method);
@@ -110,6 +114,9 @@ public class MethodHierarchies {
           subclasses.addAll(subclasses_col);
           subclasses.add(soot_class);
           for(SootClass subclass : subclasses){
+            if(valid_hierarchy_classes.contains(subclass) == false){
+              continue;
+            }
             if(subclass.declaresMethod(m_methodSubsignature)){
               SootMethod soot_method = subclass.getMethod(m_methodSubsignature);
               if(soot_method.isConcrete() == false){
