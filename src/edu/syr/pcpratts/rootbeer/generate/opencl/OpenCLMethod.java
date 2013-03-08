@@ -14,6 +14,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.body.OpenCLBody;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -302,7 +303,6 @@ public class OpenCLMethod {
   }
 
   public String getInstanceInvokeString(InstanceInvokeExpr arg0){
-    System.out.println("instance_invoke: "+arg0.toString());
     Value base = arg0.getBase();
     Type base_type = base.getType();
     List<Type> hierarchy;
@@ -313,6 +313,12 @@ public class OpenCLMethod {
     } else if (base_type instanceof RefType){
       RefType ref_type = (RefType) base_type;
       hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(ref_type.getSootClass());
+      
+      PointsToAnalysis analysis = Scene.v().getPointsToAnalysis();
+      PointsToSet set = analysis.reachingObjects((Local) base);
+      
+      hierarchy = trimHierarchy(hierarchy, set);
+      
     } else {
       throw new UnsupportedOperationException("how do we handle this case?");
     }
@@ -321,7 +327,7 @@ public class OpenCLMethod {
       System.out.println("base_type: "+base_type);
       throw new RuntimeException("hello");
     }
-        
+    
     IsPolyMorphic poly_checker = new IsPolyMorphic();    
     if(poly_checker.isPoly(m_sootMethod, hierarchy) == false || isConstructor() || arg0 instanceof SpecialInvokeExpr){
       return writeInstanceInvoke(arg0, "", m_sootClass.getType());
@@ -527,5 +533,32 @@ public class OpenCLMethod {
 
   public SootMethod getSootMethod() {
     return m_sootMethod;
+  }
+
+  private List<Type> trimHierarchy(List<Type> hierarchy, PointsToSet set) {
+    List<Type> ret = new ArrayList<Type>();
+    Set<Type> types = set.possibleTypes();
+    for(Type type : types){
+      if(type instanceof RefType){
+        ret.add(type);
+      } else if(type instanceof AnySubType){
+        AnySubType any_sub_type = (AnySubType) type;
+        RefType base = any_sub_type.getBase();
+        
+        FastHierarchy fh = Scene.v().getOrMakeFastHierarchy();
+        Collection<SootClass> subclasses = fh.getSubclassesOf(base.getSootClass());
+        List<SootClass> to_proc = new ArrayList<SootClass>();
+        to_proc.add(base.getSootClass());
+        to_proc.addAll(subclasses);
+        for(SootClass subclass : to_proc){
+          if(hierarchy.contains(subclass.getType())){
+            ret.add(subclass.getType());
+          }
+        }
+      } else {
+        ret.add(type);
+      }
+    }
+    return ret;
   }
 }

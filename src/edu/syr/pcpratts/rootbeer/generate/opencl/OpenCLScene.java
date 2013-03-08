@@ -332,7 +332,7 @@ public class OpenCLScene {
     }    
     List<OpenCLPolymorphicMethod> poly_methods = m_methodHierarchies.getPolyMorphicMethods();
     for(OpenCLPolymorphicMethod poly_method : poly_methods){
-      protos.add(poly_method.getMethodPrototype());
+      protos.add(poly_method.getMethodPrototypes());
     }
     FieldCodeGeneration gen = new FieldCodeGeneration();
     protos.add(gen.prototypes(m_classes, m_codeSegment.getReadWriteFieldInspector()));
@@ -371,7 +371,7 @@ public class OpenCLScene {
     }
     List<OpenCLPolymorphicMethod> poly_methods = m_methodHierarchies.getPolyMorphicMethods();
     for(OpenCLPolymorphicMethod poly_method : poly_methods){
-      bodies.add(poly_method.getMethodBody());
+      bodies.add(poly_method.getMethodBodies());
     }
     FieldTypeSwitch type_switch = new FieldTypeSwitch();
     FieldCodeGeneration gen = new FieldCodeGeneration();

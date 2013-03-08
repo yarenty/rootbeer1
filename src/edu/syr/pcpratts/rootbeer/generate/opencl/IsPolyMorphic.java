@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import soot.*;
+import soot.rbclassload.MethodSignatureUtil;
 
 public class IsPolyMorphic {
 
@@ -21,17 +22,13 @@ public class IsPolyMorphic {
     if(name.equals("<init>") || name.equals("<clinit>")){
       return false;
     }
-    if(soot_method.isConcrete() == false){
+    if(soot_method.isAbstract()){
       return true;
     }
-    hierarchy = trimNonConcrete(soot_method, hierarchy);
-    if(hierarchy.size() > 2){
-      return true;
-    }
-    if(hierarchy.size() == 1){
-      return false;
-    }
-    String sub_sig = soot_method.getSubSignature();
+    MethodSignatureUtil util = new MethodSignatureUtil();
+    util.parse(soot_method.getSignature());
+    List<Type> params = util.getParameterTypesTyped();
+    
     int count = 0;
     for(Type type : hierarchy){
       if(type instanceof RefType == false){
@@ -39,7 +36,7 @@ public class IsPolyMorphic {
       }
       RefType ref_type = (RefType) type;
       SootClass curr = ref_type.getSootClass();
-      if(curr.declaresMethod(sub_sig)){
+      if(curr.declaresMethod(name, params)){
         count++;
       }
     }
@@ -47,27 +44,5 @@ public class IsPolyMorphic {
       return true;
     }
     return false;
-  }
-
-  private List<Type> trimNonConcrete(SootMethod soot_method, List<Type> hierarchy) {
-    Set<Type> ret_set = new HashSet<Type>();
-    for(Type type : hierarchy){
-      if(type instanceof RefType){
-        RefType ref_type = (RefType) type;
-        SootClass soot_class = ref_type.getSootClass();
-        String subsig = soot_method.getSubSignature();
-        if(soot_class.declaresMethod(subsig)){
-          SootMethod curr_method = soot_class.getMethod(subsig);
-          if(curr_method.isConcrete()){
-            ret_set.add(type);
-          }
-        }
-      } else {
-        ret_set.add(type);
-      }
-    }
-    List<Type> ret = new ArrayList<Type>();
-    ret.addAll(ret_set);
-    return ret;
   }
 }
