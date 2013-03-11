@@ -250,6 +250,8 @@ public class OpenCLScene {
     writer.flush();
     writer.close();
     
+    NameMangling.v().writeTypesToFile();
+    
     String[] ret = new String[2];
     ret[0] = cuda_unix;
     ret[1] = cuda_windows;

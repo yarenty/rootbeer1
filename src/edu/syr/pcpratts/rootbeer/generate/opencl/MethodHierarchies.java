@@ -20,6 +20,7 @@ import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.Type;
+import soot.rbclassload.MethodEqual;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -88,10 +89,16 @@ public class MethodHierarchies {
       Set<SootClass> valid_hierarchy_classes = RootbeerClassLoader.v().getValidHierarchyClasses();
       
       if(class_hierarchy == null){
-        class_hierarchy = new HashSet<Type>();
-        List<Type> class_hierarchy2 = RootbeerClassLoader.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
-        class_hierarchy.addAll(class_hierarchy2);
+        if(m_sootMethod.isConcrete() == false){
+          return ret;
+        }
+        
+        OpenCLMethod method = new OpenCLMethod(m_sootMethod, m_sootMethod.getDeclaringClass());
+        ret.add(method);
+        return ret;
       }
+      
+      class_hierarchy.add(RefType.v(m_sootMethod.getDeclaringClass().toString()));
       
       MethodSignatureUtil util = new MethodSignatureUtil();
       util.parse(m_sootMethod.getSignature());
@@ -105,13 +112,10 @@ public class MethodHierarchies {
           if(soot_class.declaresMethod(method_name, params)){
             List<SootMethod> methods = soot_class.getMethods();
             List<SootMethod> found_methods = new ArrayList<SootMethod>();
+            MethodEqual method_equal = new MethodEqual();
             for(SootMethod method : methods){
-              if(method.getName().equals(method_name) &&
-                 method.getParameterCount() == params.size()){
-                
-                if(typesEqual(method.getParameterTypes(), params)){
-                  found_methods.add(method);
-                }
+              if(method_equal.exceptReturnType(method.getSignature(), util.getSignature())){
+                found_methods.add(method);
               }
             }
             
@@ -221,16 +225,10 @@ public class MethodHierarchies {
     private void saveHierarchy() {
       m_hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
     }
-
-    private boolean typesEqual(List<Type> types1, List<Type> types2) {
-      for(int i = 0; i < types1.size(); ++i){
-        Type lhs = types1.get(i);
-        Type rhs = types2.get(i);
-        if(lhs.equals(rhs) == false){
-          return false;
-        }
-      }
-      return true;
+    
+    @Override
+    public String toString(){
+      return m_sootMethod.getSignature();
     }
   }
 }
