@@ -121,15 +121,45 @@ public abstract class BasicMemory extends Memory {
     return value;
   }
   
+  public void readArray(byte[] array){
+    for(int i = 0; i < array.length; ++i){
+      array[i] = readByte();
+    }
+  }
+  
+  public void readArray(boolean[] array){
+    for(int i = 0; i < array.length; ++i){
+      array[i] = readBoolean();
+    }
+  }
+  
+  public void readArray(short[] array){
+    for(int i = 0; i < array.length; ++i){
+      array[i] = readShort();
+    }
+  }
+  
   public void readArray(int[] array){
     for(int i = 0; i < array.length; ++i){
       array[i] = readInt();
     }
   }
-
+  
   public void readArray(float[] array){
     for(int i = 0; i < array.length; ++i){
       array[i] = readFloat();
+    }
+  }
+  
+  public void readArray(double[] array){
+    for(int i = 0; i < array.length; ++i){
+      array[i] = readDouble();
+    }
+  }
+  
+  public void readArray(long[] array){
+    for(int i = 0; i < array.length; ++i){
+      array[i] = readLong();
     }
   }
   
@@ -185,6 +215,24 @@ public abstract class BasicMemory extends Memory {
     incPointer(8);
   }
   
+  public void writeArray(byte[] array){
+    for(byte value : array){
+      writeByte(value);
+    }
+  }
+  
+  public void writeArray(boolean[] array){
+    for(boolean value : array){
+      writeBoolean(value);
+    }
+  }
+  
+  public void writeArray(short[] array){
+    for(short value : array){
+      writeShort(value);
+    }
+  }
+  
   public void writeArray(int[] array){
     for(int value : array){
       writeInt(value);
@@ -196,7 +244,19 @@ public abstract class BasicMemory extends Memory {
       writeFloat(value);
     }
   }
-
+  
+  public void writeArray(double[] array){
+    for(double value : array){
+      writeDouble(value);
+    }
+  }
+  
+  public void writeArray(long[] array){
+    for(long value : array){
+      writeLong(value);
+    }
+  }
+  
   public void setAddress(long address){
     setPointer(address);
   }

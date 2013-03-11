@@ -141,20 +141,25 @@ public class FastMemory extends Memory {
     doWriteLong(currPointer(), value, m_CpuBase);
     incrementAddress(8);
   }
-    
+  
   @Override
-  public void writeArray(int[] array){
-    doWriteIntArray(array, m_CpuBase+currPointer(), 0, array.length);
-  }
-    
-  @Override
-  public void readArray(int[] array){
-    doReadIntArray(array, m_CpuBase+currPointer(), 0, array.length);  
+  public void readArray(byte[] array){
+    doReadByteArray(array, m_CpuBase+currPointer(), 0, array.length);  
   }
   
   @Override
-  public void writeArray(float[] array){
-    doWriteFloatArray(array, m_CpuBase+currPointer(), 0, array.length);
+  public void readArray(boolean[] array){
+    doReadBooleanArray(array, m_CpuBase+currPointer(), 0, array.length);  
+  }
+    
+  @Override
+  public void readArray(short[] array){
+    doReadShortArray(array, m_CpuBase+currPointer(), 0, array.length);  
+  }
+      
+  @Override
+  public void readArray(int[] array){
+    doReadIntArray(array, m_CpuBase+currPointer(), 0, array.length);  
   }
     
   @Override
@@ -162,10 +167,67 @@ public class FastMemory extends Memory {
     doReadFloatArray(array, m_CpuBase+currPointer(), 0, array.length);  
   }
   
+  @Override
+  public void readArray(double[] array){
+    doReadDoubleArray(array, m_CpuBase+currPointer(), 0, array.length);  
+  }
+    
+  @Override
+  public void readArray(long[] array){
+    doReadLongArray(array, m_CpuBase+currPointer(), 0, array.length);  
+  }
+    
+  @Override
+  public void writeArray(byte[] array){
+    doWriteByteArray(array, m_CpuBase+currPointer(), 0, array.length);
+  }
+    
+  @Override
+  public void writeArray(boolean[] array){
+    doWriteBooleanArray(array, m_CpuBase+currPointer(), 0, array.length);
+  }
+    
+  @Override
+  public void writeArray(short[] array){
+    doWriteShortArray(array, m_CpuBase+currPointer(), 0, array.length);
+  }
+    
+  @Override
+  public void writeArray(int[] array){
+    doWriteIntArray(array, m_CpuBase+currPointer(), 0, array.length);
+  }
+    
+  @Override
+  public void writeArray(float[] array){
+    doWriteFloatArray(array, m_CpuBase+currPointer(), 0, array.length);
+  }
+  
+  @Override
+  public void writeArray(double[] array){
+    doWriteDoubleArray(array, m_CpuBase+currPointer(), 0, array.length);
+  }
+    
+  @Override
+  public void writeArray(long[] array){
+    doWriteLongArray(array, m_CpuBase+currPointer(), 0, array.length);
+  }
+    
+  public native void doReadByteArray(byte[] array, long addr, int start, int len);
+  public native void doReadBooleanArray(boolean[] array, long addr, int start, int len);
+  public native void doReadShortArray(short[] array, long addr, int start, int len);
   public native void doReadIntArray(int[] array, long addr, int start, int len);
-  public native void doWriteIntArray(int[] array, long addr, int start, int len);
   public native void doReadFloatArray(float[] array, long addr, int start, int len);
+  public native void doReadDoubleArray(double[] array, long addr, int start, int len);
+  public native void doReadLongArray(long[] array, long addr, int start, int len);
+  
+  public native void doWriteByteArray(byte[] array, long addr, int start, int len);
+  public native void doWriteBooleanArray(boolean[] array, long addr, int start, int len);
+  public native void doWriteShortArray(short[] array, long addr, int start, int len);
+  public native void doWriteIntArray(int[] array, long addr, int start, int len);
   public native void doWriteFloatArray(float[] array, long addr, int start, int len);
+  public native void doWriteDoubleArray(double[] array, long addr, int start, int len);
+  public native void doWriteLongArray(long[] array, long addr, int start, int len);
+  
   
   public native byte doReadByte(long ptr, long cpu_base);
   public native boolean doReadBoolean(long ptr, long cpu_base);
