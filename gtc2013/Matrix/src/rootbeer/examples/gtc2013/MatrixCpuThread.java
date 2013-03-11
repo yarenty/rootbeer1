@@ -10,9 +10,10 @@ public class MatrixCpuThread implements Runnable {
   private int m_gridSize;
   private int m_numCores;
   private Thread m_thread;  
+  private boolean m_transpose;
 
   public MatrixCpuThread(float[] a, float[] b, float[] c, int index, int block_size, 
-    int grid_size, int num_cores){
+    int grid_size, int num_cores, boolean transpose){
 
     m_a = a;
     m_b = b;
@@ -21,6 +22,7 @@ public class MatrixCpuThread implements Runnable {
     m_blockSize = block_size;
     m_gridSize = grid_size;
     m_numCores = num_cores;
+    m_transpose = transpose;
     m_thread = new Thread(this);
     m_thread.setDaemon(true);
     m_thread.start();
@@ -43,25 +45,15 @@ public class MatrixCpuThread implements Runnable {
         int dest_index = i*b_columns+j;
         for(int k = 0; k < a_columns; ++k){
           int a_src = i*a_columns+k;
-          int b_src = k*b_columns+j;
+          int b_src;
+          if(m_transpose){
+            b_src = j*a_columns+k;
+          } else {
+            b_src = k*b_columns+j;
+          }
           float a_value = m_a[a_src];
           float b_value = m_b[b_src];
           sum += a_value * b_value;
-/*
-          if(dest_index == 256){
-            System.out.println("calc rowz");
-            System.out.println("  k: "+k);
-            System.out.println("  i: "+i);
-            System.out.println("  j: "+j);
-            System.out.println("  a_columns: "+a_columns);
-            System.out.println("  b_columns: "+b_columns);
-            System.out.println("  a_src: "+a_src);
-            System.out.println("  b_src: "+b_src);
-            System.out.println("  a_value: "+a_value);
-            System.out.println("  b_value: "+b_value);
-            System.out.println("  dest_index: "+dest_index);
-          }
-*/
         }
         m_c[dest_index] = sum;
       } 

@@ -44,8 +44,8 @@ Rootbeer.jar
 examples/ArraySumApp/ArraySumApp-GPU.jar
 examples/ArraySumApp/output.txt
 examples/ArraySumApp/output_err.txt
-examples/MMultApp/MMUltApp-GPU.jar
-examples/MMultApp/MMUltApp.jar
+examples/MMultApp/MMultApp-GPU.jar
+examples/MMultApp/MMultApp.jar
 examples/QuickSort/QuickSort-GPU.jar
 examples/QuickSort/QuickSort.jar
 examples/RandomDemap/RandomRemapApp-GPU.jar

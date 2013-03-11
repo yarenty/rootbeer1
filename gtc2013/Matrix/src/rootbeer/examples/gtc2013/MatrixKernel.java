@@ -15,6 +15,7 @@ public class MatrixKernel implements Kernel {
   private int m_blockSize;
   private int m_gridSize;
   private int m_blockIters;
+  public CalcList m_calcList;
 
   public MatrixKernel(float[] a, float[] b, float[] c, int block_size, int grid_size,
     int block_iters){
@@ -24,6 +25,7 @@ public class MatrixKernel implements Kernel {
     m_blockSize = block_size;
     m_gridSize = grid_size;
     m_blockIters = block_iters;
+    m_calcList = new CalcList();
   }
 
   public void gpuMethod(){
@@ -69,30 +71,7 @@ public class MatrixKernel implements Kernel {
 
           float a_value = a[a_src];
           float b_value = b[b_src];
-/*
-          if(thread_row == 0 && thread_col == 1 && sub_matrix_row == 0 && sub_matrix_col == 0){
-              Calculation calc = new Calculation();          
-              calc.sub_matrix_row = sub_matrix_row;
-              calc.sub_matrix_col = sub_matrix_col;
-              calc.sub_matrix = sub_matrix;
-              calc.m_size = m_size;
-              calc.thread_row = thread_row;
-              calc.thread_col = thread_col;
-              calc.dest_row = dest_row;
-              calc.dest_col = dest_col;
-              calc.block_size = block_size;
-              calc.dest_index = dest_index;
-              calc.m = m;
-              //calc.k = k;
-              calc.a_src_row = a_src_row;
-              calc.a_src_col = a_src_col;
-              calc.b_src_row = b_src_row;
-              calc.b_src_col = b_src_col;
-              calc.a_value = a_value;
-              calc.b_value = b_value;
-              m_calcz[m] = calc;
-          }
-*/
+
           RootbeerGpu.setSharedFloat(thread_idxx * 4, a_value);
           RootbeerGpu.setSharedFloat((1024 + thread_idxx) * 4, b_value);
 
@@ -102,8 +81,8 @@ public class MatrixKernel implements Kernel {
             a_value = RootbeerGpu.getSharedFloat((thread_row * 32 + k) * 4);
             b_value = RootbeerGpu.getSharedFloat((1024 + k * 32 + thread_col) * 4);
             sum += a_value * b_value;
-/*
-            if(dest_index == 0 && sub_matrix_row == 0 && sub_matrix_col == 0){
+
+            if(dest_index == 1){
               Calculation calc = new Calculation();          
               calc.sub_matrix_row = sub_matrix_row;
               calc.sub_matrix_col = sub_matrix_col;
@@ -123,11 +102,9 @@ public class MatrixKernel implements Kernel {
               calc.b_src_col = b_src_col;
               calc.a_value = a_value;
               calc.b_value = b_value;
-              m_calcz[(m * 32) + k] = calc;
+              m_calcList.add(calc);
             }
-*/
           }
-
           RootbeerGpu.synchthreads();
         }
         c[dest_index] += sum;

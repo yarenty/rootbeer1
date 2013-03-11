@@ -8,7 +8,10 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import soot.*;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -27,55 +30,69 @@ public class OpenCLPolymorphicMethod {
     m_sootMethod = soot_method;
   }
 
-  public String getMethodPrototype(){
+  public String getMethodPrototypes(){
     if(m_sootMethod.getName().equals("<init>"))
       return "";
-    return getMethodDecl()+";\n";
-  }
-
-  private String getMethodDecl(){
-    List<Type> hierarchy = getHierarchy();
-    Type type = hierarchy.get(0);
-    if(type instanceof RefType == false){
-      throw new RuntimeException("please report bug in OpenCLPolymorphicMethod.getMethodDecl"); 
-    }
-    RefType ref_type = (RefType) type;
-    SootClass soot_class = ref_type.getSootClass();
-    OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, soot_class);
-
+    List<String> decls = getMethodDecls();
     StringBuilder ret = new StringBuilder();
-    ret.append(Tweaks.v().getDeviceFunctionQualifier()+" ");
-    ret.append(ocl_method.getReturnString());
-    ret.append(" invoke_"+ocl_method.getPolymorphicName());
-    ret.append(ocl_method.getArgumentListStringPolymorphic());
+    for(String decl : decls){
+      decl += ";\n";
+      ret.append(decl);
+    }
     return ret.toString();
   }
 
-  public String getMethodBody(){
+  private List<String> getMethodDecls(){
+    List<Type> hierarchy = getHierarchy();
+    List<String> ret = new ArrayList<String>();
+    for(Type type : hierarchy){
+      if(type instanceof RefType == false){
+        continue;
+      }
+      RefType ref_type = (RefType) type;
+      SootClass soot_class = ref_type.getSootClass();
+      OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, soot_class);
+
+      StringBuilder builder = new StringBuilder();
+      builder.append(Tweaks.v().getDeviceFunctionQualifier()+" ");
+      builder.append(ocl_method.getReturnString());
+      builder.append(" invoke_"+ocl_method.getPolymorphicName());
+      builder.append(ocl_method.getArgumentListStringPolymorphic());
+      ret.add(builder.toString());
+    }
+    return ret;
+  }
+
+  public String getMethodBodies(){
     if(m_sootMethod.getName().equals("<init>"))
       return "";
     if(m_sootMethod.isConcrete() == false){
       return "";
     }
-    List<Type> hierarchy = getHierarchy();
-    Type first_type = hierarchy.get(0);
-    if(first_type instanceof RefType == false){
-      throw new RuntimeException("please report bug in OpenCLPolymorphicMethod.getMethodBody"); 
+    List<String> decls = getMethodDecls();
+    StringBuilder ret = new StringBuilder();
+    for(String decl : decls){
+      ret.append(getMethodBody(decl));
     }
-    RefType ref_type = (RefType) first_type;
-    SootClass first_soot_class = ref_type.getSootClass();
-
+    return ret.toString();
+  }
+  
+  public String getMethodBody(String decl){
+    List<Type> hierarchy = getHierarchy();
     StringBuilder ret = new StringBuilder();
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     //write function signature
-    ret.append(getMethodDecl());
+    ret.append(decl);
     ret.append("{\n");
 
     if(m_sootMethod.isStatic()){
       if(m_sootMethod.getReturnType() instanceof VoidType == false){
         ret.append("return ");
       }
-      String invoke_string = getStaticInvokeString(first_soot_class);
+      Type first_type = hierarchy.get(0);
+      RefType ref_type = (RefType) first_type;
+      SootClass first_class = ref_type.getSootClass();
+      String invoke_string = getStaticInvokeString(first_class);
       ret.append(invoke_string+"\n");
     } else {
       ret.append(address_qual+" char * thisref_deref;\n");
@@ -191,7 +208,14 @@ public class OpenCLPolymorphicMethod {
 
   private List<Type> getHierarchy(){
     SootClass soot_class = m_sootMethod.getDeclaringClass();
-    return RootbeerClassLoader.v().getDfsInfo().getHierarchy(soot_class);
+    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getHierarchy(soot_class);
+    List<Type> ret = new ArrayList<Type>();
+    for(Type type : types){
+      if(ret.contains(type) == false){
+        ret.add(type);
+      }
+    }
+    return ret;
   }
 
   @Override

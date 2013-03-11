@@ -291,7 +291,6 @@ public class RootbeerTestAgent {
       m_passed = false;
       m_message = "No exception thrown when expecting one.";
     } catch(Throwable ex){
-      ex.printStackTrace(System.out);
       if(rootbeer.getRanGpu() == false){
         m_message = "Ran on CPU";
         m_passed = false;

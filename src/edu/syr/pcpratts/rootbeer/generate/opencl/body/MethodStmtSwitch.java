@@ -110,7 +110,7 @@ public class MethodStmtSwitch implements StmtSwitch {
       m_valueSwitch.clearLhsRhs();
     }
     //if the right op is a field ref or array ref we use the getter
-    else if(right_op instanceof FieldRef || right_op instanceof FieldRef){
+    else if(right_op instanceof FieldRef || right_op instanceof ArrayRef){
       m_valueSwitch.setLhs();
       left_op.apply(m_valueSwitch);
       m_output.append(" = ");

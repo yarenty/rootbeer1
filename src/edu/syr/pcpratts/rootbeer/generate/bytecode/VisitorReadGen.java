@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
+import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.util.Stack;
 import java.util.HashMap;
@@ -168,19 +169,21 @@ public class VisitorReadGen extends AbstractVisitorGen {
     
     Local previous_size = bcl.lengthof(object_to_read_from);
     
-    //trying optimization where we use JNI memcpy for single
-    //dimenisonal arrays
-    if(type.baseType.equals(IntType.v()) && type.numDimensions == 1){
+    //optimization for single-dimensional arrays of primitive types.
+    //doesn't work for chars yet because they are still stored as ints on the gpu
+    if(type.baseType instanceof PrimType && type.numDimensions == 1 && 
+       type.baseType.equals(CharType.v()) == false){
+      
       bcl.pushMethod(m_currMem.top(), "readArray", VoidType.v(), type);
       bcl.invokeMethodNoRet(m_currMem.top(), object_to_read_from);
+      OpenCLType ocl_type = new OpenCLType(type.baseType);
       Local element_size = bcl.local(IntType.v());
-      bcl.assign(element_size, IntConstant.v(4));
+      bcl.assign(element_size, IntConstant.v(ocl_type.getSize()));
       bcl.mult(element_size, previous_size);
       bcl_mem.incrementAddress(element_size);
       
       return object_to_read_from;
     }
-    
     
     String label_new_float = getNextLabel();
     String label_after_new_float = getNextLabel();

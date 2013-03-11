@@ -7,6 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,5 +76,19 @@ public class NameMangling {
         ret++;
     }
     return ret;
+  }
+  
+  public void writeTypesToFile(){
+    try {
+      PrintWriter writer = new PrintWriter(RootbeerPaths.v().getRootbeerHome()+"mangling");
+      for(String name : mangleMap.keySet()){
+        int number = mangleMap.get(name);
+        writer.println(number+" "+name);
+      }
+      writer.flush();
+      writer.close();
+    } catch(Exception ex){
+      ex.printStackTrace();
+    }
   }
 }

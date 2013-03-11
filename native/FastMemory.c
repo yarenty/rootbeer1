@@ -182,26 +182,95 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_d
   longHostMemory[ptr / 8] = value;
 }
 
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteByteArray
+  (JNIEnv *env, jobject this_obj, jbyteArray array, jlong ref, jint start, jint len){
+  jbyte * dest = (jbyte *) (ref + start);
+  (*env)->GetByteArrayRegion(env, array, start, len, dest);
+}
 
-/*
- * Class:     edu_syr_pcpratts_rootbeer_runtime_memory_GpuMemoryStorage
- * Method:    doWriteIntArray
- * Signature: ([IJ)V
- */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteBooleanArray
+  (JNIEnv *env, jobject this_obj, jbooleanArray array, jlong ref, jint start, jint len){
+  jboolean * dest = (jboolean *) (ref + start);
+  (*env)->GetBooleanArrayRegion(env, array, start, len, dest);
+}
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteShortArray
+  (JNIEnv *env, jobject this_obj, jshortArray array, jlong ref, jint start, jint len){
+  jshort * dest = (jshort *) (ref + start);
+  (*env)->GetShortArrayRegion(env, array, start, len, dest);
+}
+
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteIntArray
   (JNIEnv *env, jobject this_obj, jintArray array, jlong ref, jint start, jint len){
   int * dest = (int *) (ref + start);
   (*env)->GetIntArrayRegion(env, array, start, len, dest);
 }
 
-/*
- * Class:     edu_syr_pcpratts_rootbeer_runtime_memory_GpuMemoryStorage
- * Method:    doWriteIntArray
- * Signature: ([IJ)V
- */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteFloatArray
+  (JNIEnv *env, jobject this_obj, jfloatArray array, jlong ref, jint start, jint len){
+  
+  float * dest = (float *) (ref + start);
+  (*env)->GetFloatArrayRegion(env, array, start, len, dest);
+}
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteDoubleArray
+  (JNIEnv *env, jobject this_obj, jdoubleArray array, jlong ref, jint start, jint len){
+  jdouble * dest = (jdouble *) (ref + start);
+  (*env)->GetDoubleArrayRegion(env, array, start, len, dest);
+}
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteLongArray
+  (JNIEnv *env, jobject this_obj, jlongArray array, jlong ref, jint start, jint len){
+  jlong * dest = (jlong *) (ref + start);
+  (*env)->GetLongArrayRegion(env, array, start, len, dest);
+}
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadByteArray
+  (JNIEnv *env, jobject this_obj, jbyteArray array, jlong ref, jint start, jint len){
+
+  jbyte * dest = (jbyte *) (ref + start);
+  (*env)->SetByteArrayRegion(env, array, start, len, dest);
+}
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadBooleanArray
+  (JNIEnv *env, jobject this_obj, jbooleanArray array, jlong ref, jint start, jint len){
+
+  jboolean * dest = (jboolean *) (ref + start);
+  (*env)->SetBooleanArrayRegion(env, array, start, len, dest);
+}
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadShortArray
+  (JNIEnv *env, jobject this_obj, jshortArray array, jlong ref, jint start, jint len){
+
+  jshort * dest = (jshort *) (ref + start);
+  (*env)->SetShortArrayRegion(env, array, start, len, dest);
+}
+
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadIntArray
   (JNIEnv *env, jobject this_obj, jintArray array, jlong ref, jint start, jint len){
 
   int * dest = (int *) (ref + start);
   (*env)->SetIntArrayRegion(env, array, start, len, dest);
 }
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadFloatArray
+  (JNIEnv *env, jobject this_obj, jfloatArray array, jlong ref, jint start, jint len){
+
+  float * dest = (float *) (ref + start);
+  (*env)->SetFloatArrayRegion(env, array, start, len, dest);
+}
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadDoubleArray
+  (JNIEnv *env, jobject this_obj, jdoubleArray array, jlong ref, jint start, jint len){
+
+  jdouble * dest = (jdouble *) (ref + start);
+  (*env)->SetDoubleArrayRegion(env, array, start, len, dest);
+}
+
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadLongArray
+  (JNIEnv *env, jobject this_obj, jlongArray array, jlong ref, jint start, jint len){
+
+  jlong * dest = (jlong *) (ref + start);
+  (*env)->SetLongArrayRegion(env, array, start, len, dest);
+}
+
