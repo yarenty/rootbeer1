@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import soot.*;
@@ -451,6 +452,17 @@ public class BytecodeLanguage {
     Unit u2 = jimple.newAssignStmt(u2_lhs, u1_lhs);
     mAssembler.add(u2);
     return u2_lhs;
+  }
+
+  public Local newInstanceValueOf(String mClassName, Value param) {
+    // Generate mClassName.valueOf(param)
+    SootClass soot_class = Scene.v().getSootClass(mClassName);
+    Local l_res = jimple.newLocal(getLocalName(), soot_class.getType());
+    SootMethodRef classForNameRef = soot.Scene.v().makeMethodRef(soot_class,
+        "valueOf", Arrays.asList(param.getType()), soot_class.getType(), true);
+    Unit u1 = jimple.newAssignStmt(l_res, jimple.newStaticInvokeExpr(classForNameRef, Arrays.asList(new Value[]{param})));
+    mAssembler.add(u1);
+    return l_res;
   }
 
   public Value newArray(Type type, Value size) {
