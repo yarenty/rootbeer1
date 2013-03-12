@@ -57,17 +57,34 @@ public class NewOnGpuRunOnGpu implements Kernel {
       System.out.println("brhs.test == null");
       return false;
     }
-    if(obj.value != brhs.obj.value)
+    if(obj.value != brhs.obj.value){
+      System.out.println("obj.value mismatch");
+      System.out.println("lhs: "+obj.value);
+      System.out.println("rhs: "+brhs.obj.value);
       return false;
-    if(element1.length != brhs.element1.length)
+    }
+    if(element1.length != brhs.element1.length){
+      System.out.println("element1.length mismatch");
+      System.out.println("lhs: "+element1.length);
+      System.out.println("rhs: "+brhs.element1.length);
       return false;
-    if(test.length != brhs.test.length)
+    }
+    if(test.length != brhs.test.length){
+      System.out.println("test.length mismatch");
+      System.out.println("lhs: "+test.length);
+      System.out.println("rhs: "+brhs.test.length);
       return false;
+    }
     for(int i = 0; i < test.length; ++i){
       NewOnGpuRefObject left = test[i];
       NewOnGpuRefObject right = brhs.test[i];
-      if(left.value != right.value)
+      if(left.value != right.value){
+        System.out.println("test value mismatch");
+        System.out.println("lhs: "+left.value);
+        System.out.println("rhs: "+right.value);
+        System.out.println("index: "+i);
         return false;
+      }
     }
     return true;
   }

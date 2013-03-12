@@ -170,37 +170,39 @@ public class VisitorReadGen extends AbstractVisitorGen {
     
     Local previous_size = bcl.lengthof(object_to_read_from);
     
-    //optimization for single-dimensional arrays of primitive types.
-    //doesn't work for chars yet because they are still stored as ints on the gpu
-    if(type.baseType instanceof PrimType && type.numDimensions == 1 && 
-       type.baseType.equals(CharType.v()) == false){
-      
-      bcl.pushMethod(m_currMem.top(), "readArray", VoidType.v(), type);
-      bcl.invokeMethodNoRet(m_currMem.top(), object_to_read_from);
-      OpenCLType ocl_type = new OpenCLType(type.baseType);
-      Local element_size = bcl.local(IntType.v());
-      bcl.assign(element_size, IntConstant.v(ocl_type.getSize()));
-      bcl.mult(element_size, previous_size);
-      bcl_mem.incrementAddress(element_size);
-      
-      return object_to_read_from;
-    }
-    
     String label_new_float = getNextLabel();
     String label_after_new_float = getNextLabel();
     
     bcl.ifStmt(ctor_used, "==", IntConstant.v(1), label_new_float);
+    
     bcl.assign(ret, object_to_read_from);
     bcl.gotoLabel(label_after_new_float);
+    
     bcl.label(label_new_float);
     bcl.assign(ret, bcl.newArray(type, size));
-     
+    
     bcl.label(label_after_new_float);
     
     SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
     bcl.pushMethod(m_thisRef, "checkCache",obj_class.getType(), LongType.v(), obj_class.getType());
     ret = bcl.invokeMethodRet(m_thisRef, m_RefParam, ret);
     ret = bcl.cast(type, ret);
+    
+    //optimization for single-dimensional arrays of primitive types.
+    //doesn't work for chars yet because they are still stored as ints on the gpu
+    if(type.baseType instanceof PrimType && type.numDimensions == 1 && 
+       type.baseType.equals(CharType.v()) == false){
+      
+      bcl.pushMethod(m_currMem.top(), "readArray", VoidType.v(), type);
+      bcl.invokeMethodNoRet(m_currMem.top(), ret);
+      OpenCLType ocl_type = new OpenCLType(type.baseType);
+      Local element_size = bcl.local(IntType.v());
+      bcl.assign(element_size, IntConstant.v(ocl_type.getSize()));
+      bcl.mult(element_size, size);
+      bcl_mem.incrementAddress(element_size);
+      
+      return ret;
+    }
 
     if(type.baseType == IntType.v() && type.numDimensions == 1){
       bcl_mem.readIntArray(ret, size);
