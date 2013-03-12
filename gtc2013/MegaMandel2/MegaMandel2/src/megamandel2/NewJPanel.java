@@ -34,7 +34,7 @@ public class NewJPanel extends javax.swing.JPanel {
     private float dy = 0;
     private boolean m_cpu;
     private static Stopwatch m_cpuWatch = new Stopwatch();
-    public MyThread[] threads = new MyThread[16];
+    public MyThread[] threads = new MyThread[4];
 
     /**
      * Creates new form NewJPanel
@@ -113,7 +113,7 @@ public class NewJPanel extends javax.swing.JPanel {
             while (true) {
                 while (!compute) {
                     try {
-                        sleep(1000);
+                        sleep(20);
                     } catch (InterruptedException ex) {
                     }
                 }
@@ -137,12 +137,15 @@ public class NewJPanel extends javax.swing.JPanel {
                             break;
                         }
                     }
-                    int r = (int) (0xff * (Math.sin((double) (0.01 * d + 0) + 1)) / 2);
-                    int g = (int) (0xff * (Math.sin((double) (0.02 * d + 0.01) + 1)) / 2);
-                    int b = (int) (0xff * (Math.sin((double) (0.04 * d + 0.1) + 1)) / 2);
+                    //int r = (int) (0xff * (Math.sin((double) (0.01 * d + 0) + 1)) / 2);
+                    //int g = (int) (0xff * (Math.sin((double) (0.02 * d + 0.01) + 1)) / 2);
+                    //int b = (int) (0xff * (Math.sin((double) (0.04 * d + 0.1) + 1)) / 2);
                     int dest_index = y * w + x;
 
-                    pixels[dest_index] = (r << 16) | (g << 8) | b;
+                    pixels[dest_index] =
+                            (int) ((0xff * (0.01 * d + 0) + 1) / 2) << 16
+                            | (int) ((0xff * (0.02 * d + 0.01) + 1) / 2) << 8
+                            | (int) ((0xff * (0.04 * d + 0.1) + 1) / 2);
                 }
                 compute = false;
             }
