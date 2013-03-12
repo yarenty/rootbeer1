@@ -89,6 +89,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new HashMapTest());
     ret.add(new TreeMapTest());
     ret.add(new LinkedHashMapTest());
+    ret.add(new CovarientTest());
             
     if(m_hardTests){
       ret.add(new SimpleSynchronizedTest());
