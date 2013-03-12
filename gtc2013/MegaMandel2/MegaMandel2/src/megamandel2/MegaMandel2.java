@@ -13,15 +13,20 @@ import javax.swing.JFrame;
  */
 public class MegaMandel2 {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        JFrame f = new JFrame();
-        f.setSize(200, 200);
-        f.setLayout(new GridLayout());
-        f.add(new NewJPanel());
-        f.setVisible(true);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
+  /**
+    * @param args the command line arguments
+    */
+  public static void main(String[] args) {
+    boolean cpu = true;
+    if(args.length == 1 && args[0].equals("-gpu")){
+      cpu = false;
+    }    
+
+    JFrame f = new JFrame();
+    f.setSize(256, 256);
+    f.setLayout(new GridLayout());
+    f.add(new NewJPanel(cpu));
+    f.setVisible(true);
+    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  }
 }
