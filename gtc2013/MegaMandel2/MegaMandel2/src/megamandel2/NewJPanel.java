@@ -33,8 +33,8 @@ public class NewJPanel extends javax.swing.JPanel {
     private float dx = 0;
     private float dy = 0;
     private boolean m_cpu;
-
     private static Stopwatch m_cpuWatch = new Stopwatch();
+    public MyThread[] threads = new MyThread[16];
 
     /**
      * Creates new form NewJPanel
@@ -43,6 +43,15 @@ public class NewJPanel extends javax.swing.JPanel {
         initComponents();
         img = new BufferedImage(256, 256, BufferedImage.TYPE_3BYTE_BGR);
         m_cpu = cpu;
+
+        if (cpu) {
+            for (int i = 0; i < threads.length; ++i) {
+                threads[i] = new MyThread();
+            }
+            for (MyThread mt : threads) {
+                mt.start();
+            }
+        }
 
         new Thread() {
             @Override
@@ -53,12 +62,12 @@ public class NewJPanel extends javax.swing.JPanel {
 
                     int width = im.getWidth();
                     int height = im.getHeight();
-                    int[] ps = new int[width*height];
-  
-                    if(m_cpu){
-                      cpuGenerate(width, height, minx, maxx, miny, maxy, maxdepth, ps);
+                    int[] ps = new int[width * height];
+
+                    if (m_cpu) {
+                        cpuGenerate(width, height, minx, maxx, miny, maxy, maxdepth, ps);
                     } else {
-                      MandelGenerator.gpuGenerate(width, height, minx, maxx, miny, maxy, maxdepth, ps);
+                        MandelGenerator.gpuGenerate(width, height, minx, maxx, miny, maxy, maxdepth, ps);
                     }
 
                     im.setRGB(0, 0, width, height, ps, 0, width);
@@ -86,97 +95,89 @@ public class NewJPanel extends javax.swing.JPanel {
         }.start();
     }
 
+    private static class MyThread extends Thread {
 
-  private void cpuGenerate(int w, int h, double minx, double maxx, double miny, double maxy, int maxdepth, int[] pixels) {
-    m_cpuWatch.start();
-    int num_cores = Runtime.getRuntime().availableProcessors();
-    int num_each = w / num_cores;
-    List<Thread> threads = new ArrayList<Thread>();
-    for(int i = 0; i < num_cores; ++i){
-      int start_w = i * num_each;
-      int stop_w = (i + 1) * num_each;
-      if(i == num_cores - 1){
-        stop_w = w;
-      }
-      CpuThreadProc proc = new CpuThreadProc(start_w, stop_w, w, h, minx, maxx,
-        miny, maxy, maxdepth, pixels);
-      Thread thread = new Thread(proc);
-      thread.start();
-      threads.add(thread);
-    }
-    for(Thread thread : threads){
-      try {
-        thread.join();
-      } catch(Exception ex){
-        ex.printStackTrace();
-      }
-    }
-    m_cpuWatch.stop();
-    System.out.println("avg cpu: "+m_cpuWatch.getAverageTime());    
-  }
+        public boolean compute = false;
+        public int w;
+        public int h;
+        public double minx;
+        public double maxx;
+        public double miny;
+        public double maxy;
+        public int maxdepth;
+        public int[] pixels;
+        public int y;
 
-  private class CpuThreadProc implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
+                while (!compute) {
+                    try {
+                        sleep(1000);
+                    } catch (InterruptedException ex) {
+                    }
+                }
 
-    private int m_startW;
-    private int m_stopW;
-    private int m_w;
-    private int m_h;
-    private double m_minx;
-    private double m_maxx;
-    private double m_miny;
-    private double m_maxy;
-    private int m_maxdepth;
-    private int[] m_pixels;
+                for (int x = 0; x < w; ++x) {
+                    double xr = 0;
+                    double xi = 0;
+                    double cr = (maxx - minx) * x / w + minx;
+                    double ci = (maxy - miny) * y / h + miny;
+                    int d = 0;
+                    while (true) {
+                        double xr2 = xr * xr - xi * xi + cr;
+                        double xi2 = 2.0f * xr * xi + ci;
+                        xr = xr2;
+                        xi = xi2;
+                        d++;
+                        if (d >= maxdepth) {
+                            break;
+                        }
+                        if (xr * xr + xi * xi >= 4) {
+                            break;
+                        }
+                    }
+                    int r = (int) (0xff * (Math.sin((double) (0.01 * d + 0) + 1)) / 2);
+                    int g = (int) (0xff * (Math.sin((double) (0.02 * d + 0.01) + 1)) / 2);
+                    int b = (int) (0xff * (Math.sin((double) (0.04 * d + 0.1) + 1)) / 2);
+                    int dest_index = y * w + x;
 
-    public CpuThreadProc(int start_w, int stop_w, int w, int h, double minx, 
-      double maxx, double miny, double maxy, int maxdepth, int[] pixels){
-
-      m_startW = start_w;
-      m_stopW = stop_w;
-      m_w = w;
-      m_h = h;
-      m_minx = minx;
-      m_maxx = maxx;
-      m_miny = miny;
-      m_maxy = maxy;
-      m_maxdepth = maxdepth;
-      m_pixels = pixels;
+                    pixels[dest_index] = (r << 16) | (g << 8) | b;
+                }
+                compute = false;
+            }
+        }
     }
 
-    public void run(){
-      double xr = 0;
-      double xi = 0;
-      for(int i = m_startW; i < m_stopW; ++i){
-        for(int j = 0; j < m_h; ++j){
-          double cr = (m_maxx - m_minx) * i / m_w + m_minx;
-          double ci = (m_maxy - m_miny) * j / m_h + m_miny;
-          int d = 0;
-          while (true) {
-              double xr2 = xr * xr - xi * xi + cr;
-              double xi2 = 2.0f * xr * xi + ci;
-              xr = xr2;
-              xi = xi2;
-              d++;
-              if (d >= m_maxdepth) {
-                  break;
-              }
-              if (xr * xr + xi * xi >= 4) {
-                  break;
-              }
-          }
-          int r = (int) (0xff * (Math.sin((double) (0.01 * d + 0) + 1)) / 2);
-          int g = (int) (0xff * (Math.sin((double) (0.02 * d + 0.01) + 1)) / 2);
-          int b = (int) (0xff * (Math.sin((double) (0.04 * d + 0.1) + 1)) / 2);
-          int dest_index = j * m_w + i;
-   
-          m_pixels[dest_index] =
-                  (int) ((0xff * (0.01 * d + 0) + 1) / 2) << 16
-                  | (int) ((0xff * (0.02 * d + 0.01) + 1) / 2) << 8
-                  | (int) ((0xff * (0.04 * d + 0.1) + 1) / 2);
-        }      
-      }
+    private void cpuGenerate(int w, int h, double minx, double maxx, double miny, double maxy, int maxdepth, int[] pixels) {
+        m_cpuWatch.start();
+        for (MyThread mt : threads) {
+            mt.h = h;
+            mt.w = w;
+            mt.maxdepth = maxdepth;
+            mt.maxx = maxx;
+            mt.maxy = maxy;
+            mt.minx = minx;
+            mt.miny = miny;
+            mt.pixels = pixels;
+        }
+        for (int y = 0; y < h; ++y) {
+            boolean found = false;
+            while (!found) {
+                for (MyThread mt : threads) {
+                    if (!mt.compute) {
+                        found = true;
+                        mt.y = y;
+                        mt.compute = true;
+                        mt.interrupt();
+                        break;
+                    }
+                }
+            }
+        }
+        m_cpuWatch.stop();
+        System.out.println("avg cpu: " + m_cpuWatch.getAverageTime());
     }
-  }
 
     @Override
     protected void paintComponent(Graphics g) {
