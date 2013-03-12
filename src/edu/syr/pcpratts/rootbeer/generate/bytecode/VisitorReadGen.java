@@ -20,6 +20,7 @@ import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 import soot.jimple.NullConstant;
+import soot.jimple.StringConstant;
 import soot.options.Options;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -342,17 +343,6 @@ public class VisitorReadGen extends AbstractVisitorGen {
     if(type_to_create instanceof ArrayType == false && type_to_create instanceof RefType == false)
       return;
     
-    if(type_to_create instanceof RefType){
-      RefType ref_type = (RefType) type_to_create;
-      
-      SootClass soot_class = getClassForType(ref_type);
-      if(soot_class.isApplicationClass() == false){    
-        if(soot_class.declaresMethod("void <init>()") == false){
-          return;
-        }
-      }
-    }
-    
     int id = RootbeerClassLoader.v().getDfsInfo().getClassNumber(type_to_create);
     String label_after = getNextLabel();
     BytecodeLanguage bcl = m_bcl.top();
@@ -371,6 +361,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
       if(soot_class.isApplicationClass() == false){    
         if(soot_class.declaresMethod("void <init>()")){
           new_object = bcl.newInstance(name);
+        } else if(soot_class.declaresMethod(type_to_create + " valueOf(java.lang.String)")){
+          new_object = bcl.newInstanceValueOf(name, StringConstant.v("0"));
         }
       } else {
         Local sentinal = bcl.newInstance("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
