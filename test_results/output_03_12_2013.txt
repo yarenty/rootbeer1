@@ -131,6 +131,8 @@ doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serializat
 building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CharArraysRunOnGpu: void gpuMethod()>...
 doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfRunOnGpu: void gpuMethod()>
 building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfRunOnGpu: void gpuMethod()>...
+doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu: void gpuMethod()>
+building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu: void gpuMethod()>...
 doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArraysRunOnGpu: void gpuMethod()>
 building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArraysRunOnGpu: void gpuMethod()>...
 doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.EmptyRunOnGpu: void gpuMethod()>
@@ -233,6 +235,7 @@ finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.seria
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteByteValueRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CharArraysRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfRunOnGpu: void gpuMethod()>...
+finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArraysRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.EmptyRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.FloatArraysRunOnGpu: void gpuMethod()>...
@@ -347,6 +350,8 @@ doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serializat
 building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CharArraysRunOnGpu: void gpuMethod()>...
 doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfRunOnGpu: void gpuMethod()>
 building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfRunOnGpu: void gpuMethod()>...
+doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu: void gpuMethod()>
+building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu: void gpuMethod()>...
 doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArraysRunOnGpu: void gpuMethod()>
 building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArraysRunOnGpu: void gpuMethod()>...
 doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.EmptyRunOnGpu: void gpuMethod()>
@@ -449,6 +454,7 @@ finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.seria
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteByteValueRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CharArraysRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfRunOnGpu: void gpuMethod()>...
+finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArraysRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.EmptyRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.FloatArraysRunOnGpu: void gpuMethod()>...
@@ -563,6 +569,8 @@ doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serializat
 building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CharArraysRunOnGpu: void gpuMethod()>...
 doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfRunOnGpu: void gpuMethod()>
 building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfRunOnGpu: void gpuMethod()>...
+doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu: void gpuMethod()>
+building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu: void gpuMethod()>...
 doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArraysRunOnGpu: void gpuMethod()>
 building class hierarchy for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArraysRunOnGpu: void gpuMethod()>...
 doing rootbeer dfs: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.EmptyRunOnGpu: void gpuMethod()>
@@ -665,6 +673,7 @@ finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.seria
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteByteValueRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CharArraysRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfRunOnGpu: void gpuMethod()>...
+finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArraysRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.EmptyRunOnGpu: void gpuMethod()>...
 finding new invokes for: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.FloatArraysRunOnGpu: void gpuMethod()>...
@@ -1678,7 +1687,7 @@ compiling CUDA code...
 
 /home/pcpratts/.rootbeer/generated.cu(3065): warning: statement is unreachable
 
-2 errors detected in the compilation of "/tmp/tmpxft_00001ccc_00000000-12_generated.compute_20.cpp1.ii".
+2 errors detected in the compilation of "/tmp/tmpxft_00007c2f_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 running transform2 on: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.AutoboxingRunOnGpu: void gpuMethod()>...
 <sun.security.provider.PolicyFile$PolicyInfo: sun.misc.JavaSecurityProtectionDomainAccess$ProtectionDomainCache getPdMapping()>
@@ -1695,6 +1704,11 @@ running transform2 on: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.seriali
 compiling CUDA code...
 generating serialization bytecode...
 running transform2 on: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfRunOnGpu: void gpuMethod()>...
+compiling CUDA code...
+generating serialization bytecode...
+running transform2 on: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu: void gpuMethod()>...
+<sun.security.provider.PolicyFile$PolicyInfo: sun.misc.JavaSecurityProtectionDomainAccess$ProtectionDomainCache getPdMapping()>
+no body for method: <sun.security.provider.PolicyFile$PolicyInfo: sun.misc.JavaSecurityProtectionDomainAccess$ProtectionDomainCache getPdMapping()>
 compiling CUDA code...
 generating serialization bytecode...
 running transform2 on: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArraysRunOnGpu: void gpuMethod()>...
@@ -2152,7 +2166,7 @@ compiling CUDA code...
 
 /home/pcpratts/.rootbeer/generated.cu(10038): warning: statement is unreachable
 
-4 errors detected in the compilation of "/tmp/tmpxft_00002237_00000000-12_generated.compute_20.cpp1.ii".
+4 errors detected in the compilation of "/tmp/tmpxft_00000326_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 running transform2 on: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedListRunOnGpu: void gpuMethod()>...
 <sun.security.provider.PolicyFile$PolicyInfo: sun.misc.JavaSecurityProtectionDomainAccess$ProtectionDomainCache getPdMapping()>
@@ -2272,7 +2286,7 @@ compiling CUDA code...
 
 /home/pcpratts/.rootbeer/generated.cu(3182): warning: statement is unreachable
 
-2 errors detected in the compilation of "/tmp/tmpxft_0000226e_00000000-12_generated.compute_20.cpp1.ii".
+2 errors detected in the compilation of "/tmp/tmpxft_0000035d_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 running transform2 on: <edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LongArraysRunOnGpu: void gpuMethod()>...
 compiling CUDA code...
@@ -2451,94 +2465,95 @@ compiling CUDA code...
 generating serialization bytecode...
 writing classes out...
 Packing up to: output.jar
-[TEST 1/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.NewOnGpu@18a1959a
-  FAILED
-  Compare failed at: 0
-[TEST 2/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.SimpleTest@69ebefc5
+[TEST 1/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.NewOnGpu@164cecd2
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 2302 ms
+[TEST 2/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.SimpleTest@5e56c576
   PASSED
   Cpu time: 0 ms
   Gpu time: 3 ms
-[TEST 3/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LongArrays@290142d4
+[TEST 3/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LongArrays@3fe72c9c
   PASSED
   Cpu time: 0 ms
   Gpu time: 11 ms
-[TEST 4/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteArrays@3d3749f3
+[TEST 4/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteArrays@36c5b429
   PASSED
   Cpu time: 0 ms
-  Gpu time: 49 ms
-[TEST 5/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteArrays@14fc2ab7
+  Gpu time: 52 ms
+[TEST 5/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteArrays@d0447a8
   PASSED
   Cpu time: 0 ms
-  Gpu time: 36 ms
-[TEST 6/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CharArrays@55e04e9e
+  Gpu time: 39 ms
+[TEST 6/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CharArrays@3b5bb15f
   PASSED
   Cpu time: 0 ms
-  Gpu time: 25 ms
-[TEST 7/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ShortArrays@5452865d
+  Gpu time: 24 ms
+[TEST 7/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ShortArrays@7190e268
   PASSED
   Cpu time: 0 ms
-  Gpu time: 299 ms
-[TEST 8/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.IntArrays@78c0fa61
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 10 ms
-[TEST 9/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.FloatArrays@1f2de2bd
+  Gpu time: 333 ms
+[TEST 8/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.IntArrays@2ef55e8d
   PASSED
   Cpu time: 0 ms
   Gpu time: 11 ms
-[TEST 10/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArrays@70e3083
+[TEST 9/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.FloatArrays@1ad81c05
   PASSED
   Cpu time: 0 ms
-  Gpu time: 235 ms
-[TEST 11/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest1@33cf1908
+  Gpu time: 13 ms
+[TEST 10/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.DoubleArrays@74543cc0
+  PASSED
+  Cpu time: 1 ms
+  Gpu time: 258 ms
+[TEST 11/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest1@5f5db4da
   PASSED
   Cpu time: 0 ms
   Gpu time: 7 ms
-[TEST 12/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest2@210fc233
+[TEST 12/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest2@4615bfd
   PASSED
   Cpu time: 0 ms
   Gpu time: 6 ms
-[TEST 13/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest3@c0963ad
+[TEST 13/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest3@65d7f2b2
   PASSED
   Cpu time: 0 ms
   Gpu time: 5 ms
-[TEST 14/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer4Test@8ad2028
+[TEST 14/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer4Test@51db297f
   PASSED
-  Cpu time: 76 ms
-  Gpu time: 62 ms
-[TEST 15/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.MultiArrayTest@2be8a6df
+  Cpu time: 77 ms
+  Gpu time: 60 ms
+[TEST 15/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.MultiArrayTest@16fe8258
   PASSED
   Cpu time: 13 ms
-  Gpu time: 149 ms
-[TEST 16/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.OuterClassTest@3678d58c
+  Gpu time: 157 ms
+[TEST 16/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.OuterClassTest@497ae5bc
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 8 ms
+[TEST 17/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.OuterClassTest2@3a946b89
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 8 ms
+[TEST 18/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.OuterClassTest3@31eb394f
   PASSED
   Cpu time: 0 ms
   Gpu time: 9 ms
-[TEST 17/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.OuterClassTest2@6dcbd2fc
+[TEST 19/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.SameClassUsedTwiceTest1@a7609b
   PASSED
   Cpu time: 0 ms
   Gpu time: 9 ms
-[TEST 18/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.OuterClassTest3@74257f3e
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 10 ms
-[TEST 19/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.SameClassUsedTwiceTest1@2a70cb67
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 10 ms
-[TEST 20/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.SameClassUsedTwiceTest2@115f9dc5
+[TEST 20/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.SameClassUsedTwiceTest2@2cc0b440
   PASSED
   Cpu time: 0 ms
   Gpu time: 9 ms
-[TEST 21/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.RefTypeArrays@7e5321d1
+[TEST 21/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.RefTypeArrays@366c8c75
   PASSED
   Cpu time: 0 ms
-  Gpu time: 332 ms
-[TEST 22/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.StrictMathTest@4e9e99ab
+  Gpu time: 335 ms
+[TEST 22/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.StrictMathTest@154a95c
   PASSED
   Cpu time: 0 ms
   Gpu time: 7 ms
-[TEST 23/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.AtomicLongTest@32cccb62
+[TEST 23/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.AtomicLongTest@2d98213e
 java.lang.NullPointerException
 	at edu.syr.pcpratts.rootbeer.runtime.Serializer.writeStaticField(Serializer.java)
 	at edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.AtomicLongRunOnGpuGcObjectVisitor.doReadStaticsFromHeap(Jasmin)
@@ -2580,85 +2595,85 @@ java.lang.NullPointerException
 	at edu.syr.pcpratts.rootbeer.entry.Main.run(Main.java:128)
 	at edu.syr.pcpratts.rootbeer.entry.Main.main(Main.java:155)
 
-[TEST 24/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.NativeStrictMathTest@7a6e4d6f
+[TEST 24/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.NativeStrictMathTest@4dbbb03e
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 6 ms
+[TEST 25/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.SuperClass@78d79c42
   PASSED
   Cpu time: 1 ms
-  Gpu time: 7 ms
-[TEST 25/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.SuperClass@27ccb099
+  Gpu time: 80 ms
+[TEST 26/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.StringTest@67919a8d
   PASSED
-  Cpu time: 0 ms
-  Gpu time: 81 ms
-[TEST 26/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.StringTest@65cf47e3
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 32 ms
-[TEST 27/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.StepFilterTest@737acdce
+  Cpu time: 1 ms
+  Gpu time: 31 ms
+[TEST 27/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.StepFilterTest@7b6d2611
   PASSED
   Cpu time: 120 ms
   Gpu time: 143 ms
-[TEST 28/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.GpuListTest@4d4aad11
+[TEST 28/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.GpuListTest@2242e430
   PASSED
-  Cpu time: 2 ms
+  Cpu time: 3 ms
   Gpu time: 64 ms
-[TEST 29/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.WhileTrueTest@39b05104
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 6 ms
-[TEST 30/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.arraysum.ArraySumTest@15fcc73a
-  PASSED
-  Cpu time: 15 ms
-  Gpu time: 26 ms
-[TEST 31/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.RemapTest@7e5c06dc
+[TEST 29/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.WhileTrueTest@6cad174e
   PASSED
   Cpu time: 0 ms
   Gpu time: 5 ms
-[TEST 32/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.InstanceofTest@62063cca
+[TEST 30/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.arraysum.ArraySumTest@68f88354
   PASSED
-  Cpu time: 0 ms
-  Gpu time: 4 ms
-[TEST 33/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.DotClassTest@17af6367
+  Cpu time: 6 ms
+  Gpu time: 27 ms
+[TEST 31/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.RemapTest@7a1432c7
   PASSED
   Cpu time: 0 ms
   Gpu time: 5 ms
-[TEST 34/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.PrintTest@5e1df5e6
+[TEST 32/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.InstanceofTest@245c4c91
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 5 ms
+[TEST 33/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.DotClassTest@66ec91d
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 5 ms
+[TEST 34/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.PrintTest@da0feb3
 hello world
 hello world
   PASSED
   Cpu time: 0 ms
   Gpu time: 4 ms
-[TEST 35/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.BarrierTest@4a997497
+[TEST 35/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.BarrierTest@50e67446
   PASSED
   Cpu time: 0 ms
   Gpu time: 5 ms
-[TEST 36/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.SharedMemSimpleTest@40b47dc2
+[TEST 36/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.SharedMemSimpleTest@6dd5b6b8
   PASSED
   Cpu time: 0 ms
   Gpu time: 5 ms
-[TEST 37/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.StringConstantTest@3ddd6a47
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 7 ms
-[TEST 38/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.AbstractTest@2ad2765a
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 4 ms
-[TEST 39/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.PairHmmJimpleTest@69dd34fa
+[TEST 37/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.StringConstantTest@5e0ff301
   PASSED
   Cpu time: 0 ms
   Gpu time: 6 ms
-[TEST 40/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.AutoboxingTest@734561a8
-exception thrown
-  FAILED
-  Compare failed at: 0
-[TEST 41/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ChangeThreadTest@43d3fe98
+[TEST 38/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.AbstractTest@567c8801
   PASSED
   Cpu time: 0 ms
   Gpu time: 4 ms
-[TEST 42/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ShiftTest@24e04f5c
+[TEST 39/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.PairHmmJimpleTest@37fd3cd7
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 6 ms
+[TEST 40/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.AutoboxingTest@d1f2ae9
   PASSED
   Cpu time: 0 ms
   Gpu time: 5 ms
-[TEST 43/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ArrayListTest@28b0fa06
+[TEST 41/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ChangeThreadTest@1602d5c5
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 4 ms
+[TEST 42/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ShiftTest@171cc24d
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 4 ms
+[TEST 43/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ArrayListTest@2b342f91
 java.lang.IllegalAccessError: tried to access class java.util.HashMap$Entry from class edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ArrayListRunOnGpuGcObjectVisitor
 	at edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ArrayListRunOnGpuGcObjectVisitor.doWriteStaticsToHeap(Jasmin)
 	at edu.syr.pcpratts.rootbeer.runtime.Serializer.writeStaticsToHeap(Serializer.java)
@@ -2698,23 +2713,23 @@ java.lang.IllegalAccessError: tried to access class java.util.HashMap$Entry from
 	at edu.syr.pcpratts.rootbeer.entry.Main.run(Main.java:128)
 	at edu.syr.pcpratts.rootbeer.entry.Main.main(Main.java:155)
 
-[TEST 44/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ArrayLengthTest@710ad70b
+[TEST 44/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ArrayLengthTest@5a0f30d2
   PASSED
   Cpu time: 0 ms
   Gpu time: 4 ms
-[TEST 45/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteByteValueTest@52fa010a
+[TEST 45/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ByteByteValueTest@29597cfa
   PASSED
   Cpu time: 0 ms
-  Gpu time: 4 ms
-[TEST 46/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.StringArrayTest1@452913bf
+  Gpu time: 5 ms
+[TEST 46/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.StringArrayTest1@4028d380
   PASSED
   Cpu time: 54 ms
-  Gpu time: 1355 ms
-[TEST 47/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfTest@392e4e7d
+  Gpu time: 1357 ms
+[TEST 47/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CmplInfTest@337d67be
   PASSED
   Cpu time: 0 ms
   Gpu time: 4 ms
-[TEST 48/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedListTest@212a2899
+[TEST 48/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedListTest@3d5347d2
 java.lang.IllegalAccessError: tried to access class java.util.HashMap$Entry from class edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedListRunOnGpuGcObjectVisitor
 	at edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedListRunOnGpuGcObjectVisitor.doWriteStaticsToHeap(Jasmin)
 	at edu.syr.pcpratts.rootbeer.runtime.Serializer.writeStaticsToHeap(Serializer.java)
@@ -2754,7 +2769,7 @@ java.lang.IllegalAccessError: tried to access class java.util.HashMap$Entry from
 	at edu.syr.pcpratts.rootbeer.entry.Main.run(Main.java:128)
 	at edu.syr.pcpratts.rootbeer.entry.Main.main(Main.java:155)
 
-[TEST 49/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.HashSetTest@27cea513
+[TEST 49/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.HashSetTest@2cf2b3
 java.lang.IllegalAccessError: tried to access class java.util.HashMap$Entry from class edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.HashSetRunOnGpuGcObjectVisitor
 	at edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.HashSetRunOnGpuGcObjectVisitor.doWriteStaticsToHeap(Jasmin)
 	at edu.syr.pcpratts.rootbeer.runtime.Serializer.writeStaticsToHeap(Serializer.java)
@@ -2794,7 +2809,7 @@ java.lang.IllegalAccessError: tried to access class java.util.HashMap$Entry from
 	at edu.syr.pcpratts.rootbeer.entry.Main.run(Main.java:128)
 	at edu.syr.pcpratts.rootbeer.entry.Main.main(Main.java:155)
 
-[TEST 50/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.TreeSetTest@6e7c49d1
+[TEST 50/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.TreeSetTest@ad1a98f
 java.lang.IllegalAccessError: tried to access class java.util.HashMap$Entry from class edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.TreeSetRunOnGpuGcObjectVisitor
 	at edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.TreeSetRunOnGpuGcObjectVisitor.doWriteStaticsToHeap(Jasmin)
 	at edu.syr.pcpratts.rootbeer.runtime.Serializer.writeStaticsToHeap(Serializer.java)
@@ -2834,7 +2849,7 @@ java.lang.IllegalAccessError: tried to access class java.util.HashMap$Entry from
 	at edu.syr.pcpratts.rootbeer.entry.Main.run(Main.java:128)
 	at edu.syr.pcpratts.rootbeer.entry.Main.main(Main.java:155)
 
-[TEST 51/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedHashSetTest@12206c4b
+[TEST 51/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedHashSetTest@13509307
 java.lang.IllegalAccessError: tried to access class java.util.HashMap$Entry from class edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedHashSetRunOnGpuGcObjectVisitor
 	at edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedHashSetRunOnGpuGcObjectVisitor.doWriteStaticsToHeap(Jasmin)
 	at edu.syr.pcpratts.rootbeer.runtime.Serializer.writeStaticsToHeap(Serializer.java)
@@ -2874,37 +2889,39 @@ java.lang.IllegalAccessError: tried to access class java.util.HashMap$Entry from
 	at edu.syr.pcpratts.rootbeer.entry.Main.run(Main.java:128)
 	at edu.syr.pcpratts.rootbeer.entry.Main.main(Main.java:155)
 
-[TEST 52/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.HashMapTest@13d514fb
+[TEST 52/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.HashMapTest@1fedb519
   FAILED
   Ran on CPU
-[TEST 53/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.TreeMapTest@5d954b4b
+[TEST 53/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.TreeMapTest@535e9ad1
   FAILED
   Ran on CPU
-[TEST 54/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedHashMapTest@4815e24a
+[TEST 54/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedHashMapTest@4b060585
   FAILED
   Ran on CPU
-[TEST 55/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ExceptionBasicTest@7e0aeebd
+[TEST 55/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientTest@59634e57
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 6 ms
+[TEST 56/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ExceptionBasicTest@420a4d29
   FAILED
   Exception is: edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaErrorException: ERROR STATUS:700 : error in cuCtxSynchronize
-[TEST 56/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer1Test@3fb25cd6
+[TEST 57/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer1Test@3b412f53
   PASSED
-[TEST 57/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer2Test@568b6b39
+[TEST 58/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer2Test@178cb273
   PASSED
-[TEST 58/58] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ChangeThreadTest@413c9827
+[TEST 59/59] edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ChangeThreadTest@377a739d
   PASSED
   Cpu time: 0 ms
   Gpu time: 3 ms
-46/58 tests PASS
+49/59 tests PASS
 Failing tests:
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.NewOnGpu@18a1959a
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.AtomicLongTest@32cccb62
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.AutoboxingTest@734561a8
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ArrayListTest@28b0fa06
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedListTest@212a2899
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.HashSetTest@27cea513
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.TreeSetTest@6e7c49d1
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedHashSetTest@12206c4b
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.HashMapTest@13d514fb
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.TreeMapTest@5d954b4b
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedHashMapTest@4815e24a
-  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ExceptionBasicTest@7e0aeebd
+  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.AtomicLongTest@2d98213e
+  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ArrayListTest@2b342f91
+  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedListTest@3d5347d2
+  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.HashSetTest@2cf2b3
+  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.TreeSetTest@ad1a98f
+  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedHashSetTest@13509307
+  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.HashMapTest@1fedb519
+  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.TreeMapTest@535e9ad1
+  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.LinkedHashMapTest@4b060585
+  edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ExceptionBasicTest@420a4d29
