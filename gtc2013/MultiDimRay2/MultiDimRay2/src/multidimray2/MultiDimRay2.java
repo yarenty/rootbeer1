@@ -17,10 +17,16 @@ public class MultiDimRay2 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        boolean useGPU = false;
+
+        if (args.length == 1 && args[0].equals("-gpu")) {
+            useGPU = true;
+        }
+
         JFrame f = new JFrame();
-        f.setSize(100, 100);
+        f.setSize(512, 512);
         f.setLayout(new GridLayout());
-        f.add(new NewJPanel());
+        f.add(new NewJPanel(useGPU));
         f.setVisible(true);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
