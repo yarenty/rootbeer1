@@ -82,7 +82,7 @@ public class NewJPanel extends javax.swing.JPanel {
     /**
      * Creates new form NewJPanel
      */
-    public NewJPanel() {
+    public NewJPanel(final boolean useGPU) {
         initComponents();
         img = new BufferedImage(10, 10, BufferedImage.TYPE_3BYTE_BGR);
 
@@ -125,10 +125,17 @@ public class NewJPanel extends javax.swing.JPanel {
 
                     BufferedImage im = img;
                     int[] pixels = new int[im.getWidth() * im.getHeight()];
-                    RayGenerator.generate(
-                            im.getWidth(), im.getHeight(), minx, maxx, miny, maxy,
-                            pixels, spheres, light, observer2,
-                            1, vx2, vy2, numDimensions);
+                    if (useGPU) {
+                        RayGenerator.generateGPU(
+                                im.getWidth(), im.getHeight(), minx, maxx, miny, maxy,
+                                pixels, spheres, light, observer2,
+                                1, vx2, vy2, numDimensions);
+                    }else{
+                        RayGenerator.generateCPU(
+                                im.getWidth(), im.getHeight(), minx, maxx, miny, maxy,
+                                pixels, spheres, light, observer2,
+                                1, vx2, vy2, numDimensions);
+                    }
                     im.setRGB(0, 0, im.getWidth(), im.getHeight(), pixels, 0, im.getWidth());
 
                     repaint();

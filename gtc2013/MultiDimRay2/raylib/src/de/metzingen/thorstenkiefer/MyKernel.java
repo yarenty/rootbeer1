@@ -27,6 +27,7 @@ public class MyKernel implements Kernel {
     private double[] sight_dir;
     private double[][] regs;
     private double[] intersections = new double[100];
+    private int numIntersections = 0;
     private double[][] intersectionso = new double[100][];
     private double[] vx;
     private double[] vy;
@@ -55,12 +56,6 @@ public class MyKernel implements Kernel {
         regs = new double[5][numDimensions];
         sight_start = observer;
         sight_dir = new double[numDimensions];
-    }
-
-    public static void nanOut(double[] xs) {
-        for (int i = 0; i < 100; ++i) {
-            xs[i] = Double.NaN;
-        }
     }
 
     public static void zeroOut(double[] xs) {
@@ -124,36 +119,20 @@ public class MyKernel implements Kernel {
         double x = b * b - 4 * a * c;
         if (x < 0) {
         } else if (x == 0) {
-            for (int i = 0; i < 100; ++i) {
-                if (Double.isNaN(intersections[i])) {
-                    intersections[i] = -b / 2 / a;
-                    intersectionso[i] = sphere;
-                    break;
-                }
-            }
+            intersections[numIntersections] = -b / 2 / a;
+            intersectionso[numIntersections] = sphere;
+            numIntersections++;
         } else {
-            for (int i = 0; i < 100; ++i) {
-                if (Double.isNaN(intersections[i])) {
-                    intersections[i] = (-b + sqrt(x)) / a / 2;
-                    intersectionso[i] = sphere;
-                    break;
-                }
-            }
-            for (int i = 0; i < 100; ++i) {
-                if (Double.isNaN(intersections[i])) {
-                    intersections[i] = (-b - sqrt(x)) / a / 2;
-                    intersectionso[i] = sphere;
-                    break;
-                }
-            }
+            intersections[numIntersections] = (-b + Math.sqrt(x)) / a / 2;
+            intersectionso[numIntersections] = sphere;
+            numIntersections++;
+            intersections[numIntersections] = (-b - Math.sqrt(x)) / a / 2;
+            intersectionso[numIntersections] = sphere;
+            numIntersections++;
         }
     }
 
-    @Override
-    public void gpuMethod() {
-        int xpixel = RootbeerGpu.getBlockIdxx();
-        int ypixel = RootbeerGpu.getThreadIdxx();
-
+    public void gpuMethod(int xpixel, int ypixel) {
         if (xpixel >= w || ypixel >= h) {
             return;
         }
@@ -164,17 +143,16 @@ public class MyKernel implements Kernel {
         sub(regs[0], observer, sight_dir);
         double minlambda = Double.NaN;
         double[] mino = null;
-        nanOut(intersections);
+        numIntersections = 0;
         intersect(sight_start, sight_dir, spheres);
-        for (int j = 0; j < 100; ++j) {
+        for (int j = 0; j < numIntersections; ++j) {
             if (Double.isNaN(minlambda)) {
                 minlambda = intersections[j];
                 mino = intersectionso[j];
-            } else if (!Double.isNaN(intersections[j])) {
-                if (intersections[j] < minlambda) {
-                    minlambda = intersections[j];
-                    mino = intersectionso[j];
-                }
+            }
+            if (intersections[j] < minlambda) {
+                minlambda = intersections[j];
+                mino = intersectionso[j];
             }
         }
 
@@ -188,7 +166,7 @@ public class MyKernel implements Kernel {
             mul(regs[1], 1.0 / radius, regs[1]); //normal
 
             sub(light, regs[0], regs[2]);
-            double l = sqrt(mul(regs[2], regs[2]));
+            double l = Math.sqrt(mul(regs[2], regs[2]));
             mul(regs[2], 1.0 / l, regs[2]); // light
 
             boolean intersects = false;
@@ -202,5 +180,12 @@ public class MyKernel implements Kernel {
             }
             result[xpixel + w * ypixel] = (int) (0xff * alpha) << 8;
         }
+    }
+
+    @Override
+    public void gpuMethod() {
+        int xpixel = RootbeerGpu.getBlockIdxx();
+        int ypixel = RootbeerGpu.getThreadIdxx();
+        gpuMethod(xpixel, ypixel);
     }
 }
