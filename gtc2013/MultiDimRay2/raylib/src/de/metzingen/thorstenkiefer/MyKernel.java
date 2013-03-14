@@ -149,11 +149,7 @@ public class MyKernel implements Kernel {
         }
     }
 
-    @Override
-    public void gpuMethod() {
-        int xpixel = RootbeerGpu.getBlockIdxx();
-        int ypixel = RootbeerGpu.getThreadIdxx();
-
+    public void gpuMethod(int xpixel, int ypixel){
         if (xpixel >= w || ypixel >= h) {
             return;
         }
@@ -201,6 +197,13 @@ public class MyKernel implements Kernel {
                 //System.err.println(alpha);
             }
             result[xpixel + w * ypixel] = (int) (0xff * alpha) << 8;
-        }
+        }        
+    }
+    
+    @Override
+    public void gpuMethod() {
+        int xpixel = RootbeerGpu.getBlockIdxx();
+        int ypixel = RootbeerGpu.getThreadIdxx();
+        gpuMethod(xpixel, ypixel);
     }
 }
