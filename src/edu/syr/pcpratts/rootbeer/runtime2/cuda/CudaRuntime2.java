@@ -34,7 +34,8 @@ public class CudaRuntime2 implements ParallelRuntime {
     }
     return m_Instance;
   }
-  
+
+  private final boolean m_32bit;
   
   private List<Memory> m_ToSpace;
   private List<Memory> m_Texture;
@@ -86,6 +87,9 @@ public class CudaRuntime2 implements ParallelRuntime {
   private Stopwatch m_readBlocksStopwatch;
   
   private CudaRuntime2(){
+    String arch = System.getProperty("os.arch");
+    m_32bit = arch.equals("x86") || arch.equals("i386");
+
     m_ctorStopwatch = new Stopwatch();
     m_ctorStopwatch.start();
     CudaLoader loader = new CudaLoader();
@@ -236,7 +240,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     if(any_jobs == false){
       return m_Partial;
     }
-    String filename = m_FirstJob.getCubin();
+    String filename = m_32bit ? m_FirstJob.getCubin32() : m_FirstJob.getCubin64();
     if(filename.endsWith(".error")){
       return m_Partial;
     }
@@ -429,7 +433,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   }
 
   private void compileCode() {
-    String filename = m_FirstJob.getCubin();
+    String filename = m_32bit ? m_FirstJob.getCubin32() : m_FirstJob.getCubin64();
     try {
       List<byte[]> buffer = ResourceReader.getResourceArray(filename);
       int total_len = 0;
