@@ -13,11 +13,7 @@ import edu.syr.pcpratts.deadmethods.DeadMethods;
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.util.CompilerRunner;
 import edu.syr.pcpratts.rootbeer.util.CudaPath;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,64 +59,78 @@ public class CudaTweaks extends Tweaks {
     return null;
   }
 
-  public CompileResult compileProgram(String cuda_code) {
-    try {      
-      File pre_dead = new File(RootbeerPaths.v().getRootbeerHome()+"pre_dead.cu");
-      PrintWriter writer = new PrintWriter(pre_dead.getAbsoluteFile());
-      writer.println(cuda_code.toString());
+  private CompileResult compileProgram0(File generated,
+          CudaPath cuda_path, String gencode_options, boolean m32) throws Exception {
+    File code_file = new File(RootbeerPaths.v().getRootbeerHome() + "code_file.ptx");
+    String modelString = m32 ? "-m32" : "-m64";
+    String command;
+    if (File.separator.equals("/")) {
+      command = cuda_path.get() + "/nvcc " + modelString + " " +
+              gencode_options + " -fatbin " + generated.getAbsolutePath() +
+              " -o " + code_file.getAbsolutePath();
+      CompilerRunner runner = new CompilerRunner();
+      List<String> errors = runner.run(command);
+      if (errors.isEmpty() == false) {
+        return new CompileResult(m32, null, errors);
+      }
+    } else {
+      WindowsCompile compile = new WindowsCompile();
+      String nvidia_path = cuda_path.get();
+      command = "\"" + nvidia_path + "\" " + gencode_options +
+              " -fatbin \"" + generated.getAbsolutePath() + "\" -o \"" +
+              code_file.getAbsolutePath() + "\"" + compile.endl();
+      List<String> errors = compile.compile(command);
+      if (errors.isEmpty() == false) {
+        return new CompileResult(m32, null, errors);
+      }
+    }
+    List<byte[]> file_contents;
+    try {
+      file_contents = readFile(code_file);
+    } catch (FileNotFoundException ex) {
+      file_contents = new ArrayList<byte[]>();
+      ex.printStackTrace();
+    }
+    return new CompileResult(m32, file_contents, new ArrayList<String>());
+  }
+
+  /**
+   * Compiles CUDA code.
+   *
+   * @param cuda_code string containing code.
+   * @return an array containing compilation results, first element of the array
+   * contains 32 bit code, second element of the array contains 64 bit code. If
+   * compilation for an architecture fails, only the offending element is returned.
+   */
+  public CompileResult[] compileProgram(String cuda_code) {
+    PrintWriter writer;
+    try {
+      writer = new PrintWriter(RootbeerPaths.v().getRootbeerHome() + "pre_dead.cu");
+      writer.println(cuda_code);
       writer.flush();
       writer.close();
-      
+
       DeadMethods dead_methods = new DeadMethods("entry");
       cuda_code = dead_methods.filter(cuda_code);
-      
+
       //Compressor compressor = new Compressor();
       //cuda_code = compressor.compress(cuda_code);
-      
-      //print out code for debugging
-      File generated = new File(RootbeerPaths.v().getRootbeerHome()+"generated.cu");
-      writer = new PrintWriter(generated.getAbsoluteFile());
+
+      File generated = new File(RootbeerPaths.v().getRootbeerHome() + "generated.cu");
+      writer = new PrintWriter(generated);
       writer.println(cuda_code.toString());
       writer.flush();
       writer.close();
 
-      File code_file = new File(RootbeerPaths.v().getRootbeerHome()+"code_file.ptx");
-      //String modelString = "-m"+System.getProperty("sun.arch.data.model");
-      String modelString = "-m64";
-
-      String command;
       CudaPath cuda_path = new CudaPath();
       GencodeOptions options_gen = new GencodeOptions();
       String gencode_options = options_gen.getOptions();
-      if(File.separator.equals("/")){
-        command = cuda_path.get() + "/nvcc "+modelString+" "+gencode_options+" -fatbin "+generated.getAbsolutePath()+" -o "+code_file.getAbsolutePath();
-        CompilerRunner runner = new CompilerRunner();
-        List<String> errors = runner.run(command);      
-        if(errors.isEmpty() == false){
-          return new CompileResult(null, errors);
-        }
-      } else {
-        WindowsCompile compile = new WindowsCompile();
-        String nvidia_path = cuda_path.get();
-        command = "\""+nvidia_path+"\" "+gencode_options+" -fatbin \""+generated.getAbsolutePath()+"\" -o \""+code_file.getAbsolutePath()+"\""+compile.endl();
-        List<String> errors = compile.compile(command);
-        if(errors.isEmpty() == false){
-          return new CompileResult(null, errors);
-        }
-      }
-        
-      List<byte[]> file_contents = null;
-      try {
-        file_contents = readFile(code_file);
-      } catch(FileNotFoundException ex){
-        file_contents = new ArrayList<byte[]>();
-        ex.printStackTrace();
-      }
-      return new CompileResult(file_contents, new ArrayList<String>());
-    } catch(Exception ex){
-      throw new RuntimeException(ex);
+      CompileResult res32 = compileProgram0(generated, cuda_path, gencode_options, true);
+      CompileResult res64 = compileProgram0(generated, cuda_path, gencode_options, false);
+      return new CompileResult[] { res32, res64 };
+    } catch (Exception ex) {
+      throw new RuntimeException("Failed to compile cuda code.", ex);
     }
-    
   }
 
   private List<byte[]> readFile(File file) throws Exception {

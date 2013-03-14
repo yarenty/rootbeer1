@@ -72,11 +72,11 @@ public class GenerateRuntimeBasicBlock {
     codeSegment.makeCpuBodyForRuntimeBasicBlock(mSootClass);
   }  
   
-  private void makeGetCodeMethodThatReturnsBytes(String filename) {
+  private void makeGetCodeMethodThatReturnsBytes(boolean m32, String filename) {
     BytecodeLanguage bcl = new BytecodeLanguage();
     bcl.openClass(mSootClass);
     SootClass string = Scene.v().getSootClass("java.lang.String");
-    bcl.startMethod("getCubin", string.getType());
+    bcl.startMethod("getCubin"  + (m32 ? "32" : "64"), string.getType());
     Local thisref = bcl.refThis();
     bcl.returnValue(StringConstant.v(filename));
     bcl.endMethod();
@@ -158,17 +158,20 @@ public class GenerateRuntimeBasicBlock {
   private void makeGpuBody() throws Exception {
     OpenCLScene.v().addCodeSegment(codeSegment);
     if(Configuration.compilerInstance().getMode() == Configuration.MODE_GPU){
-      CompileResult result = OpenCLScene.v().getCudaCode();
-      if(result.getBinary() == null){
-        makeGetCodeMethodThatReturnsBytes(cubinFilename(false)+".error");
-        makeGetCodeMethodThatReturnsString("", true);
-        makeGetCodeMethodThatReturnsString("", false);
-      } else {
-        List<byte[]> bytes = result.getBinary();
-        writeBytesToFile(bytes, cubinFilename(true));
-        makeGetCodeMethodThatReturnsBytes(cubinFilename(false));
-        makeGetCodeMethodThatReturnsString("", true);
-        makeGetCodeMethodThatReturnsString("", false);
+      CompileResult[] result = OpenCLScene.v().getCudaCode();
+      for (CompileResult res : result) {
+        String suffix = res.is32Bit() ? "-32" : "-64";
+        if (res.getBinary() == null) {
+          makeGetCodeMethodThatReturnsBytes(res.is32Bit(), cubinFilename(false, suffix) + ".error");
+          makeGetCodeMethodThatReturnsString("", true);
+          makeGetCodeMethodThatReturnsString("", false);
+        } else {
+          List<byte[]> bytes = res.getBinary();
+          writeBytesToFile(bytes, cubinFilename(true, suffix));
+          makeGetCodeMethodThatReturnsBytes(res.is32Bit(), cubinFilename(false, suffix));
+          makeGetCodeMethodThatReturnsString("", true);
+          makeGetCodeMethodThatReturnsString("", false);
+        }
       }
     } else {
       String[] code = OpenCLScene.v().getOpenCLCode();
@@ -196,12 +199,15 @@ public class GenerateRuntimeBasicBlock {
       
       makeGetCodeMethodThatReturnsString(code[0], true);
       makeGetCodeMethodThatReturnsString(code[1], false);
-      makeGetCodeMethodThatReturnsBytes("");
+      makeGetCodeMethodThatReturnsBytes(true, "");
+      makeGetCodeMethodThatReturnsBytes(false, "");
     }
   }
   
-  private String cubinFilename(boolean use_class_folder){
-    String class_name = File.separator + gcObjectVisitorClassName.replace(".", File.separator) + ".cubin";
+  private String cubinFilename(boolean use_class_folder, String suffix){
+    String class_name = File.separator +
+            gcObjectVisitorClassName.replace(".", File.separator) +
+            suffix + ".cubin";
     if(use_class_folder)
       return RootbeerPaths.v().getOutputClassFolder() + class_name;
     else
