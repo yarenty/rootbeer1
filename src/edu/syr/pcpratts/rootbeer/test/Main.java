@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer4Test;
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.GpuMethodTest;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.*;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.FastMatrixTest;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.remaptest.RemapTest;
@@ -90,6 +91,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new TreeMapTest());
     ret.add(new LinkedHashMapTest());
     ret.add(new CovarientTest());
+    ret.add(new GpuMethodTest());
             
     if(m_hardTests){
       ret.add(new SimpleSynchronizedTest());
