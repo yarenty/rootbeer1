@@ -4,7 +4,6 @@
  */
 package de.metzingen.thorstenkiefer;
 
-import com.sun.jmx.snmp.tasks.ThreadService;
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
 import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
