@@ -37,7 +37,7 @@ public class RayGenerator {
                     }
                 }
                 for (int x = 0; x < w; ++x) {
-                    kernel.gpuMethod(x, y);
+                    kernel.compute(x, y);
                 }
                 compute = false;
             }

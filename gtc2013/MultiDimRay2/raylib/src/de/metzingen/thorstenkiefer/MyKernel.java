@@ -132,7 +132,7 @@ public class MyKernel implements Kernel {
         }
     }
 
-    public void gpuMethod(int xpixel, int ypixel) {
+    public void compute(int xpixel, int ypixel) {
         if (xpixel >= w || ypixel >= h) {
             return;
         }
@@ -186,6 +186,6 @@ public class MyKernel implements Kernel {
     public void gpuMethod() {
         int xpixel = RootbeerGpu.getBlockIdxx();
         int ypixel = RootbeerGpu.getThreadIdxx();
-        gpuMethod(xpixel, ypixel);
+        compute(xpixel, ypixel);
     }
 }
