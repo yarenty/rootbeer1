@@ -69,7 +69,7 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
       SootClass prov_class = Scene.v().getSootClass(m_provider);
       SootMethod method = prov_class.getMethodByName("create");
       SootClass kernel_class = searchMethod(method);
-      gpu_method = kernel_class.getMethodByName("gpuMethod");
+      gpu_method = kernel_class.getMethod("void gpuMethod()");
     }
     
     m_signature = gpu_method.getSignature();
