@@ -163,16 +163,14 @@ public class GenerateRuntimeBasicBlock {
         String suffix = res.is32Bit() ? "-32" : "-64";
         if (res.getBinary() == null) {
           makeGetCodeMethodThatReturnsBytes(res.is32Bit(), cubinFilename(false, suffix) + ".error");
-          makeGetCodeMethodThatReturnsString("", true);
-          makeGetCodeMethodThatReturnsString("", false);
         } else {
           List<byte[]> bytes = res.getBinary();
           writeBytesToFile(bytes, cubinFilename(true, suffix));
           makeGetCodeMethodThatReturnsBytes(res.is32Bit(), cubinFilename(false, suffix));
-          makeGetCodeMethodThatReturnsString("", true);
-          makeGetCodeMethodThatReturnsString("", false);
         }
       }
+      makeGetCodeMethodThatReturnsString("", true);
+      makeGetCodeMethodThatReturnsString("", false);
     } else {
       String[] code = OpenCLScene.v().getOpenCLCode();
       //code[0] is unix
