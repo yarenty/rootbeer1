@@ -183,7 +183,13 @@ public class CudaRuntime2 implements ParallelRuntime {
     }
     writeSingleBlock(job_template);
     
-    String filename = m_FirstJob.getCubin();
+    String filename;
+    if(m_32bit){
+      filename = m_FirstJob.getCubin32();
+    } else {
+      filename = m_FirstJob.getCubin64();
+    }
+    
     if(filename.endsWith(".error")){
       return;
     }
