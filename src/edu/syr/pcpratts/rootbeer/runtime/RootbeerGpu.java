@@ -36,14 +36,14 @@ public class RootbeerGpu {
  
   public static int getThreadIdxx() {
     if (Thread.currentThread() instanceof TemplateThread) {
-      return ((TemplateThread) Thread.currentThread()).threadid;
+      return ((TemplateThread) Thread.currentThread()).m_threadIdxx;
     }
     return m_threadIdxx;
   }
 
   public static int getBlockIdxx() {
     if (Thread.currentThread() instanceof TemplateThread) {
-      return ((TemplateThread) Thread.currentThread()).blockid;
+      return ((TemplateThread) Thread.currentThread()).m_blockIdxx;
     }
     return m_blockIdxx;
   }

@@ -35,8 +35,9 @@ public class MyKernel implements Kernel {
     public void gpuMethod() {
         double xr = 0;
         double xi = 0;
-        int i = RootbeerGpu.getBlockIdxx();
-        int j = RootbeerGpu.getThreadIdxx();
+        int id = RootbeerGpu.getBlockIdxx() * RootbeerGpu.getBlockDimx() + RootbeerGpu.getThreadIdxx();
+        int i = id % w;
+        int j = id / w;
         if (i >= w || j >= h) {
             return;
         }

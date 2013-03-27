@@ -1,36 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright 2012 Phil Pratt-Szeliga and other contributors
+ * http://chirrup.org/
+ * 
+ * See the file LICENSE for copying permission.
  */
 package edu.syr.pcpratts.rootbeer.runtime;
 
-import static edu.syr.pcpratts.rootbeer.runtime.TemplateThread.sleeping;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- *
- * @author thorsten
- */
-class TemplateThread extends Thread {
+public class TemplateThread extends Thread {
 
-  public static List<TemplateThread> sleeping = Collections.synchronizedList(new ArrayList<TemplateThread>());
-  public static List<TemplateThread> computing = Collections.synchronizedList(new ArrayList<TemplateThread>());
+  private TemplateThreadListsProvider templateThreadListsProvider = TemplateThreadListsProvider.getInstance();
   public boolean compute = false;
   public int startid;
   public int endid;
-  public int threadid;
-  public int blockid;
+  public int m_threadIdxx;
+  public int m_blockIdxx;
   public Kernel kernel;
-
-  static {
-    for (int i = 0; i < 8; ++i) {
-      TemplateThread t = new TemplateThread();
-      t.start();
-      sleeping.add(t);
-    }
-  }
 
   @Override
   public void run() {
@@ -41,13 +29,13 @@ class TemplateThread extends Thread {
         } catch (InterruptedException ex) {
         }
       }
-      computing.add(this);
-      for (threadid = startid; threadid < endid; ++threadid) {
+      templateThreadListsProvider.getComputing().add(this);
+      for (m_threadIdxx = startid; m_threadIdxx < endid; ++m_threadIdxx) {
         kernel.gpuMethod();
       }
       compute = false;
-      computing.remove(this);
-      sleeping.add(this);
+      templateThreadListsProvider.getComputing().remove(this);
+      templateThreadListsProvider.getSleeping().add(this);
     }
   }
 }
