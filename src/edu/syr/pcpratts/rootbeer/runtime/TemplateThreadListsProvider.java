@@ -14,23 +14,15 @@ public class TemplateThreadListsProvider {
 
   private List<TemplateThread> sleeping = Collections.synchronizedList(new ArrayList<TemplateThread>());
   private List<TemplateThread> computing = Collections.synchronizedList(new ArrayList<TemplateThread>());
-  private static TemplateThreadListsProvider instance = null;
 
-  private TemplateThreadListsProvider() {
+  public TemplateThreadListsProvider() {
     for (int i = 0; i < Runtime.getRuntime().availableProcessors(); ++i) {
-      TemplateThread t = new TemplateThread();
+      TemplateThread t = new TemplateThread(this);
       t.start();
       sleeping.add(t);
     }
   }
-
-  public static TemplateThreadListsProvider getInstance() {
-    if (instance == null) {
-      instance = new TemplateThreadListsProvider();
-    }
-    return instance;
-  }
-
+  
   public List<TemplateThread> getSleeping() {
     return sleeping;
   }

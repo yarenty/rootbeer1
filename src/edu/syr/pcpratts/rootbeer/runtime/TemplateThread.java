@@ -6,13 +6,9 @@
  */
 package edu.syr.pcpratts.rootbeer.runtime;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class TemplateThread extends Thread {
 
-  private TemplateThreadListsProvider templateThreadListsProvider = TemplateThreadListsProvider.getInstance();
+  private TemplateThreadListsProvider templateThreadListsProvider;
   public boolean compute = false;
   public int startid;
   public int endid;
@@ -20,6 +16,10 @@ public class TemplateThread extends Thread {
   public int m_blockIdxx;
   public Kernel kernel;
 
+  public TemplateThread(TemplateThreadListsProvider templateThreadListsProvider) {
+    this.templateThreadListsProvider = templateThreadListsProvider;
+  }
+  
   @Override
   public void run() {
     while (true) {
