@@ -19,8 +19,9 @@ public class MyKernel implements Kernel {
     public int h;
     public double maxx, minx;
     public double maxy, miny;
+    public int offset;
 
-    public MyKernel(int[] result, int maxdepth, int w, int h, double maxx, double minx, double maxy, double miny) {
+    public MyKernel(int[] result, int maxdepth, int w, int h, double maxx, double minx, double maxy, double miny,int offset) {
         this.result = result;
         this.maxdepth = maxdepth;
         this.w = w;
@@ -29,6 +30,7 @@ public class MyKernel implements Kernel {
         this.minx = minx;
         this.maxy = maxy;
         this.miny = miny;
+        this.offset = offset;
     }
 
     @Override
@@ -60,7 +62,7 @@ public class MyKernel implements Kernel {
         //int r = (int) (0xff * (RootbeerGpu.sin((double) (0.01 * d + 0) + 1)) / 2);
         //int g = (int) (0xff * (RootbeerGpu.sin((double) (0.02 * d + 0.01) + 1)) / 2);
         //int b = (int) (0xff * (RootbeerGpu.sin((double) (0.04 * d + 0.1) + 1)) / 2);
-        int dest_index = j * w + i;
+        int dest_index = j * w + i + offset;
 
         //result[dest_index] = r;  
         //result[dest_index] = g;

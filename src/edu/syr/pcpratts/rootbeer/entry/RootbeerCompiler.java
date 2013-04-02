@@ -149,6 +149,7 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.PrivateFields");
     RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.util.IntStack");
+    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.TemplateThread");
     
     List<String> cuda_entries = new ArrayList<String>();
     cuda_entries.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadId()>");

@@ -110,7 +110,7 @@ public class ConcreteRootbeer implements IRootbeerInternal {
     int warp = 32;
     TemplateThreadListsProvider templateThreadListsProvider = new TemplateThreadListsProvider();
 
-    for (int i = 0; i < m_threadConfig.getBlockShapeX() * m_threadConfig.getGridShapeX() - warp; i += warp) {
+    for (int i = 0; i < m_threadConfig.getNumThreads() - warp; i += warp) {
       while (templateThreadListsProvider.getSleeping().isEmpty());
       TemplateThread t = templateThreadListsProvider.getSleeping().remove(0);
       t.kernel = kernel;

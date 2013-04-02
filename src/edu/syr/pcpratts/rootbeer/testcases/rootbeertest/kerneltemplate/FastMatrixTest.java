@@ -37,7 +37,7 @@ public class FastMatrixTest implements TestKernelTemplate {
   }
 
   public ThreadConfig getThreadConfig() {
-    ThreadConfig ret = new ThreadConfig(m_blockSize, m_gridSize);
+    ThreadConfig ret = new ThreadConfig(m_blockSize, m_gridSize,m_blockSize * m_gridSize);
     return ret;
   }
 
