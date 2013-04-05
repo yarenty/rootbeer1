@@ -12,13 +12,12 @@ import java.util.Iterator;
 import java.util.List;
 import soot.SootClass;
 import soot.SootMethod;
+import soot.rbclassload.HierarchySootClass;
+import soot.rbclassload.HierarchySootMethod;
 import soot.rbclassload.EntryPointDetector;
 
 public class KernelEntryPointDetector implements EntryPointDetector {
-
-  /*
-    */
-   
+  
   private List<String> m_entryPoints;
   
   public KernelEntryPointDetector(){
@@ -27,21 +26,24 @@ public class KernelEntryPointDetector implements EntryPointDetector {
     //m_entryPoints.add("<edu.syr.pcpratts.rootbeer.runtime.Rootbeer: void runAll(edu.syr.pcpratts.rootbeer.runtime.Kernel)>");
   }
     
-  public void testEntryPoint(SootMethod sm) {
+  public void testEntryPoint(HierarchySootMethod sm) {
+    System.out.println("testEntryPoint: ");
+    System.out.println("  "+sm.getSignature());
+    System.out.println("  "+sm.getSignature());
     if(isKernel(sm)){
       m_entryPoints.add(sm.getSignature());
     }
   }
 
-  private boolean isKernel(SootMethod sm){
+  private boolean isKernel(HierarchySootMethod sm){
     if(sm.getSubSignature().equals("void gpuMethod()") == false){
       return false;
     }
-    SootClass soot_class = sm.getDeclaringClass();
-    Iterator<SootClass> iter = soot_class.getInterfaces().iterator();
+    HierarchySootClass soot_class = sm.getHierarchySootClass();
+    Iterator<String> iter = soot_class.getInterfaces().iterator();
     while(iter.hasNext()){
-      SootClass iface = iter.next();
-      if(iface.getName().equals("edu.syr.pcpratts.rootbeer.runtime.Kernel")){
+      String iface = iter.next();
+      if(iface.equals("edu.syr.pcpratts.rootbeer.runtime.Kernel")){
         return true;
       }
     }
@@ -51,4 +53,5 @@ public class KernelEntryPointDetector implements EntryPointDetector {
   public List<String> getEntryPoints(){
     return m_entryPoints;
   }
+
 }

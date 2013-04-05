@@ -33,9 +33,11 @@ import soot.rbclassload.RootbeerClassLoader;
 public class MethodHierarchies {
 
   private Set<MethodHierarchy> m_hierarchies;
+  private MethodSignatureUtil m_util;
   
   public MethodHierarchies(){
     m_hierarchies = new LinkedHashSet<MethodHierarchy>();
+    m_util = new MethodSignatureUtil();
   }
   
   public void addMethod(SootMethod method){
@@ -89,8 +91,10 @@ public class MethodHierarchies {
         return ret;
       }
       
-      List<SootMethod> methods = RootbeerClassLoader.v().getClassHierarchy().getAllVirtualMethods(m_sootMethod.getSignature());
-      for(SootMethod soot_method : methods){
+      List<String> methods = RootbeerClassLoader.v().getClassHierarchy().getVirtualMethods(m_sootMethod.getSignature());
+      for(String virt_method : methods){
+        m_util.parse(virt_method);
+        SootMethod soot_method = m_util.getSootMethod();
         OpenCLMethod method = new OpenCLMethod(soot_method, soot_method.getDeclaringClass());
         ret.add(method);
       }
@@ -107,8 +111,9 @@ public class MethodHierarchies {
     
     public OpenCLPolymorphicMethod getOpenCLPolyMorphicMethod(){
       ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-      List<SootMethod> virtual_methods = class_hierarchy.getAllVirtualMethods(m_sootMethod.getSignature());
-      return new OpenCLPolymorphicMethod(virtual_methods.get(0));
+      List<String> virtual_methods = class_hierarchy.getVirtualMethods(m_sootMethod.getSignature());
+      m_util.parse(virtual_methods.get(0));
+      return new OpenCLPolymorphicMethod(m_util.getSootMethod());
     }
     
     @Override

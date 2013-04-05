@@ -15,6 +15,7 @@ import soot.jimple.*;
 import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.DfsInfo;
 import soot.rbclassload.HierarchyGraph;
+import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.util.Chain;
@@ -28,6 +29,7 @@ public class FieldReadWriteInspector {
   private SootClass mRuntimeBasicBlock;
   private Set<SootMethod> mMethodsInspected;
   private Set<String> mWritenOnGpuFieldsClassesChecked;
+  private MethodSignatureUtil m_util;
 
   public FieldReadWriteInspector(SootClass runtime_basic_block){
     mRuntimeBasicBlock = runtime_basic_block;
@@ -37,6 +39,7 @@ public class FieldReadWriteInspector {
     mAllFields = new HashSet<SootField>();
     mMethodsInspected = new HashSet<SootMethod>();
     mWritenOnGpuFieldsClassesChecked = new HashSet<String>();
+    m_util = new MethodSignatureUtil();
 
     SootMethod root_method = mRuntimeBasicBlock.getMethodByName("run");
     inspectMethod(root_method);
@@ -227,10 +230,13 @@ public class FieldReadWriteInspector {
           // ignore immutable members
           if (!invoke.isStatic() && !invoke.isFinal() && !invoke.getDeclaringClass().isFinal()) {
             ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-            List<SootMethod> virt_methods = class_hierarchy.getAllVirtualMethods(invoke.getSignature());
-            for(SootMethod virt_method : virt_methods){
-              if (!virt_method.isNative() && !virt_method.isAbstract() && mMethodsInspected.add(virt_method))
-                worklist.add(virt_method);
+            List<String> virt_methods = class_hierarchy.getVirtualMethods(invoke.getSignature());
+            for(String virt_method : virt_methods){
+              m_util.parse(virt_method);
+              SootMethod soot_method = m_util.getSootMethod();
+              if(soot_method.isConcrete() && mMethodsInspected.add(soot_method)){
+                worklist.add(soot_method);
+              }
             }
           }
         }
