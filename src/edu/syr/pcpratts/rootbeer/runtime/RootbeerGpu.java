@@ -7,9 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.runtime;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class RootbeerGpu {
 
   private static boolean m_isOnGpu;
@@ -36,15 +33,21 @@ public class RootbeerGpu {
   public static int getThreadId() {
     return 0;
   }
-  
-  public static int getThreadIdxx(){
+ 
+  public static int getThreadIdxx() {
+    if (Thread.currentThread() instanceof TemplateThread) {
+      return ((TemplateThread) Thread.currentThread()).m_threadIdxx;
+    }
     return m_threadIdxx;
   }
-  
-  public static int getBlockIdxx(){
+
+  public static int getBlockIdxx() {
+    if (Thread.currentThread() instanceof TemplateThread) {
+      return ((TemplateThread) Thread.currentThread()).m_blockIdxx;
+    }
     return m_blockIdxx;
   }
-  
+
   public static void setThreadIdxx(int thread_idxx){
     m_threadIdxx = thread_idxx;
   }
