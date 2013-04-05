@@ -23,8 +23,8 @@ public class KernelEntryPointDetector implements EntryPointDetector {
   
   public KernelEntryPointDetector(){
     m_entryPoints = new ArrayList<String>();
-    m_entryPoints.add("<edu.syr.pcpratts.rootbeer.runtime.Rootbeer: void runAll(java.util.List)>");
-    m_entryPoints.add("<edu.syr.pcpratts.rootbeer.runtime.Rootbeer: void runAll(edu.syr.pcpratts.rootbeer.runtime.Kernel)>");
+    //m_entryPoints.add("<edu.syr.pcpratts.rootbeer.runtime.Rootbeer: void runAll(java.util.List)>");
+    //m_entryPoints.add("<edu.syr.pcpratts.rootbeer.runtime.Rootbeer: void runAll(edu.syr.pcpratts.rootbeer.runtime.Kernel)>");
   }
     
   public void testEntryPoint(SootMethod sm) {

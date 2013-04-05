@@ -279,7 +279,7 @@ public class GenerateRuntimeBasicBlock {
   
   private void makeExceptionMethod(String method_name, String cls_name) {
     SootClass soot_class = Scene.v().getSootClass(cls_name);
-    int number = RootbeerClassLoader.v().getDfsInfo().getClassNumber(soot_class);
+    int number = RootbeerClassLoader.v().getClassNumber(soot_class);
     
     BytecodeLanguage bcl = new BytecodeLanguage();
     bcl.openClass(mSootClass);

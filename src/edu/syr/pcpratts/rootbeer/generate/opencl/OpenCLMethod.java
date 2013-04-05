@@ -24,6 +24,7 @@ import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
 import soot.options.Options;
+import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -153,7 +154,7 @@ public class OpenCLMethod {
     if(m_sootMethod.isStatic() == false){
       ret += "if(thisref == -1){\n";
       SootClass null_ptr = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
-      ret += "  *exception = "+RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_ptr)+";\n";
+      ret += "  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr)+";\n";
       if(returnsAValue()){
         ret += "  return 0;\n";
       } else {
@@ -251,7 +252,6 @@ public class OpenCLMethod {
           }
         }
       } catch(RuntimeException ex){
-        ex.printStackTrace(System.out);
         System.out.println("error creating method body: "+m_sootMethod.getSignature());
         OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, m_sootClass);
         if(ocl_method.returnsAValue())
@@ -303,40 +303,12 @@ public class OpenCLMethod {
   }
 
   public String getInstanceInvokeString(InstanceInvokeExpr arg0){
-    Value base = arg0.getBase();
-    Type base_type = base.getType();
-    List<Type> hierarchy;
-    if(base_type instanceof ArrayType){
-      hierarchy = new ArrayList<Type>();
-      SootClass obj = Scene.v().getSootClass("java.lang.Object");
-      hierarchy.add(obj.getType());
-    } else if (base_type instanceof RefType){
-      RefType ref_type = (RefType) base_type;
-      hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(ref_type.getSootClass());
-      
-      PointsToAnalysis analysis = Scene.v().getPointsToAnalysis();
-      PointsToSet set = analysis.reachingObjects((Local) base);
-      
-      hierarchy = trimHierarchy(hierarchy, set);
-      
-    } else {
-      throw new UnsupportedOperationException("how do we handle this case?");
-    }
-    
-    if(hierarchy == null){
-      System.out.println("base_type: "+base_type);
-      throw new RuntimeException("hello");
-    }
-    
-    IsPolyMorphic poly_checker = new IsPolyMorphic();    
-    if(poly_checker.isPoly(m_sootMethod, hierarchy) == false || isConstructor() || arg0 instanceof SpecialInvokeExpr){
+    IsPolymorphic is_polymorphic = new IsPolymorphic();
+    if(is_polymorphic.test(arg0.getMethod(), arg0 instanceof SpecialInvokeExpr)){
       return writeInstanceInvoke(arg0, "", m_sootClass.getType());
-    } else if(hierarchy.size() == 0){
-      System.out.println("size = 0");
-      return null;
     } else {
-      return writeInstanceInvoke(arg0, "invoke_", hierarchy.get(0));
-    } 
+      return writeInstanceInvoke(arg0, "invoke_", is_polymorphic.getBaseMethod().getDeclaringClass().getType());
+    }
   }
 
   public String getStaticInvokeString(StaticInvokeExpr expr){
@@ -446,17 +418,16 @@ public class OpenCLMethod {
     //if we are here and a method is not concrete, it is the case where a 
     //invoke expresion is to an interface pointer and the method is not polymorphic
     if(m_sootMethod.isConcrete() == false){
-      Set<String> virtual_signatures = RootbeerClassLoader.v().getVirtualSignaturesDown(m_sootMethod, null);
+      //Set<String> virtual_signatures = RootbeerClassLoader.v().getVirtualSignaturesDown(m_sootMethod, null);
+      ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+      List<SootMethod> virtual_methods = class_hierarchy.getAllVirtualMethods(m_sootMethod.getSignature());
+      
       //double check that we are safe to do the interface remapping
-      if(virtual_signatures.size() != 1){
+      if(virtual_methods.size() != 1){
         //not safe, go back to normal method
         return getBaseMethodName(m_sootClass, m_sootMethod);
       } else {
-        String signature = virtual_signatures.iterator().next();
-        MethodSignatureUtil util = new MethodSignatureUtil();
-        util.parse(signature);
-        
-        SootMethod soot_method = util.getSootMethod();
+        SootMethod soot_method = virtual_methods.iterator().next();
         SootClass soot_class = soot_method.getDeclaringClass();
         return getBaseMethodName(soot_class, soot_method);
       }
@@ -533,32 +504,5 @@ public class OpenCLMethod {
 
   public SootMethod getSootMethod() {
     return m_sootMethod;
-  }
-
-  private List<Type> trimHierarchy(List<Type> hierarchy, PointsToSet set) {
-    List<Type> ret = new ArrayList<Type>();
-    Set<Type> types = set.possibleTypes();
-    for(Type type : types){
-      if(type instanceof RefType){
-        ret.add(type);
-      } else if(type instanceof AnySubType){
-        AnySubType any_sub_type = (AnySubType) type;
-        RefType base = any_sub_type.getBase();
-        
-        FastHierarchy fh = Scene.v().getOrMakeFastHierarchy();
-        Collection<SootClass> subclasses = fh.getSubclassesOf(base.getSootClass());
-        List<SootClass> to_proc = new ArrayList<SootClass>();
-        to_proc.add(base.getSootClass());
-        to_proc.addAll(subclasses);
-        for(SootClass subclass : to_proc){
-          if(hierarchy.contains(subclass.getType())){
-            ret.add(subclass.getType());
-          }
-        }
-      } else {
-        ret.add(type);
-      }
-    }
-    return ret;
   }
 }

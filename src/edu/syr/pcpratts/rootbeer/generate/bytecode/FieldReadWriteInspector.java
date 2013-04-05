@@ -12,7 +12,9 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import java.util.*;
 import soot.*;
 import soot.jimple.*;
+import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.DfsInfo;
+import soot.rbclassload.HierarchyGraph;
 import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.util.Chain;
@@ -108,13 +110,12 @@ public class FieldReadWriteInspector {
       return false;
     mWritenOnGpuFieldsClassesChecked.add(soot_type.toString());
 
-    List<Type> hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(soot_class);
-    for(Type curr_type : hierarchy){
-      if(curr_type instanceof RefType == false){
-        continue;
-      }
-      RefType ref_type = (RefType) curr_type;
-      SootClass curr_class = ref_type.getSootClass();
+    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph(soot_class);
+    List<String> classes = hgraph.getAllClasses();
+    
+    for(String class_name : classes){
+      SootClass curr_class = Scene.v().getSootClass(class_name);
       Chain<SootField> fields = curr_class.getFields();
       for(SootField field : fields){
         if(fieldIsWrittenOnGpu(field)){
@@ -225,20 +226,11 @@ public class FieldReadWriteInspector {
             worklist.add(invoke);
           // ignore immutable members
           if (!invoke.isStatic() && !invoke.isFinal() && !invoke.getDeclaringClass().isFinal()) {
-            SootClass declClass = invoke.getDeclaringClass();
-            FastHierarchy fa = Scene.v().getOrMakeFastHierarchy();
-            Collection<SootClass> subClasses = declClass.isInterface() ?
-                    fa.getAllImplementersOfInterface(declClass) :
-                    fa.getSubclassesOf(declClass);
-            String name = invoke.getName();
-            List<Type> paramTypes = invoke.getParameterTypes();
-            Type returnType = invoke.getReturnType();
-            for (SootClass subClass : subClasses) {
-              if (!subClass.declaresMethod(name, paramTypes))
-                continue;
-              SootMethod meth = subClass.getMethod(name, paramTypes, returnType);
-              if (!meth.isNative() && !meth.isAbstract() && mMethodsInspected.add(meth))
-                worklist.add(meth);
+            ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+            List<SootMethod> virt_methods = class_hierarchy.getAllVirtualMethods(invoke.getSignature());
+            for(SootMethod virt_method : virt_methods){
+              if (!virt_method.isNative() && !virt_method.isAbstract() && mMethodsInspected.add(virt_method))
+                worklist.add(virt_method);
             }
           }
         }

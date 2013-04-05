@@ -20,6 +20,8 @@ import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.Type;
+import soot.rbclassload.ClassHierarchy;
+import soot.rbclassload.HierarchyGraph;
 import soot.rbclassload.MethodEqual;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
@@ -70,11 +72,13 @@ public class MethodHierarchies {
     
     private String m_methodSubsignature;
     private SootMethod m_sootMethod;
-    private List<Type> m_hierarchy;
+    private HierarchyGraph m_hierarchyGraph;
     
     public MethodHierarchy(SootMethod method){
       m_methodSubsignature = method.getSubSignature();
       m_sootMethod = method;
+      ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+      m_hierarchyGraph = class_hierarchy.getHierarchyGraph(m_sootMethod.getSignature());
     }
     
     public List<OpenCLMethod> getMethods(){
@@ -85,118 +89,26 @@ public class MethodHierarchies {
         return ret;
       }
       
-      Set<Type> class_hierarchy = RootbeerClassLoader.v().getDfsInfo().getPointsTo(m_sootMethod.getSignature());
-      Set<SootClass> valid_hierarchy_classes = RootbeerClassLoader.v().getValidHierarchyClasses();
-      
-      if(class_hierarchy == null){
-        if(m_sootMethod.isConcrete() == false){
-          return ret;
-        }
-        
-        OpenCLMethod method = new OpenCLMethod(m_sootMethod, m_sootMethod.getDeclaringClass());
+      List<SootMethod> methods = RootbeerClassLoader.v().getClassHierarchy().getAllVirtualMethods(m_sootMethod.getSignature());
+      for(SootMethod soot_method : methods){
+        OpenCLMethod method = new OpenCLMethod(soot_method, soot_method.getDeclaringClass());
         ret.add(method);
-        return ret;
       }
-      
-      class_hierarchy.add(RefType.v(m_sootMethod.getDeclaringClass().toString()));
-      
-      MethodSignatureUtil util = new MethodSignatureUtil();
-      util.parse(m_sootMethod.getSignature());
-      String method_name = util.getMethodName();
-      List<Type> params = util.getParameterTypesTyped();
-      
-      for(Type type : class_hierarchy){
-        if(type instanceof RefType){
-          RefType ref_type = (RefType) type;
-          SootClass soot_class = ref_type.getSootClass();
-          if(soot_class.declaresMethod(method_name, params)){
-            List<SootMethod> methods = soot_class.getMethods();
-            List<SootMethod> found_methods = new ArrayList<SootMethod>();
-            MethodEqual method_equal = new MethodEqual();
-            for(SootMethod method : methods){
-              if(method_equal.exceptReturnType(method.getSignature(), util.getSignature())){
-                found_methods.add(method);
-              }
-            }
-            
-            if(found_methods.size() == 1){
-              SootMethod soot_method = found_methods.get(0);
-              if(soot_method.isConcrete() == false){
-                continue;
-              }
-              OpenCLMethod method = new OpenCLMethod(soot_method, soot_class);
-              ret.add(method);
-            } else {
-              //select method with same return type as declaring class
-              int matching_count = 0;
-              for(SootMethod soot_method : found_methods){
-                if(soot_method.getReturnType().equals(RefType.v(m_sootMethod.getDeclaringClass()))){
-                  if(soot_method.isConcrete() == false){
-                    continue;
-                  }
-                  OpenCLMethod method = new OpenCLMethod(soot_method, soot_class);
-                  ret.add(method);
-                  matching_count++;
-                }
-              }
-              if(matching_count == 0){
-                throw new RuntimeException("matching_count == 0");
-              }
-            }
-          }
-        }
-        if(type instanceof AnySubType){
-          AnySubType any_sub_type = (AnySubType) type;
-          RefType base = any_sub_type.getBase();
-          SootClass soot_class = base.getSootClass();
-          FastHierarchy fast_hierarchy = Scene.v().getOrMakeFastHierarchy();
-          Collection<SootClass> subclasses_col = fast_hierarchy.getSubclassesOf(soot_class);
-          List<SootClass> subclasses = new ArrayList<SootClass>();
-          subclasses.addAll(subclasses_col);
-          subclasses.add(soot_class);
-          for(SootClass subclass : subclasses){
-            if(valid_hierarchy_classes.contains(subclass) == false){
-              continue;
-            }
-            if(subclass.declaresMethod(m_methodSubsignature)){
-              SootMethod soot_method = subclass.getMethod(m_methodSubsignature);
-              if(soot_method.isConcrete() == false){
-                continue;
-              }
-              OpenCLMethod method = new OpenCLMethod(soot_method, subclass);
-              ret.add(method);
-            }
-          }
-        }
-      }      
       return ret;
     }
         
     public boolean isPolyMorphic(){
-      List<Type> class_hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
-      IsPolyMorphic poly_checker = new IsPolyMorphic();
-      if(poly_checker.isPoly(m_sootMethod, class_hierarchy)){
+      IsPolymorphic poly_checker = new IsPolymorphic();
+      if(poly_checker.test(m_sootMethod)){
         return true;
       }
       return false;
     }
     
     public OpenCLPolymorphicMethod getOpenCLPolyMorphicMethod(){
-      List<Type> class_hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
-      for(Type type : class_hierarchy){
-        if(type instanceof RefType == false){
-          continue;
-        }
-        RefType ref_type = (RefType) type;
-        SootClass soot_class = ref_type.getSootClass();
-        try {
-          SootMethod soot_method = soot_class.getMethod(m_methodSubsignature);
-          return new OpenCLPolymorphicMethod(soot_method);
-        } catch(RuntimeException ex){
-          continue;
-        }
-      }
-      throw new RuntimeException("Cannot find class: "+m_methodSubsignature);
+      ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+      List<SootMethod> virtual_methods = class_hierarchy.getAllVirtualMethods(m_sootMethod.getSignature());
+      return new OpenCLPolymorphicMethod(virtual_methods.get(0));
     }
     
     @Override
@@ -206,9 +118,7 @@ public class MethodHierarchies {
       MethodHierarchy other = (MethodHierarchy) o;
       if(m_methodSubsignature.equals(other.m_methodSubsignature) == false)
         return false;
-      saveHierarchy();
-      other.saveHierarchy();
-      if(m_hierarchy == other.m_hierarchy == false){
+      if(m_hierarchyGraph == other.m_hierarchyGraph == false){
         return false;
       }
       return true;
@@ -218,12 +128,8 @@ public class MethodHierarchies {
     public int hashCode() {
       int hash = 7;
       hash = 59 * hash + (this.m_methodSubsignature != null ? this.m_methodSubsignature.hashCode() : 0);
-      hash = 59 * hash + (this.m_hierarchy != null ? this.m_hierarchy.hashCode() : 0);
+      hash = 59 * hash + (this.m_hierarchyGraph != null ? this.m_hierarchyGraph.hashCode() : 0);
       return hash;
-    }
-
-    private void saveHierarchy() {
-      m_hierarchy = RootbeerClassLoader.v().getDfsInfo().getHierarchy(m_sootMethod.getDeclaringClass());
     }
     
     @Override

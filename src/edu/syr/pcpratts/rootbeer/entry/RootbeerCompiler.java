@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -28,11 +27,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import pack.Pack;
 import soot.*;
-import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.options.Options;
 import soot.rbclassload.EntryPointDetector;
 import soot.rbclassload.RootbeerClassLoader;
-import soot.util.Chain;
 import soot.util.JasminOutputStream;
 
 public class RootbeerCompiler {
@@ -83,6 +80,7 @@ public class RootbeerCompiler {
     if(rootbeer_jar.equals("") == false){
       Options.v().set_soot_classpath(rootbeer_jar);
     }
+    Options.v().set_debug_resolver(true);
     
     //Options.v().set_rbcl_remap_all(Configuration.compilerInstance().getRemapAll());
     Options.v().set_rbcl_remap_all(false);
@@ -206,7 +204,7 @@ public class RootbeerCompiler {
     
     System.out.println("applying optimizations...");
     RootbeerClassLoader.v().applyOptimizations();
-      
+   
     Transform2 transform2 = new Transform2();
     for(SootMethod kernel_method : kernel_methods){   
       System.out.println("running transform2 on: "+kernel_method.getSignature()+"...");
@@ -218,6 +216,7 @@ public class RootbeerCompiler {
     System.out.println("writing classes out...");
     RootbeerClassLoader.v().setLoaded();
     
+    /*
     List<String> all_classes = RootbeerClassLoader.v().getClassesToOutput();
     for(String cls : all_classes){
       writeClassFile(cls);
@@ -226,6 +225,7 @@ public class RootbeerCompiler {
     
     makeOutJar();
     pack(outname);
+    */ 
   }
   
   public void pack(String outjar_name) throws Exception {

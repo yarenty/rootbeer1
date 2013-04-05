@@ -91,7 +91,7 @@ public class OpenCLScene {
   }
 
   public int getClassType(SootClass soot_class){
-    return RootbeerClassLoader.v().getDfsInfo().getClassNumber(soot_class);
+    return RootbeerClassLoader.v().getClassNumber(soot_class);
   }
   
   public void addMethod(SootMethod soot_method){

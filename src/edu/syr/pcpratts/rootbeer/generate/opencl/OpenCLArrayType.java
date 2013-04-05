@@ -146,7 +146,7 @@ public class OpenCLArrayType {
     ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("offset = "+offset_size+"+(parameter0*"+element_size+");\n");
     ret.append("if(thisref == -1){\n");
-    ret.append("  *exception = "+RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_ptr) +";\n");
+    ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
     ret.append("  return 0;\n");
     ret.append("}\n");
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
@@ -165,7 +165,7 @@ public class OpenCLArrayType {
     ret.append("int length;\n");
     ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("  if(thisref == -1){\n");
-    ret.append("    *exception = "+RootbeerClassLoader.v().getDfsInfo().getClassNumber(null_ptr) +";\n");
+    ret.append("    *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
     ret.append("    return;\n");
     ret.append("  }\n");
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
@@ -184,7 +184,7 @@ public class OpenCLArrayType {
     ret.append("}\n");
     
     //new
-    int derived_type = RootbeerClassLoader.v().getDfsInfo().getClassNumber(m_arrayType);
+    int derived_type = RootbeerClassLoader.v().getClassNumber(m_arrayType.toString());
     ret.append(decls.get(2)+"{\n");
     ret.append("int i;\n");
     ret.append("int total_size;\n");
@@ -316,7 +316,7 @@ public class OpenCLArrayType {
   }
 
   int getTypeInteger() {
-    return RootbeerClassLoader.v().getDfsInfo().getClassNumber(m_arrayType);
+    return RootbeerClassLoader.v().getClassNumber(m_arrayType.toString());
   }
 
   private boolean isCharArray() {

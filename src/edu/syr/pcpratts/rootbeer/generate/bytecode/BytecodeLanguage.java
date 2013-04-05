@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Stack;
 import soot.*;
 import soot.jimple.*;
+import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class BytecodeLanguage {
@@ -404,13 +405,10 @@ public class BytecodeLanguage {
     }
 
     //couldn't find the field, try searching the class hierarchy
-    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getHierarchy(original_class);
-    for(Type type : types){
-      if(type instanceof RefType == false){
-        continue;
-      }
-      RefType ref_type = (RefType) type;
-      SootClass soot_class = ref_type.getSootClass();
+    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+    List<String> classes = class_hierarchy.getHierarchyGraph(original_class).getAllClasses();
+    for(String class_name : classes){
+      SootClass soot_class = Scene.v().getSootClass(class_name);
       try {
         ret = soot_class.getFieldByName(field_name);
         return ret;
