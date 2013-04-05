@@ -11,11 +11,17 @@ import java.util.List;
 import soot.SootMethod;
 import soot.jimple.SpecialInvokeExpr;
 import soot.rbclassload.ClassHierarchy;
+import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class IsPolymorphic {
   
   private SootMethod m_baseMethod;
+  private MethodSignatureUtil m_util;
+  
+  public IsPolymorphic(){
+    m_util = new MethodSignatureUtil();
+  }
   
   public boolean test(SootMethod soot_method){
     return test(soot_method, false);
@@ -24,9 +30,11 @@ public class IsPolymorphic {
   public boolean test(SootMethod soot_method, boolean special_invoke){
     String signature = soot_method.getSignature();
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    List<SootMethod> virtual_methods = class_hierarchy.getAllVirtualMethods(signature);
+    List<String> virtual_methods = class_hierarchy.getVirtualMethods(signature);
     
-    m_baseMethod = virtual_methods.get(0);
+    String base_sig = virtual_methods.get(0);
+    m_util.parse(base_sig);
+    m_baseMethod = m_util.getSootMethod();
     
     if(virtual_methods.size() == 1 || m_baseMethod.isConstructor() || special_invoke){
       return false;

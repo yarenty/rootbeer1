@@ -37,10 +37,12 @@ public class OpenCLMethod {
   private SootClass m_sootClass;
   private Set<String> m_dontMangleMethods;
   private Set<String> m_emitUnmangled;
+  private MethodSignatureUtil m_util;
   
   public OpenCLMethod(SootMethod soot_method, SootClass soot_class){
     m_sootMethod = soot_method;
     m_sootClass = soot_class;
+    m_util = new MethodSignatureUtil();
     createDontMangleMethods();
   }
   
@@ -420,14 +422,16 @@ public class OpenCLMethod {
     if(m_sootMethod.isConcrete() == false){
       //Set<String> virtual_signatures = RootbeerClassLoader.v().getVirtualSignaturesDown(m_sootMethod, null);
       ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-      List<SootMethod> virtual_methods = class_hierarchy.getAllVirtualMethods(m_sootMethod.getSignature());
+      List<String> virtual_methods = class_hierarchy.getVirtualMethods(m_sootMethod.getSignature());
       
       //double check that we are safe to do the interface remapping
       if(virtual_methods.size() != 1){
         //not safe, go back to normal method
         return getBaseMethodName(m_sootClass, m_sootMethod);
       } else {
-        SootMethod soot_method = virtual_methods.iterator().next();
+        String virt_method = virtual_methods.iterator().next();
+        m_util.parse(virt_method);
+        SootMethod soot_method = m_util.getSootMethod();
         SootClass soot_class = soot_method.getDeclaringClass();
         return getBaseMethodName(soot_class, soot_method);
       }

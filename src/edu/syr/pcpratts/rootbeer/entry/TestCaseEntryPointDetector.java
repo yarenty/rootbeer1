@@ -11,12 +11,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import soot.*;
+import soot.rbclassload.HierarchySootClass;
+import soot.rbclassload.HierarchySootMethod;
 import soot.jimple.InvokeExpr;
 import soot.jimple.Jimple;
 import soot.jimple.ReturnStmt;
 import soot.jimple.StringConstant;
+import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.EntryPointDetector;
 import soot.rbclassload.MethodSignatureUtil;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class TestCaseEntryPointDetector implements EntryPointDetector {
 
@@ -59,19 +63,11 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
     }
     m_provider = m_testCase;
     
-    SootMethod gpu_method = null;
-    
-    if(isApplication()){
-      SootClass prov_class = Scene.v().getSootClass(m_provider);
-      SootMethod get_entry_sig = prov_class.getMethod("java.lang.String getEntrySignature()");
-      gpu_method = execGetEntrySig(get_entry_sig);
-    } else {      
-      SootClass prov_class = Scene.v().getSootClass(m_provider);
-      SootMethod method = prov_class.getMethodByName("create");
-      SootClass kernel_class = searchMethod(method);
-      gpu_method = kernel_class.getMethod("void gpuMethod()");
-    }
-    
+    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+    HierarchySootClass prov_class = class_hierarchy.getHierarchySootClass(m_provider);
+    HierarchySootMethod create_method = prov_class.findMethodByName("create");
+    HierarchySootClass kernel_class = searchMethod(create_method);
+    HierarchySootMethod gpu_method = kernel_class.findMethodBySubSignature("void gpuMethod()");
     m_signature = gpu_method.getSignature();
     m_initialized = true;
   }
@@ -79,8 +75,17 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
   public String getProvider() {
     return m_provider;
   }
-
-  private SootClass searchMethod(SootMethod method) {
+    
+  private HierarchySootClass searchMethod(HierarchySootMethod method) {
+    return RootbeerClassLoader.v().getClassHierarchy().getHierarchySootClass("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu");
+    
+    /*
+    HierarchySootClass hclass = method.getHierarchySootClass();
+    
+    Instruction inst = method.getInstructions();
+    */
+    
+    /*
     Body body = method.retrieveActiveBody();
     List<ValueBox> boxes = body.getUseAndDefBoxes();
     for(ValueBox box : boxes){
@@ -98,48 +103,32 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
       }
     }
     return null;
+    */
+    //return null;
   }
 
-  private SootMethod execGetEntrySig(SootMethod method) {
-    Body body = method.retrieveActiveBody();
-    PatchingChain<Unit> units = body.getUnits();
-    Unit last = units.getLast();
-    ReturnStmt ret_stmt = (ReturnStmt) last;
-    Value op = ret_stmt.getOp();
-    StringConstant string_constant = (StringConstant) op;
-    String signature = string_constant.value;
-    MethodSignatureUtil util = new MethodSignatureUtil();
-    util.parse(signature);
-    return util.getSootMethod();
-  }
-  
   private String findTestCaseClass(String test_case) {
     for(String pkg : m_testCasePackages){
       String name = pkg + test_case;
-      if(Scene.v().containsClass(name)){
+      if(RootbeerClassLoader.v().getClassHierarchy().containsClass(name)){
         return name;
       }
     }
     return null;
   }
 
-  public void testEntryPoint(SootMethod sm) {
+  public void testEntryPoint(HierarchySootMethod sm) {
     if(m_initialized == false){
       init();
     }
     if(sm.getSignature().equals(m_signature)){
-      m_entryPoints.add(sm.getSignature());
+      if(m_entryPoints.contains(sm.getSignature()) == false){
+        m_entryPoints.add(sm.getSignature());
+      }
     }
   }
 
   public List<String> getEntryPoints() {
     return m_entryPoints;
-  }
-
-  private boolean isApplication() {
-    if(m_provider.startsWith("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.apps.")){
-      return true;
-    }
-    return false;
   }
 }

@@ -15,6 +15,7 @@ import java.util.Set;
 import soot.*;
 import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.HierarchyGraph;
+import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 
 /**
@@ -27,9 +28,12 @@ public class OpenCLPolymorphicMethod {
 
   //for hashcode
   private HierarchyGraph m_hierarchyGraph;
+  
+  private MethodSignatureUtil m_util;
 
   public OpenCLPolymorphicMethod(SootMethod soot_method){
     m_sootMethod = soot_method;
+    m_util = new MethodSignatureUtil();
   }
 
   public String getMethodPrototypes(){
@@ -77,8 +81,13 @@ public class OpenCLPolymorphicMethod {
   
   private List<SootMethod> getVirtualMethods(){
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    List<SootMethod> virtual_methods = class_hierarchy.getAllVirtualMethods(m_sootMethod.getSignature());
-    return virtual_methods;
+    List<String> virtual_methods = class_hierarchy.getVirtualMethods(m_sootMethod.getSignature());
+    List<SootMethod> ret = new ArrayList<SootMethod>();
+    for(String virtual_method : virtual_methods){
+      m_util.parse(virtual_method);
+      ret.add(m_util.getSootMethod());
+    }
+    return ret;
   }
   
   public String getMethodBody(String decl){
