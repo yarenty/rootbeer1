@@ -18,6 +18,7 @@ import soot.jimple.IntConstant;
 import soot.jimple.NullConstant;
 import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
+import soot.rbclassload.StringToType;
 
 public class VisitorGen extends AbstractVisitorGen {
 
@@ -253,7 +254,8 @@ public class VisitorGen extends AbstractVisitorGen {
     List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedTypes();
     for(int i = types.size() - 1; i >= 0; --i){
       NumberedType ntype = types.get(i);
-      Type type = ntype.getType();
+      StringToType converter = new StringToType();
+      Type type = converter.convert(ntype.getType());
       if(type instanceof RefType){
         RefType ref_type = (RefType) type;
         AcceptableGpuTypes accept = new AcceptableGpuTypes();
