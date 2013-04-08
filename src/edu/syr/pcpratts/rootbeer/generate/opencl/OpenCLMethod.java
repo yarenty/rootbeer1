@@ -307,9 +307,9 @@ public class OpenCLMethod {
   public String getInstanceInvokeString(InstanceInvokeExpr arg0){
     IsPolymorphic is_polymorphic = new IsPolymorphic();
     if(is_polymorphic.test(arg0.getMethod(), arg0 instanceof SpecialInvokeExpr)){
-      return writeInstanceInvoke(arg0, "", m_sootClass.getType());
-    } else {
       return writeInstanceInvoke(arg0, "invoke_", is_polymorphic.getBaseMethod().getDeclaringClass().getType());
+    } else {
+      return writeInstanceInvoke(arg0, "", m_sootClass.getType());
     }
   }
 

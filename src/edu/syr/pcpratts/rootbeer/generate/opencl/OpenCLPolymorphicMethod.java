@@ -9,9 +9,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import soot.*;
 import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.HierarchyGraph;
@@ -85,7 +83,10 @@ public class OpenCLPolymorphicMethod {
     List<SootMethod> ret = new ArrayList<SootMethod>();
     for(String virtual_method : virtual_methods){
       m_util.parse(virtual_method);
-      ret.add(m_util.getSootMethod());
+      SootMethod soot_method = m_util.getSootMethod();
+      if(soot_method.isConcrete()){
+        ret.add(soot_method);
+      }
     }
     return ret;
   }
@@ -131,11 +132,14 @@ public class OpenCLPolymorphicMethod {
         int count = 0;
         for(SootMethod method : virtual_methods){
           SootClass sclass = method.getDeclaringClass();
+          String invoke_string = getInvokeString(sclass);
+          if(invoke_string == ""){
+            continue;
+          }
           ret.append("else if(derived_type == "+RootbeerClassLoader.v().getClassNumber(sclass)+"){\n");
           if(m_sootMethod.getReturnType() instanceof VoidType == false){
             ret.append("return ");
           }
-          String invoke_string = getInvokeString(sclass);
           ret.append(invoke_string+"\n");
           ret.append("}\n");
           count++;
@@ -169,7 +173,7 @@ public class OpenCLPolymorphicMethod {
       if(soot_class.hasSuperclass()){
         soot_class = soot_class.getSuperclass();
       } else {
-        throw new RuntimeException("cannot find concrete base method: "+m_sootMethod.getSignature()+" "+start_class);
+        return "";
       }
     }
     

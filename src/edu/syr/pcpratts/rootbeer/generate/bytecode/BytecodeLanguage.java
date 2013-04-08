@@ -14,7 +14,9 @@ import java.util.Stack;
 import soot.*;
 import soot.jimple.*;
 import soot.rbclassload.ClassHierarchy;
+import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
+import soot.rbclassload.TypeToString;
 
 public class BytecodeLanguage {
 
@@ -189,35 +191,19 @@ public class BytecodeLanguage {
   public void pushMethod(String class_name, String method_name, Type return_type, Type... arg_types){
     SootClass soot_class = Scene.v().getSootClass(class_name);
     SootClass org_class = soot_class;
-    List<Type> args = convertTypeArrayToList(arg_types);
-    SootMethod soot_method;
     
-    while(true){
-      try {
-        soot_method = soot_class.getMethod(method_name, args, return_type);
-        mMethodStack.push(soot_method);
-        return;
-      } catch(RuntimeException ex){
-        try {
-          if(soot_class.hasSuperclass()){
-            soot_class = soot_class.getSuperclass();
-          } else if(soot_class.hasOuterClass()){
-            soot_class = soot_class.getOuterClass();
-          } else {
-            throw new RuntimeException("no upper class");
-          }
-          soot_class = Scene.v().getSootClass(soot_class.getName());
-        } catch(RuntimeException ex1){
-          System.out.println(class_name+": "+method_name);     
-          System.out.println("Args:");
-          for(Type arg : args){
-            System.out.println(arg.toString());
-          }
-          ex1.printStackTrace();
-          System.exit(-1);
-        }
-      }
+    TypeToString converter = new TypeToString();
+    MethodSignatureUtil util = new MethodSignatureUtil();
+    util.setClassName(class_name);
+    util.setMethodName(method_name);
+    util.setReturnType(converter.convert(return_type));
+    List<String> parameter_types = new ArrayList<String>();
+    for(Type arg_type : arg_types){
+      parameter_types.add(converter.convert(arg_type));
     }
+    util.setParameterTypes(parameter_types);
+    SootMethod soot_method = util.getSootMethod();
+    mMethodStack.push(soot_method);
   }
 
   private List<Value> convertValueArrayToList(Value[] local_array){

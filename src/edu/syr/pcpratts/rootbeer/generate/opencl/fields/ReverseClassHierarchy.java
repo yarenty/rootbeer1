@@ -25,9 +25,7 @@ public class ReverseClassHierarchy {
   public ReverseClassHierarchy(Map<String, OpenCLClass> classes){
     m_Hierarchy = new ArrayList<TreeNode>();
     m_Classes = classes;
-    
-    addClass("java.lang.String");
-    
+        
     Set<String> key_set = classes.keySet();
     Set<String> visited = new HashSet<String>();
     for(String key : key_set){

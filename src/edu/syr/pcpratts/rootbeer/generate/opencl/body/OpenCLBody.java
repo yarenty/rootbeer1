@@ -58,7 +58,7 @@ public class OpenCLBody {
 
     m_SootClass = method.getDeclaringClass();
     Body body = method.retrieveActiveBody();
-    setup(body);
+    m_Body = body;  
   }
   
   /**
@@ -71,25 +71,6 @@ public class OpenCLBody {
     m_AllTraps = new ArrayList<TrapItem>();
     m_IsConstructor = false;
     m_IsConstructorBodyWithoutHeader = true;
-    
-    setup(body);
-  }
-
-  private void setup(Body body){
-    //convert ShimpleBody to JimpleBody
-    if(body instanceof ShimpleBody){
-      ShimpleBody sbody = (ShimpleBody) body;
-      body = sbody.toJimpleBody();
-    } else if(body instanceof JimpleBody){
-      try {
-      ShimpleBody sbody = Shimple.v().newBody(body);
-      body = sbody.toJimpleBody();
-      } catch(Exception ex){
-        SootMethod soot_method = body.getMethod();
-        SootClass soot_class = soot_method.getDeclaringClass();
-        System.out.println(soot_class+"."+soot_method);
-      }
-    }
     m_Body = body;  
   }
   

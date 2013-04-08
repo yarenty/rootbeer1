@@ -19,7 +19,9 @@ import soot.jimple.ReturnStmt;
 import soot.jimple.StringConstant;
 import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.EntryPointDetector;
+import soot.rbclassload.HierarchyInstruction;
 import soot.rbclassload.MethodSignatureUtil;
+import soot.rbclassload.Operand;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class TestCaseEntryPointDetector implements EntryPointDetector {
@@ -77,34 +79,28 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
   }
     
   private HierarchySootClass searchMethod(HierarchySootMethod method) {
-    return RootbeerClassLoader.v().getClassHierarchy().getHierarchySootClass("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientRunOnGpu");
-    
-    /*
-    HierarchySootClass hclass = method.getHierarchySootClass();
-    
-    Instruction inst = method.getInstructions();
-    */
-    
-    /*
-    Body body = method.retrieveActiveBody();
-    List<ValueBox> boxes = body.getUseAndDefBoxes();
-    for(ValueBox box : boxes){
-      Value value = box.getValue();
-      if(value instanceof InvokeExpr){
-        InvokeExpr expr = (InvokeExpr) value;
-        SootClass to_call = expr.getMethodRef().declaringClass();
-        Iterator<SootClass> iter = to_call.getInterfaces().iterator();
-        while(iter.hasNext()){
-          SootClass iface = iter.next();
-          if(iface.getName().equals("edu.syr.pcpratts.rootbeer.runtime.Kernel")){
-            return to_call;
+    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+    List<HierarchyInstruction> instructions = method.getInstructions();
+    for(HierarchyInstruction inst : instructions){
+      String name = inst.getName();
+      if(name.equals("new")){
+        List<Operand> operands = inst.getOperands();
+        for(Operand operand : operands){
+          if(operand.getType().equals("class_ref") == false){
+            continue;
+          }
+          String class_name = operand.getValue();
+          HierarchySootClass hclass = class_hierarchy.getHierarchySootClass(class_name);
+          List<String> ifaces = hclass.getInterfaces();
+          for(String iface : ifaces){
+            if(iface.equals("edu.syr.pcpratts.rootbeer.runtime.Kernel")){
+              return hclass;
+            }
           }
         }
       }
     }
     return null;
-    */
-    //return null;
   }
 
   private String findTestCaseClass(String test_case) {
