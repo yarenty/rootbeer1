@@ -113,7 +113,7 @@ public class GenerateRuntimeBasicBlock {
     assembler.add(r1_assign);
 
     //specialinvoke $r1.<java.lang.StringBuilder: void <init>()>();
-    SootMethod string_builder_ctor = string_builder_soot_class.getMethod("<init>", new ArrayList(), VoidType.v());
+    SootMethod string_builder_ctor = string_builder_soot_class.getMethod("void <init>()");
     Value r1_ctor = jimple.newSpecialInvokeExpr(r1, string_builder_ctor.makeRef(), new ArrayList());
     Unit r1_ctor_unit = jimple.newInvokeStmt(r1_ctor);
     assembler.add(r1_ctor_unit);
@@ -124,9 +124,7 @@ public class GenerateRuntimeBasicBlock {
     assembler.add(r2_assign_r1);
     
     SootClass string_class = Scene.v().getSootClass("java.lang.String");
-    List parameter_types = new ArrayList();
-    parameter_types.add(string_class.getType());
-    SootMethod string_builder_append = string_builder_soot_class.getMethod("append", parameter_types, string_builder_soot_class.getType());
+    SootMethod string_builder_append = string_builder_soot_class.getMethod("java.lang.StringBuilder append(java.lang.String)");
 
     GpuCodeSplitter splitter = new GpuCodeSplitter();
     List<String> blocks = splitter.split(gpu_code);

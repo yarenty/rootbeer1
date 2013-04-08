@@ -53,6 +53,7 @@ public class FieldReadWriteInspector {
     mAllFields = new HashSet<SootField>();
     mMethodsInspected = new HashSet<SootMethod>();
     mWritenOnGpuFieldsClassesChecked = new HashSet<String>();
+    m_util = new MethodSignatureUtil();
     
     inspectMethod(root_method);
     addParentFields();

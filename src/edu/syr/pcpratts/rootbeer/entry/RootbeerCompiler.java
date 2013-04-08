@@ -39,6 +39,7 @@ public class RootbeerCompiler {
   private String m_provider;
   private boolean m_enableClassRemapping;
   private EntryPointDetector m_entryDetector;
+  private Set<String> m_runtimeClasses;
   
   public RootbeerCompiler(){
     clearOutputFolders();
@@ -53,6 +54,35 @@ public class RootbeerCompiler {
     }
     
     m_enableClassRemapping = true;
+    m_runtimeClasses = new HashSet<String>();
+    addRuntimeClasses();
+  }
+  
+  private void addRuntimeClasses(){
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtimegpu.GpuException");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.generate.bytecode.Constants");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.RootbeerFactory");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.Rootbeer");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.StatsRow");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.Kernel");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.CompiledKernel");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.Serializer");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.ThreadConfig");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.RootbeerTestAgent");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestSerialization");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestSerializationFactory");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestException");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestExceptionFactory");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestKernelTemplate");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestKernelTemplateFactory");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestApplication");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.test.TestApplicationFactory");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.runtime.PrivateFields");
+    m_runtimeClasses.add("edu.syr.pcpratts.rootbeer.util.IntStack");
   }
   
   public void disableClassRemapping(){
@@ -94,7 +124,6 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.rootbeer.configuration.");
     RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.rootbeer.entry.");
     RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.rootbeer.generate.");
-    RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.rootbeer.runtime.");
     RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.rootbeer.test.");
     RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.rootbeer.testcases.");
     RootbeerClassLoader.v().addIgnorePackage("edu.syr.pcpratts.rootbeer.util.");
@@ -118,40 +147,24 @@ public class RootbeerCompiler {
       RootbeerClassLoader.v().addTestCasePackage("edu.syr.pcpratts.rootbeer.testcases.");
     }
     
-    RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime.");
     RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime2.");
     RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.configuration.");
     
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtimegpu.GpuException");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.generate.bytecode.Constants");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerFactory");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.Rootbeer");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.StatsRow");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.Kernel");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.CompiledKernel");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.Serializer");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.ThreadConfig");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestSerialization");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestSerializationFactory");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestException");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestExceptionFactory");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestKernelTemplate");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestKernelTemplateFactory");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestApplication");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.test.TestApplicationFactory");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.runtime.PrivateFields");
-    RootbeerClassLoader.v().addRuntimeClass("edu.syr.pcpratts.rootbeer.util.IntStack");
+    for(String runtime_class : m_runtimeClasses){
+      RootbeerClassLoader.v().addSignaturesClass(runtime_class);
+    }
     
-    List<String> cuda_entries = new ArrayList<String>();
-    cuda_entries.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getThreadId()>");
-    cuda_entries.add("<edu.syr.pcpratts.rootbeer.runtime.Serializer: void <init>(edu.syr.pcpratts.rootbeer.runtime.memory.Memory,edu.syr.pcpratts.rootbeer.runtime.memory.Memory)>");
-    cuda_entries.add("<edu.syr.pcpratts.rootbeer.runtime.Sentinal: void <init>()>");
-    cuda_entries.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
-    RootbeerClassLoader.v().setCudaEntryPoints(cuda_entries);
+    RootbeerClassLoader.v().addNewInvoke("java.lang.StringBuilder");
+    RootbeerClassLoader.v().addFollowSignature("<java.lang.StringBuilder: void <init>()>");
+    RootbeerClassLoader.v().addFollowSignature("<java.lang.StringBuilder: java.lang.StringBuilder append(java.lang.String)>");
+    RootbeerClassLoader.v().addFollowSignature("java.lang.StringBuilder: java.lang.String toString()>");
+    RootbeerClassLoader.v().addFollowSignature("<edu.syr.pcpratts.rootbeer.runtime.Sentinal: void <init>()>");
+    RootbeerClassLoader.v().addFollowSignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
+    RootbeerClassLoader.v().addFollowSignature("<edu.syr.pcpratts.rootbeer.runtime.Serializer: void <init>(edu.syr.pcpratts.rootbeer.runtime.memory.Memory,edu.syr.pcpratts.rootbeer.runtime.memory.Memory)>");
+    RootbeerClassLoader.v().addFollowSignature("<edu.syr.pcpratts.rootbeer.runtime.memory.Memory: void useInstancePointer()>");
+    RootbeerClassLoader.v().addFollowSignature("<edu.syr.pcpratts.rootbeer.runtime.memory.Memory: void useStaticPointer()>");
+    RootbeerClassLoader.v().addFollowSignature("<edu.syr.pcpratts.rootbeer.runtime.memory.Memory: long mallocWithSize(int)>");
+    RootbeerClassLoader.v().addFollowSignature("<edu.syr.pcpratts.rootbeer.runtime.memory.Memory: void setAddress(long)>");
     
     RootbeerClassLoader.v().addConditionalCudaEntry(new StringConstantCudaEntry());
     
@@ -212,18 +225,26 @@ public class RootbeerCompiler {
     }
     
     System.out.println("writing classes out...");
-    RootbeerClassLoader.v().setLoaded();
     
-    /*
-    List<String> all_classes = RootbeerClassLoader.v().getClassesToOutput();
-    for(String cls : all_classes){
-      writeClassFile(cls);
-      writeJimpleFile(cls);
+    Iterator<SootClass> iter = Scene.v().getClasses().iterator();
+    while(iter.hasNext()){
+      SootClass soot_class = iter.next();
+      if(soot_class.isLibraryClass()){
+        System.out.println("skipping library class: "+soot_class.getName());
+        continue;
+      }
+      String class_name = soot_class.getName();
+      if(m_runtimeClasses.contains(class_name)){
+        System.out.println("skipping runtine class: "+class_name);
+        continue;
+      }
+      System.out.println("writing class_file: "+class_name);
+      writeClassFile(class_name);
+      writeJimpleFile(class_name);
     }
     
     makeOutJar();
     pack(outname);
-    */ 
   }
   
   public void pack(String outjar_name) throws Exception {

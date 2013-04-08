@@ -183,8 +183,14 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     }
   }
 
+  private boolean reachesJavaLangClass(){
+    List<RefType> ref_types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefTypes();  
+    RefType java_lang_class = RefType.v("java.lang.Class");
+    return ref_types.contains(java_lang_class);
+  }
+  
   private void writeType(Type type) {
-    if(RootbeerClassLoader.v().getDfsInfo().reachesJavaLangClass() == false){
+    if(reachesJavaLangClass() == false){
       return;
     }
     int number = RootbeerClassLoader.v().getClassNumber(type.toString());
