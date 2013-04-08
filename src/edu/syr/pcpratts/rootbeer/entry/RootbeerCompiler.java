@@ -116,7 +116,6 @@ public class RootbeerCompiler {
     
     if(runtests){
       RootbeerClassLoader.v().addTestCasePackage("edu.syr.pcpratts.rootbeer.testcases.");
-      RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.test."); 
     }
     
     RootbeerClassLoader.v().addKeepPackages("edu.syr.pcpratts.rootbeer.runtime.");
