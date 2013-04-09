@@ -18,13 +18,13 @@ import soot.jimple.Jimple;
 import soot.jimple.ReturnStmt;
 import soot.jimple.StringConstant;
 import soot.rbclassload.ClassHierarchy;
-import soot.rbclassload.EntryPointDetector;
 import soot.rbclassload.HierarchyInstruction;
 import soot.rbclassload.MethodSignatureUtil;
+import soot.rbclassload.MethodTester;
 import soot.rbclassload.Operand;
 import soot.rbclassload.RootbeerClassLoader;
 
-public class TestCaseEntryPointDetector implements EntryPointDetector {
+public class TestCaseEntryPointDetector implements MethodTester {
 
   private String m_testCase;
   private List<SootClass> m_kernels;
@@ -113,18 +113,15 @@ public class TestCaseEntryPointDetector implements EntryPointDetector {
     return null;
   }
 
-  public void testEntryPoint(HierarchySootMethod sm) {
+  public boolean test(HierarchySootMethod sm) {
     if(m_initialized == false){
       init();
     }
     if(sm.getSignature().equals(m_signature)){
       if(m_entryPoints.contains(sm.getSignature()) == false){
-        m_entryPoints.add(sm.getSignature());
+        return true;
       }
     }
-  }
-
-  public List<String> getEntryPoints() {
-    return m_entryPoints;
+    return false;
   }
 }

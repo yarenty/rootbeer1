@@ -252,7 +252,7 @@ public class VisitorGen extends AbstractVisitorGen {
 
   private void makeSentinalCtors() {
     List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedTypes();
-    for(int i = types.size() - 1; i >= 0; --i){
+    for(int i = 0; i < types.size(); ++i){
       NumberedType ntype = types.get(i);
       StringToType converter = new StringToType();
       Type type = converter.convert(ntype.getType());
