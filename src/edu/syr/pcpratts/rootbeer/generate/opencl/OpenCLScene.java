@@ -42,7 +42,6 @@ public class OpenCLScene {
   private static OpenCLScene m_instance;
   private static int m_curentIdent;
   private Map<String, OpenCLClass> m_classes;
-  private Map<String, String> m_oclToSoot;
   private Set<OpenCLArrayType> m_arrayTypes;
   private CodeSegment m_codeSegment;
   private MethodHierarchies m_methodHierarchies;
@@ -59,7 +58,6 @@ public class OpenCLScene {
   public OpenCLScene(){
     m_codeSegment = null;
     m_classes = new LinkedHashMap<String, OpenCLClass>();
-    m_oclToSoot = new HashMap<String, String>();
     m_arrayTypes = new LinkedHashSet<OpenCLArrayType>();
     m_methodHierarchies = new MethodHierarchies();
     m_instanceOfs = new HashSet<OpenCLInstanceof>();
@@ -117,8 +115,15 @@ public class OpenCLScene {
     }
   }
 
-  public OpenCLClass getOpenCLClass(SootClass soot_class){
-    return m_classes.get(soot_class.getName());
+  public OpenCLClass getOpenCLClass(SootClass soot_class){    
+    String class_name = soot_class.getName();
+    if(m_classes.containsKey(class_name)){
+      return m_classes.get(class_name);
+    } else {
+      OpenCLClass ocl_class = new OpenCLClass(soot_class);
+      m_classes.put(class_name, ocl_class);
+      return ocl_class;
+    }
   }
 
   public void addField(SootField soot_field){
@@ -156,22 +161,6 @@ public class OpenCLScene {
     return m_usesGarbageCollector;
   }
   
-  public OpenCLClass addClass(SootClass soot_class){
-    OpenCLClass ocl_class = new OpenCLClass(soot_class);
-    
-    if(m_classes.containsKey(soot_class.getName()) == false){
-      m_classes.put(soot_class.getName(), ocl_class);
-    } else {
-      ocl_class = m_classes.get(soot_class.getName());
-    }
-    
-    if(m_oclToSoot.containsKey(ocl_class.getName()) == false){
-      m_oclToSoot.put(ocl_class.getName(), soot_class.getName());
-    }
-  
-    return ocl_class;
-  }
-  
   private void writeTypesToFile(List<NumberedType> types){
     try {
       PrintWriter writer = new PrintWriter(RootbeerPaths.v().getTypeFile());
@@ -197,7 +186,6 @@ public class OpenCLScene {
       //System.out.println("OpenCLScene method_sig: "+method_sig);
       util.parse(method_sig);
       SootMethod method = util.getSootMethod();
-      OpenCLScene.v().addClass(method.getDeclaringClass());
       addMethod(method);
     }
     
@@ -366,7 +354,7 @@ public class OpenCLScene {
     bodies.add(arr_generate.get(new_types));
     
     ObjectCloneGenerate clone_generate = new ObjectCloneGenerate();
-    bodies.add(clone_generate.get(m_arrayTypes, m_classes, m_oclToSoot));
+    bodies.add(clone_generate.get(m_arrayTypes, m_classes));
     
     List<OpenCLMethod> methods = m_methodHierarchies.getMethods();
     for(OpenCLMethod method : methods){ 

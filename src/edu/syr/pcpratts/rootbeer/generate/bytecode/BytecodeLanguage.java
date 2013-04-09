@@ -9,11 +9,13 @@ package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import soot.*;
 import soot.jimple.*;
 import soot.rbclassload.ClassHierarchy;
+import soot.rbclassload.HierarchyGraph;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.TypeToString;
@@ -375,36 +377,6 @@ public class BytecodeLanguage {
     mAssembler.add(u);
   }
 
-  private SootField getFieldByName(SootClass base_class, String field_name){
-    SootClass original_class = base_class;
-    SootField ret;
-    while(true){
-      try {
-        ret = base_class.getFieldByName(field_name);
-        return ret;
-      } catch(Exception ex){
-        if(base_class.getName().equals("java.lang.Object")){
-          break;
-        }
-        base_class = base_class.getSuperclass();
-      }
-    }
-
-    //couldn't find the field, try searching the class hierarchy
-    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    List<String> classes = class_hierarchy.getHierarchyGraph(original_class).getAllClasses();
-    for(String class_name : classes){
-      SootClass soot_class = Scene.v().getSootClass(class_name);
-      try {
-        ret = soot_class.getFieldByName(field_name);
-        return ret;
-      } catch(Exception ex){
-        continue;
-      }
-    }
-    throw new RuntimeException("Cannot find field: "+field_name+" in "+original_class.getName());
-  }
-
   public String getTypeString(Local local){
     Type type = local.getType();
     return type.toString();
@@ -614,5 +586,25 @@ public class BytecodeLanguage {
     }
     
     throw new RuntimeException("please report bug in BytecodeLanguage.convertToConstant");
+  }
+
+  private SootField getFieldByName(SootClass base_class, String field_name) {
+    List<String> queue = new LinkedList<String>();
+    queue.add(base_class.getName());
+    while(queue.isEmpty() == false){
+      String curr_class = queue.get(0);
+      queue.remove(0);
+      SootClass soot_class = Scene.v().getSootClass(curr_class);
+      if(soot_class.declaresFieldByName(field_name)){
+        return soot_class.getFieldByName(field_name);
+      }
+      if(soot_class.hasSuperclass()){
+        queue.add(soot_class.getSuperclass().getName());
+      }
+      if(soot_class.hasOuterClass()){
+        queue.add(soot_class.getOuterClass().getName());
+      }
+    }
+    throw new RuntimeException("cannot find field: "+field_name+" in "+base_class.getName());
   }
 }

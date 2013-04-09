@@ -18,7 +18,7 @@ import soot.rbclassload.RootbeerClassLoader;
 
 public class ObjectCloneGenerate {
  
-  public String get(Set<OpenCLArrayType> arrays, Map<String, OpenCLClass> classes, Map<String, String> ocl_to_soot){
+  public String get(Set<OpenCLArrayType> arrays, Map<String, OpenCLClass> classes){
     StringBuilder ret = new StringBuilder();
     String device_function_qual = Tweaks.v().getDeviceFunctionQualifier();
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
@@ -39,7 +39,7 @@ public class ObjectCloneGenerate {
         continue; 
       }
       OpenCLClass ocl_class = classes.get(key);
-      String soot_class = ocl_to_soot.get(key);
+      String soot_class = ocl_class.getJavaName();
       cloneRefType(ret, soot_class, ocl_class);
     }
     ret.append("  return -1;\n");
