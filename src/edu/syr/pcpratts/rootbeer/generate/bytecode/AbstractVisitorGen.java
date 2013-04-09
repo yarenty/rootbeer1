@@ -74,6 +74,9 @@ public class AbstractVisitorGen {
 
   protected List<OpenCLField> getRefFields(SootClass soot_class){
     OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(soot_class);
+    if(ocl_class == null){
+      System.out.println("ocl_class == null: "+soot_class.getName());
+    }
     return ocl_class.getInstanceRefFields();
   }
   

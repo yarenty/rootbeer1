@@ -23,17 +23,7 @@ public class Transform2 {
   }
 
   public void run(String cls){    
-    DfsInfo dfs_info = RootbeerClassLoader.v().getDfsInfo();
-    List<Type> types = dfs_info.getOrderedRefLikeTypes();
     OpenCLScene scene = new OpenCLScene();
-    for(Type type : types){
-      if(type instanceof RefType == false){
-        continue;
-      }
-      RefType ref_type = (RefType) type;
-      scene.addClass(ref_type.getSootClass());
-    }
-    
     OpenCLScene.setInstance(scene);
     
     SootClass soot_class1 = Scene.v().getSootClass(cls);

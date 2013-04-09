@@ -162,6 +162,8 @@ public class RootbeerCompiler {
     follow_tester.addSignature("<edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientTest: void <init>()>");
     RootbeerClassLoader.v().addFollowMethodTester(follow_tester);
     
+    RootbeerClassLoader.v().addFollowClassTester(new TestCaseFollowTester());
+    
     RootbeerClassLoader.v().addConditionalCudaEntry(new StringConstantCudaEntry());
     
     DontDfsMethods dont_dfs_methods = new DontDfsMethods();
@@ -236,6 +238,13 @@ public class RootbeerCompiler {
         if(class_name.startsWith(runtime_class)){
           write = false;
           break;
+        }
+      }
+      Iterator<SootClass> ifaces = soot_class.getInterfaces().iterator();
+      while(ifaces.hasNext()){
+        SootClass iface = ifaces.next();
+        if(iface.getName().startsWith("edu.syr.pcpratts.rootbeer.test.")){
+          write = false;
         }
       }
       if(write){
