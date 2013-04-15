@@ -417,27 +417,7 @@ public class OpenCLMethod {
   }
 
   private String getBaseMethodName(){
-    //if we are here and a method is not concrete, it is the case where a 
-    //invoke expresion is to an interface pointer and the method is not polymorphic
-    if(m_sootMethod.isConcrete() == false){
-      //Set<String> virtual_signatures = RootbeerClassLoader.v().getVirtualSignaturesDown(m_sootMethod, null);
-      ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-      List<String> virtual_methods = class_hierarchy.getVirtualMethods(m_sootMethod.getSignature());
-      
-      //double check that we are safe to do the interface remapping
-      if(virtual_methods.size() != 1){
-        //not safe, go back to normal method
-        return getBaseMethodName(m_sootClass, m_sootMethod);
-      } else {
-        String virt_method = virtual_methods.iterator().next();
-        m_util.parse(virt_method);
-        SootMethod soot_method = m_util.getSootMethod();
-        SootClass soot_class = soot_method.getDeclaringClass();
-        return getBaseMethodName(soot_class, soot_method);
-      }
-    } else {
-      return getBaseMethodName(m_sootClass, m_sootMethod);  
-    }
+    return getBaseMethodName(m_sootClass, m_sootMethod);  
   }
   
   private String getBaseMethodName(SootClass soot_class, SootMethod soot_method){

@@ -66,9 +66,6 @@ public class OpenCLPolymorphicMethod {
   public String getMethodBodies(){
     if(m_sootMethod.getName().equals("<init>"))
       return "";
-    if(m_sootMethod.isConcrete() == false){
-      return "";
-    }
     List<String> decls = getMethodDecls();
     StringBuilder ret = new StringBuilder();
     for(String decl : decls){
@@ -158,31 +155,14 @@ public class OpenCLPolymorphicMethod {
   private String getInvokeString(SootClass start_class){
     if(m_sootMethod.getName().equals("<init>"))
       return "";
-    
+        
     SootClass soot_class = start_class;
-    SootMethod soot_method = null;
-    String subsig = m_sootMethod.getSubSignature();
-    while(true){
-      if(soot_class.declaresMethod(subsig)){
-        SootMethod curr = soot_class.getMethod(subsig);
-        if(curr.isConcrete()){
-          soot_method = curr;
-          break;
-        }
-      }
-      if(soot_class.hasSuperclass()){
-        soot_class = soot_class.getSuperclass();
-      } else {
-        return "";
-      }
-    }
-    
-    OpenCLMethod ocl_method = new OpenCLMethod(soot_method, soot_class);
+    OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, soot_class);
     String ret = ocl_method.getPolymorphicName() + "(";
 
     //write the gc_info and thisref
     ret += "gc_info, thisref";
-    List args = soot_method.getParameterTypes();
+    List args = m_sootMethod.getParameterTypes();
     if(args.size() != 0)
       ret += ", ";
 
