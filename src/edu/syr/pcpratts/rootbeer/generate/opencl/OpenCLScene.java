@@ -9,10 +9,10 @@ package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
-import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.ReadOnlyTypes;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.CompositeField;
+import edu.syr.pcpratts.rootbeer.generate.opencl.fields.CompositeFieldFactory;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCodeGeneration;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldTypeSwitch;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import soot.*;
+import soot.rbclassload.FieldSignatureUtil;
 import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -127,6 +129,7 @@ public class OpenCLScene {
   }
 
   public void addField(SootField soot_field){
+    System.out.println("adding field: "+soot_field.getSignature());
     SootClass soot_class = soot_field.getDeclaringClass();
     OpenCLClass ocl_class = getOpenCLClass(soot_class);
     ocl_class.addField(new OpenCLField(soot_field, soot_class));
@@ -188,10 +191,26 @@ public class OpenCLScene {
       SootMethod method = util.getSootMethod();
       addMethod(method);
     }
+    List<String> extra_methods = new ArrayList<String>();
+    extra_methods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
+    extra_methods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void <init>()>");
+    for(String extra_method : extra_methods){
+      util.parse(extra_method);
+      addMethod(util.getSootMethod());
+    }
     
     Set<SootField> fields = RootbeerClassLoader.v().getDfsInfo().getFields();
     for(SootField field : fields){
       addField(field);
+    }
+    FieldSignatureUtil futil = new FieldSignatureUtil();
+    List<String> extra_fields = new ArrayList<String>();
+    extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_arrayLength>");
+    extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_arrayIndex>");
+    extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_array>");
+    for(String extra_field : extra_fields){
+      futil.parse(extra_field);
+      addField(futil.getSootField());
     }
     
     Set<ArrayType> array_types = RootbeerClassLoader.v().getDfsInfo().getArrayTypes();
@@ -384,9 +403,8 @@ public class OpenCLScene {
   }
   
   public OffsetCalculator getOffsetCalculator(SootClass soot_class){
-    FieldCloner cloner = new FieldCloner();
-    cloner.setup(m_classes);
-    List<CompositeField> composites = cloner.getCompositeFields();
+    CompositeFieldFactory composite_factory = new CompositeFieldFactory();
+    List<CompositeField> composites = composite_factory.create(m_classes);
     for(CompositeField composite : composites){
       List<SootClass> classes = composite.getClasses();
       if(classes.contains(soot_class))

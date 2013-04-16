@@ -10,7 +10,7 @@ package edu.syr.pcpratts.rootbeer.generate.bytecode;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.CompositeField;
-import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCloner;
+import edu.syr.pcpratts.rootbeer.generate.opencl.fields.CompositeFieldFactory;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,9 +65,8 @@ public class StaticOffsets {
   }
   
   private void buildMaps() {
-    FieldCloner cloner = new FieldCloner();
-    cloner.setup(OpenCLScene.v().getClassMap());
-    List<CompositeField> composites = cloner.getCompositeFields();
+    CompositeFieldFactory comp_factory = new CompositeFieldFactory();
+    List<CompositeField> composites = comp_factory.create(OpenCLScene.v().getClassMap());
     List<SortableField> sortable_fields = new ArrayList<SortableField>();
     for(CompositeField composite : composites){
       List<SootClass> classes = composite.getClasses();
