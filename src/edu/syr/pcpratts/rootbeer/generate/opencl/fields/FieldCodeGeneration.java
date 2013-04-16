@@ -15,28 +15,35 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import soot.SootClass;
 
 public class FieldCodeGeneration {
   
-  private FieldCloner m_FieldCloner;
   private FieldReadWriteInspector m_Inspector;
   private FieldTypeSwitch m_TypeSwitch;
+  private CompositeFieldFactory m_compositeFactory;
+  
+  public FieldCodeGeneration(){
+    m_compositeFactory = new CompositeFieldFactory();
+  }
  
   public String prototypes(Map<String, OpenCLClass> classes, FieldReadWriteInspector inspector) {
-    setup(classes, inspector);    
+    m_Inspector = inspector;
     Set<String> set = new HashSet<String>();
-    for(CompositeField composite : m_FieldCloner.getCompositeFields()){
-      set.addAll(getFieldPrototypes(composite));
+    List<CompositeField> fields = m_compositeFactory.create(classes);
+    for(CompositeField field : fields){
+      set.addAll(getFieldPrototypes(field));
     }
     return setToString(set);
   }
   
   public String bodies(Map<String, OpenCLClass> classes, FieldReadWriteInspector inspector, FieldTypeSwitch type_switch) {
+    m_Inspector = inspector;
     m_TypeSwitch = type_switch;
-    setup(classes, inspector);   
     Set<String> set = new HashSet<String>();
-    for(CompositeField composite : m_FieldCloner.getCompositeFields()){
-      set.addAll(getFieldBodies(composite));
+    List<CompositeField> fields = m_compositeFactory.create(classes);
+    for(CompositeField field : fields){
+      set.addAll(getFieldBodies(field));
     }
     return setToString(set);
   }
@@ -76,11 +83,4 @@ public class FieldCodeGeneration {
     }
     return ret;
   }
-
-  private void setup(Map<String, OpenCLClass> classes, FieldReadWriteInspector inspector) {
-    m_FieldCloner = new FieldCloner();
-    m_FieldCloner.setup(classes);
-    m_Inspector = inspector;
-  }
-    
 }

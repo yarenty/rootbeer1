@@ -116,7 +116,7 @@ public class FieldReadWriteInspector {
 
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
     HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph(soot_class);
-    List<String> classes = hgraph.getAllClasses();
+    Set<String> classes = hgraph.getAllClasses();
     
     for(String class_name : classes){
       SootClass curr_class = Scene.v().getSootClass(class_name);
