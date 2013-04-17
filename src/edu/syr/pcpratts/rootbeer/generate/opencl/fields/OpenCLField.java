@@ -68,9 +68,6 @@ public class OpenCLField {
 
   private String getFullName(){
     OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(m_SootClass);
-    if(ocl_class == null){
-      System.out.println("hello");
-    }
     return ocl_class.getName()+"_"+getName();
   }
   

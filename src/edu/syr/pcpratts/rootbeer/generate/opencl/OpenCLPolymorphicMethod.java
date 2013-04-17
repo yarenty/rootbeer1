@@ -125,6 +125,7 @@ public class OpenCLPolymorphicMethod {
         ret.append(invoke_string+"\n");
       } else {
         ret.append("derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
+        ret.append("printf(\"derived_type: %d\\n\", derived_type);\n");
         ret.append("if(0){}\n");
         int count = 0;
         for(SootMethod method : virtual_methods){

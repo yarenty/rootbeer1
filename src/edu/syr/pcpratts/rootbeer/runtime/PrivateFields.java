@@ -140,14 +140,27 @@ public class PrivateFields {
   }
   
   public Field getField(Object base, String name, String cls_name){
+    Class cls = null;
     try {
-      Class cls = Class.forName(cls_name);
-      Field f = cls.getDeclaredField(name);
-      f.setAccessible(true);
-      return f;
+      cls = Class.forName(cls_name);
     } catch(Exception ex){
-      ex.printStackTrace();
+      ex.printStackTrace(System.out);
       return null;
+    }
+    
+    while(true){
+      try {
+        Field f = cls.getDeclaredField(name);
+        f.setAccessible(true);
+        return f;
+      } catch(Exception ex){
+        try {
+          cls = cls.getSuperclass();
+        } catch(Exception ex2){
+          ex2.printStackTrace(System.out);
+          return null;
+        }
+      }
     }
   }
 }

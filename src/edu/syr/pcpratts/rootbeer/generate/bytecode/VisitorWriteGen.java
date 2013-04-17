@@ -138,6 +138,9 @@ public class VisitorWriteGen extends AbstractVisitorGen {
       if(differentPackageAndPrivate(ref_type)){
         return;  
       }
+      if(soot_class.isInterface()){
+        return;
+      }
       if(m_classesToIgnore.contains(ref_type.getSootClass().getName())){
         return; 
       }              
@@ -166,10 +169,11 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     int class_id = RootbeerClassLoader.v().getClassNumber(type.toString());
 
     BclMemory bcl_mem = new BclMemory(bcl, m_CurrentMem.top());
-    bcl_mem.writeByte((byte) 0);
-    bcl_mem.writeByte((byte) 0);
-    bcl_mem.writeByte((byte) class_id);
-    bcl_mem.writeByte((byte) 0);
+    bcl_mem.writeByte((byte) 0);      //ref_type count
+    bcl_mem.writeByte((byte) 0);      //garabage collector color
+    bcl_mem.writeByte((byte) 0);      //reserved
+    bcl_mem.writeByte((byte) 0);      //ctor used
+    bcl_mem.writeInt(class_id);       //class number
 
     Local size = bcl.local(IntType.v());
     bcl.assign(size, IntConstant.v(Constants.SizeGcInfo));
@@ -183,9 +187,13 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     }
     bcl.mult(element_size, length);
     bcl.plus(size, element_size);
-    bcl_mem.writeInt(size);
-    bcl_mem.writeInt(length);    
-    bcl_mem.writeInt(-1);
+    bcl_mem.writeInt(size);           //object size
+    bcl_mem.writeInt(length);         //array length
+    bcl_mem.writeInt(-1);             //monitor
+    bcl_mem.writeInt(0);              //reserved
+    bcl_mem.writeInt(0);              //reserved
+    bcl_mem.writeInt(0);              //reserved
+    
 
     //optimization for single-dimensional arrays of primitive types.
     //doesn't work for chars yet because they are still stored as ints on the gpu
@@ -254,15 +262,16 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     int size = ocl_class.getSize();
     int gc_count = ocl_class.getRefFieldsSize();
     
-    bcl_mem.writeByte((byte) gc_count);
-    bcl_mem.writeByte((byte) 0);
-    bcl_mem.writeByte((byte) class_id);
-    bcl_mem.writeByte((byte) 0);
-    bcl_mem.writeInt(size);
-    bcl_mem.incrementAddress(4);
-    bcl_mem.writeInt(-1);
+    bcl_mem.writeByte((byte) gc_count);      //ref_type count
+    bcl_mem.writeByte((byte) 0);             //garabage collector color
+    bcl_mem.writeByte((byte) 0);             //reserved
+    bcl_mem.writeByte((byte) 0);             //ctor used
+    bcl_mem.writeInt(class_id);              //class number
+    bcl_mem.writeInt(size);                  //object size
+    bcl_mem.writeInt(0);                     //reserved
+    bcl_mem.writeInt(-1);                    //monitor
     
-    int written_size = 1+1+1+1+4+4+4;
+    int written_size = 1+1+1+1+4+4+4+4;
     
     bcl_mem.incrementAddress(Constants.SizeGcInfo - written_size);
     

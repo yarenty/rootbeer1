@@ -41,15 +41,15 @@ public class ArrayListRunOnGpu implements Kernel {
       ArrayListTestObject lhs_obj = lhs_list.get(i);
       ArrayListTestObject rhs_obj = rhs_list.get(i);
       if(lhs_obj == null){
-        System.out.println("lhs_obj null");
+        System.out.println("lhs_obj null at "+i);
         return false;
       }
       if(rhs_obj == null){
-        System.out.println("rhs_obj null");
+        System.out.println("rhs_obj null at "+i);
         return false;
       }
       if(lhs_obj.m_value != rhs_obj.m_value){
-        System.out.println("obj.m_value");
+        System.out.println("obj.m_value at "+i);
         return false;
       }
     }

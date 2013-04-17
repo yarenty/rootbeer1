@@ -28,9 +28,6 @@ public class IsPolymorphic {
   }
   
   public boolean test(SootMethod soot_method, boolean special_invoke){
-    if(soot_method.getName().equals("add")){
-      System.out.println("hello");
-    }
     String signature = soot_method.getSignature();
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
     List<String> virtual_methods = class_hierarchy.getVirtualMethods(signature);

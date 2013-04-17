@@ -126,6 +126,9 @@ public class VisitorGen extends AbstractVisitorGen {
       SootClass soot_class = ref_type.getSootClass();
       if(soot_class.getName().equals("java.lang.Object"))
         return; 
+      if(soot_class.isInterface()){
+        return;
+      }
       if(differentPackageAndPrivate(ref_type)){
         return;  
       }
