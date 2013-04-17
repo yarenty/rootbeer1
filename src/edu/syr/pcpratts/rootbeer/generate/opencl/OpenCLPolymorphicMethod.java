@@ -48,6 +48,7 @@ public class OpenCLPolymorphicMethod {
 
   private List<String> getMethodDecls(){
     List<SootMethod> virtual_methods = getVirtualMethods();
+    
     List<String> ret = new ArrayList<String>();
     for(SootMethod virtual_method : virtual_methods){
       SootClass soot_class = virtual_method.getDeclaringClass();
@@ -84,6 +85,9 @@ public class OpenCLPolymorphicMethod {
       if(soot_method.isConcrete()){
         ret.add(soot_method);
       }
+    }
+    if(ret.contains(m_sootMethod) == false){
+      ret.add(m_sootMethod);
     }
     return ret;
   }
@@ -129,6 +133,9 @@ public class OpenCLPolymorphicMethod {
         int count = 0;
         for(SootMethod method : virtual_methods){
           SootClass sclass = method.getDeclaringClass();
+          if(sclass.isInterface()){
+            continue;
+          }
           String invoke_string = getInvokeString(sclass);
           if(invoke_string == ""){
             continue;

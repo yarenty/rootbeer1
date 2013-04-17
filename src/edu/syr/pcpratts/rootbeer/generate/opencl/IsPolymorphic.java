@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import java.util.List;
+import soot.SootClass;
 import soot.SootMethod;
 import soot.jimple.SpecialInvokeExpr;
 import soot.rbclassload.ClassHierarchy;
@@ -28,6 +29,12 @@ public class IsPolymorphic {
   }
   
   public boolean test(SootMethod soot_method, boolean special_invoke){
+    SootClass soot_class = soot_method.getDeclaringClass();
+    if(soot_class.isInterface()){
+      m_baseMethod = soot_method;
+      return true;
+    }
+    
     String signature = soot_method.getSignature();
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
     List<String> virtual_methods = class_hierarchy.getVirtualMethods(signature);
