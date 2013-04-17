@@ -10,6 +10,7 @@ package edu.syr.pcpratts.rootbeer.generate.bytecode;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -255,6 +256,10 @@ public class VisitorGen extends AbstractVisitorGen {
 
   private void makeSentinalCtors() {
     List<RefType> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefTypes();
+    //types are ordered from largest type number to smallest
+    //reverse the order for this computation because the sentinal ctors
+    //need the parent to first have the sential ctor made.
+    Collections.reverse(types);
     for(RefType ref_type : types){
       AcceptableGpuTypes accept = new AcceptableGpuTypes();
       if(accept.shouldGenerateCtor(ref_type.getClassName())){
