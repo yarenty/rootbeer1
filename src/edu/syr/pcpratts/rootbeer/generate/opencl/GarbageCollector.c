@@ -1,6 +1,6 @@
 #define GC_OBJ_TYPE_COUNT char
 #define GC_OBJ_TYPE_COLOR char
-#define GC_OBJ_TYPE_TYPE char
+#define GC_OBJ_TYPE_TYPE int
 #define GC_OBJ_TYPE_CTOR_USED char
 #define GC_OBJ_TYPE_SIZE int
 
@@ -351,8 +351,8 @@ $$__device__$$ double edu_syr_pcpratts_modulus(double a, double b)
 $$__device__$$ int
 edu_syr_pcpratts_gc_get_loc($$__global$$ char * mem_loc, int count){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) +
-    sizeof(GC_OBJ_TYPE_TYPE) + sizeof(GC_OBJ_TYPE_CTOR_USED) +sizeof(GC_OBJ_TYPE_SIZE) +
-    count * sizeof(int);
+    sizeof(char) + sizeof(GC_OBJ_TYPE_CTOR_USED) + sizeof(GC_OBJ_TYPE_SIZE) +
+    sizeof(GC_OBJ_TYPE_TYPE) + count * sizeof(int);
   return (($$__global$$ int *) mem_loc)[0];
 }
 
@@ -375,7 +375,7 @@ edu_syr_pcpratts_gc_set_color($$__global$$ char * mem_loc, GC_OBJ_TYPE_COLOR val
 $$__device__$$ void
 edu_syr_pcpratts_gc_init_monitor($$__global$$ char * mem_loc){
   int * addr;
-  mem_loc += 12;
+  mem_loc += 16;
   addr = (int *) mem_loc;
   *addr = -1;
 }
@@ -388,37 +388,41 @@ edu_syr_pcpratts_gc_get_color($$__global$$ char * mem_loc){
 
 $$__device__$$ void
 edu_syr_pcpratts_gc_set_type($$__global$$ char * mem_loc, GC_OBJ_TYPE_TYPE value){
-  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR);
-  mem_loc[0] = value;
+  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char) +
+    sizeof(GC_OBJ_TYPE_CTOR_USED);
+  *(($$__global$$ GC_OBJ_TYPE_TYPE *) &mem_loc[0]) = value;
 }
 
 $$__device__$$ GC_OBJ_TYPE_TYPE
 edu_syr_pcpratts_gc_get_type($$__global$$ char * mem_loc){
-  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR);
-  return (GC_OBJ_TYPE_TYPE) mem_loc[0];
+  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char) +
+    sizeof(GC_OBJ_TYPE_CTOR_USED);
+  return *(($$__global$$ GC_OBJ_TYPE_TYPE *) &mem_loc[0]);
 }
 
 $$__device__$$ void
 edu_syr_pcpratts_gc_set_ctor_used($$__global$$ char * mem_loc, GC_OBJ_TYPE_CTOR_USED value){
-  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(GC_OBJ_TYPE_TYPE);
+  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char);
   mem_loc[0] = value;
 }
 
 $$__device__$$ GC_OBJ_TYPE_CTOR_USED
 edu_syr_pcpratts_gc_get_ctor_used($$__global$$ char * mem_loc){
-  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(GC_OBJ_TYPE_TYPE);
+  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char);
   return mem_loc[0];
 }
 
 $$__device__$$ void
 edu_syr_pcpratts_gc_set_size($$__global$$ char * mem_loc, GC_OBJ_TYPE_SIZE value){
-  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(GC_OBJ_TYPE_TYPE) + sizeof(GC_OBJ_TYPE_CTOR_USED);
+  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char) + 
+    sizeof(GC_OBJ_TYPE_CTOR_USED) + sizeof(GC_OBJ_TYPE_TYPE);
   *(($$__global$$ GC_OBJ_TYPE_SIZE *) &mem_loc[0]) = value;
 }
 
 $$__device__$$ GC_OBJ_TYPE_SIZE
 edu_syr_pcpratts_gc_get_size($$__global$$ char * mem_loc){
-  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(GC_OBJ_TYPE_TYPE) + sizeof(GC_OBJ_TYPE_CTOR_USED);
+  mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char) + 
+    sizeof(GC_OBJ_TYPE_CTOR_USED) + sizeof(GC_OBJ_TYPE_TYPE);
   return *(($$__global$$ GC_OBJ_TYPE_SIZE *) &mem_loc[0]);
 }
 
@@ -526,7 +530,7 @@ edu_syr_pcpratts_array_length($$__global$$ char * gc_info, int thisref){
   //  return edu_syr_pcpratts_cache_get_int(thisref);
   //} else {
     $$__global$$ char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
-    int ret = edu_syr_pcpratts_getint(thisref_deref, 8);
+    int ret = edu_syr_pcpratts_getint(thisref_deref, 12);
     return ret;
   //}
 }
@@ -655,7 +659,7 @@ java_util_Arrays_copyOf(char * gc_info, int object_array, int new_size, int * ex
     ret_deref[i] = object_array_deref[i];
   }
   
-  length = edu_syr_pcpratts_getint(object_array_deref, 8);
+  length = edu_syr_pcpratts_getint(object_array_deref, 12);
   
   edu_syr_pcpratts_setint(ret_deref, 8, new_size);
   

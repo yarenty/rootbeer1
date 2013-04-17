@@ -123,6 +123,10 @@ public class VisitorReadGen extends AbstractVisitorGen {
           return;
         }
       }
+      SootClass soot_class = ref_type.getSootClass();
+      if(soot_class.isInterface()){
+        return;
+      }
       if(differentPackageAndPrivate(ref_type)){
         return;  
       }
@@ -158,7 +162,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl_mem.incrementAddress(3);
     Local ctor_used = bcl_mem.readByte();
     
-    bcl_mem.incrementAddress(4);
+    bcl_mem.incrementAddress(8);
     
     Local size = bcl_mem.readInt();
     //m_Bcl.top().println("reading size: ");

@@ -212,7 +212,7 @@ public class OpenCLMethod {
       ret += "  }\n";
 
       ret += "  thisref_synch_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref );\n";
-      ret += "  * ( ( int * ) & thisref_synch_deref [ 16 ] ) = 20 ;\n";
+      ret += "  * ( ( int * ) & thisref_synch_deref [ 20 ] ) = 20 ;\n";
     }
     return ret;
   }
