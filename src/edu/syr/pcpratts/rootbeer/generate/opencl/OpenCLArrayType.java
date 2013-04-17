@@ -165,7 +165,6 @@ public class OpenCLArrayType {
     ret.append("int length;\n");
     ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("  if(thisref == -1){\n");
-    ret.append("    printf(\"null-pointer\\n\");\n");
     ret.append("    *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
     ret.append("    return;\n");
     ret.append("  }\n");
@@ -173,7 +172,6 @@ public class OpenCLArrayType {
      if(Configuration.compilerInstance().getArrayChecks()){
       ret.append("length = edu_syr_pcpratts_getint(thisref_deref, 12);\n");
       ret.append("if(parameter0 >= length){\n");
-      ret.append("  printf(\"array-out-of-bounds: parameter0: %d length: %d\\n\", parameter0, length);\n");
       ret.append("  *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, parameter0, thisref, length, exception);");
       ret.append("  return;\n");
       ret.append("}\n");
@@ -181,7 +179,6 @@ public class OpenCLArrayType {
     if(isCharArray()){
       ret.append("*(("+address_qual+" int *) &thisref_deref["+offset_size+"+(parameter0*"+element_size+")]) = 0;\n");
     }
-    ret.append("printf(\"wrote to array %p:%d\\n\",thisref,parameter0);\n");
     ret.append("*(("+address_qual+" "+getAssignType()+" *) &thisref_deref["+offset_size+"+(parameter0*"+element_size+")]) = parameter1;\n");
     
     ret.append("}\n");
