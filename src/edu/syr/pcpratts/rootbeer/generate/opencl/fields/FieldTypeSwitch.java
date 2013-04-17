@@ -11,6 +11,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -62,7 +63,7 @@ public class FieldTypeSwitch {
     ret.append("switch(type){\n");
     for(int key : sorted_keys){
       List<SootClass> classes = offsets.get(key);
-      classes = sortClasses(classes);
+      Collections.sort(classes, new NumberedTypeSortComparator(true));
       for(SootClass sclass : classes){
         ret.append(" case "+OpenCLScene.v().getClassType(sclass)+":\n");
       }
@@ -88,40 +89,5 @@ public class FieldTypeSwitch {
     }
     Arrays.sort(array);
     return array;
-  }
-
-  private List<SootClass> sortClasses(List<SootClass> classes) {
-    WrappedClass[] wrapped_classes = new WrappedClass[classes.size()];
-    int index = 0;
-    for(SootClass sclass : classes){
-      WrappedClass wclass = new WrappedClass(sclass);
-      wrapped_classes[index] = wclass;
-      index++;
-    }
-    Arrays.sort(wrapped_classes);
-    List<SootClass> ret = new ArrayList<SootClass>();
-    for(WrappedClass wrapped : wrapped_classes){
-      ret.add(wrapped.getSootClass());
-    }    
-    return ret;
-  }
-  
-  private class WrappedClass implements Comparable<WrappedClass>{
-
-    private SootClass m_SootClass;
-    private int m_DerivedType;
-    
-    public WrappedClass(SootClass sclass){
-      m_SootClass = sclass;
-      m_DerivedType = OpenCLScene.v().getClassType(sclass);
-    }
-    
-    public int compareTo(WrappedClass o) {
-      return Integer.valueOf(m_DerivedType).compareTo(Integer.valueOf(o.m_DerivedType));
-    }
-    
-    public SootClass getSootClass(){
-      return m_SootClass;
-    }
   }
 }

@@ -320,14 +320,17 @@ public abstract class GcHeap {
         } else if(ref_num == first_block.getOutOfMemoryNumber()){
           throw new OutOfMemoryError();
         }
-        mToSpaceMemory.setAddress(ref_num);
-        Object except = mGcObjectVisitor.readFromHeap(null, true, ref_num);
+        mToSpaceMemory.setAddress(ref);
+        Object except = mGcObjectVisitor.readFromHeap(null, true, ref);
         if(except instanceof Error){
           Error except_th = (Error) except;
           throw except_th;
         } else if(except instanceof RuntimeException){ 
           RuntimeException runtime_ex = (RuntimeException) except;
           throw runtime_ex;
+        } else if(except instanceof GpuException){
+          GpuException gpu_except = (GpuException) except;
+          gpu_except.throwArrayOutOfBounds();
         } else {
           throw new RuntimeException((Throwable) except);
         }

@@ -10,6 +10,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl.fields;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.FieldReadWriteInspector;
 import edu.syr.pcpratts.rootbeer.generate.opencl.FieldPackingSorter;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
+import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -21,16 +22,11 @@ public class FieldCodeGeneration {
   
   private FieldReadWriteInspector m_Inspector;
   private FieldTypeSwitch m_TypeSwitch;
-  private CompositeFieldFactory m_compositeFactory;
-  
-  public FieldCodeGeneration(){
-    m_compositeFactory = new CompositeFieldFactory();
-  }
  
   public String prototypes(Map<String, OpenCLClass> classes, FieldReadWriteInspector inspector) {
     m_Inspector = inspector;
     Set<String> set = new HashSet<String>();
-    List<CompositeField> fields = m_compositeFactory.create(classes);
+    List<CompositeField> fields = OpenCLScene.v().getCompositeFields();
     for(CompositeField field : fields){
       set.addAll(getFieldPrototypes(field));
     }
@@ -41,7 +37,7 @@ public class FieldCodeGeneration {
     m_Inspector = inspector;
     m_TypeSwitch = type_switch;
     Set<String> set = new HashSet<String>();
-    List<CompositeField> fields = m_compositeFactory.create(classes);
+    List<CompositeField> fields = OpenCLScene.v().getCompositeFields();
     for(CompositeField field : fields){
       set.addAll(getFieldBodies(field));
     }
