@@ -11,58 +11,86 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import soot.Scene;
 import soot.SootClass;
 import soot.options.Options;
+import soot.rbclassload.ClassHierarchy;
+import soot.rbclassload.HierarchyGraph;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class ReverseClassHierarchy {
   private List<TreeNode> m_Hierarchy;
   private Map<String, OpenCLClass> m_Classes;
   
+  /**
+   * Builds a List<TreeNode> where each is a class just below Object. The 
+   * algorithm works when there are holes in the class hierarchy (a hole is
+   * when the real root or a parent is not in Map<String, OpenCLClass> classes)
+   * @param classes 
+   */
   public ReverseClassHierarchy(Map<String, OpenCLClass> classes){
     m_Hierarchy = new ArrayList<TreeNode>();
     m_Classes = classes;
         
     Set<String> key_set = classes.keySet();
-    Set<String> visited = new HashSet<String>();
-    for(String key : key_set){
-      OpenCLClass ocl_class = classes.get(key);
-      SootClass soot_class = Scene.v().getSootClass(ocl_class.getJavaName());
-      if(soot_class.hasSuperclass() == false)
-        continue;
-      SootClass parent = soot_class.getSuperclass();
-      if(parent.getName().equals("java.lang.Object")){
-        TreeNode tree = new TreeNode(soot_class, ocl_class);
-        m_Hierarchy.add(tree);
-        visited.add(key);
+    Set<String> roots = new HashSet<String>();
+    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+    
+    SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
+    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph(obj_class);
+    
+    List<String> queue = new LinkedList<String>();
+    queue.add("java.lang.Object");
+    
+    while(!queue.isEmpty()){
+      String class_name = queue.get(0);
+      queue.remove(0);
+      
+      if(key_set.contains(class_name) && !class_name.equals("java.lang.Object")){
+        if(roots.contains(class_name)){
+          continue;
+        } else {
+          SootClass soot_class = Scene.v().getSootClass(class_name);
+          OpenCLClass ocl_class = classes.get(class_name);
+          TreeNode tree = new TreeNode(soot_class, ocl_class);
+          m_Hierarchy.add(tree);
+          roots.add(class_name);
+        }
+      } else {
+        queue.addAll(hgraph.getChildren(class_name));
+      }
+      if(roots.size() == m_Classes.size()){
+        break;
       }
     }
     
-    boolean modified;
-    do {      
-      modified = false;
-      
-      key_set = classes.keySet();
-      for(String key : key_set){
-        if(visited.contains(key))
-          continue;
-        OpenCLClass ocl_class = classes.get(key);
-        SootClass soot_class = Scene.v().getSootClass(ocl_class.getJavaName());
-        if(soot_class.hasSuperclass() == false)
-          continue;
-        SootClass parent = soot_class.getSuperclass();
-        TreeNode node = getNode(parent);
-        if(node == null)
-          continue;
-        node.addChild(soot_class, ocl_class);
-        modified = true;
-        visited.add(key);
+    for(String class_name : m_Classes.keySet()){
+      if(roots.contains(class_name)){
+        continue;
       }
+      List<String> up_queue = new LinkedList<String>();
+      up_queue.add(class_name);
       
-    } while(modified);
+      while(up_queue.isEmpty() == false){
+        String curr_class = up_queue.get(0);
+        up_queue.remove(0);
+        
+        if(roots.contains(curr_class)){
+          SootClass root = Scene.v().getSootClass(curr_class);
+          TreeNode node = getNode(root);
+          SootClass soot_class = Scene.v().getSootClass(class_name);
+          OpenCLClass ocl_class = classes.get(class_name);
+          node.addChild(soot_class, ocl_class);
+          break;
+        } else {
+          up_queue.addAll(hgraph.getParents(curr_class));
+        }
+      }
+    }
   }
   
   public List<TreeNode> get(){

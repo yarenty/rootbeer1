@@ -52,6 +52,7 @@ public class OpenCLScene {
   private int m_endOfStatics;
   private ReadOnlyTypes m_readOnlyTypes;
   private Set<OpenCLInstanceof> m_instanceOfs;
+  private List<CompositeField> m_compositeFields;
   
   static {
     m_curentIdent = 0;
@@ -224,6 +225,8 @@ public class OpenCLScene {
     for(Type type : instanceofs){
       addInstanceof(type);
     }
+    
+    buildCompositeFields();
     
     StringBuilder unix_code = new StringBuilder();
     StringBuilder windows_code = new StringBuilder();
@@ -404,8 +407,7 @@ public class OpenCLScene {
   }
   
   public OffsetCalculator getOffsetCalculator(SootClass soot_class){
-    CompositeFieldFactory composite_factory = new CompositeFieldFactory();
-    List<CompositeField> composites = composite_factory.create(m_classes);
+    List<CompositeField> composites = getCompositeFields();
     for(CompositeField composite : composites){
       List<SootClass> classes = composite.getClasses();
       if(classes.contains(soot_class))
@@ -435,5 +437,15 @@ public class OpenCLScene {
 
   public Map<String, OpenCLClass> getClassMap(){
     return m_classes;
+  }
+
+  public List<CompositeField> getCompositeFields() {
+    return m_compositeFields;
+  }
+
+  private void buildCompositeFields() {
+    CompositeFieldFactory factory = new CompositeFieldFactory();
+    factory.setup(m_classes);
+    m_compositeFields = factory.getCompositeFields();
   }
 }

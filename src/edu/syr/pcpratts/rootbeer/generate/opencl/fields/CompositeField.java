@@ -8,6 +8,8 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl.fields;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +75,13 @@ public class CompositeField {
       lst.add(field);
       fields_by_class.put(soot_class, lst);
     }
-    if(m_Classes.contains(soot_class) == false)
+    if(m_Classes.contains(soot_class) == false){
       m_Classes.add(soot_class);
+    }
+  }
+
+  public void sort() {
+    Collections.sort(m_Classes, new NumberedTypeSortComparator(true));
   }
 
 }

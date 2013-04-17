@@ -20,4 +20,8 @@ public class GpuException {
     ret.m_array = array;
     return ret;
   }
+  
+  public void throwArrayOutOfBounds(){
+    throw new ArrayIndexOutOfBoundsException("array_index: "+m_arrayIndex+" array_length: "+m_arrayLength+" array: "+m_array);
+  }
 }

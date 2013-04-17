@@ -428,8 +428,6 @@ public class RootbeerCompiler {
   }
   
   private void writeClassFile(String cls, String filename){
-    if(cls.equals("java.lang.Object"))
-      return;
     FileOutputStream fos = null;
     OutputStream out1 = null;
     PrintWriter writer = null;
@@ -476,7 +474,6 @@ public class RootbeerCompiler {
   }
   
   private void writeClassFile(String cls) {
-    System.out.println("writing class file: "+cls);
     writeClassFile(cls, classNameToFileName(cls, false));
   }
   
