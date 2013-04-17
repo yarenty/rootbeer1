@@ -153,6 +153,7 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addNewInvoke("java.lang.StringBuilder");
     
     ListMethodTester follow_tester = new ListMethodTester();
+    follow_tester.addSignature("<java.lang.String: void <init>(char[])>");
     follow_tester.addSignature("<java.lang.StringBuilder: void <init>()>");
     follow_tester.addSignature("<java.lang.StringBuilder: java.lang.StringBuilder append(java.lang.String)>");
     follow_tester.addSignature("java.lang.StringBuilder: java.lang.String toString()>");
@@ -175,9 +176,7 @@ public class RootbeerCompiler {
     }
     RootbeerClassLoader.v().addDontFollowMethodTester(dont_dfs_tester);
     
-    List<String> cuda_fields = new ArrayList<String>();
-    cuda_fields.add("<java.lang.Class: java.lang.String name>");
-    RootbeerClassLoader.v().setCudaFields(cuda_fields);
+    RootbeerClassLoader.v().loadField("<java.lang.Class: java.lang.String name>");
     
     RootbeerClassLoader.v().loadNecessaryClasses();
   }
@@ -477,6 +476,7 @@ public class RootbeerCompiler {
   }
   
   private void writeClassFile(String cls) {
+    System.out.println("writing class file: "+cls);
     writeClassFile(cls, classNameToFileName(cls, false));
   }
   

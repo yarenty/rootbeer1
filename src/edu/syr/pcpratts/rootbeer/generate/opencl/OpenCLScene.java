@@ -193,6 +193,7 @@ public class OpenCLScene {
     List<String> extra_methods = new ArrayList<String>();
     extra_methods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
     extra_methods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void <init>()>");
+    extra_methods.add("<java.lang.String: void <init>(char[])>");
     for(String extra_method : extra_methods){
       util.parse(extra_method);
       addMethod(util.getSootMethod());
@@ -207,6 +208,7 @@ public class OpenCLScene {
     extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_arrayLength>");
     extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_arrayIndex>");
     extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_array>");
+    extra_fields.add("<java.lang.Class: java.lang.String name>");
     for(String extra_field : extra_fields){
       futil.parse(extra_field);
       addField(futil.getSootField());
