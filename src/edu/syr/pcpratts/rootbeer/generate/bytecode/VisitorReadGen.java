@@ -169,8 +169,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     //m_Bcl.top().println(size);
     Local ret = bcl.local(type);
 
-    //pad for 8 bytes
-    bcl_mem.incrementAddress(4);
+    //pad for 16 bytes
+    bcl_mem.incrementAddress(16);
     
     Local previous_size = bcl.lengthof(object_to_read_from);
     
@@ -333,8 +333,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top());   
     
     Local start = bcl_mem.getPointer();
-    bcl_mem.incrementAddress(2);
-    Local type_id = bcl_mem.readByte();
+    bcl_mem.incrementAddress(4);
+    Local type_id = bcl_mem.readInt();
     bcl_mem.setAddress(start);
     
     //m_Bcl.top().println("searching null creators for:");
