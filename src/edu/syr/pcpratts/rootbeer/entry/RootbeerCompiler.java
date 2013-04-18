@@ -212,10 +212,7 @@ public class RootbeerCompiler {
       System.out.println("edu.syr.pcpratts.rootbeer.runtime.Kernel");
       System.exit(0);
     }
-    
-    System.out.println("applying optimizations...");
-    RootbeerClassLoader.v().applyOptimizations();
-   
+       
     Transform2 transform2 = new Transform2();
     for(SootMethod kernel_method : kernel_methods){   
       System.out.println("running transform2 on: "+kernel_method.getSignature()+"...");
