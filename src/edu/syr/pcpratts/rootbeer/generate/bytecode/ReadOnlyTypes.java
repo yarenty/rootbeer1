@@ -53,7 +53,10 @@ public class ReadOnlyTypes {
     if(method.isConcrete() == false){
       return;
     }
-    Body body = method.retrieveActiveBody();
+    if(method.hasActiveBody() == false){
+      return;
+    }
+    Body body = method.getActiveBody();
     if(body == null)
       return;
     inspectBody(body);
