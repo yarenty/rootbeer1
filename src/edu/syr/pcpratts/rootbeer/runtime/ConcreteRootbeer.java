@@ -60,7 +60,7 @@ public class ConcreteRootbeer implements IRootbeerInternal {
     } else if (Configuration.runtimeInstance().getMode() == Configuration.MODE_JEMU) {
       runKernelTemplateJava(kernel);
     } else {
-      CudaRuntime2.v().run(kernel, m_rootbeer, m_threadConfig);
+      CudaRuntime2.v(m_rootbeer).run(kernel, m_rootbeer, m_threadConfig);
     }
 
   }
@@ -88,8 +88,8 @@ public class ConcreteRootbeer implements IRootbeerInternal {
 
   private Iterator<Kernel> runOnCudaGpu(Iterator<Kernel> jobs) {
     Tweaks.setInstance(new CudaTweaks());
-    PartiallyCompletedParallelJob partial = CudaRuntime2.v().run(jobs, m_rootbeer, m_threadConfig);
-    return new ResultIterator(partial, CudaRuntime2.v(), m_rootbeer);
+    PartiallyCompletedParallelJob partial = CudaRuntime2.v(m_rootbeer).run(jobs, m_rootbeer, m_threadConfig);
+    return new ResultIterator(partial, CudaRuntime2.v(m_rootbeer), m_rootbeer);
   }
 
   private Iterator<Kernel> runOnNativeCpu(Iterator<Kernel> jobs) {
@@ -125,6 +125,6 @@ public class ConcreteRootbeer implements IRootbeerInternal {
   }
 
   public void printMem(int start, int len) {
-    CudaRuntime2.v().printMem(start, len);
+    CudaRuntime2.v(m_rootbeer).printMem(start, len);
   }
 }

@@ -7,7 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization;
 
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;;
+import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

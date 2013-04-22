@@ -7,30 +7,46 @@
 
 package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
-import edu.syr.pcpratts.rootbeer.configuration.Configuration;
-import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
-import edu.syr.pcpratts.rootbeer.runtime.*;
-import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
-import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
-import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
-import edu.syr.pcpratts.rootbeer.runtimegpu.GpuException;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.FastMatrixTest;
-import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.MatrixKernel;
-import edu.syr.pcpratts.rootbeer.util.ResourceReader;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
+import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
+import edu.syr.pcpratts.rootbeer.runtime.CompiledKernel;
+import edu.syr.pcpratts.rootbeer.runtime.GpuCard;
+import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import edu.syr.pcpratts.rootbeer.runtime.ParallelRuntime;
+import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
+import edu.syr.pcpratts.rootbeer.runtime.ReadOnlyAnalyzer;
+import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
+import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
+import edu.syr.pcpratts.rootbeer.runtime.Serializer;
+import edu.syr.pcpratts.rootbeer.runtime.StatsRow;
+import edu.syr.pcpratts.rootbeer.runtime.ThreadConfig;
+import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
+import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
+import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
+import edu.syr.pcpratts.rootbeer.runtimegpu.GpuException;
+import edu.syr.pcpratts.rootbeer.util.ResourceReader;
+
 public class CudaRuntime2 implements ParallelRuntime {
 
   private static CudaRuntime2 m_Instance;
   
-  public static CudaRuntime2 v(){
+  public static CudaRuntime2 v(Rootbeer rootbeer){
     if(m_Instance == null){
-      m_Instance = new CudaRuntime2();
+      m_Instance = new CudaRuntime2(rootbeer);
     }
     return m_Instance;
   }
@@ -86,7 +102,7 @@ public class CudaRuntime2 implements ParallelRuntime {
   private Stopwatch m_runOnGpuStopwatch;
   private Stopwatch m_readBlocksStopwatch;
   
-  private CudaRuntime2(){
+  private CudaRuntime2(Rootbeer rootbeer){
     String arch = System.getProperty("os.arch");
     m_32bit = arch.equals("x86") || arch.equals("i386");
 
@@ -96,7 +112,9 @@ public class CudaRuntime2 implements ParallelRuntime {
     loader.load();
         
     m_BlockShaper = new BlockShaper();
-    initNativeModule();
+    initNativeModule(
+    		(rootbeer.getCurrentGpuCard()!=null)?rootbeer.getCurrentGpuCard().getCardID():-1);
+   
     m_JobsToWrite = new ArrayList<Kernel>();
     m_JobsWritten = new ArrayList<Kernel>();  
     m_NotWritten = new ArrayList<Kernel>();
@@ -135,10 +153,10 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_initTime = m_ctorStopwatch.elapsedTimeMillis();
   }
   
-  private void initNativeModule(){
+  private void initNativeModule(int device_id){
     File file = new File(RootbeerPaths.v().getConfigFile());
     if(file.exists() == false){
-      m_reserveMem = findReserveMem(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock());
+      m_reserveMem = findReserveMem(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), device_id);
       Properties props = new Properties();
       props.setProperty("reserve_mem", Long.toString(m_reserveMem));
       try {
@@ -159,7 +177,7 @@ public class CudaRuntime2 implements ParallelRuntime {
         Properties props = new Properties();
         props.load(reader);
         m_reserveMem = Long.parseLong(props.getProperty("reserve_mem"));
-        setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), m_reserveMem);
+        setup(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), m_reserveMem, device_id);
       } catch(Exception ex){
         ex.printStackTrace();
       }
@@ -200,7 +218,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     
     Object gpu_thrown = null;
     try {
-      runOnGpu();
+      runOnGpu((rootbeer.getCurrentGpuCard()!=null)?rootbeer.getCurrentGpuCard().getCardID():-1);
       readSingleBlock(job_template);
       unload();
     } catch(Throwable ex){
@@ -261,7 +279,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     
     Object gpu_thrown = null;
     try {
-      runOnGpu();
+      runOnGpu((rootbeer.getCurrentGpuCard()!=null)?rootbeer.getCurrentGpuCard().getCardID():-1);
       readBlocks();
       unload();
     } catch(Throwable ex){
@@ -452,14 +470,14 @@ public class CudaRuntime2 implements ParallelRuntime {
     }
   }
   
-  private void runOnGpu(){    
+  private void runOnGpu(int device_id){    
     try {
       m_runOnGpuStopwatch.start();
       runBlocks(m_NumThreads, m_BlockShape, m_GridShape); 
       m_runOnGpuStopwatch.stop();
       m_executionTime = m_runOnGpuStopwatch.elapsedTimeMillis();
     } catch(CudaErrorException ex){
-      reinit(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), m_reserveMem);
+      reinit(m_BlockShaper.getMaxBlocksPerProc(), m_BlockShaper.getMaxThreadsPerBlock(), m_reserveMem, device_id);
       m_Handles = new Handles(m_HandlesAddr, m_GpuHandlesAddr);
       m_ExceptionHandles = new Handles(m_ExceptionsHandlesAddr, m_GpuExceptionsHandlesAddr);
       throw ex;
@@ -607,13 +625,14 @@ public class CudaRuntime2 implements ParallelRuntime {
     printer.print(m_ToSpace.get(0), start, len);
   }
   
-  private native long findReserveMem(int max_blocks, int max_threads);
-  private native void setup(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
+  private native long findReserveMem(int max_blocks, int max_threads, int device_id);
+  private native void setup(int max_blocks_per_proc, int max_threads_per_block, long free_memory, int device_id);
   public static native void printDeviceInfo();
   private native void loadFunction(long heap_end_ptr, Object buffer, int size, int total_size, int num_blocks);
   private native void writeClassTypeRef(int[] refs);
   private native int runBlocks(int size, int block_shape, int grid_shape);
   private native void unload();
-  private native void reinit(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
+  private native void reinit(int max_blocks_per_proc, int max_threads_per_block, long free_memory, int device_id);
+  public static native List<GpuCard> getGpuCards();
   
 }

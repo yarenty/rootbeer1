@@ -7,6 +7,8 @@
 
 package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
+import edu.syr.pcpratts.rootbeer.entry.RootbeerTest;
+import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
 import edu.syr.pcpratts.rootbeer.runtime.memory.BufferPrinter;
 import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
 
@@ -42,6 +44,6 @@ public class MemoryTest {
   }
   
   public static void main(String[] args){
-    CudaRuntime2.v().memoryTest();
+    CudaRuntime2.v(new Rootbeer()).memoryTest();
   }
 }
