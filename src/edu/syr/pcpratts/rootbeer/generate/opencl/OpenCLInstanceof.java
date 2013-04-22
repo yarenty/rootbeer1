@@ -12,6 +12,8 @@ import java.util.List;
 import soot.RefType;
 import soot.Type;
 import soot.jimple.InstanceOfExpr;
+import soot.rbclassload.ClassHierarchy;
+import soot.rbclassload.HierarchyGraph;
 import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -46,8 +48,8 @@ public class OpenCLInstanceof {
     if(m_type instanceof RefType == false){
       throw new RuntimeException("not supported yet");
     }
-    RefType ref_type = (RefType) m_type;
-    List<NumberedType> type_list = RootbeerClassLoader.v().getDfsInfo().getNumberedHierarchyDown(ref_type.getSootClass());
+    RefType ref_type = (RefType) m_type;    
+    List<NumberedType> type_list = RootbeerClassLoader.v().getDfsInfo().getNumberedHierarchyUp(ref_type.getSootClass());
     
     String ret = getDecl();
     ret += "{\n";
