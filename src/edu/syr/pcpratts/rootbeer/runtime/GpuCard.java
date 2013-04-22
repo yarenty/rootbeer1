@@ -153,5 +153,5 @@ public class GpuCard {
 	public String toString() {
 		return "GpuCard [cardID=" + cardID + ", name=" + name + "]";
 	}
-	
+
 }

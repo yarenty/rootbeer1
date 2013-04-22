@@ -15,6 +15,7 @@ public interface IRootbeer {
   void runAll(List<Kernel> jobs);
   Iterator<Kernel> run(Iterator<Kernel> jobs);
   List<GpuCard> getGpuCards();
-  void setGpuCard(GpuCard gpuCard);
+  void setCurrentGpuCard(GpuCard gpuCard);
+  GpuCard getCurrentGpuCard();
   
 }

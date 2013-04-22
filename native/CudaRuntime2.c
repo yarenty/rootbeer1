@@ -99,7 +99,7 @@ void setLongField(JNIEnv *env, jobject obj, const char * name, jlong value){
   return;
 }
 
-void getBestDevice(JNIEnv *env){
+void getBestDevice(JNIEnv *env, jint device_id){
   int num_devices;
   int status;
   int i;
@@ -114,23 +114,31 @@ void getBestDevice(JNIEnv *env){
   if(num_devices == 0)
       throw_cuda_errror_exception(env,"0 Cuda Devices were found",0);
   
-  for(i = 0; i < num_devices; ++i){
-    status = cuDeviceGet(&temp_device, i);
-    CHECK_STATUS(env,"error in cuDeviceGet",status)
+  // if no device was defined, search for the best one
+  if(device_id<0) {
+    for(i = 0; i < num_devices; ++i) {
+      status = cuDeviceGet(&temp_device, i);
+      CHECK_STATUS(env,"error in cuDeviceGet",status)
             
-    status = cuDeviceGetAttribute(&curr_multiprocessors, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT, temp_device);    
-    CHECK_STATUS(env,"error in cuDeviceGetAttribute",status)
+      status = cuDeviceGetAttribute(&curr_multiprocessors, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT, temp_device);
+      CHECK_STATUS(env,"error in cuDeviceGetAttribute",status)
             
-    if(curr_multiprocessors > max_multiprocessors)
-    {
-      max_multiprocessors = curr_multiprocessors;
-      max_i = i;
+      if(curr_multiprocessors > max_multiprocessors) {
+        max_multiprocessors = curr_multiprocessors;
+        max_i = i;
+      }
     }
+    status = cuDeviceGet(&cuDevice, max_i);
+    CHECK_STATUS(env,"error in cuDeviceGet",status)
+    
+  }else if(device_id<num_devices) {
+      status = cuDeviceGet(&cuDevice, device_id);
+      CHECK_STATUS(env,"error in cuDeviceGet",status)
+      
+  }else {
+    throw_cuda_errror_exception(env,"Cuda Devices not found!",0);
   }
 
-  status = cuDeviceGet(&cuDevice, max_i); 
-  CHECK_STATUS(env,"error in cuDeviceGet",status)
-          
   status = cuDeviceGetAttribute(&maxGridDim, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X, cuDevice);    
   CHECK_STATUS(env,"error in cuDeviceGetAttribute",status)
           
@@ -157,7 +165,7 @@ void savePointers(JNIEnv * env, jobject this_ref){
   return;
 }
 
-void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
+void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space, jint device_id)
 {          
   int status;
   int deviceCount = 0;
@@ -169,7 +177,7 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
   status = cuDeviceGetCount(&deviceCount);
   CHECK_STATUS(env,"error in cuDeviceGetCount",status)
 
-  getBestDevice(env);
+  getBestDevice(env, device_id);
   
   status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);  
   CHECK_STATUS(env,"error in cuCtxCreate",status)
@@ -251,7 +259,7 @@ void initDevice(JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint m
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_reinit
-  (JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
+  (JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space, jint device_id)
 {
   cuMemFreeHost(toSpace);
   cuMemFree(gpuToSpace);
@@ -264,12 +272,12 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   cuMemFree(gpuHeapEndPtr);
   cuMemFree(gpuBufferSize);
   cuCtxDestroy(cuContext);
-  initDevice(env, this_ref, max_blocks_per_proc, max_threads_per_block, free_space);
+  initDevice(env, this_ref, max_blocks_per_proc, max_threads_per_block, free_space, device_id);
   
   return;
 }
 
-size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_block)
+size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_block, jint device_id)
 {
   size_t to_space_size;
   int status;
@@ -280,7 +288,8 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
   status = cuDeviceGetCount(&deviceCount);
   CHECK_STATUS_RTN(env,"error in cuDeviceGetCount",status, 0);
 
-  getBestDevice(env);
+  if(device_id<0)
+    getBestDevice(env, device_id);
 
   status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);
   CHECK_STATUS_RTN(env,"error in cuCtxCreate",status, 0)
@@ -312,7 +321,7 @@ size_t initContext(JNIEnv * env, jint max_blocks_per_proc, jint max_threads_per_
  * Signature: ()I
  */
 JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_findReserveMem
-  (JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block)
+  (JNIEnv * env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jint device_id)
 {
   size_t to_space_size;
   size_t temp_size;
@@ -328,7 +337,7 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
 
   printf("automatically determining CUDA reserve space...\n");
   
-  to_space_size = initContext(env, max_blocks_per_proc, max_threads_per_block);
+  to_space_size = initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
   numBlocks = numMultiProcessors * max_threads_per_block * max_blocks_per_proc;
   
   for(i = 1024L*1024L; i < to_space_size; i += 100L*1024L*1024L){
@@ -339,70 +348,70 @@ JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime
     status = cuMemHostAlloc(&toSpace, temp_size, 0);  
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
-      initContext(env, max_blocks_per_proc, max_threads_per_block);
+      initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
       continue;
     }
     
     status = cuMemAlloc(&gpuToSpace, temp_size);
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
-      initContext(env, max_blocks_per_proc, max_threads_per_block);
+      initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
       continue;
     } 
 
     status = cuMemAlloc(&gpuClassMemory, classMemSize);
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
-      initContext(env, max_blocks_per_proc, max_threads_per_block);
+      initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
       continue;
     } 
 
     status = cuMemHostAlloc(&handlesMemory, numBlocks * sizeof(jlong), 0); 
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
-      initContext(env, max_blocks_per_proc, max_threads_per_block);
+      initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
       continue;
     } 
 
     status = cuMemAlloc(&gpuHandlesMemory, numBlocks * sizeof(jlong)); 
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
-      initContext(env, max_blocks_per_proc, max_threads_per_block);
+      initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
       continue;
     } 
 
     status = cuMemHostAlloc(&exceptionsMemory, numBlocks * sizeof(jlong), 0); 
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
-      initContext(env, max_blocks_per_proc, max_threads_per_block);
+      initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
       continue;
     } 
 
     status = cuMemAlloc(&gpuExceptionsMemory, numBlocks * sizeof(jlong)); 
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
-      initContext(env, max_blocks_per_proc, max_threads_per_block);
+      initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
       continue;
     } 
 
     status = cuMemAlloc(&gcInfoSpace, gc_space_size);  
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
-      initContext(env, max_blocks_per_proc, max_threads_per_block);
+      initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
       continue;
     } 
 
     status = cuMemAlloc(&gpuHeapEndPtr, 8);
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
-      initContext(env, max_blocks_per_proc, max_threads_per_block);
+      initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
       continue;
     } 
 
     status = cuMemAlloc(&gpuBufferSize, 8);
     if(status != CUDA_SUCCESS){
       cuCtxDestroy(cuContext);
-      initContext(env, max_blocks_per_proc, max_threads_per_block);
+      initContext(env, max_blocks_per_proc, max_threads_per_block, device_id);
       continue;
     } 
 
@@ -509,14 +518,14 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_setup
-  (JNIEnv *env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space)
+  (JNIEnv *env, jobject this_ref, jint max_blocks_per_proc, jint max_threads_per_block, jlong free_space, jint device_id)
 {
   int status;
   
   status = cuInit(0);
   CHECK_STATUS(env,"error in cuInit",status)
 
-  initDevice(env, this_ref, max_blocks_per_proc, max_threads_per_block, free_space);
+  initDevice(env, this_ref, max_blocks_per_proc, max_threads_per_block, free_space, device_id);
   
   return;
 }

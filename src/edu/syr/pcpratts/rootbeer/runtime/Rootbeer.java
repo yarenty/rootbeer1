@@ -7,14 +7,13 @@
 
 package edu.syr.pcpratts.rootbeer.runtime;
 
-import edu.syr.pcpratts.rootbeer.configuration.Configuration;
-import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaLoader;
-import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaRuntime2;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaLoader;
+import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaRuntime2;
 
 public class Rootbeer implements IRootbeer {
 
@@ -22,6 +21,7 @@ public class Rootbeer implements IRootbeer {
   private List<StatsRow> m_stats;
   private boolean m_ranGpu;
   private ThreadConfig m_threadConfig;
+  private GpuCard currentGpuCard = null;
   
   public Rootbeer(){
     RootbeerFactory factory = new RootbeerFactory();
@@ -112,7 +112,13 @@ public class Rootbeer implements IRootbeer {
   }
 
   @Override
-  public void setGpuCard(GpuCard gpuCard) {
-	// TODO Auto-generated method stub
+  public void setCurrentGpuCard(GpuCard gpuCard) {
+	this.currentGpuCard = gpuCard;
   }
+  
+  @Override
+  public GpuCard getCurrentGpuCard() {
+	return this.currentGpuCard;
+  }
+  
 }
