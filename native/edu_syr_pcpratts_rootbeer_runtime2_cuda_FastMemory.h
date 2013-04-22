@@ -9,6 +9,118 @@ extern "C" {
 #endif
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doReadByteArray
+ * Signature: ([BJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadByteArray
+  (JNIEnv *, jobject, jbyteArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doReadBooleanArray
+ * Signature: ([ZJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadBooleanArray
+  (JNIEnv *, jobject, jbooleanArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doReadShortArray
+ * Signature: ([SJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadShortArray
+  (JNIEnv *, jobject, jshortArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doReadIntArray
+ * Signature: ([IJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadIntArray
+  (JNIEnv *, jobject, jintArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doReadFloatArray
+ * Signature: ([FJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadFloatArray
+  (JNIEnv *, jobject, jfloatArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doReadDoubleArray
+ * Signature: ([DJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadDoubleArray
+  (JNIEnv *, jobject, jdoubleArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doReadLongArray
+ * Signature: ([JJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doReadLongArray
+  (JNIEnv *, jobject, jlongArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doWriteByteArray
+ * Signature: ([BJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteByteArray
+  (JNIEnv *, jobject, jbyteArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doWriteBooleanArray
+ * Signature: ([ZJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteBooleanArray
+  (JNIEnv *, jobject, jbooleanArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doWriteShortArray
+ * Signature: ([SJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteShortArray
+  (JNIEnv *, jobject, jshortArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doWriteIntArray
+ * Signature: ([IJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteIntArray
+  (JNIEnv *, jobject, jintArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doWriteFloatArray
+ * Signature: ([FJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteFloatArray
+  (JNIEnv *, jobject, jfloatArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doWriteDoubleArray
+ * Signature: ([DJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteDoubleArray
+  (JNIEnv *, jobject, jdoubleArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
+ * Method:    doWriteLongArray
+ * Signature: ([JJII)V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteLongArray
+  (JNIEnv *, jobject, jlongArray, jlong, jint, jint);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory
  * Method:    doReadByte
  * Signature: (JJ)B
  */
@@ -118,12 +230,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_d
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteLong
   (JNIEnv *, jobject, jlong, jlong, jlong);
-
-JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteIntArray
-  (JNIEnv *, jobject, jintArray, jlong, jint, jint);
-
-JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_FastMemory_doWriteIntArrayEx
-  (JNIEnv *, jobject, jintArray, jlong, jint, jint);
 
 #ifdef __cplusplus
 }

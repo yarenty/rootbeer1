@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.runtime;
 
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
+import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaLoader;
 import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaRuntime2;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -101,5 +102,17 @@ public class Rootbeer implements IRootbeer {
   
   public List<StatsRow> getStats(){
     return m_stats;
+  }
+
+  @Override
+  public List<GpuCard> getGpuCards() {
+    CudaLoader loader = new CudaLoader();
+    loader.load();
+    return CudaRuntime2.getGpuCards();
+  }
+
+  @Override
+  public void setGpuCard(GpuCard gpuCard) {
+	// TODO Auto-generated method stub
   }
 }

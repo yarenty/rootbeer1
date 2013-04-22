@@ -615,5 +615,6 @@ public class CudaRuntime2 implements ParallelRuntime {
   private native int runBlocks(int size, int block_shape, int grid_shape);
   private native void unload();
   private native void reinit(int max_blocks_per_proc, int max_threads_per_block, long free_memory);
+  public static native List<GpuCard> getGpuCards();
   
 }

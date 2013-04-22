@@ -16,7 +16,7 @@
   <description>Rootbeer - compile Java bytecode for a CUDA GPU</description>
 
   <properties>
-    <java.version>1.5</java.version>
+    <java.version>1.6</java.version>
     <soot.version>2.5.0</soot.version>
   </properties>
 

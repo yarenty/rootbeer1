@@ -735,3 +735,146 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  
   return;
 }
+
+
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
+ * Method:    getGpuCards
+ * Signature: ()Ledu/syr/pcpratts/rootbeer/runtime/GpuCard;
+ */
+JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_getGpuCards
+(JNIEnv *env, jobject this_obj) {
+    
+    int i, a=0, b=0, status;
+    int num_devices = 0;
+    char name[1024];
+    int computeCapabilityA=0, computeCapabilityB=0;
+    size_t free_mem, total_mem;
+    int FREE_MEM=0, TOTAL_MEM=0;
+    int MAX_REGISTERS_PER_BLOCK=0;
+    int WARP_SIZE=0;
+    int MAX_PITCH=0;    
+    int MAX_THREADS_PER_BLOCK=0;    
+    int MAX_SHARED_MEMORY_PER_BLOCK=0;
+    float CLOCK_RATE=0.0;
+    float MEMORY_CLOCK_RATE=0.0;
+    float TOTAL_CONSTANT_MEMORY=0.0;
+    int INTEGRATED=0;
+    int MAX_THREADS_PER_MULTIPROCESSOR=0;
+    int MULTIPROCESSOR_COUNT=0;
+    int MAX_BLOCK_DIM_X=0;
+    int MAX_BLOCK_DIM_Y=0;
+    int MAX_BLOCK_DIM_Z=0;
+    int MAX_GRID_DIM_X=0;
+    int MAX_GRID_DIM_Y=0;
+    int MAX_GRID_DIM_Z=0;
+    
+    // ArrayList Class and Constructor and Add Method
+    jclass arrayListClass = (*env)->FindClass(env, "java/util/ArrayList");
+    jmethodID arrayListCons =  (*env)->GetMethodID(env, arrayListClass,
+                                                   "<init>", "()V");
+    jmethodID arrayListAdd = (*env)->GetMethodID(env, arrayListClass,
+                                                 "add", "(Ljava/lang/Object;)Z");
+    jobject gpuCardList = (*env)->NewObject(env, arrayListClass, arrayListCons);
+    
+    // GpuCard Class and Constructor
+    jclass gpuCardClass = (*env)->FindClass(env,"edu/syr/pcpratts/rootbeer/runtime/GpuCard");
+    jmethodID gpuCardCons = (*env)->GetMethodID(env, gpuCardClass,
+                                    "<init>", "(ILjava/lang/String;IIIIIIIIIFFFIIIIIIIII)V");
+    if (gpuCardCons == NULL) return NULL;
+    
+    status = cuInit(0);
+    CHECK_STATUS(env,"error in cuInit",status)
+    
+    cuDeviceGetCount(&num_devices);
+    
+    for (i = 0; i < num_devices; ++i)
+    {
+        CUdevice dev;
+        status = cuDeviceGet(&dev, i);
+        CHECK_STATUS(env,"error in cuDeviceGet",status)
+        
+        status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, dev);
+        CHECK_STATUS(env,"error in cuCtxCreate",status)
+        
+        if(cuDeviceComputeCapability(&a, &b, dev) == CUDA_SUCCESS){
+            computeCapabilityA = a;
+            computeCapabilityB = b;
+        }
+        cuDeviceGetName(name,1024,dev);
+        if(cuMemGetInfo(&free_mem, &total_mem) == CUDA_SUCCESS){
+            FREE_MEM = free_mem/1024/1024;
+            TOTAL_MEM = total_mem/1024/1024;
+        }
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_REGISTERS_PER_BLOCK,dev) == CUDA_SUCCESS)
+            MAX_REGISTERS_PER_BLOCK = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_WARP_SIZE,dev) == CUDA_SUCCESS)
+            WARP_SIZE = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_PITCH,dev) == CUDA_SUCCESS)
+            MAX_PITCH = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_BLOCK,dev) == CUDA_SUCCESS)
+            MAX_THREADS_PER_BLOCK = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK,dev) == CUDA_SUCCESS)
+            MAX_SHARED_MEMORY_PER_BLOCK = a/1024.0;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_CLOCK_RATE,dev) == CUDA_SUCCESS)
+            CLOCK_RATE = a/1000000.0;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE,dev) == CUDA_SUCCESS)
+            MEMORY_CLOCK_RATE = a/1000000.0;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_TOTAL_CONSTANT_MEMORY,dev) == CUDA_SUCCESS)
+            TOTAL_CONSTANT_MEMORY = a/1024.0/1024.0;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_INTEGRATED,dev) == CUDA_SUCCESS)
+            INTEGRATED = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR,dev) == CUDA_SUCCESS)
+            MAX_THREADS_PER_MULTIPROCESSOR = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,dev) == CUDA_SUCCESS)
+            MULTIPROCESSOR_COUNT = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_X,dev) == CUDA_SUCCESS)
+            MAX_BLOCK_DIM_X = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_Y,dev) == CUDA_SUCCESS)
+            MAX_BLOCK_DIM_Y = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_Z,dev) == CUDA_SUCCESS)
+            MAX_BLOCK_DIM_Z = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X,dev) == CUDA_SUCCESS)
+            MAX_GRID_DIM_X = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y,dev) == CUDA_SUCCESS)
+            MAX_GRID_DIM_Y = a;
+        if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z,dev) == CUDA_SUCCESS)
+            MAX_GRID_DIM_Z = a;
+        
+        jobject gpuCardObject = (*env)->NewObject(env, gpuCardClass,
+                                                  gpuCardCons,
+                                                  i,
+                                                  (*env)->NewStringUTF(env,name),
+                                                  computeCapabilityA,
+                                                  computeCapabilityB,
+                                                  TOTAL_MEM,
+                                                  FREE_MEM,
+                                                  MAX_REGISTERS_PER_BLOCK,
+                                                  WARP_SIZE,
+                                                  MAX_PITCH,
+                                                  MAX_THREADS_PER_BLOCK,
+                                                  MAX_SHARED_MEMORY_PER_BLOCK,
+                                                  CLOCK_RATE,
+                                                  MEMORY_CLOCK_RATE,
+                                                  TOTAL_CONSTANT_MEMORY,
+                                                  INTEGRATED,
+                                                  MAX_THREADS_PER_MULTIPROCESSOR,
+                                                  MULTIPROCESSOR_COUNT,
+                                                  MAX_BLOCK_DIM_X,
+                                                  MAX_BLOCK_DIM_Y,
+                                                  MAX_BLOCK_DIM_Z,
+                                                  MAX_GRID_DIM_X,
+                                                  MAX_GRID_DIM_Y,
+                                                  MAX_GRID_DIM_Z);
+        if (gpuCardObject == NULL) return NULL;
+        
+        jboolean jbool = (*env)->CallBooleanMethod(env, gpuCardList,
+                                                   arrayListAdd, gpuCardObject);
+        
+        cuCtxDestroy(cuContext);
+    }
+	
+	return gpuCardList;
+}
+
