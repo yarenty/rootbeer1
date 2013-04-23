@@ -19,6 +19,7 @@ glob:native/CudaRuntime2.o
 glob:native/FastMemory.o
 cl_script.bat
 cudaruntime.dll
+cudaruntime.dylib
 native/Cuda2DeviceMemory.obj
 native/cudaruntime.exp
 native/cudaruntime.lib
