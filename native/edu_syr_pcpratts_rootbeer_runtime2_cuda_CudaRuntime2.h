@@ -9,26 +9,26 @@ extern "C" {
 #endif
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
- * Method:    findReserveMem
- * Signature: (III)J
+ * Method:    setupGpuCards
+ * Signature: (II[J)Ljava/util/List;
  */
-JNIEXPORT jlong JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_findReserveMem
-  (JNIEnv *, jobject, jint, jint, jint);
+JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_setupGpuCards
+  (JNIEnv *, jclass, jint, jint, jlongArray);
 
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
- * Method:    setup
- * Signature: (IIJI)V
- */
-JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_setup
-  (JNIEnv *, jobject, jint, jint, jlong, jint);
-
-/*
- * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
- * Method:    printDeviceInfo
+ * Method:    initCurrentGpuCard
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_printDeviceInfo
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_initCurrentGpuCard
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
+ * Method:    freeCurrentGpuCard
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_freeCurrentGpuCard
   (JNIEnv *, jclass);
 
 /*
@@ -65,18 +65,10 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
 
 /*
  * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
- * Method:    reinit
- * Signature: (IIJI)V
+ * Method:    printDeviceInfo
+ * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_reinit
-  (JNIEnv *, jobject, jint, jint, jlong, jint);
-
-/*
- * Class:     edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
- * Method:    getGpuCards
- * Signature: ()Ljava/util/List;
- */
-JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_getGpuCards
+JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_printDeviceInfo
   (JNIEnv *, jclass);
 
 #ifdef __cplusplus

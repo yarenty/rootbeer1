@@ -5,8 +5,8 @@ public class GpuCard {
 	private String name;
 	private int computeCapabilityVersionA;
 	private int computeCapabilityVersionB;
-	private int totalMemory; // MBytes
-	private int freeMemory; // MBytes
+	private int totalMemory; // bytes
+	private int freeMemory; // bytes
 	private int totalRegisterPerBlock;
 	private int wrapSize;
 	private int maxMemoryPitch;
@@ -25,6 +25,23 @@ public class GpuCard {
 	private int maxDimensionYofGrid;
 	private int maxDimensionZofGrid;
 
+	private long toSpaceAddr;
+	private long gpuToSpaceAddr;
+	private long textureAddr;
+	private long gpuTextureAddr;
+	private long gpuClassAddr;
+	private long handlesAddr;
+	private long gpuHandlesAddr;
+	private long exceptionsHandlesAddr;
+	private long gpuExceptionsHandlesAddr;
+	private long gcInfoSpace;
+	private long gpuHeapEndPtr;
+	private long gpuBufferSize;
+
+	private long toSpaceSize;
+	private long numBlocks;
+	private long reserveMem;
+
 	public GpuCard(int cardID, String name, int computeCapabilityVersionA,
 			int computeCapabilityVersionB, int totalMemory, int freeMemory,
 			int totalRegisterPerBlock, int wrapSize, int maxMemoryPitch,
@@ -34,7 +51,8 @@ public class GpuCard {
 			int numberOfMultiprocessor, int maxDimensionXofBlock,
 			int maxDimensionYofBlock, int maxDimensionZofBlock,
 			int maxDimensionXofGrid, int maxDimensionYofGrid,
-			int maxDimensionZofGrid) {
+			int maxDimensionZofGrid, long toSpaceSize, long numBlocks,
+			long reserveMem) {
 		super();
 		this.cardID = cardID;
 		this.name = name;
@@ -59,6 +77,9 @@ public class GpuCard {
 		this.maxDimensionXofGrid = maxDimensionXofGrid;
 		this.maxDimensionYofGrid = maxDimensionYofGrid;
 		this.maxDimensionZofGrid = maxDimensionZofGrid;
+		this.toSpaceSize = toSpaceSize;
+		this.numBlocks = numBlocks;
+		this.reserveMem = reserveMem;
 	}
 
 	public int getCardID() {
@@ -147,6 +168,66 @@ public class GpuCard {
 
 	public int getMaxDimensionZofGrid() {
 		return maxDimensionZofGrid;
+	}
+
+	public long getToSpaceAddr() {
+		return toSpaceAddr;
+	}
+
+	public long getGpuToSpaceAddr() {
+		return gpuToSpaceAddr;
+	}
+
+	public long getTextureAddr() {
+		return textureAddr;
+	}
+
+	public long getGpuTextureAddr() {
+		return gpuTextureAddr;
+	}
+
+	public long getGpuClassAddr() {
+		return gpuClassAddr;
+	}
+
+	public long getHandlesAddr() {
+		return handlesAddr;
+	}
+
+	public long getGpuHandlesAddr() {
+		return gpuHandlesAddr;
+	}
+
+	public long getExceptionsHandlesAddr() {
+		return exceptionsHandlesAddr;
+	}
+
+	public long getGpuExceptionsHandlesAddr() {
+		return gpuExceptionsHandlesAddr;
+	}
+
+	public long getGcInfoSpace() {
+		return gcInfoSpace;
+	}
+
+	public long getGpuHeapEndPtr() {
+		return gpuHeapEndPtr;
+	}
+
+	public long getGpuBufferSize() {
+		return gpuBufferSize;
+	}
+
+	public long getToSpaceSize() {
+		return toSpaceSize;
+	}
+
+	public long getNumBlocks() {
+		return numBlocks;
+	}
+
+	public long getReserveMem() {
+		return reserveMem;
 	}
 
 	@Override
