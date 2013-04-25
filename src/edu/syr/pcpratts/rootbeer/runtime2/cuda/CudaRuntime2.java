@@ -7,8 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.runtime2.cuda;
 
-import jas.Pair;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -196,8 +194,8 @@ public class CudaRuntime2 implements ParallelRuntime {
         if(!reserveMemList.isEmpty()) {
           primitiveReserveMemList = new long[maxGpuId + 1];
           for(Pair<Integer, Long> p : reserveMemList) {
-            Long b = p.getO2();
-            primitiveReserveMemList[p.getO1()] = (b == null ? 0 : b.longValue());
+            Long b = p.getValue();
+            primitiveReserveMemList[p.getKey()] = (b == null ? 0 : b.longValue());
           }
         }
 
