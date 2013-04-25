@@ -6,4 +6,4 @@ ant jar
 
 cd examples/MMultApp/
 ant jar
-java -jar ../../Rootbeer.jar MMultApp.jar MMultApp-GPU.jar
+java -Xmx2G -jar ../../Rootbeer.jar MMultApp.jar MMultApp-GPU.jar

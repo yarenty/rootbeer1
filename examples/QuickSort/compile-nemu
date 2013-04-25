@@ -6,4 +6,4 @@ ant jar
 
 cd examples/QuickSort/
 ant jar
-java -jar ../../Rootbeer.jar QuickSort.jar QuickSort-GPU.jar -nemu
+java -Xmx2G -jar ../../Rootbeer.jar QuickSort.jar QuickSort-GPU.jar -nemu

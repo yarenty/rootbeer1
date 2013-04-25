@@ -6,4 +6,4 @@ ant jar
 
 cd examples/ArraySumApp/
 ant jar
-java -jar ../../Rootbeer.jar ArraySumApp.jar ArraySumApp-GPU.jar
+java -Xmx2G -jar ../../Rootbeer.jar ArraySumApp.jar ArraySumApp-GPU.jar
