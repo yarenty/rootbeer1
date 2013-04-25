@@ -6,4 +6,4 @@ ant jar
 
 cd examples/RandomRemap/
 ant jar
-java -jar ../../Rootbeer.jar RandomRemapApp.jar RandomRemapApp-GPU.jar -nemu
+java -Xmx2G -jar ../../Rootbeer.jar RandomRemapApp.jar RandomRemapApp-GPU.jar -nemu

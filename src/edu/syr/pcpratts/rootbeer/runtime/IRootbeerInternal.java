@@ -17,4 +17,7 @@ public interface IRootbeerInternal {
   public void setThreadConfig(ThreadConfig thread_config);
   public void clearThreadConfig();
   public void printMem(int start, int len);
+  public List<GpuCard> getGpuCards();
+  public void setCurrentGpuCard(GpuCard gpuCard);
+  public GpuCard getCurrentGpuCard();
 }

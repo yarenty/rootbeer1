@@ -44,6 +44,6 @@ public class MemoryTest {
   }
   
   public static void main(String[] args){
-    CudaRuntime2.v(new Rootbeer()).memoryTest();
+    CudaRuntime2.v().memoryTest();
   }
 }

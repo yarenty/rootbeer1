@@ -1,0 +1,30 @@
+#!/bin/sh
+
+PROGRAM='java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 -jar ArrayMultApp-GPU.jar'
+
+echo $PROGRAM
+
+#if [ $# -lt 1 ]; then
+#  echo "Please specify PROGRAM NAME for debugging!"
+#  exit 1
+#fi
+
+#SEARCH_CMD="ps -ax | grep  $PROGRAM | grep -v grep | awk '{print $PROGRAM}'"
+#echo $SEARCH_CMD
+
+pid=$(ps -ax | grep ' $PROGRAM  ' | grep -v ' grep ' | awk '{print $PROGRAM}')
+#pid=$(ps -ax | grep $1 | grep -v ' grep ' | awk '{print $}')
+
+#echo "Debugging $PROGRAM with pid=${pid}"
+
+#ddd $PROGRAM ${pid}
+#ddd ArrayMultApp-GPU.jar ${pid}
+#gdb -p ${pid}
+
+echo "PID: '$pid'"
+
+if [ -z "$pid" ]; then
+    echo "PID NOT FOUND"
+else
+    echo "PID FOUND"
+fi
