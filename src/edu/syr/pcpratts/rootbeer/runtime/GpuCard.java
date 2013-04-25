@@ -5,16 +5,16 @@ public class GpuCard {
   private String name;
   private int computeCapabilityVersionA;
   private int computeCapabilityVersionB;
-  private int totalMemory; // bytes
-  private int freeMemory; // bytes
+  private long totalMemory; // bytes
+  private long freeMemory; // bytes
   private int totalRegisterPerBlock;
   private int wrapSize;
   private int maxMemoryPitch;
   private int maxThreadsPerBlock;
-  private int totalSharedMemoryPerBlock; // KBytes
+  private long totalSharedMemoryPerBlock; // bytes
   private float clockRate; // MHz
   private float memoryClockRate; // MHz
-  private float totalConstantMemory; // MBytes
+  private float totalConstantMemory; // bytes
   private int integrated;
   private int maxThreadsPerMultiprocessor;
   private int numberOfMultiprocessor;
@@ -42,10 +42,12 @@ public class GpuCard {
   private long numBlocks;
   private long reserveMem;
 
+  private long cudaContext = 0; // Is only used in the native Class
+
   public GpuCard(int cardID, String name, int computeCapabilityVersionA,
-      int computeCapabilityVersionB, int totalMemory, int freeMemory,
+      int computeCapabilityVersionB, long totalMemory, long freeMemory,
       int totalRegisterPerBlock, int wrapSize, int maxMemoryPitch,
-      int maxThreadsPerBlock, int totalSharedMemoryPerBlock, float clockRate,
+      int maxThreadsPerBlock, long totalSharedMemoryPerBlock, float clockRate,
       float memoryClockRate, float totalConstantMemory, int integrated,
       int maxThreadsPerMultiprocessor, int numberOfMultiprocessor,
       int maxDimensionXofBlock, int maxDimensionYofBlock,
@@ -93,11 +95,11 @@ public class GpuCard {
     return computeCapabilityVersionA + "." + computeCapabilityVersionB;
   }
 
-  public int getTotalMemory(){
+  public long getTotalMemory(){
     return totalMemory;
   }
 
-  public int getFreeMemory(){
+  public long getFreeMemory(){
     return freeMemory;
   }
 
@@ -117,7 +119,7 @@ public class GpuCard {
     return maxThreadsPerBlock;
   }
 
-  public int getTotalSharedMemoryPerBlock(){
+  public long getTotalSharedMemoryPerBlock(){
     return totalSharedMemoryPerBlock;
   }
 
@@ -227,6 +229,10 @@ public class GpuCard {
 
   public long getReserveMem(){
     return reserveMem;
+  }
+
+  public Object getCudaContext(){
+    return cudaContext;
   }
 
   @Override

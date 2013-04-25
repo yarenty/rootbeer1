@@ -23,50 +23,23 @@ if (CUDA_SUCCESS != status) {\
 #define CUDA_ERROR_EXCEPTION_CLASS_NAME "edu/syr/pcpratts/rootbeer/runtime2/cuda/CudaErrorException"
 
 
+// Global Variables
 static jlong heapEndPtr;
-static CUtexref    cache;
-static jlong classMemSize;
-static int textureMemSize;
 
 static size_t gc_space_size = 1024;
+static jlong classMemSize = sizeof(jint)*100; //space for 100 types in the scene
+
+//static int textureMemSize;
 
 static CUmodule cuModule;
 static CUfunction cuFunction;
 
+static CUtexref    cache;
+
 
 /**
- * Returns the current GPU Device
+ * JNI IntField Setter
  */
-jobject getCurrentGPUDevice(JNIEnv *env, jobject this_obj){
-    
-    //jclass runtimeClass = (*env)->FindClass(env, RUNTIME_CLASS_NAME);
-    jclass runtimeClass = (*env)->GetObjectClass(env, this_obj);
-    if (runtimeClass == NULL) return NULL;
-    //if ((*env)->ExceptionCheck(env)) return;
-    
-    jfieldID fid = (*env)->GetFieldID(env, runtimeClass, "currentGpuCard", GPUCARD_CLASS_NAME_SIG);
-    if (fid == NULL) return NULL;
-    
-    jobject currentGpuCard = (*env)->GetObjectField(env, this_obj, fid);
-    return currentGpuCard;
-}
-
-/**
- * Sets the current GPU Device
- */
-void setCurrentGPUDevice(JNIEnv *env, jobject this_obj, jobject gpuDevice){
-    
-    //jclass runtimeClass = (*env)->FindClass(env, RUNTIME_CLASS_NAME);
-    jclass runtimeClass = (*env)->GetObjectClass(env, this_obj);
-    if (runtimeClass == NULL) return;
-    
-    jfieldID fid = (*env)->GetFieldID(env, runtimeClass, "currentGpuCard", GPUCARD_CLASS_NAME_SIG);
-    if (fid == NULL) return;
-    
-    (*env)->SetObjectField(env, this_obj, fid, gpuDevice);
-    return;
-}
-
 jint getIntField(JNIEnv *env, jobject obj, const char * name){
     
     jclass c = (*env)->GetObjectClass(env, obj);
@@ -75,6 +48,9 @@ jint getIntField(JNIEnv *env, jobject obj, const char * name){
     return value;
 }
 
+/**
+ * JNI LongField Setter
+ */
 void setLongField(JNIEnv *env, jobject obj, const char * name, jlong value){
     
     jclass c = (*env)->GetObjectClass(env, obj);
@@ -83,6 +59,9 @@ void setLongField(JNIEnv *env, jobject obj, const char * name, jlong value){
     return;
 }
 
+/**
+ * JNI LongField Getter
+ */
 jlong getLongField(JNIEnv *env, jobject obj, const char * name){
     
     jclass c = (*env)->GetObjectClass(env, obj);
@@ -91,9 +70,46 @@ jlong getLongField(JNIEnv *env, jobject obj, const char * name){
     return value;
 }
 
+/**
+ * JNI ObjectField Setter
+ */
+void setObjectField(JNIEnv *env, jobject obj, const char * name, jobject value, const char * valueClass){
+    
+    jclass c = (*env)->GetObjectClass(env, obj);
+    jfieldID fid = (*env)->GetFieldID(env, c, name, valueClass);
+    (*env)->SetObjectField(env, obj, fid, value);
+    return;
+}
 
 /**
- * Throws a runtimeexception
+ * JNI ObjectField Getter
+ */
+jobject getObjectField(JNIEnv *env, jobject obj, const char * name, const char * valueClass){
+    
+    jclass c = (*env)->GetObjectClass(env, obj);
+    jfieldID fid = (*env)->GetFieldID(env, c, name, valueClass);
+    jobject value = (*env)->GetObjectField(env, obj, fid);
+    return value;
+}
+
+/**
+ * Returns the current GPU Device
+ */
+jobject getCurrentGPUDevice(JNIEnv *env, jobject this_obj){
+    return getObjectField(env, this_obj, "currentGpuCard", GPUCARD_CLASS_NAME_SIG);
+}
+
+/**
+ * Sets the current GPU Device
+ */
+void setCurrentGPUDevice(JNIEnv *env, jobject this_obj, jobject gpuDevice){
+    setObjectField(env, this_obj, "currentGpuCard", gpuDevice, GPUCARD_CLASS_NAME_SIG);
+}
+
+
+/**
+ * Throws a edu/syr/pcpratts/rootbeer/runtime2/cuda/CudaErrorException
+ * without checking error code and GPU detailed information
  */
 void throw_error_exception(JNIEnv *env, const char *message, int error) {
     char msg[1024];
@@ -115,8 +131,9 @@ void throw_error_exception(JNIEnv *env, const char *message, int error) {
 }
 
 /**
-* Throws a runtimeexception
-*/
+ * Throws a edu/syr/pcpratts/rootbeer/runtime2/cuda/CudaErrorException
+ * WITH checking error code and GPU detailed information
+ */
 void throw_cuda_error_exception(JNIEnv *env, jobject this_obj, const char *message, int error) {
   char msg[1024];
   jclass exp;
@@ -173,13 +190,13 @@ JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRunti
 (JNIEnv * env, jobject this_obj, jint _max_blocks_per_proc, jint _max_threads_per_block, jlongArray _reserve_mem_list) {
 
     int num_devices = 0;
-    // Temp variables
+    // Global temp variables
     int i, a=0, b=0, status;
     long j;
-    // Best GPU
+    // For searching the best GPU Device
     int max_multiprocessors = -1;
     jobject bestGpuCard = NULL;
-    
+
     // GPU Property variables
     char name[1024];
     int computeCapabilityA=0, computeCapabilityB=0;
@@ -189,7 +206,7 @@ JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRunti
     int warp_size=0;
     int max_pitch=0;
     int max_threads_per_block=0;
-    int max_shared_memory_per_block=0;
+    long max_shared_memory_per_block=0;
     float clock_rate=0.0;
     float memory_clock_rate=0.0;
     float total_constant_memory=0.0;
@@ -222,7 +239,7 @@ JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRunti
     // GpuCard Class and Constructor
     jclass gpuCardClass = (*env)->FindClass(env,GPUCARD_CLASS_NAME);
     jmethodID gpuCardCons = (*env)->GetMethodID(env, gpuCardClass,
-                                                "<init>", "(ILjava/lang/String;IIIIIIIIIFFFIIIIIIIIIJJJ)V");
+                                                "<init>", "(ILjava/lang/String;IIJJIIIIJFFFIIIIIIIIIJJJ)V");
     if (gpuCardCons == NULL) return NULL;
     
     // Initializes the driver API
@@ -268,13 +285,13 @@ JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRunti
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_BLOCK,cuDevice) == CUDA_SUCCESS)
             max_threads_per_block = a;
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK,cuDevice) == CUDA_SUCCESS)
-            max_shared_memory_per_block = a/1024.0;
+            max_shared_memory_per_block = a; // /1024.0;
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_CLOCK_RATE,cuDevice) == CUDA_SUCCESS)
             clock_rate = a/1000000.0;
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE,cuDevice) == CUDA_SUCCESS)
             memory_clock_rate = a/1000000.0;
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_TOTAL_CONSTANT_MEMORY,cuDevice) == CUDA_SUCCESS)
-            total_constant_memory = a/1024.0/1024.0;
+            total_constant_memory = a; // /1024.0/1024.0;
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_INTEGRATED,cuDevice) == CUDA_SUCCESS)
             integrated = a;
         if(cuDeviceGetAttribute(&a, CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR,cuDevice) == CUDA_SUCCESS)
@@ -297,8 +314,7 @@ JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRunti
         
         // Calculate to_space_size
         to_space_size = free_mem;
-        //space for 100 types in the scene
-        classMemSize = sizeof(jint)*100;
+
         numBlocks = multiprocessor_count * _max_threads_per_block * _max_blocks_per_proc;
         
         to_space_size -= (numBlocks * sizeof(jlong));
@@ -316,6 +332,7 @@ JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRunti
             if (reserve_memory_list == NULL) return NULL;
             
             reserve_mem = reserve_memory_list[i];
+            to_space_size -= reserve_mem;
         }
         
         // Try to find reserve_mem if no reserve_mem was configured or invalid
@@ -482,7 +499,7 @@ JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRunti
                                                   reserve_mem);
         if (gpuCardObject == NULL) return NULL;
         
-        // Find best GPU and save currentGpuCard
+        // Find best GPU Device
         if(multiprocessor_count > max_multiprocessors) {
             max_multiprocessors = multiprocessor_count;
             bestGpuCard = gpuCardObject;
@@ -493,7 +510,8 @@ JNIEXPORT jobject JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRunti
         
         cuCtxDestroy(cuContext);
     }
-    // Set current currentGpuCard
+    
+    // Set best GPU Device to currentGpuCard
     setCurrentGPUDevice(env, this_obj, bestGpuCard);
     
 	return gpuCardList;
@@ -514,7 +532,8 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
     // Get the current GPU Device and ID
     jobject currentGPUDevice = getCurrentGPUDevice(env, this_obj);
     jint currentGPUDeviceID = getIntField(env, currentGPUDevice, "cardID");    
-    printf("STARTED: initCurrentGpuCard with currentGPUDeviceID: %d\n",currentGPUDeviceID);
+    // DEBUG Info
+    //printf("STARTED: initCurrentGpuCard with currentGPUDeviceID: %d\n",currentGPUDeviceID);
     
     CUdevice cuDevice;
     status = cuDeviceGet(&cuDevice, currentGPUDeviceID);
@@ -524,16 +543,14 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
     status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);
     CHECK_STATUS(env,this_obj,"error in cuCtxCreate",status)
     
-    //TODO
-    // Save cuContext in GPUDEVICE!!!
+    // Context Management
+    // Save cuContext in currentGPUDevice
+    setLongField(env, currentGPUDevice, "cudaContext", (jlong)cuContext);
     
     //size_t f_mem = getLongField(env, currentGPUDevice, "freeMemory");
     //size_t t_mem = getLongField(env, currentGPUDevice, "totalMemory");
     jlong numBlocks = getLongField(env, currentGPUDevice, "numBlocks");
     jlong to_space_size = getLongField(env, currentGPUDevice, "toSpaceSize");
-    
-    //space for 100 types in the scene
-    classMemSize = sizeof(jint)*100;
     
     void * toSpace;
     status = cuMemHostAlloc(&toSpace, to_space_size, 0);
@@ -599,10 +616,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
     CHECK_STATUS(env,this_obj,"gpuBufferSize memory allocation failed",status)
     setLongField(env, currentGPUDevice, "gpuBufferSize", (jlong)gpuBufferSize);
     
-    cuCtxDestroy(cuContext);
-    
-    printf("FINISHED initCurrentGpuCard!\n");
-    
     return;
 }
 
@@ -614,55 +627,64 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
  */
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_freeCurrentGpuCard
 (JNIEnv * env, jobject this_obj) {
-
-    int status;
     
     // Get the current GPU Device and ID
     jobject currentGPUDevice = getCurrentGPUDevice(env,this_obj);
-    jint currentGPUDeviceID = getIntField(env, currentGPUDevice, "cardID");
     
-    printf("STARTED: freeCurrentGpuCard with currentGPUDeviceID: %d\n",currentGPUDeviceID);
-    
-    CUdevice cuDevice;
-    status = cuDeviceGet(&cuDevice, currentGPUDeviceID);
-    CHECK_STATUS(env,this_obj,"error in cuDeviceGet",status)
-    
-    CUcontext cuContext;
-    status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);
-    CHECK_STATUS(env,this_obj,"error in cuCtxCreate",status)
+    // DEBUG INFO
+    //jint currentGPUDeviceID = getIntField(env, currentGPUDevice, "cardID");
+    //printf("STARTED: freeCurrentGpuCard with currentGPUDeviceID: %d\n",currentGPUDeviceID);
     
     void * toSpace = (void *) getLongField(env, currentGPUDevice, "toSpaceAddr");
     cuMemFreeHost(toSpace);
+    setLongField(env, currentGPUDevice, "toSpaceAddr", 0);
     
     CUdeviceptr gpuToSpace = getLongField(env, currentGPUDevice, "gpuToSpaceAddr");
     cuMemFree(gpuToSpace);
+    setLongField(env, currentGPUDevice, "gpuToSpaceAddr", 0);
     
     CUdeviceptr gpuClassMemory = getLongField(env, currentGPUDevice, "gpuClassAddr");
     cuMemFree(gpuClassMemory);
+    setLongField(env, currentGPUDevice, "gpuClassAddr", 0);
     
     void * handlesMemory = (void *)getLongField(env, currentGPUDevice, "handlesAddr");
     cuMemFreeHost(handlesMemory);
+    setLongField(env, currentGPUDevice, "handlesAddr", 0);
     
     CUdeviceptr gpuHandlesMemory = getLongField(env, currentGPUDevice, "gpuHandlesAddr");
     cuMemFree(gpuHandlesMemory);
+    setLongField(env, currentGPUDevice, "gpuHandlesAddr", 0);
     
     void * exceptionsMemory = (void *)getLongField(env, currentGPUDevice, "exceptionsHandlesAddr");
     cuMemFreeHost(exceptionsMemory);
+    setLongField(env, currentGPUDevice, "exceptionsHandlesAddr", 0);
     
     CUdeviceptr gpuExceptionsMemory = getLongField(env, currentGPUDevice, "gpuExceptionsHandlesAddr");
     cuMemFree(gpuExceptionsMemory);
+    setLongField(env, currentGPUDevice, "gpuExceptionsHandlesAddr", 0);
     
     CUdeviceptr gcInfoSpace = getLongField(env, currentGPUDevice, "gcInfoSpace");
     cuMemFree(gcInfoSpace);
+    setLongField(env, currentGPUDevice, "gcInfoSpace", 0);
     
     CUdeviceptr gpuHeapEndPtr = getLongField(env, currentGPUDevice, "gpuHeapEndPtr");
     cuMemFree(gpuHeapEndPtr);
+    setLongField(env, currentGPUDevice, "gpuHeapEndPtr", 0);
     
     CUdeviceptr gpuBufferSize = getLongField(env, currentGPUDevice, "gpuBufferSize");
     cuMemFree(gpuBufferSize);
+    setLongField(env, currentGPUDevice, "gpuBufferSize", 0);
+    
+    // Get cuContext from currentGPUDevice
+    long cuContextPointer = getLongField(env, currentGPUDevice, "cudaContext");
+    if (cuContextPointer == 0)
+      throw_error_exception(env, "cudaContext was not set in currentGPUDevice!", CUDA_ERROR_INVALID_VALUE);
+    
+    CUcontext cuContext = (CUcontext)cuContextPointer;
     
     cuCtxDestroy(cuContext);
-     
+    setLongField(env, currentGPUDevice, "cudaContext", 0);
+    
     return;
 }
 
@@ -731,17 +753,19 @@ void * readCubinFileFromBuffers(JNIEnv *env, jobject buffers, jint size, jint to
 JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2_writeClassTypeRef
   (JNIEnv *env, jobject this_obj, jintArray jarray)
 {
-  int i;
-  jint * native_array = (*env)->GetIntArrayElements(env, jarray, 0);
-  
-  // Get the current GPU Device and gpuClassMemory
+    
+  // Get the current GPU Device
   jobject currentGPUDevice = getCurrentGPUDevice(env,this_obj);
+
+  // DEBUG INFO
+  //jint currentGPUDeviceID = getIntField(env, currentGPUDevice, "cardID");
+  //printf("STARTED: writeClassTypeRef with currentGPUDeviceID: %d\n",currentGPUDeviceID);
+    
   CUdeviceptr gpuClassMemory = getLongField(env, currentGPUDevice, "gpuClassAddr");
-  
-  printf("STARTED: writeClassTypeRef with gpuClassMemory: %ld\n",gpuClassMemory);
-    
+  //printf("STARTED: writeClassTypeRef with gpuClassMemory: %ld\n", gpuClassMemory);
+
+  jint * native_array = (*env)->GetIntArrayElements(env, jarray, 0);
   cuMemcpyHtoD(gpuClassMemory, native_array, classMemSize);
-    
   (*env)->ReleaseIntArrayElements(env, jarray, native_array, 0);
   
   return;
@@ -761,23 +785,22 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   CUresult status;
   char * native_filename;
       
-  printf("STARTED: loadFunction!\n");
   heapEndPtr = heap_end_ptr;
   
-  // Get the current GPU Device and ID
+  // Get the current GPU Device
   jobject currentGPUDevice = getCurrentGPUDevice(env,this_obj);
-  jint currentGPUDeviceID = getIntField(env, currentGPUDevice, "cardID");
-
-  printf("STARTED: loadFunction with currentGPUDeviceID: %d\n",currentGPUDeviceID);
       
-  CUdevice cuDevice;
-  status = cuDeviceGet(&cuDevice, currentGPUDeviceID);
-  CHECK_STATUS(env,this_obj,"error in cuDeviceGet",status)
+  // DEBUG INFO
+  //jint currentGPUDeviceID = getIntField(env, currentGPUDevice, "cardID");
+  //printf("STARTED: loadFunction with currentGPUDeviceID: %d\n",currentGPUDeviceID);
+       
+  // Get cuContext from currentGPUDevice
+  long cuContextPointer = getLongField(env, currentGPUDevice, "cudaContext");
+  if (cuContextPointer == 0)
+    throw_error_exception(env, "cudaContext was not set in currentGPUDevice!", CUDA_ERROR_INVALID_VALUE);
       
-  CUcontext cuContext;
-  status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);
-  CHECK_STATUS(env,this_obj,"error in cuCtxCreate",status)
-
+  CUcontext cuContext = (CUcontext)cuContextPointer;
+      
   cuCtxPushCurrent(cuContext);
       
   fatcubin = readCubinFileFromBuffers(env, buffers, size, total_size);
@@ -836,7 +859,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   offset += sizeof(int);
       
   cuCtxPopCurrent(&cuContext);
-  cuCtxDestroy(cuContext);
       
   return;
 }
@@ -853,23 +875,25 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   CUresult status;
   jlong * infoSpace = (jlong *) malloc(gc_space_size);
 
-  printf("STARTED: runBlocks!\n");
   infoSpace[1] = heapEndPtr;
       
-  // Get the current GPU Device and ID
+  // Get the current GPU Device
   jobject currentGPUDevice = getCurrentGPUDevice(env,this_obj);
-  jint currentGPUDeviceID = getIntField(env, currentGPUDevice, "cardID");
-
-  printf("STARTED: runBlocks with currentGPUDeviceID: %d\n",currentGPUDeviceID);
       
-  CUdevice cuDevice;
-  status = cuDeviceGet(&cuDevice, currentGPUDeviceID);
-  CHECK_STATUS(env,this_obj,"error in cuDeviceGet",status)
-      
-  CUcontext cuContext;
-  status = cuCtxCreate(&cuContext, CU_CTX_MAP_HOST, cuDevice);
-  CHECK_STATUS(env,this_obj,"error in cuCtxCreate",status)
+  // DEBUG INFO
+  //jint currentGPUDeviceID = getIntField(env, currentGPUDevice, "cardID");
+  //printf("STARTED: runBlocks with currentGPUDeviceID: %d\n",currentGPUDeviceID);
 
+  // Get cuContext from currentGPUDevice
+  long cuContextPointer = getLongField(env, currentGPUDevice, "cudaContext");
+  if (cuContextPointer == 0)
+    throw_error_exception(env, "cudaContext was not set in currentGPUDevice!", CUDA_ERROR_INVALID_VALUE);
+      
+  CUcontext cuContext = (CUcontext)cuContextPointer;
+      
+  cuCtxPushCurrent(cuContext);
+      
+  // Init variables
   void * toSpace = (void *) getLongField(env, currentGPUDevice, "toSpaceAddr");
   CUdeviceptr gpuToSpace = getLongField(env, currentGPUDevice, "gpuToSpaceAddr");
   void * handlesMemory = (void *)getLongField(env, currentGPUDevice, "handlesAddr");
@@ -880,8 +904,7 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   CUdeviceptr gpuHeapEndPtr = getLongField(env, currentGPUDevice, "gpuHeapEndPtr");
   CUdeviceptr gpuBufferSize = getLongField(env, currentGPUDevice, "gpuBufferSize");
   jlong bufferSize = getLongField(env, currentGPUDevice, "toSpaceSize");
-      
-  cuCtxPushCurrent(cuContext);
+
 
   cuMemcpyHtoD(gcInfoSpace, infoSpace, gc_space_size);
   cuMemcpyHtoD(gpuToSpace, toSpace, heapEndPtr);
@@ -932,7 +955,6 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   free(infoSpace);
       
   cuCtxPopCurrent(&cuContext);
-  cuCtxDestroy(cuContext);
       
   return 0;
 }

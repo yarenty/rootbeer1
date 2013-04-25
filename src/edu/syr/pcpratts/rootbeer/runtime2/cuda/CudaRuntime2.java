@@ -123,12 +123,6 @@ public class CudaRuntime2 implements ParallelRuntime {
     // Setup gpuCard array and currentGpuCard
     gpuCards = setupGpuCards();
 
-    // DEBUG
-    for(GpuCard gpuCard : gpuCards)
-      System.out.println(gpuCard.toString());
-
-    System.out.println("currentGpuCard: " + this.currentGpuCard.toString());
-    
     // there is a bug in the concurrent serializer. setting num_cores to 1
     // right now.
     // next version of rootbeer should have a faster concurrent serializer
@@ -143,6 +137,13 @@ public class CudaRuntime2 implements ParallelRuntime {
 
     m_ctorStopwatch.stop();
     m_initTime = m_ctorStopwatch.elapsedTimeMillis();
+
+    // DEBUG
+    // for(GpuCard gpuCard : gpuCards)
+    // System.out.println(gpuCard.toString());
+
+    // System.out.println("currentGpuCard: " + this.currentGpuCard.toString());
+
   }
 
   private List<GpuCard> setupGpuCards(){
@@ -156,7 +157,7 @@ public class CudaRuntime2 implements ParallelRuntime {
 
       // Save generated reserve_mem values to config file
       Properties props = new Properties();
-      for(GpuCard gpuCard : gpuCards) {
+      for(GpuCard gpuCard : _gpuCards) {
         props.setProperty("gpu_" + gpuCard.getCardID() + "_reserve_mem",
             Long.toString(gpuCard.getReserveMem()));
       }
@@ -716,12 +717,6 @@ public class CudaRuntime2 implements ParallelRuntime {
   private native void initCurrentGpuCard();
 
   private native void freeCurrentGpuCard();
-
-  // private native long findReserveMem(int max_blocks, int max_threads);
-  // private native void setup(int max_blocks_per_proc, int
-  // max_threads_per_block, long free_memory);
-  // private native void reinit(int max_blocks_per_proc,
-  // int max_threads_per_block, long free_memory);
 
   private native void loadFunction(long heap_end_ptr, Object buffer, int size,
       int total_size, int num_blocks);
