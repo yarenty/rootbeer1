@@ -179,7 +179,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     if(thread_config != null){
       m_BlockShape = thread_config.getBlockShapeX();
       m_GridShape = thread_config.getGridShapeX(); 
-      m_NumThreads = m_BlockShape * m_GridShape;
+      m_NumThreads = thread_config.getNumThreads();
     }
     writeSingleBlock(job_template);
     
@@ -193,8 +193,9 @@ public class CudaRuntime2 implements ParallelRuntime {
     if(filename.endsWith(".error")){
       return;
     }
+    
     if(thread_config == null){
-      calculateShape();
+      throw new NullPointerException();
     } 
     compileCode();
     
@@ -255,7 +256,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     } else {
       m_BlockShape = thread_config.getBlockShapeX();
       m_GridShape = thread_config.getGridShapeX(); 
-      m_NumThreads = m_BlockShape * m_GridShape;
+      m_NumThreads = thread_config.getNumThreads();
     }
     compileCode();
     

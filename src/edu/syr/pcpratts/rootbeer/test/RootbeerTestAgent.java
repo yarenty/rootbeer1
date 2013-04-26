@@ -237,7 +237,7 @@ public class RootbeerTestAgent {
       Kernel known_good_item = creator.create();
       Kernel testing_item = creator.create();
       ThreadConfig thread_config = creator.getThreadConfig();
-      rootbeer.setThreadConfig(thread_config.getBlockShapeX(), thread_config.getGridShapeX());
+      rootbeer.setThreadConfig(thread_config.getBlockShapeX(), thread_config.getGridShapeX(),thread_config.getNumThreads());
       Stopwatch watch = new Stopwatch();
       watch.start();
       rootbeer.runAll(testing_item);
