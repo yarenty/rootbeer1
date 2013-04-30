@@ -26,6 +26,12 @@ native/cudaruntime.lib
 native/Handles.obj
 native/FastMemory.obj
 native/CudaRuntime2.obj
+native/cudaruntime_x64.dll
+native/cudaruntime_x64.exp
+native/cudaruntime_x64.lib
+native/cudaruntime_x86.dll
+native/cudaruntime_x86.exp
+native/cudaruntime_x86.lib
 glob:native/nativecpudev.so.1
 glob:*.so.1
 /.project
@@ -53,6 +59,8 @@ examples/RandomDemap/RandomRemapApp-GPU.jar
 examples/RandomDemap/RandomRemapApp.jar
 gtc2013/Matrix/MatrixApp-GPU.jar
 gtc2013/Matrix/MatrixApp.jar
+gtc2013/Matrix/NativeCpuDevice.obj
+gtc2013/Matrix/generated.obj
 native/cudaruntime.dylib
 MegaMandel2-GPU.jar
 MegaMandel2-CPU.jar
@@ -68,3 +76,4 @@ mandellib-GPU.jar
 raylib-GPU.jar
 ArrayMultApp-GPU.jar
 ArrayMultApp.jar
+generated.fatbin
