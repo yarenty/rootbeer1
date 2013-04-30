@@ -1,8 +1,3 @@
 #!/bin/sh
 
 java -jar lib/pack.jar -mainjar dist/Rootbeer1.jar -directory lib -destjar Rootbeer.jar
-
-if builtin type -p mvn &>/dev/null; then
-  mvn install:install-file -Dfile=Rootbeer.jar -DgroupId=edu.syr.pcpratts \
-    -DartifactId=rootbeer -Dversion=1.x-SNAPSHOT -Dpackaging=jar
-fi
