@@ -340,7 +340,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
 
   public void caseNegExpr(NegExpr arg0) {
     Value op = arg0.getOp();
-    m_output.append("! ");
+    m_output.append("-");
     op.apply(this);
   }
 
