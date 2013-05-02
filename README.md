@@ -50,10 +50,6 @@ competative speed when using single-dimensional arrays of primitive types.
 You need to have the CUDA Toolkit and CUDA Driver installed to use Rootbeer.
 Download it from http://www.nvidia.com/content/cuda/cuda-downloads.html
 
-## Open Source
-
-We are talking on: https://trifort.campfirenow.com/c1ac1
-
 ## Clarifications
 
 Rootbeer does NOT automatically parallelize code. It provides help serializing
