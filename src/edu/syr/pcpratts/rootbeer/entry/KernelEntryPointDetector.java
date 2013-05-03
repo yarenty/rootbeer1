@@ -18,13 +18,21 @@ import soot.rbclassload.MethodTester;
 
 public class KernelEntryPointDetector implements MethodTester {
 
+  private boolean m_runTests;
+  
+  public KernelEntryPointDetector(boolean run_tests){
+    m_runTests = run_tests;
+  }
+  
   public boolean test(HierarchySootMethod sm) {
     if(sm.getSubSignature().equals("void gpuMethod()") == false){
       return false;
     }
     HierarchySootClass soot_class = sm.getHierarchySootClass();
-    if(soot_class.getName().startsWith("edu.syr.pcpratts.rootbeer.testcases.")){
-      return false;
+    if(m_runTests == false){
+      if(soot_class.getName().startsWith("edu.syr.pcpratts.rootbeer.testcases.")){
+        return false;
+      }
     }
     Iterator<String> iter = soot_class.getInterfaces().iterator();
     while(iter.hasNext()){

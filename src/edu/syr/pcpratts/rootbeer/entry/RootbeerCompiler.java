@@ -199,7 +199,7 @@ public class RootbeerCompiler {
   }
   
   public void compile(String jar_filename, String outname, boolean run_tests) throws Exception {
-    m_entryDetector = new KernelEntryPointDetector();
+    m_entryDetector = new KernelEntryPointDetector(run_tests);
     CurrJarName jar_name = new CurrJarName();
     setupSoot(jar_filename, jar_name.get(), run_tests);
     
