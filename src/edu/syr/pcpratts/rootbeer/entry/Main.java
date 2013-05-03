@@ -89,8 +89,12 @@ public class Main {
         String count = safeGet(args, i+1, "-maxrregcount");
         ++i;
         Configuration.compilerInstance().setMaxRegCount(Integer.parseInt(count));
-      } else if(args.equals("-noarraychecks")){
+      } else if(arg.equals("-noarraychecks")){
         Configuration.compilerInstance().setArrayChecks(false);
+      } else if(arg.equals("-nodoubles")){
+        Configuration.compilerInstance().setDoubles(false);
+      } else if(arg.equals("-norecursion")){
+        Configuration.compilerInstance().setRecursion(false);
       } else if(m_simpleCompile == false){      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);

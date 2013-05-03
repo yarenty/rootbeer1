@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl.tweaks;
 
 //help: http://mlso.hao.ucar.edu/hao/acos/sw/cuda-sdk/shared/common.mk
 
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.util.CmdRunner;
 import edu.syr.pcpratts.rootbeer.util.CudaPath;
 import java.io.File;
@@ -35,6 +36,16 @@ public class GencodeOptions {
       sm_21 = "--generate-code arch=compute_20,code=\"sm_21\" ";
       sm_20 = "--generate-code arch=compute_20,code=\"sm_20\" ";  
       sm_12 = "--generate-code arch=compute_12,code=\"sm_12\" "; 
+    }
+    
+    //sm_12 doesn't support recursion
+    if(Configuration.compilerInstance().getRecursion()){
+      sm_12 = "";
+    }
+    
+    //sm_12 doesn't support doubles
+    if(Configuration.compilerInstance().getDoubles()){
+      sm_12 = "";
     }
     
     if(version.equals("Cuda compilation tools, release 5.0, V0.2.1221")){

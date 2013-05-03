@@ -372,6 +372,9 @@ public class CudaRuntime2 implements ParallelRuntime {
       } else if(gpu_thrown instanceof RuntimeException) {
         RuntimeException runtime_ex = (RuntimeException) gpu_thrown;
         throw runtime_ex;
+      } else if(gpu_thrown instanceof ArrayIndexOutOfBoundsException) {
+        ArrayIndexOutOfBoundsException array_except = (ArrayIndexOutOfBoundsException) gpu_thrown;
+        throw array_except;
       } else {
         throw new RuntimeException("unknown exception type.");
       }
@@ -590,12 +593,9 @@ public class CudaRuntime2 implements ParallelRuntime {
         if(except instanceof Error) {
           Error except_th = (Error) except;
           throw except_th;
-        } else if(except instanceof GpuException) {
+        } else if(except instanceof GpuException){
           GpuException gpu_except = (GpuException) except;
-          System.out.println("array: " + gpu_except.m_array);
-          System.out.println("index: " + gpu_except.m_arrayIndex);
-          System.out.println("length: " + gpu_except.m_arrayLength);
-          System.exit(1);
+          gpu_except.throwArrayOutOfBounds();
         } else {
           throw new RuntimeException((Throwable) except);
         }
@@ -648,6 +648,9 @@ public class CudaRuntime2 implements ParallelRuntime {
         if(except instanceof Error) {
           Error except_th = (Error) except;
           throw except_th;
+        } else if(except instanceof GpuException){
+          GpuException gpu_except = (GpuException) except;
+          gpu_except.throwArrayOutOfBounds();
         } else {
           throw new RuntimeException((Throwable) except);
         }
