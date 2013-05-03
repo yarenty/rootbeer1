@@ -41,9 +41,14 @@ competative speed when using single-dimensional arrays of primitive types.
 
 1. Clone the github repo to `rootbeer1/`
 2. `cd rootbeer1/`
-3. `ant`
-4. `./pack-rootbeer` (linux) or `./pack-rootbeer.bat` (windows)
-5. Use the `rootbeer1/Rootbeer.jar` (not `dist/Rootbeer1.jar`)
+3. `git checkout feature/rbclassload2`  
+4. `ant`
+5. `./pack-rootbeer` (linux) or `./pack-rootbeer.bat` (windows)
+6. Use the `rootbeer1/Rootbeer.jar` (not `dist/Rootbeer1.jar`)
+
+## Pre-Built Binaries  
+
+See here: http://rbcompiler.com/download.html
 
 ## CUDA Setup
 
