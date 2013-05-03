@@ -23,6 +23,9 @@ public class KernelEntryPointDetector implements MethodTester {
       return false;
     }
     HierarchySootClass soot_class = sm.getHierarchySootClass();
+    if(soot_class.getName().startsWith("edu.syr.pcpratts.rootbeer.testcases.")){
+      return false;
+    }
     Iterator<String> iter = soot_class.getInterfaces().iterator();
     while(iter.hasNext()){
       String iface = iter.next();

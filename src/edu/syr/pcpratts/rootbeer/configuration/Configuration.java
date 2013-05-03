@@ -43,6 +43,8 @@ public class Configuration {
   private boolean m_maxRegCountSet;
   private int m_maxRegCount;
   private boolean m_arrayChecks;
+  private boolean m_doubles;
+  private boolean m_recursion;
   
   static {
     m_printMem = false;
@@ -53,6 +55,8 @@ public class Configuration {
     m_remapAll = true;
     m_maxRegCountSet = false;
     m_arrayChecks = true;
+    m_doubles = true;
+    m_recursion = true;
   }
 
   private Configuration(boolean load) {
@@ -117,5 +121,21 @@ public class Configuration {
   
   public boolean getArrayChecks(){
     return m_arrayChecks;
+  }
+  
+  public void setDoubles(boolean value){
+    m_doubles = value;
+  }
+
+  public void setRecursion(boolean value){
+    m_recursion = value;
+  }
+  
+  public boolean getDoubles() {
+    return m_doubles;
+  }
+
+  public boolean getRecursion() {
+    return m_recursion;
   }
 }
