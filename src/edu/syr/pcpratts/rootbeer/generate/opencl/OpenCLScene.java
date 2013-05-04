@@ -177,6 +177,12 @@ public class OpenCLScene {
     }
   }
   
+  public int getOutOfMemoryNumber(){
+    SootClass soot_class = Scene.v().getSootClass("java.lang.OutOfMemoryError");
+    int ret = RootbeerClassLoader.v().getClassNumber(soot_class); 
+    return ret;
+  }
+  
   private String[] makeSourceCode() throws Exception {
     m_usesGarbageCollector = false;
     
