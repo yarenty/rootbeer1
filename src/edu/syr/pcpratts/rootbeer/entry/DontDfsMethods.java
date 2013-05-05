@@ -54,7 +54,7 @@ public class DontDfsMethods {
     m_methods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getBlockIdxx()>");
     m_methods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: int getBlockDimx()>");
     m_methods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: long getRef(java.lang.Object)>");
-    m_methods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void synchthreads()>");
+    m_methods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void syncthreads()>");
     m_methods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: byte getSharedByte(int)>");
     m_methods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: void setSharedByte(int,byte)>");
     m_methods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu: char getSharedChar(int)>");

@@ -32,7 +32,7 @@ int getBlockDimx(){
 }
 
 __device__
-void synchthreads(){
+void edu_syr_pcpratts_syncthreads(){
   __syncthreads();
 }
 

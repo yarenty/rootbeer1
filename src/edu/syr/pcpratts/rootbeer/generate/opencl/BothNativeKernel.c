@@ -8,7 +8,7 @@ int global_num_threads;
 long long * global_exceptions;
 int * global_class_refs;
 
-void synchthreads()
+void edu_syr_pcpratts_syncthreads()
 {
 }
 

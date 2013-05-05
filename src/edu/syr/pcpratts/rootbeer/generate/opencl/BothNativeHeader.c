@@ -44,7 +44,7 @@ int getThreadIdxx();
 int getBlockIdxx();
 int getBlockDimx();
 
-void synchthreads();
+void edu_syr_pcpratts_syncthreads();
 
 void __threadfence(){ }
 

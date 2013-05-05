@@ -475,6 +475,7 @@ public class OpenCLMethod {
     for(String dont_dfs : dont_dfs_methods.get()){
       m_dontMangleMethods.add(dont_dfs);
     }
+    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerAtomicInt: int atomicAdd(int)>");
     m_dontMangleMethods.add("<java.lang.String: void <init>(char[])>");
     m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
   

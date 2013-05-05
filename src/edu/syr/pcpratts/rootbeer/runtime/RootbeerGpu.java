@@ -60,7 +60,7 @@ public class RootbeerGpu {
     return 0;
   }
   
-  public static void synchthreads(){ 
+  public static void syncthreads(){ 
   }
 
   public static long getRef(Object obj) {

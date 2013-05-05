@@ -293,13 +293,27 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedDouble($$__global$$ 
 }
 
 $$__device__$$
+void java_io_PrintStream_println($$__global$$ char * gc_info, int thisref, int str_ret, int * exception){
+  //1. take characters from str_ret
+  //2. print using printf
+}
+
+$$__device__$$
+int edu_syr_pcpratts_rootbeer_runtime_RootbeerAtomicInt_atomicAdd($$__global$$ char * gc_info, int thisref, int value, int * exception){
+  char * thisref_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref ) ;
+  thisref_deref += 32;
+  int * array = (int *) thisref_deref;
+  return atomicAdd(array, value);
+}
+
+$$__device__$$
 double edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_sin($$__global$$ char * gc_info, double value, int * exception){
   return sin(value);
 }
 
 $$__device__$$ 
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_synchthreads($$__global$$ char * gc_info, int * exception){
-  synchthreads();
+void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_syncthreads($$__global$$ char * gc_info, int * exception){
+  edu_syr_pcpratts_syncthreads();
 }
 
 $$__device__$$ char
