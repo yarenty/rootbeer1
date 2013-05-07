@@ -28,56 +28,58 @@ import soot.Type;
 import soot.Value;
 import soot.jimple.toolkits.typing.fast.Integer127Type;
 import soot.options.Options;
+import soot.rbclassload.FieldSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class OpenCLField {
-  private final SootField m_SootField;
-  private final SootClass m_SootClass;
-  private boolean m_CheckAlignment;
-  private boolean m_Cloned;
-  private OpenCLField m_CloneSource;
-  private Map<Integer, List<SootClass>> m_Offsets;
+  private final SootField m_sootField;
+  private final SootClass m_sootClass;
+  private boolean m_cloned;
+  private OpenCLField m_cloneSource;
+  private Map<Integer, List<SootClass>> m_offsets;
 
   public OpenCLField(SootField soot_field, SootClass soot_class) {
-    m_SootField = soot_field;
-    m_SootClass = soot_class;
-    m_CheckAlignment = false;
-    m_Cloned = false;    
+    m_sootField = soot_field;
+    m_sootClass = soot_class;
+    m_cloned = false;    
   }
   
   public void setClone(OpenCLField source){
-    m_Cloned = true;
-    m_CloneSource = source;
+    m_cloned = true;
+    m_cloneSource = source;
   }
   
   public boolean isCloned(){
-    return m_Cloned;
+    return m_cloned;
   }  
   
   public OpenCLField getCloneSource(){
-    return m_CloneSource;
+    return m_cloneSource;
   }
   
   public String getName(){
-    return m_SootField.getName();
+    return m_sootField.getName();
   }
 
   public SootField getSootField(){
-    return m_SootField;
+    return m_sootField;
   }
 
   private String getFullName(){
-    OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(m_SootClass);
+    FieldSignatureUtil util = new FieldSignatureUtil();
+    util.parse(m_sootField.getSignature());
+    SootField real_field = util.getSootField();
+    OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(real_field.getDeclaringClass());
     return ocl_class.getName()+"_"+getName();
   }
   
   public OpenCLType getClassType(){
-    Type soot_type = m_SootClass.getType();
+    Type soot_type = m_sootClass.getType();
     return new OpenCLType(soot_type);
   }
 
   public OpenCLType getType(){
-    Type soot_type = m_SootField.getType();
+    Type soot_type = m_sootField.getType();
     return new OpenCLType(soot_type);
   }
 
@@ -86,7 +88,7 @@ public class OpenCLField {
     String type_string = getType().getCudaTypeString();
     String device_function_qual = Tweaks.v().getDeviceFunctionQualifier();
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
-    if(m_SootField.isStatic() == false){
+    if(m_sootField.isStatic() == false){
       //instance getter
       ret.add(device_function_qual+" "+type_string+" instance_getter_"+getFullName()+"("+address_qual+" char * gc_info, int thisref, int * exception)");
       //instance setter
@@ -115,22 +117,22 @@ public class OpenCLField {
 
   private void calculateOffsets(CompositeField composite){    
     OffsetCalculator calc = new OffsetCalculator(composite);
-    m_Offsets = new TreeMap<Integer, List<SootClass>>();
+    m_offsets = new TreeMap<Integer, List<SootClass>>();
     for(SootClass sclass : composite.getClasses()){
       int field_offset = calc.getOffset(this, sclass);
       List<SootClass> classes;
-      if(m_Offsets.containsKey(field_offset)){
-        classes = m_Offsets.get(field_offset);
+      if(m_offsets.containsKey(field_offset)){
+        classes = m_offsets.get(field_offset);
       } else {
         classes = new ArrayList<SootClass>();
-        m_Offsets.put(field_offset, classes);
+        m_offsets.put(field_offset, classes);
       }
       classes.add(sclass);
     }
   }
   
   private int getOnlyOffset(){
-    Iterator<Integer> iter = m_Offsets.keySet().iterator();
+    Iterator<Integer> iter = m_offsets.keySet().iterator();
     while(iter.hasNext()){
       int ret = iter.next();
       return ret;
@@ -177,7 +179,7 @@ public class OpenCLField {
       ret.append("return *(("+address_qual+" "+cast_string+" *) &thisref_deref["+Integer.toString(field_offset)+"]);\n");
     } else {
       ret.append("derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
-      ret.append("offset = "+type_switch.typeSwitchName(m_Offsets)+"(derived_type);\n");
+      ret.append("offset = "+type_switch.typeSwitchName(m_offsets)+"(derived_type);\n");
       ret.append("return *(("+address_qual+" "+cast_string+" *) &thisref_deref[offset]);\n");
     }
     //ret.append("}\n");
@@ -201,7 +203,7 @@ public class OpenCLField {
       }
     } else {
       ret.append("derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
-      ret.append("offset = "+type_switch.typeSwitchName(m_Offsets)+"(derived_type);\n");     
+      ret.append("offset = "+type_switch.typeSwitchName(m_offsets)+"(derived_type);\n");     
       if(getType().isRefType()){
         ret.append("edu_syr_pcpratts_gc_assign_global(gc_info, ("+address_qual+" "+cast_string+" *) &thisref_deref[offset], parameter0);\n");
       } else {
@@ -237,7 +239,7 @@ public class OpenCLField {
   public String getGetterSetterBodies(CompositeField composite, boolean writable,
     FieldTypeSwitch type_switch){
     
-    if(m_SootField.isStatic()){
+    if(m_sootField.isStatic()){
       return getGetterSetterBodiesStatic();
     } else {
       return getGetterSetterBodiesInstance(composite, writable, type_switch);
@@ -248,7 +250,7 @@ public class OpenCLField {
     String ret = "";
     ret += "int addr = thisref_deref + "+field_offset+";\n";
     ret += "if(addr % "+getSize()+" != 0){\n";
-    ret += "  printf(\"misaligned field: "+m_SootField.toString()+"\\n\");\n";
+    ret += "  printf(\"misaligned field: "+m_sootField.toString()+"\\n\");\n";
     ret += "}\n";
     return ret;
   }
@@ -289,7 +291,7 @@ public class OpenCLField {
     if(o instanceof OpenCLField == false)
       return false;
     OpenCLField other = (OpenCLField) o;
-    if(m_SootField.equals(other.m_SootField) && m_SootClass.equals(other.m_SootClass))
+    if(m_sootField.equals(other.m_sootField) && m_sootClass.equals(other.m_sootClass))
       return true;
     return false;
   }
@@ -297,13 +299,13 @@ public class OpenCLField {
   @Override
   public int hashCode() {
     int hash = 7;
-    hash = 37 * hash + (this.m_SootField != null ? this.m_SootField.hashCode() : 0);
-    hash = 37 * hash + (this.m_SootClass != null ? this.m_SootClass.hashCode() : 0);
+    hash = 37 * hash + (this.m_sootField != null ? this.m_sootField.hashCode() : 0);
+    hash = 37 * hash + (this.m_sootClass != null ? this.m_sootClass.hashCode() : 0);
     return hash;
   }
 
   public boolean isInstance() {
-    if(m_SootField.isStatic())
+    if(m_sootField.isStatic())
       return false;
     return true;
   }
@@ -314,6 +316,6 @@ public class OpenCLField {
   }
 
   public boolean isFinal() {
-    return m_SootField.isFinal();
+    return m_sootField.isFinal();
   }
 }
