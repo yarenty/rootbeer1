@@ -22,6 +22,7 @@ static void * run(void * data){
     curr_thread_idxx = index % global_block_shape;
     
     pthread_setspecific(blockIdxxKey, (void *) curr_block_idxx);
+    pthread_setspecific(blockDimxKey, (void *) global_block_shape);
     pthread_setspecific(threadIdxxKey, (void *) curr_thread_idxx);
     pthread_setspecific(threadIdKey, (void *) index);
 

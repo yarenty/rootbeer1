@@ -24,6 +24,7 @@ DWORD run(void * data)
     TlsSetValue(threadIdKey, (void *) index);
     TlsSetValue(threadIdxxKey, (void *) curr_thread_idxx);
     TlsSetValue(blockIdxxKey, (void *) curr_block_idxx);
+    TlsSetValue(blockDimxKey, (void *) global_block_shape);
 
     lhandle = global_handles[index];
     lhandle = lhandle >> 4;

@@ -6,6 +6,7 @@
 DWORD threadIdKey;
 DWORD threadIdxxKey;
 DWORD blockIdxxKey;
+DWORD blockDimxKey;
 CRITICAL_SECTION atom_add_mutex;
 CRITICAL_SECTION thread_id_mutex;
 
@@ -35,6 +36,10 @@ int getThreadIdxx(){
 
 int getBlockIdxx(){
   return (int) TlsGetValue(blockIdxxKey);
+}
+
+int getBlockDimx(){
+  return (int) TlsGetValue(blockDimxKey);
 }
 
 long long java_lang_System_nanoTime(char * gc_info, int * exception){
