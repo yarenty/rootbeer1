@@ -31,7 +31,7 @@ public class SharedMemSimpleRunOnGpu implements Kernel {
     RootbeerGpu.setSharedFloat(18, 7.1f);
     RootbeerGpu.setSharedDouble(22, 8.2);
     
-    RootbeerGpu.synchthreads();
+    RootbeerGpu.syncthreads();
     
     m_boolean = RootbeerGpu.getSharedBoolean(0);
     m_byte = RootbeerGpu.getSharedByte(1);

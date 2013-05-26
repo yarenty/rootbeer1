@@ -24,7 +24,7 @@ public class BarrierRunOnGpu implements Kernel {
   public void gpuMethod() {
     if(RootbeerGpu.isOnGpu()){
       int value = m_array[m_threadId];
-      RootbeerGpu.synchthreads();
+      RootbeerGpu.syncthreads();
       int len = m_array.length;
       m_array[len - m_threadId - 1] = value;
     }
