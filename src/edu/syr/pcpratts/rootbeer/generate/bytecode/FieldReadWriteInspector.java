@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
+import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import java.util.*;
@@ -171,11 +172,9 @@ public class FieldReadWriteInspector {
   private void inspectMethod(SootMethod root) {
     if (mMethodsInspected.contains(root))
       return;
-    // work list to reduce recursion
-    ArrayDeque<SootMethod> worklist = new ArrayDeque<SootMethod>(1);
-    worklist.add(root);
-    while (!worklist.isEmpty()) {
-      SootMethod method = worklist.pop();
+    
+    List<SootMethod> methods = OpenCLScene.v().getMethods();
+    for(SootMethod method : methods){
       Body body;
       try {
         body = method.retrieveActiveBody();
@@ -217,27 +216,6 @@ public class FieldReadWriteInspector {
             if(base instanceof Local){
               Local local_base = (Local) base;
               mWrittenOnGpuArrayLocals.add(local_base);
-            }
-          }
-        }
-      }
-      
-      for(ValueBox use_box : use_boxes){
-        Value use = use_box.getValue();
-        if(use instanceof InvokeExpr) {
-          SootMethod invoke = ((InvokeExpr) use).getMethod();
-          if (!invoke.isAbstract() && !invoke.isNative() && mMethodsInspected.add(invoke))
-            worklist.add(invoke);
-          // ignore immutable members
-          if (!invoke.isStatic() && !invoke.isFinal() && !invoke.getDeclaringClass().isFinal()) {
-            ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-            List<String> virt_methods = class_hierarchy.getVirtualMethods(invoke.getSignature());
-            for(String virt_method : virt_methods){
-              m_util.parse(virt_method);
-              SootMethod soot_method = m_util.getSootMethod();
-              if(soot_method.isConcrete() && mMethodsInspected.add(soot_method)){
-                worklist.add(soot_method);
-              }
             }
           }
         }

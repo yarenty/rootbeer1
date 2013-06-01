@@ -35,7 +35,7 @@ edu_syr_pcpratts_gc_deref(char * gc_info, int handle){
 }
 
 int
-edu_syr_pcpratts_gc_malloc(char * gc_info, long long size){
+edu_syr_pcpratts_gc_malloc(char * gc_info, int size){
   long long * addr;
   long long space_size;
   long long ret;

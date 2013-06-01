@@ -166,8 +166,10 @@ public class OpenCLField {
     //ret.append("  thisref += "+field_offset+";\n");
     //ret.append("  return edu_syr_pcpratts_cache_get_"+type+"(thisref);\n");
     //ret.append("} else {\n");   
-    ret.append("GC_OBJ_TYPE_TYPE derived_type;\n");
-    ret.append("int offset;\n");
+    if(composite.getClasses().size() != 1){
+      ret.append("GC_OBJ_TYPE_TYPE derived_type;\n");
+      ret.append("int offset;\n");
+    }
     ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("if(thisref == -1){\n");
     ret.append("  *exception = "+null_num+";\n");
@@ -186,8 +188,10 @@ public class OpenCLField {
     ret.append("}\n");
     //instance setter
     ret.append(decls.get(1)+"{\n");
-    ret.append("GC_OBJ_TYPE_TYPE derived_type;\n");
-    ret.append("int offset;\n");
+    if(composite.getClasses().size() != 1){
+      ret.append("GC_OBJ_TYPE_TYPE derived_type;\n");
+      ret.append("int offset;\n");
+    }
     ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("if(thisref == -1){\n");
     ret.append("  *exception = "+null_num+";\n");

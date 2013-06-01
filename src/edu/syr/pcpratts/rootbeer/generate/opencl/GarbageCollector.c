@@ -11,8 +11,8 @@
 $$__device__$$ void edu_syr_pcpratts_gc_collect($$__global$$ char * gc_info);
 $$__device__$$ void edu_syr_pcpratts_gc_assign($$__global$$ char * gc_info, int * lhs, int rhs);
 $$__device__$$ $$__global$$ char * edu_syr_pcpratts_gc_deref($$__global$$ char * gc_info, int handle);
-$$__device__$$ int edu_syr_pcpratts_gc_malloc($$__global$$ char * gc_info, long long size);
-$$__device__$$ long long edu_syr_pcpratts_gc_malloc_no_fail($$__global$$ char * gc_info, long long size);
+$$__device__$$ int edu_syr_pcpratts_gc_malloc($$__global$$ char * gc_info, int size);
+$$__device__$$ unsigned long long edu_syr_pcpratts_gc_malloc_no_fail($$__global$$ char * gc_info, int size);
 $$__device__$$ int edu_syr_pcpratts_classConstant(int type_num);
 $$__device__$$ long long java_lang_System_nanoTime($$__global$$ char * gc_info, int * exception);
 
@@ -22,7 +22,6 @@ $$__device__$$ long long java_lang_System_nanoTime($$__global$$ char * gc_info, 
 
 #define TO_SPACE_OFFSET               0
 #define TO_SPACE_FREE_POINTER_OFFSET  8
-#define SPACE_SIZE_OFFSET             16
 
 $$__device__$$
 void edu_syr_pcpratts_exitMonitorRef($$__global$$ char * gc_info, int thisref, int old){

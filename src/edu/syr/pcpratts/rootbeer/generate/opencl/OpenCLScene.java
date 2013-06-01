@@ -53,6 +53,7 @@ public class OpenCLScene {
   private ReadOnlyTypes m_readOnlyTypes;
   private Set<OpenCLInstanceof> m_instanceOfs;
   private List<CompositeField> m_compositeFields;
+  private List<SootMethod> m_methods;
   
   static {
     m_curentIdent = 0;
@@ -64,6 +65,8 @@ public class OpenCLScene {
     m_arrayTypes = new LinkedHashSet<OpenCLArrayType>();
     m_methodHierarchies = new MethodHierarchies();
     m_instanceOfs = new HashSet<OpenCLInstanceof>();
+    m_methods = new ArrayList<SootMethod>();
+    loadTypes();
   }
 
   public static OpenCLScene v(){
@@ -103,6 +106,11 @@ public class OpenCLScene {
 
     //add the method 
     m_methodHierarchies.addMethod(soot_method);
+    m_methods.add(soot_method);
+  }
+  
+  public List<SootMethod> getMethods(){
+    return m_methods;
   }
 
   public void addArrayType(OpenCLArrayType array_type){
@@ -183,12 +191,7 @@ public class OpenCLScene {
     return ret;
   }
   
-  private String[] makeSourceCode() throws Exception {
-    m_usesGarbageCollector = false;
-    
-    List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedTypes();
-    writeTypesToFile(types);
-    
+  private void loadTypes(){
     Set<String> methods = RootbeerClassLoader.v().getDfsInfo().getMethods();  
     MethodSignatureUtil util = new MethodSignatureUtil();
     for(String method_sig : methods){
@@ -231,8 +234,15 @@ public class OpenCLScene {
       addInstanceof(type);
     }
     
-    buildCompositeFields();
+    buildCompositeFields();  
+  }
+  
+  private String[] makeSourceCode() throws Exception {
+    m_usesGarbageCollector = false;
     
+    List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedTypes();
+    writeTypesToFile(types);
+        
     StringBuilder unix_code = new StringBuilder();
     StringBuilder windows_code = new StringBuilder();
     

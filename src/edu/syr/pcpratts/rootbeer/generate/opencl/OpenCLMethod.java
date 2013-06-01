@@ -249,9 +249,6 @@ public class OpenCLMethod {
               ret.append("}\n");
             }
           }
-          if(returnsAValue()){
-            ret.append("return 0;");
-          }
         }
       } catch(RuntimeException ex){
         System.out.println("error creating method body: "+m_sootMethod.getSignature());
