@@ -36,6 +36,7 @@ public class OpenCLMethod {
   private final SootMethod m_sootMethod;
   private SootClass m_sootClass;
   private Set<String> m_dontMangleMethods;
+  private Set<String> m_dontEmitMethods;
   private Set<String> m_emitUnmangled;
   private MethodSignatureUtil m_util;
   
@@ -435,6 +436,9 @@ public class OpenCLMethod {
     if(m_dontMangleMethods.contains(signature)){
       return false;
     }
+    if(m_dontEmitMethods.contains(signature)){
+      return false;
+    }
     return true;
   }
   
@@ -466,6 +470,7 @@ public class OpenCLMethod {
   
   private void createDontMangleMethods() {
     m_dontMangleMethods = new HashSet<String>();
+    m_dontEmitMethods = new HashSet<String>();
     m_emitUnmangled = new HashSet<String>();
     
     DontDfsMethods dont_dfs_methods = new DontDfsMethods();
@@ -476,7 +481,10 @@ public class OpenCLMethod {
     m_dontMangleMethods.add("<java.lang.String: void <init>(char[])>");
     m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
   
-    m_emitUnmangled.add("<java.lang.String: void <init>(char[])>");
+    m_dontEmitMethods.add("<java.lang.StringBuilder: java.lang.StringBuilder append(int)>");
+    m_dontEmitMethods.add("<java.lang.StringBuilder: java.lang.StringBuilder append(java.lang.String)>");
+    m_dontEmitMethods.add("<java.lang.StringBuilder: java.lang.String toString()>");
+    
     m_emitUnmangled.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
   }
 

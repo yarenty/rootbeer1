@@ -203,6 +203,7 @@ public class OpenCLScene {
     extra_methods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
     extra_methods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void <init>()>");
     extra_methods.add("<java.lang.String: void <init>(char[])>");
+    extra_methods.add("<java.lang.Integer: java.lang.String toString(int)>");
     for(String extra_method : extra_methods){
       util.parse(extra_method);
       addMethod(util.getSootMethod());
@@ -218,6 +219,11 @@ public class OpenCLScene {
     extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_arrayIndex>");
     extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_array>");
     extra_fields.add("<java.lang.Class: java.lang.String name>");
+    extra_fields.add("<java.lang.String: char[] value>");
+    extra_fields.add("<java.lang.String: int count>");
+    extra_fields.add("<java.lang.String: int offset>");
+    extra_fields.add("<java.lang.StringBuilder: char[] value>");
+    extra_fields.add("<java.lang.StringBuilder: int count>");
     for(String extra_field : extra_fields){
       futil.parse(extra_field);
       addField(futil.getSootField());
@@ -228,6 +234,8 @@ public class OpenCLScene {
       OpenCLArrayType ocl_array_type = new OpenCLArrayType(array_type);
       addArrayType(ocl_array_type);
     }
+    OpenCLArrayType char_array = new OpenCLArrayType(ArrayType.v(CharType.v(), 1));
+    addArrayType(char_array);
     
     Set<Type> instanceofs = RootbeerClassLoader.v().getDfsInfo().getInstanceOfs();
     for(Type type : instanceofs){
