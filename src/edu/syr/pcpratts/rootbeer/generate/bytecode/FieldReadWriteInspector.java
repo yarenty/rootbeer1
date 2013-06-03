@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
+import edu.syr.pcpratts.rootbeer.entry.ExtraFields;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;

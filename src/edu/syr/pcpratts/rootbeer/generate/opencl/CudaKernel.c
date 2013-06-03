@@ -28,8 +28,8 @@ edu_syr_pcpratts_gc_malloc(char * gc_info, int size){
 __device__ unsigned long long
 edu_syr_pcpratts_gc_malloc_no_fail(char * gc_info, int size){
   unsigned long long * addr = (unsigned long long *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
-  if(size % 8 != 0){
-    size += (8 - (size % 8));
+  if(size % 16 != 0){
+    size += (16 - (size %16));
   }
 
   unsigned long long ret;

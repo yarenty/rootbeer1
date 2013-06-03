@@ -152,7 +152,7 @@ public class OpenCLArrayType {
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
     if(Configuration.compilerInstance().getArrayChecks()){
       ret.append("length = edu_syr_pcpratts_getint(thisref_deref, 12);\n");
-      ret.append("if(parameter0 >= length){\n");
+      ret.append("if(parameter0 < 0 || parameter0 >= length){\n");
       ret.append("  *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, parameter0, thisref, length, exception);");
       ret.append("  return 0;\n");
       ret.append("}\n");
@@ -171,7 +171,7 @@ public class OpenCLArrayType {
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
      if(Configuration.compilerInstance().getArrayChecks()){
       ret.append("length = edu_syr_pcpratts_getint(thisref_deref, 12);\n");
-      ret.append("if(parameter0 >= length){\n");
+      ret.append("if(parameter0 < 0 || parameter0 >= length){\n");
       ret.append("  *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, parameter0, thisref, length, exception);");
       ret.append("  return;\n");
       ret.append("}\n");
@@ -180,7 +180,6 @@ public class OpenCLArrayType {
       ret.append("*(("+address_qual+" int *) &thisref_deref["+offset_size+"+(parameter0*"+element_size+")]) = 0;\n");
     }
     ret.append("*(("+address_qual+" "+getAssignType()+" *) &thisref_deref["+offset_size+"+(parameter0*"+element_size+")]) = parameter1;\n");
-    
     ret.append("}\n");
     
     //new
@@ -197,7 +196,7 @@ public class OpenCLArrayType {
     ret.append("  total_size += (8 - mod);\n");
     ret.append("thisref = edu_syr_pcpratts_gc_malloc(gc_info, total_size);\n");
     ret.append("if(thisref == -1){\n");
-    ret.append("  *exception = -1;\n");
+    ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
     ret.append("  return -1;\n");
     ret.append("}\n");
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
@@ -231,6 +230,7 @@ public class OpenCLArrayType {
     ret.append("  total_size += (8 - mod);\n");
     ret.append("thisref = edu_syr_pcpratts_gc_malloc(gc_info, total_size);\n");
     ret.append("if(thisref == -1){\n");
+    ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
     ret.append("  return -1;\n");
     ret.append("}\n");
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");

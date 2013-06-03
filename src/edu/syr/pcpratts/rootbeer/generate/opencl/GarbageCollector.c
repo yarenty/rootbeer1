@@ -293,14 +293,22 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedDouble($$__global$$ 
 
 $$__device__$$
 void java_io_PrintStream_println($$__global$$ char * gc_info, int thisref, int str_ret, int * exception){
-  int valueref = instance_getter_java_lang_String_value(gc_info, str_ret, exception);
+  int valueref = instance_getter_java_lang_String_value(gc_info, str_ret, exception);  
+  if(*exception != 0){
+    return; 
+  } 
   int count = instance_getter_java_lang_String_count(gc_info, str_ret, exception);
+  if(*exception != 0){
+    return; 
+  } 
   int offset = instance_getter_java_lang_String_offset(gc_info, str_ret, exception);
-  printf("count: %d offset: %d\n", count, offset);
+  if(*exception != 0){
+    return; 
+  } 
   char * valueref_deref = (char *) edu_syr_pcpratts_gc_deref(gc_info, valueref);
   for(int i = offset; i < count; ++i){
     int offset = 32 + (i * 4);
-    printf("[%c]", valueref_deref[offset]);
+    printf("%c", valueref_deref[offset]);
   }
   printf("\n");
 }
@@ -560,11 +568,9 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a66 ( char * gc_info , int
   edu_syr_pcpratts_gc_init_monitor ( thisref_deref ) ; 
 
   int len = edu_syr_pcpratts_array_length(gc_info, parameter0);
-  printf("String_init array_length: %d\n", len);
   int characters_copy = char__array_new(gc_info, len, exception);
   for(int i = 0; i < len; ++i){
     char ch = char__array_get(gc_info, parameter0, i, exception);
-    printf("  ch: %c\n", ch);
     char__array_set(gc_info, characters_copy, i, ch, exception);
   }
   instance_setter_java_lang_String_value ( gc_info , thisref , characters_copy , exception ) ; 
@@ -584,11 +590,11 @@ edu_syr_pcpratts_string_constant($$__global$$ char * gc_info, char * str_constan
   int i;
   int len = edu_syr_pcpratts_strlen(str_constant);
   int characters = char__array_new(gc_info, len, exception);
+  unsigned long long * addr = (unsigned long long *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
   for(i = 0; i < len; ++i){
     char__array_set(gc_info, characters, i, str_constant[i], exception);
   }
   
-  printf("string_constant: str: %s len: %d\n", str_constant, len);
   return java_lang_String_initab850b60f96d11de8a390800200c9a66(gc_info, characters, exception);
 }
 
@@ -637,27 +643,28 @@ $$__device__$$ void instance_setter_java_lang_Throwable_stackDepth($$__global$$ 
 $$__device__$$ void java_lang_VirtualMachineError_initab850b60f96d11de8a390800200c9a66_body0_($$__global$$ char * gc_info, int thisref, int * exception);
 
 $$__device__$$ int java_lang_OutOfMemoryError_initab850b60f96d11de8a390800200c9a66($$__global$$ char * gc_info, int * exception){
+  int r0 = -1;
+  int thisref = edu_syr_pcpratts_gc_malloc(gc_info, 40);
+  char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
 
-int r0 = -1;
-int thisref = edu_syr_pcpratts_gc_malloc(gc_info, 40);
-char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
+  //class info
+  edu_syr_pcpratts_gc_set_count(thisref_deref, 0);
+  edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY);
+  edu_syr_pcpratts_gc_set_type(thisref_deref, 9);
+  edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1);
+  edu_syr_pcpratts_gc_set_size(thisref_deref, 40);
 
-//class info
-edu_syr_pcpratts_gc_set_count(thisref_deref, 0);
-edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY);
-edu_syr_pcpratts_gc_set_type(thisref_deref, 9);
-edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1);
-edu_syr_pcpratts_gc_set_size(thisref_deref, 40);
-instance_setter_java_lang_Throwable_cause(gc_info, thisref, -1, exception);
-instance_setter_java_lang_Throwable_detailMessage(gc_info, thisref, -1, exception);
-instance_setter_java_lang_Throwable_stackTrace(gc_info, thisref, -1, exception);
-//r0 := @this: java.lang.OutOfMemoryError
-edu_syr_pcpratts_gc_assign(gc_info, & r0 ,  thisref );
-//specialinvoke r0.<java.lang.VirtualMachineError: void <init>()>()
-java_lang_VirtualMachineError_initab850b60f96d11de8a390800200c9a66_body0_(gc_info,
- thisref, exception);
-//return
-return thisref;
+  instance_setter_java_lang_Throwable_cause(gc_info, thisref, -1, exception);
+  instance_setter_java_lang_Throwable_detailMessage(gc_info, thisref, -1, exception);
+  instance_setter_java_lang_Throwable_stackTrace(gc_info, thisref, -1, exception);
+
+  //r0 := @this: java.lang.OutOfMemoryError
+  edu_syr_pcpratts_gc_assign(gc_info, & r0 ,  thisref );
+
+  //specialinvoke r0.<java.lang.VirtualMachineError: void <init>()>()
+  java_lang_VirtualMachineError_initab850b60f96d11de8a390800200c9a66_body0_(gc_info,
+   thisref, exception);
+  return thisref;
 }
 
 
@@ -744,7 +751,7 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(char * gc_
   int thisref ; 
   char * thisref_deref ; 
   thisref =-1 ; 
-  edu_syr_pcpratts_gc_assign ( gc_info , & thisref , edu_syr_pcpratts_gc_malloc ( gc_info , 32 ) ) ; 
+  edu_syr_pcpratts_gc_assign ( gc_info , & thisref , edu_syr_pcpratts_gc_malloc ( gc_info , 48 ) ) ; 
   if ( thisref ==-1 ) { 
     * exception = 21164 ; 
     return-1 ; 
@@ -752,9 +759,9 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(char * gc_
   thisref_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref ) ; 
   edu_syr_pcpratts_gc_set_count ( thisref_deref , 0 ) ; 
   edu_syr_pcpratts_gc_set_color ( thisref_deref , COLOR_GREY ) ; 
-  edu_syr_pcpratts_gc_set_type ( thisref_deref , 14470 ) ; 
+  edu_syr_pcpratts_gc_set_type ( thisref_deref , %%java_lang_StringBuilder_TypeNumber%% ) ; 
   edu_syr_pcpratts_gc_set_ctor_used ( thisref_deref , 1 ) ; 
-  edu_syr_pcpratts_gc_set_size ( thisref_deref , 32 ) ; 
+  edu_syr_pcpratts_gc_set_size ( thisref_deref , 44 ) ; 
   edu_syr_pcpratts_gc_init_monitor ( thisref_deref ) ; 
 
   int str_value = instance_getter_java_lang_String_value(gc_info, str, exception);
@@ -778,10 +785,10 @@ int java_lang_StringBuilder_append10_9_(char * gc_info, int thisref,
     exception);
 
   //get string value and count
-  int str_value = instance_getter_java_lang_String_value(gc_info, thisref,
+  int str_value = instance_getter_java_lang_String_value(gc_info, parameter0,
     exception);
 
-  int str_count = instance_getter_java_lang_String_count(gc_info, thisref,
+  int str_count = instance_getter_java_lang_String_count(gc_info, parameter0,
     exception);
 
   int new_count = sb_count + str_count;

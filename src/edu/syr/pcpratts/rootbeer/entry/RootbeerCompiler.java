@@ -39,6 +39,7 @@ import java.util.zip.ZipOutputStream;
 import pack.Pack;
 import soot.*;
 import soot.options.Options;
+import soot.rbclassload.DfsInfo;
 import soot.rbclassload.ListClassTester;
 import soot.rbclassload.ListMethodTester;
 import soot.rbclassload.MethodTester;
@@ -165,10 +166,10 @@ public class RootbeerCompiler {
     follow_tester.addSignature("<edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientTest: void <init>()>");
     RootbeerClassLoader.v().addFollowMethodTester(follow_tester);
     
-    RootbeerClassLoader.v().addFollowClassTester(new TestCaseFollowTester());
-    
-    RootbeerClassLoader.v().addConditionalCudaEntry(new StringConstantCudaEntry());
-    
+    if(runtests){
+      RootbeerClassLoader.v().addFollowClassTester(new TestCaseFollowTester());
+    }
+        
     DontDfsMethods dont_dfs_methods = new DontDfsMethods();
     ListMethodTester dont_dfs_tester = new ListMethodTester();
     Set<String> dont_dfs_set = dont_dfs_methods.get();
@@ -177,15 +178,10 @@ public class RootbeerCompiler {
     }
     RootbeerClassLoader.v().addDontFollowMethodTester(dont_dfs_tester);
     
-    RootbeerClassLoader.v().loadField("<java.lang.Class: java.lang.String name>");
-    RootbeerClassLoader.v().loadField("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_arrayLength>");
-    RootbeerClassLoader.v().loadField("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_arrayIndex>");
-    RootbeerClassLoader.v().loadField("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_array>");
-    RootbeerClassLoader.v().loadField("<java.lang.String: char[] value>");
-    RootbeerClassLoader.v().loadField("<java.lang.String: int count>");
-    RootbeerClassLoader.v().loadField("<java.lang.String: int offset>");
-    RootbeerClassLoader.v().loadField("<java.lang.StringBuilder: char[] value>");
-    RootbeerClassLoader.v().loadField("<java.lang.StringBuilder: int count>");
+    ExtraFields extra_fields = new ExtraFields();
+    for(String field_sig : extra_fields.get()){
+      RootbeerClassLoader.v().loadField(field_sig);
+    }
     
     RootbeerClassLoader.v().loadNecessaryClasses();
   }
@@ -224,8 +220,17 @@ public class RootbeerCompiler {
        
     Transform2 transform2 = new Transform2();
     for(SootMethod kernel_method : kernel_methods){   
+      
       System.out.println("running transform2 on: "+kernel_method.getSignature()+"...");
       RootbeerClassLoader.v().loadDfsInfo(kernel_method);
+      DfsInfo dfs_info = RootbeerClassLoader.v().getDfsInfo();
+      
+      RootbeerDfs rootbeer_dfs = new RootbeerDfs();
+      rootbeer_dfs.run(dfs_info);
+      
+      dfs_info.expandArrayTypes();
+      dfs_info.finalizeTypes();
+
       SootClass soot_class = kernel_method.getDeclaringClass();
       transform2.run(soot_class.getName());
     }

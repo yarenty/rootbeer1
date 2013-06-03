@@ -17,29 +17,29 @@ import soot.SootClass;
 import soot.SootField;
 
 public class OpenCLClass {
-  private final Set<OpenCLMethod> m_Methods;
-  private final Set<OpenCLField> mFields;
-  private final SootClass m_SootClass;
-  private List<OpenCLField> mInstanceRefFields;
-  private List<OpenCLField> mInstanceNonRefFields;
-  private List<OpenCLField> mAllUsedInstanceFields;
+  private final Set<OpenCLMethod> m_methods;
+  private final Set<OpenCLField> m_fields;
+  private final SootClass m_sootClass;
+  private List<OpenCLField> m_instanceRefFields;
+  private List<OpenCLField> m_instanceNonRefFields;
+  private List<OpenCLField> m_allUsedInstanceFields;
   
-  private List<OpenCLField> mStaticRefFields;
-  private List<OpenCLField> mStaticNonRefFields;
-  private List<OpenCLField> mAllUsedStaticFields;
+  private List<OpenCLField> m_staticRefFields;
+  private List<OpenCLField> m_staticNonRefFields;
+  private List<OpenCLField> m_allUsedStaticFields;
   
-  private int mStaticFieldSize;
+  private int m_staticFieldSize;
 
   public OpenCLClass(SootClass soot_class){
-    m_Methods = new LinkedHashSet<OpenCLMethod>();
-    mFields = new LinkedHashSet<OpenCLField>();
-    m_SootClass = soot_class;
-    mInstanceRefFields = null;
-    mInstanceNonRefFields = null;
-    mAllUsedInstanceFields = null;
-    mStaticRefFields = null;
-    mStaticNonRefFields = null;
-    mAllUsedStaticFields = null;
+    m_methods = new LinkedHashSet<OpenCLMethod>();
+    m_fields = new LinkedHashSet<OpenCLField>();
+    m_sootClass = soot_class;
+    m_instanceRefFields = null;
+    m_instanceNonRefFields = null;
+    m_allUsedInstanceFields = null;
+    m_staticRefFields = null;
+    m_staticNonRefFields = null;
+    m_allUsedStaticFields = null;
   }
   
   public void addField(SootField soot_field){
@@ -47,49 +47,63 @@ public class OpenCLClass {
   }
   
   public SootClass getSootClass(){
-    return m_SootClass;
+    return m_sootClass;
   }
 
   public void calculateStaticFieldSize(){
-    mStaticFieldSize = 0;
+    m_staticFieldSize = 0;
     determineFieldTypes();
-    for(OpenCLField field : mAllUsedInstanceFields){
+    for(OpenCLField field : m_allUsedInstanceFields){
       SootField soot_field = field.getSootField();
       if(soot_field.isStatic() == false)
         continue;
       OpenCLType type = new OpenCLType(soot_field.getType());
-      mStaticFieldSize += type.getSize();
+      m_staticFieldSize += type.getSize();
     }
   }
 
   public int getStaticFieldSize(){
-    return mStaticFieldSize;
+    return m_staticFieldSize;
   }
 
   public int getSize(){
+    int max = edu.syr.pcpratts.rootbeer.generate.bytecode.Constants.SizeGcInfo;
     try {
-      OffsetCalculator calc = OpenCLScene.v().getOffsetCalculator(m_SootClass);
-      return calc.getSize(m_SootClass);
+      SootClass soot_class = m_sootClass;
+      
+      //find the largest size from all super classes
+      while(true){
+        OffsetCalculator calc = OpenCLScene.v().getOffsetCalculator(soot_class);
+        int size = calc.getSize(soot_class);
+        if(size > max){
+          max = size;
+        }
+        if(soot_class.hasSuperclass()){
+          soot_class = soot_class.getSuperclass();
+        } else {
+          return max;
+        }
+      }
     } catch(RuntimeException ex){
-      return edu.syr.pcpratts.rootbeer.generate.bytecode.Constants.SizeGcInfo;
+      return max;
     }
   }
   
   public String getName(){
-    OpenCLType ocl_type = new OpenCLType(m_SootClass.getType());
+    OpenCLType ocl_type = new OpenCLType(m_sootClass.getType());
     return ocl_type.getDerefString();
   }
   
   public String getJavaName(){
-    return m_SootClass.getName();
+    return m_sootClass.getName();
   }
   
   public void addMethod(OpenCLMethod method){
-    m_Methods.add(method);
+    m_methods.add(method);
   }
 
   void addField(OpenCLField ocl_field) {
-    mFields.add(ocl_field);
+    m_fields.add(ocl_field);
   }
 
   @Override
@@ -97,7 +111,7 @@ public class OpenCLClass {
     if(o instanceof OpenCLClass == false)
       return false;
     OpenCLClass other = (OpenCLClass) o;
-    if(m_SootClass.equals(other.m_SootClass))
+    if(m_sootClass.equals(other.m_sootClass))
       return true;
     return false;
   }
@@ -110,54 +124,54 @@ public class OpenCLClass {
   @Override
   public int hashCode() {
     int hash = 5;
-    hash = 83 * hash + (this.m_SootClass != null ? this.m_SootClass.hashCode() : 0);
+    hash = 83 * hash + (this.m_sootClass != null ? this.m_sootClass.hashCode() : 0);
     return hash;
   }
 
   private void determineFieldTypes() {
     //caching
-    if(mInstanceRefFields != null)
+    if(m_instanceRefFields != null)
       return;
 
-    mInstanceRefFields = new ArrayList<OpenCLField>();
-    mInstanceNonRefFields = new ArrayList<OpenCLField>();
-    mAllUsedInstanceFields = new ArrayList<OpenCLField>();
+    m_instanceRefFields = new ArrayList<OpenCLField>();
+    m_instanceNonRefFields = new ArrayList<OpenCLField>();
+    m_allUsedInstanceFields = new ArrayList<OpenCLField>();
 
-    mStaticRefFields = new ArrayList<OpenCLField>();
-    mStaticNonRefFields = new ArrayList<OpenCLField>();
-    mAllUsedStaticFields = new ArrayList<OpenCLField>();
+    m_staticRefFields = new ArrayList<OpenCLField>();
+    m_staticNonRefFields = new ArrayList<OpenCLField>();
+    m_allUsedStaticFields = new ArrayList<OpenCLField>();
     
-    for(OpenCLField field : mFields){
+    for(OpenCLField field : m_fields){
       OpenCLType type = field.getType();
       if(type.isRefType()){
         if(field.isInstance()){
-          mInstanceRefFields.add(field);
+          m_instanceRefFields.add(field);
         } else {
-          mStaticRefFields.add(field);
+          m_staticRefFields.add(field);
         }
       } else {
         if(field.isInstance()){
-          mInstanceNonRefFields.add(field);
+          m_instanceNonRefFields.add(field);
         } else {
-          mStaticNonRefFields.add(field);
+          m_staticNonRefFields.add(field);
         }
       }
     }
 
-    mAllUsedInstanceFields.addAll(mInstanceRefFields);
-    mAllUsedInstanceFields.addAll(mInstanceNonRefFields);
+    m_allUsedInstanceFields.addAll(m_instanceRefFields);
+    m_allUsedInstanceFields.addAll(m_instanceNonRefFields);
     
-    mAllUsedStaticFields.addAll(mStaticRefFields);
-    mAllUsedStaticFields.addAll(mStaticNonRefFields);
+    m_allUsedStaticFields.addAll(m_staticRefFields);
+    m_allUsedStaticFields.addAll(m_staticNonRefFields);
   }
   
   public int getRefFieldsSize() {
     determineFieldTypes();
-    return mInstanceRefFields.size();
+    return m_instanceRefFields.size();
   }
 
   public List<OpenCLField> getAllUsedInstanceFields(){
-    return mAllUsedInstanceFields;
+    return m_allUsedInstanceFields;
   }
 
   boolean isLibraryClass() {
@@ -167,42 +181,42 @@ public class OpenCLClass {
   public List<OpenCLField> getInstanceRefFields() {
     determineFieldTypes();
     FieldPackingSorter sorter = new FieldPackingSorter();
-    return sorter.sort(mInstanceRefFields);
+    return sorter.sort(m_instanceRefFields);
   }
 
   public List<OpenCLField> getInstanceNonRefFields() {
     determineFieldTypes();
     FieldPackingSorter sorter = new FieldPackingSorter();
-    return sorter.sort(mInstanceNonRefFields);
+    return sorter.sort(m_instanceNonRefFields);
   }
   
   public List<OpenCLField> getStaticRefFields() {
     determineFieldTypes();
     FieldPackingSorter sorter = new FieldPackingSorter();
-    return sorter.sort(mStaticRefFields);
+    return sorter.sort(m_staticRefFields);
   }
   
   public List<OpenCLField> getStaticNonRefFields() {
     determineFieldTypes();
     FieldPackingSorter sorter = new FieldPackingSorter();
-    return sorter.sort(mStaticNonRefFields);
+    return sorter.sort(m_staticNonRefFields);
   }
   
   public List<OpenCLField> getAllUsedStaticFields(){
-    return mAllUsedStaticFields;
+    return m_allUsedStaticFields;
   }
 
   public Set<OpenCLMethod> getMethods() {
-    return m_Methods;
+    return m_methods;
   }
 
   public OpenCLField getField(String name) {
     determineFieldTypes();
-    for(OpenCLField field : mAllUsedInstanceFields){
+    for(OpenCLField field : m_allUsedInstanceFields){
       if(field.getName().equals(name))
         return field;
     }
-    for(OpenCLField field : mAllUsedStaticFields){
+    for(OpenCLField field : m_allUsedStaticFields){
       if(field.getName().equals(name))
         return field;
     }
@@ -210,7 +224,7 @@ public class OpenCLClass {
   }
 
   public OpenCLMethod getMethod(String signature) {
-    for(OpenCLMethod ocl_method : m_Methods){
+    for(OpenCLMethod ocl_method : m_methods){
       if(ocl_method.getSignature().equals(signature)){
         return ocl_method;
       }

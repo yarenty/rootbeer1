@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
+import edu.syr.pcpratts.rootbeer.entry.ExtraFields;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.ReadOnlyTypes;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
@@ -214,17 +215,8 @@ public class OpenCLScene {
       addField(field);
     }
     FieldSignatureUtil futil = new FieldSignatureUtil();
-    List<String> extra_fields = new ArrayList<String>();
-    extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_arrayLength>");
-    extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_arrayIndex>");
-    extra_fields.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: int m_array>");
-    extra_fields.add("<java.lang.Class: java.lang.String name>");
-    extra_fields.add("<java.lang.String: char[] value>");
-    extra_fields.add("<java.lang.String: int count>");
-    extra_fields.add("<java.lang.String: int offset>");
-    extra_fields.add("<java.lang.StringBuilder: char[] value>");
-    extra_fields.add("<java.lang.StringBuilder: int count>");
-    for(String extra_field : extra_fields){
+    ExtraFields extra_fields = new ExtraFields();
+    for(String extra_field : extra_fields.get()){
       futil.parse(extra_field);
       addField(futil.getSootField());
     }
@@ -300,6 +292,10 @@ public class OpenCLScene {
     //class names can have $ in them, make them regex safe
     replacement = replacement.replace("$", "\\$");
     cuda_code = cuda_code.replaceAll("%%invoke_run%%", replacement);  
+    
+    int string_builder_number = RootbeerClassLoader.v().getClassNumber("java.lang.StringBuilder");
+    String sbn_str = "" + string_builder_number;
+    cuda_code = cuda_code.replaceAll("%%java_lang_StringBuilder_TypeNumber%%", ""+sbn_str);
     return cuda_code;
   }
   

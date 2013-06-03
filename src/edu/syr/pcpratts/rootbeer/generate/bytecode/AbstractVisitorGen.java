@@ -40,6 +40,8 @@ public class AbstractVisitorGen {
     m_fieldInspector = inspector;
     m_classesToIgnore = new ArrayList<String>();
     m_classesToIgnore.add("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
+    m_classesToIgnore.add("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
+    m_classesToIgnore.add("edu.syr.pcpratts.rootbeer.runtimegpu.GpuException");
   }
   
   protected boolean differentPackageAndPrivate(RefType ref_inspecting) {
