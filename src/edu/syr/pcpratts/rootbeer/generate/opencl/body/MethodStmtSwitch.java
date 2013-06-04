@@ -178,7 +178,7 @@ public class MethodStmtSwitch implements StmtSwitch {
     m_output.append("char * "+synch+" = edu_syr_pcpratts_gc_deref(gc_info, ");
     arg0.getOp().apply(m_valueSwitch);
     m_output.append(");\n");
-    m_output.append(mem+" += 12;\n");
+    m_output.append(mem+" += 16;\n");
     m_output.append("int "+count+" = 0;\n");
     m_output.append("int "+old+";\n");
     m_output.append("while("+count+" < 100){\n");
@@ -191,7 +191,7 @@ public class MethodStmtSwitch implements StmtSwitch {
     m_output.append("  } else {\n");
     
     //the first write gets messed up in synch test cases
-    m_output.append("  * ( ( int * ) & "+synch+" [ 16 ] ) = 20 ;\n");
+    m_output.append("  * ( ( int * ) & "+synch+" [ 20 ] ) = 20 ;\n");
   }
 
   public void caseExitMonitorStmt(ExitMonitorStmt arg0) {
