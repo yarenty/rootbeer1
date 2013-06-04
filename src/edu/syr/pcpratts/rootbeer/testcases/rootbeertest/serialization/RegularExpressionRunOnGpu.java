@@ -8,7 +8,7 @@
 package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-
+/*
 public class RegularExpressionRunOnGpu implements Kernel {
 
   private String m_inputString1;
@@ -45,3 +45,4 @@ public class RegularExpressionRunOnGpu implements Kernel {
   }
   
 }
+*/
