@@ -56,10 +56,10 @@ Download it from http://www.nvidia.com/content/cuda/cuda-downloads.html
 
 ## API
 
-See the following links for help on the API:
-1. http://rbcompiler.com/
-2. http://rbcompiler.com/features.html
-3. https://github.com/pcpratts/rootbeer1/tree/develop/gtc2013/Matrix
+See the following links for help on the API:  
+1. http://rbcompiler.com/  
+2. http://rbcompiler.com/features.html  
+3. https://github.com/pcpratts/rootbeer1/tree/develop/gtc2013/Matrix  
 
 ## About
 
