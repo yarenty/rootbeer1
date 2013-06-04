@@ -262,14 +262,14 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     int size = ocl_class.getSize();
     int gc_count = ocl_class.getRefFieldsSize();
     
-    bcl_mem.writeByte((byte) gc_count);      //ref_type count
-    bcl_mem.writeByte((byte) 0);             //garabage collector color
-    bcl_mem.writeByte((byte) 0);             //reserved
-    bcl_mem.writeByte((byte) 0);             //ctor used
-    bcl_mem.writeInt(class_id);              //class number
-    bcl_mem.writeInt(size);                  //object size
-    bcl_mem.writeInt(0);                     //reserved
-    bcl_mem.writeInt(-1);                    //monitor
+    bcl_mem.writeByte((byte) gc_count);      //ref_type count [0]
+    bcl_mem.writeByte((byte) 0);             //garabage collector color [1]
+    bcl_mem.writeByte((byte) 0);             //reserved [2]
+    bcl_mem.writeByte((byte) 0);             //ctor used [3]
+    bcl_mem.writeInt(class_id);              //class number [4]
+    bcl_mem.writeInt(size);                  //object size [8]
+    bcl_mem.writeInt(0);                     //reserved [12]
+    bcl_mem.writeInt(-1);                    //monitor [16]
     
     int written_size = 1+1+1+1+4+4+4+4;
     

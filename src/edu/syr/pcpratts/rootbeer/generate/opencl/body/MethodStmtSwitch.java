@@ -189,6 +189,7 @@ public class MethodStmtSwitch implements StmtSwitch {
     m_output.append("      "+count+" = 0;\n");
     m_output.append("    }\n");
     m_output.append("  } else {\n");
+    m_output.append("    printf(\"thread_id entered: %d\\n\", getThreadId());\n");
     
     //the first write gets messed up in synch test cases
     m_output.append("  * ( ( int * ) & "+synch+" [ 20 ] ) = 20 ;\n");

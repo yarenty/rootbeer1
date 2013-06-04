@@ -12,14 +12,10 @@ import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 public class StringBuilderRunOnGpu implements Kernel {
   
   private String m_str;
-  
-  public StringBuilderRunOnGpu(){
-    m_str = "str"; 
-  }
-  
+
   public void gpuMethod(){
     //StringBuilder.append(boolean)
-    m_str += " " + true;
+    m_str = "str " + true;
     
     //StringBuilder.append(char)
     m_str += " " + 'c';

@@ -28,8 +28,11 @@ void edu_syr_pcpratts_exitMonitorRef($$__global$$ char * gc_info, int thisref, i
   char * mem = edu_syr_pcpratts_gc_deref(gc_info, thisref); 
   mem += 16;
   if(old == -1){    
+    printf("edu_syr_pcpratts_exitMonitorRef: old == -1\n");
     __threadfence();  
     atomicExch((int *) mem, -1); 
+  } else {
+    printf("edu_syr_pcpratts_exitMonitorRef: %d\n", old);
   }
 }
 

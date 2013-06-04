@@ -94,6 +94,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new GpuMethodTest());
     //ret.add(new RegularExpressionTest());
     ret.add(new StringBuilderTest());
+    ret.add(new StringBuilderTest2());
             
     if(m_hardTests){
       ret.add(new SimpleSynchronizedTest());
