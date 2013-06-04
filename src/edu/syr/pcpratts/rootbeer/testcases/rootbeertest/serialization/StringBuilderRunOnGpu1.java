@@ -9,13 +9,17 @@ package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 
-public class StringBuilderRunOnGpu implements Kernel {
+public class StringBuilderRunOnGpu1 implements Kernel {
   
   private String m_str;
 
+  public StringBuilderRunOnGpu1(){
+    m_str = "str";
+  }
+  
   public void gpuMethod(){
     //StringBuilder.append(boolean)
-    m_str = "str " + true;
+    m_str = " " + true;
     
     //StringBuilder.append(char)
     m_str += " " + 'c';
@@ -36,7 +40,7 @@ public class StringBuilderRunOnGpu implements Kernel {
     m_str += " " + "str";
   }
 
-  public boolean compare(StringBuilderRunOnGpu rhs) {
+  public boolean compare(StringBuilderRunOnGpu1 rhs) {
     if(rhs.m_str == null){
       System.out.println("rhs.m_str == null");
       return false;
