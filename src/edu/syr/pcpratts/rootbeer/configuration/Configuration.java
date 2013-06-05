@@ -45,6 +45,7 @@ public class Configuration {
   private boolean m_arrayChecks;
   private boolean m_doubles;
   private boolean m_recursion;
+  private boolean m_exceptions;
   
   static {
     m_printMem = false;
@@ -57,6 +58,7 @@ public class Configuration {
     m_arrayChecks = true;
     m_doubles = true;
     m_recursion = true;
+    m_exceptions = true;
   }
 
   private Configuration(boolean load) {
@@ -137,5 +139,13 @@ public class Configuration {
 
   public boolean getRecursion() {
     return m_recursion;
+  }
+
+  public void setExceptions(boolean value) {
+    m_exceptions = value;
+  }
+  
+  public boolean getExceptions(){
+    return m_exceptions;
   }
 }

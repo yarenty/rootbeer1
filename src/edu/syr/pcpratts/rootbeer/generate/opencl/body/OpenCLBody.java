@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
@@ -199,10 +200,12 @@ public class OpenCLBody {
     if(mod != 0)
       alloc_size += (8 - mod);
     ret.append("edu_syr_pcpratts_gc_assign(gc_info, &thisref, edu_syr_pcpratts_gc_malloc(gc_info, "+Integer.toString(alloc_size)+"));\n");
-    ret.append("if(thisref == -1){\n");
-    ret.append("  *exception = "+OpenCLScene.v().getOutOfMemoryNumber()+";\n");
-    ret.append("  return -1;\n");
-    ret.append("}\n");
+    if(Configuration.compilerInstance().getExceptions()){
+      ret.append("if(thisref == -1){\n");
+      ret.append("  *exception = "+OpenCLScene.v().getOutOfMemoryNumber()+";\n");
+      ret.append("  return -1;\n");
+      ret.append("}\n");
+    }
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
     ret.append("\n//class info\n");
     ret.append("edu_syr_pcpratts_gc_set_count(thisref_deref, "+Integer.toString(m_RefFieldsSize)+");\n");

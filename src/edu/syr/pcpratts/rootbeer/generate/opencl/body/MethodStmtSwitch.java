@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.body;
 
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLMethod;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -332,6 +333,10 @@ public class MethodStmtSwitch implements StmtSwitch {
   }
 
   private void checkException() {    
+    //if exceptions are turned off, do not check them
+    if(Configuration.compilerInstance().getExceptions() == false){
+      return;
+    }
     String prefix = Options.v().rbcl_remap_prefix();
     if(Options.v().rbcl_remap_all() == false){
       prefix = "";

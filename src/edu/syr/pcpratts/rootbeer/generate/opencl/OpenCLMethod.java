@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.entry.DontDfsMethods;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
@@ -155,15 +156,17 @@ public class OpenCLMethod {
     ret += "int old;\n";
     ret += "char * thisref_synch_deref;\n";
     if(m_sootMethod.isStatic() == false){
-      ret += "if(thisref == -1){\n";
-      SootClass null_ptr = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
-      ret += "  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr)+";\n";
-      if(returnsAValue()){
-        ret += "  return 0;\n";
-      } else {
-        ret += "  return;\n";
+      if(Configuration.compilerInstance().getExceptions()){
+        ret += "if(thisref == -1){\n";
+        SootClass null_ptr = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
+        ret += "  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr)+";\n";
+        if(returnsAValue()){
+          ret += "  return 0;\n";
+        } else {
+          ret += "  return;\n";
+        }
+        ret += "}\n";
       }
-      ret += "}\n";
     }
     ret += "id = getThreadId();\n";
     StaticOffsets static_offsets = new StaticOffsets();
@@ -199,18 +202,20 @@ public class OpenCLMethod {
     //adding this in makes the WhileTrueTest pass.
     //for some reason the first write to memory doesn't work well inside a sync block.
     if(m_sootMethod.isStatic() == false){
-      ret += "  if ( thisref ==-1 ) { \n";
-      ret += "    * exception = 11;\n";
-      ret += "  }\n";
+      if(Configuration.compilerInstance().getExceptions()){
+        ret += "  if ( thisref ==-1 ) { \n";
+        ret += "    * exception = 11;\n";
+        ret += "  }\n";
 
-      ret += "  if ( * exception != 0 ) {\n";
-      ret += "    edu_syr_pcpratts_exitMonitorMem ( gc_info , mem , old ) ;\n";
-      if(returnsAValue()){
-        ret += "    return 0;\n";
-      } else {
-        ret += "    return;\n";
+        ret += "  if ( * exception != 0 ) {\n";
+        ret += "    edu_syr_pcpratts_exitMonitorMem ( gc_info , mem , old ) ;\n";
+        if(returnsAValue()){
+          ret += "    return 0;\n";
+        } else {
+          ret += "    return;\n";
+        }
+        ret += "  }\n";
       }
-      ret += "  }\n";
 
       ret += "  thisref_synch_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref );\n";
       ret += "  * ( ( int * ) & thisref_synch_deref [ 20 ] ) = 20 ;\n";

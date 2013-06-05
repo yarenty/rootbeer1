@@ -95,6 +95,8 @@ public class Main {
         Configuration.compilerInstance().setDoubles(false);
       } else if(arg.equals("-norecursion")){
         Configuration.compilerInstance().setRecursion(false);
+      } else if(arg.equals("-noexceptions")){
+        Configuration.compilerInstance().setExceptions(false);
       } else if(m_simpleCompile == false){      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);
