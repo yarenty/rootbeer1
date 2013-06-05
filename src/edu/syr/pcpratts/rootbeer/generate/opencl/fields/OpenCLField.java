@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.fields;
 
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -171,10 +172,12 @@ public class OpenCLField {
       ret.append("int offset;\n");
     }
     ret.append(address_qual+" char * thisref_deref;\n");
-    ret.append("if(thisref == -1){\n");
-    ret.append("  *exception = "+null_num+";\n");
-    ret.append("  return 0;\n");
-    ret.append("}\n");
+    if(Configuration.compilerInstance().getExceptions()){
+      ret.append("if(thisref == -1){\n");
+      ret.append("  *exception = "+null_num+";\n");
+      ret.append("  return 0;\n");
+      ret.append("}\n");
+    }
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");
     if(composite.getClasses().size() == 1){
       SootClass sclass = composite.getClasses().get(0);
@@ -193,10 +196,12 @@ public class OpenCLField {
       ret.append("int offset;\n");
     }
     ret.append(address_qual+" char * thisref_deref;\n");
-    ret.append("if(thisref == -1){\n");
-    ret.append("  *exception = "+null_num+";\n");
-    ret.append("  return;\n");
-    ret.append("}\n");
+    if(Configuration.compilerInstance().getExceptions()){
+      ret.append("if(thisref == -1){\n");
+      ret.append("  *exception = "+null_num+";\n");
+      ret.append("  return;\n");
+      ret.append("}\n");
+    }
     ret.append("thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n");    
     if(composite.getClasses().size() == 1){
       SootClass sclass = composite.getClasses().get(0);  
