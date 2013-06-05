@@ -38,4 +38,9 @@ void edu_syr_pcpratts_syncthreads(){
   __syncthreads();
 }
 
+__device__
+void edu_syr_pcpratts_threadfence(){
+  _threadfence();
+}
+
 __device__ clock_t global_now;

@@ -28,18 +28,15 @@ void edu_syr_pcpratts_exitMonitorRef($$__global$$ char * gc_info, int thisref, i
   char * mem = edu_syr_pcpratts_gc_deref(gc_info, thisref); 
   mem += 16;
   if(old == -1){    
-    printf("edu_syr_pcpratts_exitMonitorRef: old == -1\n");
-    __threadfence();  
+    edu_syr_pcpratts_threadfence();  
     atomicExch((int *) mem, -1); 
-  } else {
-    printf("edu_syr_pcpratts_exitMonitorRef: %d\n", old);
   }
 }
 
 $$__device__$$
 void edu_syr_pcpratts_exitMonitorMem($$__global$$ char * gc_info, char * mem, int old){
   if(old == -1){   
-    __threadfence(); 
+    edu_syr_pcpratts_threadfence(); 
     atomicExch((int *) mem, -1);
   }
 }
@@ -334,6 +331,10 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_syncthreads($$__global$$ char
   edu_syr_pcpratts_syncthreads();
 }
 
+$$__device__$$ 
+void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_threadfence($$__global$$ char * gc_info, int * exception){
+  edu_syr_pcpratts_threadfence();
+}
 $$__device__$$ char
 edu_syr_pcpratts_cmp(long long lhs, long long rhs){
   if(lhs > rhs)
