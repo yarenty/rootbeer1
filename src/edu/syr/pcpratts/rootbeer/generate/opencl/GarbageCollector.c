@@ -873,10 +873,51 @@ int java_lang_StringBuilder_append10_6_(char * gc_info, int thisref,
 $$__device__$$ 
 int java_lang_StringBuilder_toString9_(char * gc_info, int thisref,
   int * exception){
-
+ 
   int value = instance_getter_java_lang_AbstractStringBuilder_value(gc_info, thisref,
     exception);
-
   return java_lang_String_initab850b60f96d11de8a390800200c9a66(gc_info, value, 
     exception);
+}
+
+//<java.lang.Double: java.lang.String toString(double)>
+$$__device__$$ 
+int java_lang_Double_toString9_8_(char * gc_info, double parameter0, int * exception){
+
+  long long long_value = (long) parameter0;
+  long_value *= 10000000;
+  long long fraction = (long) (parameter0 * 10000000);
+  fraction -= long_value;
+    
+  int part1 = java_lang_Long_toString9_6_(gc_info, long_value, exception);
+  int part2 = edu_syr_pcpratts_string_constant(gc_info, ".", exception);
+  int part3 = java_lang_Long_toString9_6_(gc_info, fraction, exception);
+
+  int string_builder = java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(gc_info,
+    part1, exception);
+  java_lang_StringBuilder_append10_9_(gc_info, string_builder, part2, exception);
+  java_lang_StringBuilder_append10_9_(gc_info, string_builder, part3, exception);
+
+  return java_lang_StringBuilder_toString9_(gc_info, string_builder, exception);
+}
+
+//<java.lang.Float: java.lang.String toString(float)>
+$$__device__$$ 
+int java_lang_Float_toString9_7_(char * gc_info, float parameter0, int * exception){
+
+  long long long_value = (long) parameter0;
+  long_value *= 10000000;
+  long long fraction = (long) (parameter0 * 10000000);
+  fraction -= long_value;
+    
+  int part1 = java_lang_Long_toString9_6_(gc_info, long_value, exception);
+  int part2 = edu_syr_pcpratts_string_constant(gc_info, ".", exception);
+  int part3 = java_lang_Long_toString9_6_(gc_info, fraction, exception);
+
+  int string_builder = java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(gc_info,
+    part1, exception);
+  java_lang_StringBuilder_append10_9_(gc_info, string_builder, part2, exception);
+  java_lang_StringBuilder_append10_9_(gc_info, string_builder, part3, exception);
+
+  return java_lang_StringBuilder_toString9_(gc_info, string_builder, exception);
 }

@@ -181,6 +181,8 @@ public class RootbeerCompiler {
     for(String dont_dfs : dont_dfs_set){
       dont_dfs_tester.addSignature(dont_dfs);
     }
+    dont_dfs_tester.addSignature("<java.lang.Double: java.lang.String toString(double)>");
+    dont_dfs_tester.addSignature("<java.lang.Float: java.lang.String toString(float)>");
     RootbeerClassLoader.v().addDontFollowMethodTester(dont_dfs_tester);
     
     ExtraFields extra_fields = new ExtraFields();

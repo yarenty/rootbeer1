@@ -355,7 +355,7 @@ public class OpenCLScene {
     ret = ret.replace("$$__global$$", Tweaks.v().getGlobalAddressSpaceQualifier());
     return ret;
   }
-
+  
   private String methodPrototypesString(){
     //using a set so duplicates get filtered out.
     Set<String> protos = new HashSet<String>();

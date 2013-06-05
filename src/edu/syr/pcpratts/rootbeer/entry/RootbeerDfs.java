@@ -42,6 +42,23 @@ public class RootbeerDfs {
     queue.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void <init>()>");
     queue.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
 
+    DontDfsMethods dont_dfs_methods = new DontDfsMethods();
+    Set<String> dont_dfs_set = dont_dfs_methods.get();
+    for(String dont_dfs : dont_dfs_set){
+      visited.add(dont_dfs);
+    }
+    visited.add("<java.lang.Double: java.lang.String toString(double)>");
+    visited.add("<java.lang.Float: java.lang.String toString(float)>");
+    
+    visited.add("<java.lang.StringBuilder: java.lang.StringBuilder append(boolean)>");
+    visited.add("<java.lang.StringBuilder: java.lang.StringBuilder append(char)>");
+    visited.add("<java.lang.StringBuilder: java.lang.StringBuilder append(double)>");
+    visited.add("<java.lang.StringBuilder: java.lang.StringBuilder append(float)>");
+    visited.add("<java.lang.StringBuilder: java.lang.StringBuilder append(int)>");
+    visited.add("<java.lang.StringBuilder: java.lang.StringBuilder append(long)>");
+    visited.add("<java.lang.StringBuilder: java.lang.StringBuilder append(java.lang.String)>");
+    visited.add("<java.lang.StringBuilder: java.lang.String toString()>");
+    
     while(queue.isEmpty() == false){
       String curr = queue.removeFirst();
       doDfsForRootbeer(curr, queue, visited);
@@ -63,7 +80,7 @@ public class RootbeerDfs {
     m_currDfsInfo.addType(mutil.getClassName());
     m_currDfsInfo.addType(mutil.getReturnType());
     m_currDfsInfo.addMethod(signature);
-
+    
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
     List<String> virt_methods = class_hierarchy.getVirtualMethods(signature);
     for(String virt_method : virt_methods){

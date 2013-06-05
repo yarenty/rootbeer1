@@ -489,6 +489,8 @@ public class OpenCLMethod {
     m_dontEmitMethods.add("<java.lang.StringBuilder: java.lang.StringBuilder append(long)>");
     m_dontEmitMethods.add("<java.lang.StringBuilder: java.lang.StringBuilder append(java.lang.String)>");
     m_dontEmitMethods.add("<java.lang.StringBuilder: java.lang.String toString()>");
+    m_dontEmitMethods.add("<java.lang.Double: java.lang.String toString(double)>");
+    m_dontEmitMethods.add("<java.lang.Float: java.lang.String toString(float)>");
     
     m_emitUnmangled.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
   }
