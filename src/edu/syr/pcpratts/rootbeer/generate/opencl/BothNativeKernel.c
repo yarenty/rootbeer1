@@ -16,6 +16,10 @@ void edu_syr_pcpratts_threadfence()
 {
 }
 
+void edu_syr_pcpratts_threadfence_block()
+{
+}
+
 char *
 edu_syr_pcpratts_gc_deref(char * gc_info, int handle){
   long long lhandle;

@@ -335,6 +335,12 @@ $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_threadfence($$__global$$ char * gc_info, int * exception){
   edu_syr_pcpratts_threadfence();
 }
+
+$$__device__$$ 
+void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_threadfenceBlock($$__global$$ char * gc_info, int * exception){
+  edu_syr_pcpratts_threadfence_block();
+}
+
 $$__device__$$ char
 edu_syr_pcpratts_cmp(long long lhs, long long rhs){
   if(lhs > rhs)

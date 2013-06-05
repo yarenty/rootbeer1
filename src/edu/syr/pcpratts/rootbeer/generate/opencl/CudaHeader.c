@@ -40,7 +40,12 @@ void edu_syr_pcpratts_syncthreads(){
 
 __device__
 void edu_syr_pcpratts_threadfence(){
-  _threadfence();
+  __threadfence();
+}
+
+__device__
+void edu_syr_pcpratts_threadfence_block(){
+  __threadfence_block();
 }
 
 __device__ clock_t global_now;

@@ -46,6 +46,7 @@ int getBlockDimx();
 
 void edu_syr_pcpratts_syncthreads();
 void edu_syr_pcpratts_threadfence();
+void edu_syr_pcpratts_threadfence_block();
 
 long long m_Local[3];
 int * m_Cache;
