@@ -825,7 +825,7 @@ int java_lang_StringBuilder_append10_9_(char * gc_info, int thisref,
 //<java.lang.StringBuilder: java.lang.StringBuilder append(boolean)>
 $$__device__$$ 
 int java_lang_StringBuilder_append10_1_(char * gc_info, int thisref,
-  int parameter0, int * exception){
+  bool parameter0, int * exception){
   
   int str = java_lang_Boolean_toString9_1_(gc_info, parameter0, exception);
   return java_lang_StringBuilder_append10_9_(gc_info, thisref, str, exception);
@@ -843,7 +843,7 @@ int java_lang_StringBuilder_append10_3_(char * gc_info, int thisref,
 //<java.lang.StringBuilder: java.lang.StringBuilder append(double)>
 $$__device__$$ 
 int java_lang_StringBuilder_append10_8_(char * gc_info, int thisref,
-  int parameter0, int * exception){
+  double parameter0, int * exception){
   
   int str = java_lang_Double_toString9_8_(gc_info, parameter0, exception);
   return java_lang_StringBuilder_append10_9_(gc_info, thisref, str, exception);
@@ -852,7 +852,7 @@ int java_lang_StringBuilder_append10_8_(char * gc_info, int thisref,
 //<java.lang.StringBuilder: java.lang.StringBuilder append(float)>
 $$__device__$$ 
 int java_lang_StringBuilder_append10_7_(char * gc_info, int thisref,
-  int parameter0, int * exception){
+  float parameter0, int * exception){
   
   int str = java_lang_Float_toString9_7_(gc_info, parameter0, exception);
   return java_lang_StringBuilder_append10_9_(gc_info, thisref, str, exception);
@@ -870,7 +870,7 @@ int java_lang_StringBuilder_append10_5_(char * gc_info, int thisref,
 //<java.lang.StringBuilder: java.lang.StringBuilder append(long)>
 $$__device__$$ 
 int java_lang_StringBuilder_append10_6_(char * gc_info, int thisref,
-  int parameter0, int * exception){
+  long long parameter0, int * exception){
 
   int str = java_lang_Long_toString9_6_(gc_info, parameter0, exception);
   return java_lang_StringBuilder_append10_9_(gc_info, thisref, str, exception);
