@@ -13,18 +13,7 @@ import edu.syr.pcpratts.rootbeer.compiler.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.NativeCpuTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
-import edu.syr.pcpratts.rootbeer.runtime.CompiledKernel;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-import edu.syr.pcpratts.rootbeer.runtime.PartiallyCompletedParallelJob;
-import edu.syr.pcpratts.rootbeer.runtime.Serializer;
-import edu.syr.pcpratts.rootbeer.runtime.memory.Memory;
-import edu.syr.pcpratts.rootbeer.runtime2.cuda.CpuRunner;
-import edu.syr.pcpratts.rootbeer.runtime2.cuda.Handles;
-import edu.syr.pcpratts.rootbeer.runtime2.cuda.ToSpaceReader;
-import edu.syr.pcpratts.rootbeer.runtime2.cuda.ToSpaceWriter;
-import edu.syr.pcpratts.rootbeer.test.TestSerialization;
 import edu.syr.pcpratts.rootbeer.util.*;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -33,6 +22,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -95,10 +86,10 @@ public class RootbeerCompiler {
     
   private void setupSoot(String jar_filename, String rootbeer_jar, boolean runtests){
     RootbeerClassLoader.v().setUserJar(jar_filename);
-    extractJar(jar_filename);
+    //extractJar(jar_filename);
     
     List<String> proc_dir = new ArrayList<String>();
-    proc_dir.add(RootbeerPaths.v().getJarContentsFolder());
+    proc_dir.add(jar_filename);
     
     Options.v().set_allow_phantom_refs(true);
     Options.v().set_rbclassload(true);
@@ -201,7 +192,7 @@ public class RootbeerCompiler {
     m_provider = detector.getProvider();
         
     List<SootMethod> kernel_methods = RootbeerClassLoader.v().getEntryPoints();
-    compileForKernels(outname, kernel_methods);
+    compileForKernels(outname, kernel_methods, jar_filename);
   }
   
   public void compile(String jar_filename, String outname) throws Exception {
@@ -214,10 +205,10 @@ public class RootbeerCompiler {
     setupSoot(jar_filename, jar_name.get(), run_tests);
     
     List<SootMethod> kernel_methods = RootbeerClassLoader.v().getEntryPoints();
-    compileForKernels(outname, kernel_methods);
+    compileForKernels(outname, kernel_methods, jar_filename);
   }
   
-  private void compileForKernels(String outname, List<SootMethod> kernel_methods) throws Exception {
+  private void compileForKernels(String outname, List<SootMethod> kernel_methods, String jar_filename) throws Exception {
     
     if(kernel_methods.isEmpty()){
       System.out.println("There are no kernel classes. Please implement the following interface to use rootbeer:");
@@ -271,7 +262,7 @@ public class RootbeerCompiler {
       }
     }
     
-    makeOutJar();
+    makeOutJar(jar_filename);
     pack(outname);
   }
   
@@ -284,25 +275,30 @@ public class RootbeerCompiler {
     p.run(main_jar, lib_jars, outjar_name);
   }
 
-  public void makeOutJar() throws Exception {
+  public void makeOutJar(String jar_filename) throws Exception {
     JarEntryHelp.mkdir(RootbeerPaths.v().getOutputJarFolder() + File.separator);
     String outfile = RootbeerPaths.v().getOutputJarFolder() + File.separator + "partial-ret.jar";
 
     ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(outfile));
-    addJarInputManifestFiles(zos);
+    addJarInputManifestFiles(zos, jar_filename);
     addOutputClassFiles(zos);
     addConfigurationFile(zos);
     zos.flush();
     zos.close();
   }
   
-  private void addJarInputManifestFiles(ZipOutputStream zos) throws Exception {
-    List<File> jar_input_files = getFiles(RootbeerPaths.v().getJarContentsFolder());
-    for(File f : jar_input_files){
-      if(f.getPath().contains("META-INF")){
-        writeFileToOutput(f, zos, RootbeerPaths.v().getJarContentsFolder());
+  private void addJarInputManifestFiles(ZipOutputStream zos, String jar_filename) throws Exception {
+    JarInputStream jin = new JarInputStream(new FileInputStream(jar_filename));
+    while(true){
+      JarEntry jar_entry = jin.getNextJarEntry();
+      if(jar_entry == null){
+        break;
+      }
+      if(jar_entry.getName().contains("META_INF")){
+        writeFileToOutput(jin, jar_entry, zos, RootbeerPaths.v().getJarContentsFolder());
       }
     }
+    jin.close();
   }
 
   private void addOutputClassFiles(ZipOutputStream zos) throws Exception {
@@ -373,6 +369,22 @@ public class RootbeerCompiler {
     fout.close();
   }
   
+  private void writeFileToOutput(JarInputStream jin, JarEntry jar_entry, ZipOutputStream zos, String folder) throws Exception {
+    ZipEntry entry = new ZipEntry(jar_entry.getName());
+    entry.setSize(jar_entry.getSize());
+    entry.setCrc(jar_entry.getCrc());
+    zos.putNextEntry(entry);
+
+    while(true){
+      byte[] buffer = new byte[4096];
+      int len = jin.read(buffer);
+      if(len == -1)
+        break;
+      zos.write(buffer, 0, len);
+    }
+    zos.flush();
+  }
+  
   private void writeFileToOutput(File f, ZipOutputStream zos, String folder) throws Exception {
     String name = makeJarFileName(f, folder);
     ZipEntry entry = new ZipEntry(name);
@@ -428,21 +440,6 @@ public class RootbeerCompiler {
     } catch(Exception ex){
       System.out.println("Error writing .jimple: "+cls);
     }   
-  }
-  
-  private void writeClassFileString(String cls){
-    try { 
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      SootClass c = Scene.v().getSootClass(cls);
-      PrintWriter writer = new PrintWriter(new OutputStreamWriter(bout));
-      new soot.jimple.JasminClass(c).print(writer);
-      writer.flush();
-      byte[] array = bout.toByteArray();
-      String string = new String(array);
-      System.out.println(string);
-    } catch(Exception ex){
-      ex.printStackTrace();
-    }
   }
   
   private void writeClassFile(String cls, String filename){
@@ -528,16 +525,5 @@ public class RootbeerCompiler {
 
   public String getProvider() {
     return m_provider;
-  }
-
-  private void extractJar(String jar_filename) {
-    JarToFolder extractor = new JarToFolder();
-    try {
-      System.out.println("extracting jar "+jar_filename+"...");
-      extractor.writeJar(jar_filename, RootbeerPaths.v().getJarContentsFolder());
-    } catch(Exception ex){
-      ex.printStackTrace();
-      System.exit(0);
-    }
   }
 }
