@@ -123,21 +123,6 @@ public class MethodStmtSwitch implements StmtSwitch {
       }
       m_valueSwitch.clearLhsRhs();
     }
-    //if the left op is a ref type we use gc_assign
-    else if(ocl_left_op_type.isRefType()){
-      m_valueSwitch.setLhs();
-      m_valueSwitch.resetNewCalled();
-      m_output.append("edu_syr_pcpratts_gc_assign(gc_info, &");
-      arg0.getLeftOp().apply(m_valueSwitch);
-      m_output.append(", ");
-      m_valueSwitch.setRhs();
-      arg0.getRightOp().apply(m_valueSwitch);
-      m_output.append(");\n");
-      if(m_valueSwitch.getCheckException()){
-        checkException();
-      }
-      m_valueSwitch.clearLhsRhs();
-    }
     //otherwise just use normal assignment
     else {
       m_valueSwitch.setLhs();
