@@ -16,9 +16,11 @@ import soot.Type;
 import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.DfsInfo;
 import soot.rbclassload.FieldSignatureUtil;
+import soot.rbclassload.HierarchySignature;
 import soot.rbclassload.HierarchyValueSwitch;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
+import soot.rbclassload.StringNumbers;
 import soot.rbclassload.StringToType;
 
 /**
@@ -33,22 +35,23 @@ public class RootbeerDfs {
     m_currDfsInfo = dfs_info;
     String signature = dfs_info.getRootMethodSignature();
     
-    Set<String> visited = new HashSet<String>();
+    Set<HierarchySignature> visited = new HashSet<HierarchySignature>();
     //System.out.println("doing rootbeer dfs: "+signature);
-    LinkedList<String> queue = new LinkedList<String>();
-    queue.add(signature);
-    queue.add("<java.lang.Integer: java.lang.String toString(int)>");
-    queue.add("<edu.syr.pcpratts.rootbeer.runtime.Sentinal: void <init>()>");
-    queue.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void <init>()>");
-    queue.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
+    LinkedList<HierarchySignature> queue = new LinkedList<HierarchySignature>();
+    queue.add(new HierarchySignature(signature));
+    queue.add(new HierarchySignature("<java.lang.Integer: java.lang.String toString(int)>"));
+    queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtime.Sentinal: void <init>()>"));
+    queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void <init>()>"));
+    queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>"));
     
     while(queue.isEmpty() == false){
-      String curr = queue.removeFirst();
+      HierarchySignature curr = queue.removeFirst();
       doDfsForRootbeer(curr, queue, visited);
     }
   }
 
-  private void doDfsForRootbeer(String signature, LinkedList<String> queue, Set<String> visited){
+  private void doDfsForRootbeer(HierarchySignature signature, 
+    LinkedList<HierarchySignature> queue, Set<HierarchySignature> visited){
 
     if(visited.contains(signature)){
       return;
@@ -59,14 +62,13 @@ public class RootbeerDfs {
     FieldSignatureUtil futil = new FieldSignatureUtil();
     MethodSignatureUtil mutil = new MethodSignatureUtil();
 
-    mutil.parse(signature);
-    m_currDfsInfo.addType(mutil.getClassName());
-    m_currDfsInfo.addType(mutil.getReturnType());
-    m_currDfsInfo.addMethod(signature);
+    m_currDfsInfo.addType(signature.getClassName());
+    m_currDfsInfo.addType(signature.getReturnType());
+    m_currDfsInfo.addMethod(signature.toString());
     
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    List<String> virt_methods = class_hierarchy.getVirtualMethods(signature);
-    for(String virt_method : virt_methods){
+    List<HierarchySignature> virt_methods = class_hierarchy.getVirtualMethods(signature);
+    for(HierarchySignature virt_method : virt_methods){
       if(RootbeerClassLoader.v().dontFollow(virt_method)){
         continue;
       }
@@ -77,12 +79,13 @@ public class RootbeerDfs {
     }
 
     HierarchyValueSwitch value_switch = RootbeerClassLoader.v().getValueSwitch(signature);
-    for(String type_str : value_switch.getAllTypes()){
+    for(Integer num : value_switch.getAllTypesInteger()){
+      String type_str = StringNumbers.v().getString(num);
       Type type = converter.convert(type_str);
       m_currDfsInfo.addType(type);
     }    
 
-    for(String method_sig : value_switch.getMethodRefs()){
+    for(HierarchySignature method_sig : value_switch.getMethodRefsHierarchy()){
       if(RootbeerClassLoader.v().dontFollow(method_sig)){
         continue;
       }
@@ -96,8 +99,9 @@ public class RootbeerDfs {
       m_currDfsInfo.addField(soot_field);
     }
 
-    for(String instanceof_str : value_switch.getInstanceOfs()){
-      Type type = converter.convert(instanceof_str);
+    for(Integer num : value_switch.getInstanceOfsInteger()){
+      String type_str = StringNumbers.v().getString(num);
+      Type type = converter.convert(type_str);
       m_currDfsInfo.addInstanceOf(type);
     }
   }

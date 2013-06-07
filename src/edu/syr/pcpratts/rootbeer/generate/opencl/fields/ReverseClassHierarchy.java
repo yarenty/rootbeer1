@@ -21,6 +21,7 @@ import soot.options.Options;
 import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.HierarchyGraph;
 import soot.rbclassload.RootbeerClassLoader;
+import soot.rbclassload.StringNumbers;
 
 public class ReverseClassHierarchy {
   private List<TreeNode> m_Hierarchy;
@@ -43,13 +44,14 @@ public class ReverseClassHierarchy {
     SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
     HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph(obj_class);
     
-    List<String> queue = new LinkedList<String>();
-    queue.add("java.lang.Object");
+    List<Integer> queue = new LinkedList<Integer>();
+    queue.add(0);                         //java.lang.Object is number 0
     
     while(!queue.isEmpty()){
-      String class_name = queue.get(0);
+      Integer class_num = queue.get(0);
       queue.remove(0);
       
+      String class_name = StringNumbers.v().getString(class_num);
       if(key_set.contains(class_name) && !class_name.equals("java.lang.Object")){
         if(roots.contains(class_name)){
           continue;
@@ -61,7 +63,7 @@ public class ReverseClassHierarchy {
           roots.add(class_name);
         }
       } else {
-        queue.addAll(hgraph.getChildren(class_name));
+        queue.addAll(hgraph.getChildren(class_num));
       }
       if(roots.size() == m_Classes.size()){
         break;
@@ -87,7 +89,11 @@ public class ReverseClassHierarchy {
           node.addChild(soot_class, ocl_class);
           break;
         } else {
-          up_queue.addAll(hgraph.getParents(curr_class));
+          int num = StringNumbers.v().addString(curr_class);
+          Set<Integer> parents = hgraph.getParents(num);
+          for(Integer parent : parents){
+            up_queue.add(StringNumbers.v().getString(parent));
+          }
         }
       }
     }

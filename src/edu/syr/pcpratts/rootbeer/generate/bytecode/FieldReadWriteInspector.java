@@ -20,6 +20,7 @@ import soot.rbclassload.HierarchyGraph;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
+import soot.rbclassload.StringNumbers;
 import soot.util.Chain;
 
 public class FieldReadWriteInspector {
@@ -118,9 +119,10 @@ public class FieldReadWriteInspector {
 
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
     HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph(soot_class);
-    Set<String> classes = hgraph.getAllClasses();
+    Set<Integer> classes = hgraph.getAllClasses();
     
-    for(String class_name : classes){
+    for(Integer class_num : classes){
+      String class_name = StringNumbers.v().getString(class_num);
       SootClass curr_class = Scene.v().getSootClass(class_name);
       Chain<SootField> fields = curr_class.getFields();
       for(SootField field : fields){
