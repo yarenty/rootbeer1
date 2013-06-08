@@ -169,11 +169,11 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     int class_id = RootbeerClassLoader.v().getClassNumber(type.toString());
 
     BclMemory bcl_mem = new BclMemory(bcl, m_CurrentMem.top());
-    bcl_mem.writeByte((byte) 0);      //ref_type count
-    bcl_mem.writeByte((byte) 0);      //garabage collector color
-    bcl_mem.writeByte((byte) 0);      //reserved
-    bcl_mem.writeByte((byte) 0);      //ctor used
-    bcl_mem.writeInt(class_id);       //class number
+    bcl_mem.writeByte((byte) 0);      //ref_type count              [0]
+    bcl_mem.writeByte((byte) 0);      //garabage collector color    [1]
+    bcl_mem.writeByte((byte) 0);      //reserved                    [2]
+    bcl_mem.writeByte((byte) 0);      //ctor used                   [3]
+    bcl_mem.writeInt(class_id);       //class number                [4]
 
     Local size = bcl.local(IntType.v());
     bcl.assign(size, IntConstant.v(Constants.SizeGcInfo));
@@ -187,12 +187,12 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     }
     bcl.mult(element_size, length);
     bcl.plus(size, element_size);
-    bcl_mem.writeInt(size);           //object size
-    bcl_mem.writeInt(length);         //array length
-    bcl_mem.writeInt(-1);             //monitor
-    bcl_mem.writeInt(0);              //reserved
-    bcl_mem.writeInt(0);              //reserved
-    bcl_mem.writeInt(0);              //reserved
+    bcl_mem.writeInt(size);           //object size                 [8]
+    bcl_mem.writeInt(length);         //array length                [12]
+    bcl_mem.writeInt(-1);             //monitor                     [16]
+    bcl_mem.writeInt(0);              //reserved                    [20]
+    bcl_mem.writeInt(0);              //reserved                    [24]
+    bcl_mem.writeInt(0);              //reserved                    [28]
     
 
     //optimization for single-dimensional arrays of primitive types.

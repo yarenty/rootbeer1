@@ -725,29 +725,29 @@ java_util_Arrays_copyOf(char * gc_info, int object_array, int new_size, int * ex
   int length;
   int i;
   
-  ret = edu_syr_pcpratts_gc_malloc(gc_info, 16 + (4 * new_size));
+  ret = edu_syr_pcpratts_gc_malloc(gc_info, 32 + (4 * new_size));
   ret_deref = edu_syr_pcpratts_gc_deref(gc_info, ret);
   object_array_deref = edu_syr_pcpratts_gc_deref(gc_info, object_array);
     
-  for(i = 0; i < 16; ++i){
+  for(i = 0; i < 32; ++i){
     ret_deref[i] = object_array_deref[i];
   }
-  
+
   length = edu_syr_pcpratts_getint(object_array_deref, 12);
-  
-  edu_syr_pcpratts_setint(ret_deref, 8, new_size);
-  
+  edu_syr_pcpratts_setint(ret_deref, 8, 32 + (4 * new_size));
+  edu_syr_pcpratts_setint(ret_deref, 12, new_size);
+      
   if(length < new_size){
     for(i = 0; i < length * 4; ++i){
-      ret_deref[16+i], object_array_deref[16+i];
+      ret_deref[32+i], object_array_deref[32+i];
     }
     int diff = new_size - length;
     for(i = 0; i < diff; ++i){
-      * ((int *) ret_deref[16 + (length * 4) + (i * 4)]) = -1;
+      * ((int *) &ret_deref[32 + (length * 4) + (i * 4)]) = -1;
     }
   } else {
     for(i = 0; i < new_size * 4; ++i){
-      ret_deref[16+i], object_array_deref[16+i];
+      ret_deref[32+i], object_array_deref[32+i];
     }
   }
   return ret; 
