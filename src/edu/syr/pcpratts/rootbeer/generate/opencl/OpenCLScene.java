@@ -301,7 +301,12 @@ public class OpenCLScene {
     
     int string_builder_number = RootbeerClassLoader.v().getClassNumber("java.lang.StringBuilder");
     String sbn_str = "" + string_builder_number;
-    cuda_code = cuda_code.replaceAll("%%java_lang_StringBuilder_TypeNumber%%", ""+sbn_str);
+    cuda_code = cuda_code.replaceAll("%%java_lang_StringBuilder_TypeNumber%%", sbn_str);
+    
+    int null_pointer_number = RootbeerClassLoader.v().getClassNumber("java.lang.NullPointerException");
+    String np_str = "" + null_pointer_number;
+    cuda_code = cuda_code.replaceAll("%%java_lang_NullPointerException_TypeNumber%%", np_str);
+    
     return cuda_code;
   }
   
@@ -330,7 +335,14 @@ public class OpenCLScene {
       both_header = ResourceReader.getResource(both_path);
     }
     String specific_header = ResourceReader.getResource(specific_path);
-    return specific_header + "\n" + both_header;
+    
+    String barrier_path = Tweaks.v().getBarrierPath();
+    String barrier_code = "";
+    if(barrier_path != null){
+      barrier_code = ResourceReader.getResource(barrier_path);
+    }
+    
+    return specific_header + "\n" + both_header + "\n" + barrier_code;
   }
   
   private String kernelString(boolean unix) throws IOException {

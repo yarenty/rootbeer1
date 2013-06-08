@@ -293,22 +293,30 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedDouble($$__global$$ 
 
 $$__device__$$
 void java_io_PrintStream_println($$__global$$ char * gc_info, int thisref, int str_ret, int * exception){
-  int valueref = instance_getter_java_lang_String_value(gc_info, str_ret, exception);  
+  int valueref;
+  int count;
+  int offset;
+  int i;
+  int curr_offset;
+
+  char * valueref_deref;
+
+  valueref = instance_getter_java_lang_String_value(gc_info, str_ret, exception);  
   if(*exception != 0){
     return; 
   } 
-  int count = instance_getter_java_lang_String_count(gc_info, str_ret, exception);
+  count = instance_getter_java_lang_String_count(gc_info, str_ret, exception);
   if(*exception != 0){
     return; 
   } 
-  int offset = instance_getter_java_lang_String_offset(gc_info, str_ret, exception);
+  offset = instance_getter_java_lang_String_offset(gc_info, str_ret, exception);
   if(*exception != 0){
     return; 
   } 
-  char * valueref_deref = (char *) edu_syr_pcpratts_gc_deref(gc_info, valueref);
-  for(int i = offset; i < count; ++i){
-    int offset = 32 + (i * 4);
-    printf("%c", valueref_deref[offset]);
+  valueref_deref = (char *) edu_syr_pcpratts_gc_deref(gc_info, valueref);
+  for(i = offset; i < count; ++i){
+    curr_offset = 32 + (i * 4);
+    printf("%c", valueref_deref[curr_offset]);
   }
   printf("\n");
 }
@@ -563,6 +571,11 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a66 ( char * gc_info , int
   int $r2 =-1 ; 
   int thisref ; 
   char * thisref_deref ; 
+  int i;
+  int len;
+  int characters_copy;
+  char ch;
+  
   thisref =-1 ; 
   edu_syr_pcpratts_gc_assign ( gc_info , & thisref , edu_syr_pcpratts_gc_malloc ( gc_info , 48 ) ) ; 
   if ( thisref ==-1 ) { 
@@ -577,10 +590,10 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a66 ( char * gc_info , int
   edu_syr_pcpratts_gc_set_size ( thisref_deref , 48 ) ; 
   edu_syr_pcpratts_gc_init_monitor ( thisref_deref ) ; 
 
-  int len = edu_syr_pcpratts_array_length(gc_info, parameter0);
-  int characters_copy = char__array_new(gc_info, len, exception);
-  for(int i = 0; i < len; ++i){
-    char ch = char__array_get(gc_info, parameter0, i, exception);
+  len = edu_syr_pcpratts_array_length(gc_info, parameter0);
+  characters_copy = char__array_new(gc_info, len, exception);
+  for(i = 0; i < len; ++i){
+    ch = char__array_get(gc_info, parameter0, i, exception);
     char__array_set(gc_info, characters_copy, i, ch, exception);
   }
   instance_setter_java_lang_String_value ( gc_info , thisref , characters_copy , exception ) ; 
@@ -763,7 +776,7 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(char * gc_
   thisref =-1 ; 
   edu_syr_pcpratts_gc_assign ( gc_info , & thisref , edu_syr_pcpratts_gc_malloc ( gc_info , 48 ) ) ; 
   if ( thisref ==-1 ) { 
-    * exception = 21164 ; 
+    * exception = %%java_lang_NullPointerException_TypeNumber%%; 
     return-1 ; 
   } 
   thisref_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref ) ; 
@@ -787,34 +800,44 @@ $$__device__$$
 int java_lang_StringBuilder_append10_9_(char * gc_info, int thisref,
   int parameter0, int * exception){
 
+  int sb_value;
+  int sb_count;
+  int str_value;
+  int str_count;
+  int new_count;
+  int new_sb_value;
+  int i;
+  char ch;
+  int new_str;
+
   //get string builder value and count
-  int sb_value = instance_getter_java_lang_AbstractStringBuilder_value(gc_info, thisref,
+  sb_value = instance_getter_java_lang_AbstractStringBuilder_value(gc_info, thisref,
     exception);
 
-  int sb_count = instance_getter_java_lang_AbstractStringBuilder_count(gc_info, thisref,
+  sb_count = instance_getter_java_lang_AbstractStringBuilder_count(gc_info, thisref,
     exception);
 
   //get string value and count
-  int str_value = instance_getter_java_lang_String_value(gc_info, parameter0,
+  str_value = instance_getter_java_lang_String_value(gc_info, parameter0,
     exception);
 
-  int str_count = instance_getter_java_lang_String_count(gc_info, parameter0,
+  str_count = instance_getter_java_lang_String_count(gc_info, parameter0,
     exception);
 
-  int new_count = sb_count + str_count;
+  new_count = sb_count + str_count;
 
-  int new_sb_value = char__array_new(gc_info, new_count, exception);
-  for(int i = 0; i < sb_count; ++i){
-    char ch = char__array_get(gc_info, sb_value, i, exception);
+  new_sb_value = char__array_new(gc_info, new_count, exception);
+  for(i = 0; i < sb_count; ++i){
+    ch = char__array_get(gc_info, sb_value, i, exception);
     char__array_set(gc_info, new_sb_value, i, ch, exception);
   }
-  for(int i = 0; i < str_count; ++i){
-    char ch = char__array_get(gc_info, str_value, i, exception);
+  for(i = 0; i < str_count; ++i){
+    ch = char__array_get(gc_info, str_value, i, exception);
     char__array_set(gc_info, new_sb_value, sb_count + i, ch, exception);
   }
 
   //make new String
-  int new_str = java_lang_String_initab850b60f96d11de8a390800200c9a66(gc_info, 
+  new_str = java_lang_String_initab850b60f96d11de8a390800200c9a66(gc_info, 
     new_sb_value, exception);
 
   //return new StringBuilder from String
@@ -891,16 +914,23 @@ int java_lang_StringBuilder_toString9_(char * gc_info, int thisref,
 $$__device__$$ 
 int java_lang_Double_toString9_8_(char * gc_info, double parameter0, int * exception){
 
-  long long long_value = (long) parameter0;
+  long long long_value;
+  long long fraction;
+  int part1;
+  int part2;
+  int part3;
+  int string_builder;
+
+  long_value = (long) parameter0;
   long_value *= 10000000;
-  long long fraction = (long) (parameter0 * 10000000);
+  fraction = (long) (parameter0 * 10000000);
   fraction -= long_value;
     
-  int part1 = java_lang_Long_toString9_6_(gc_info, long_value, exception);
-  int part2 = edu_syr_pcpratts_string_constant(gc_info, ".", exception);
-  int part3 = java_lang_Long_toString9_6_(gc_info, fraction, exception);
+  part1 = java_lang_Long_toString9_6_(gc_info, long_value, exception);
+  part2 = edu_syr_pcpratts_string_constant(gc_info, ".", exception);
+  part3 = java_lang_Long_toString9_6_(gc_info, fraction, exception);
 
-  int string_builder = java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(gc_info,
+  string_builder = java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(gc_info,
     part1, exception);
   java_lang_StringBuilder_append10_9_(gc_info, string_builder, part2, exception);
   java_lang_StringBuilder_append10_9_(gc_info, string_builder, part3, exception);
@@ -912,16 +942,23 @@ int java_lang_Double_toString9_8_(char * gc_info, double parameter0, int * excep
 $$__device__$$ 
 int java_lang_Float_toString9_7_(char * gc_info, float parameter0, int * exception){
 
-  long long long_value = (long) parameter0;
+  long long long_value;
+  long long fraction;
+  int part1;
+  int part2;
+  int part3;
+  int string_builder;
+
+  long_value = (long) parameter0;
   long_value *= 10000000;
-  long long fraction = (long) (parameter0 * 10000000);
+  fraction = (long) (parameter0 * 10000000);
   fraction -= long_value;
     
-  int part1 = java_lang_Long_toString9_6_(gc_info, long_value, exception);
-  int part2 = edu_syr_pcpratts_string_constant(gc_info, ".", exception);
-  int part3 = java_lang_Long_toString9_6_(gc_info, fraction, exception);
+  part1 = java_lang_Long_toString9_6_(gc_info, long_value, exception);
+  part2 = edu_syr_pcpratts_string_constant(gc_info, ".", exception);
+  part3 = java_lang_Long_toString9_6_(gc_info, fraction, exception);
 
-  int string_builder = java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(gc_info,
+  string_builder = java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(gc_info,
     part1, exception);
   java_lang_StringBuilder_append10_9_(gc_info, string_builder, part2, exception);
   java_lang_StringBuilder_append10_9_(gc_info, string_builder, part3, exception);

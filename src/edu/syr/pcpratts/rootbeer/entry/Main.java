@@ -10,6 +10,7 @@ package edu.syr.pcpratts.rootbeer.entry;
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaLoader;
 import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaRuntime2;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,6 +101,13 @@ public class Main {
       } else if(m_simpleCompile == false){      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);
+        
+        File main_jar = new File(m_mainJar);
+        if(main_jar.exists() == false){
+          System.out.println("Cannot find: "+m_mainJar);
+          System.exit(0);
+        }
+        
         ++i;
         m_simpleCompile = true;
       }

@@ -19,15 +19,15 @@ public class ReadFile {
   }
   
   public String read() throws Exception {
-    String ret = "";
+    StringBuilder ret = new StringBuilder();
     BufferedReader reader = new BufferedReader(new FileReader(m_Filename));
     while(true){
       String line = reader.readLine();
       if(line == null)
         break;
-      ret += line;
-      ret += "\n";
+      ret.append(line);
+      ret.append("\n");
     }
-    return ret;    
+    return ret.toString();    
   }
 }

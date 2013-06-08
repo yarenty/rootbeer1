@@ -24,6 +24,7 @@ public abstract class Tweaks {
   public abstract String getUnixHeaderPath();
   public abstract String getWindowsHeaderPath();
   public abstract String getBothHeaderPath();
+  public abstract String getBarrierPath();
   public abstract String getUnixKernelPath();
   public abstract String getWindowsKernelPath();
   public abstract String getBothKernelPath();

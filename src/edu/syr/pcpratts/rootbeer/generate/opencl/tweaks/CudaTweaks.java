@@ -41,6 +41,11 @@ public class CudaTweaks extends Tweaks {
   }
   
   @Override
+  public String getBarrierPath() {
+    return null;
+  }
+  
+  @Override
   public String getGarbageCollectorPath() {
     return "/edu/syr/pcpratts/rootbeer/generate/opencl/GarbageCollector.c";
   }

@@ -28,6 +28,11 @@ public class NativeCpuTweaks extends Tweaks {
   public String getBothHeaderPath() {
     return "/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeHeader.c";
   }
+  
+  @Override
+  public String getBarrierPath() {
+    return "/edu/syr/pcpratts/rootbeer/generate/opencl/BarrierNativeBoth.c";
+  }
 
   @Override
   public String getGarbageCollectorPath() {

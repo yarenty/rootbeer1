@@ -50,4 +50,19 @@ void edu_syr_pcpratts_threadfence_block();
 
 long long m_Local[3];
 int * m_Cache;
-long long m_shared[40*1024];
+long long m_shared[80*1024];
+
+char * global_gc_info;
+long long * global_handles;
+int global_thread_count;
+int global_num_cores;
+int global_block_idxx;
+int global_block_dimx;
+int global_grid_dimx;
+int global_thread_id;
+int global_barrier_count1;
+int global_barrier_count2;
+int global_barrier_count3;
+int global_thread_gate_count;
+long long * global_exceptions;
+int * global_class_refs;
