@@ -26,6 +26,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import pack.Pack;
 import soot.*;
@@ -292,14 +293,14 @@ public class RootbeerCompiler {
   }
   
   private void addJarInputManifestFiles(ZipOutputStream zos, String jar_filename) throws Exception {
-    JarInputStream jin = new JarInputStream(new FileInputStream(jar_filename));
+    ZipInputStream jin = new ZipInputStream(new FileInputStream(jar_filename));
     while(true){
-      JarEntry jar_entry = jin.getNextJarEntry();
+      ZipEntry jar_entry = jin.getNextEntry();
       if(jar_entry == null){
         break;
       }
-      if(jar_entry.getName().contains("META_INF")){
-        writeFileToOutput(jin, jar_entry, zos, RootbeerPaths.v().getJarContentsFolder());
+      if(jar_entry.getName().contains("META-INF")){
+        writeFileToOutput(jin, jar_entry, zos);
       }
     }
     jin.close();
@@ -373,20 +374,24 @@ public class RootbeerCompiler {
     fout.close();
   }
   
-  private void writeFileToOutput(JarInputStream jin, JarEntry jar_entry, ZipOutputStream zos, String folder) throws Exception {
-    ZipEntry entry = new ZipEntry(jar_entry.getName());
-    entry.setSize(jar_entry.getSize());
-    entry.setCrc(jar_entry.getCrc());
-    zos.putNextEntry(entry);
+  private void writeFileToOutput(ZipInputStream jin, ZipEntry jar_entry, ZipOutputStream zos) throws Exception {
+    if(jar_entry.isDirectory() == false){
+      ZipEntry entry = new ZipEntry(jar_entry.getName());
+      entry.setSize(jar_entry.getSize());
+      entry.setCrc(jar_entry.getCrc());
+      zos.putNextEntry(entry);
 
-    while(true){
-      byte[] buffer = new byte[4096];
-      int len = jin.read(buffer);
-      if(len == -1)
-        break;
-      zos.write(buffer, 0, len);
+      while(true){
+        byte[] buffer = new byte[4096];
+        int len = jin.read(buffer);
+        if(len == -1)
+          break;
+        zos.write(buffer, 0, len);
+      }
+      zos.flush();
+    } else {
+      zos.putNextEntry(jar_entry);
     }
-    zos.flush();
   }
   
   private void writeFileToOutput(File f, ZipOutputStream zos, String folder) throws Exception {
