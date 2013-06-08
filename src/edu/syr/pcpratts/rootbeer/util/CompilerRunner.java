@@ -17,7 +17,6 @@ public class CompilerRunner {
 
   public List<String> run(String command) {
     try {
-      System.out.println("compiling CUDA code...");
       List<String> ret = new ArrayList<String>();
       Process p = Runtime.getRuntime().exec(command);
       StreamReader reader1 = new StreamReader(p.getInputStream());
