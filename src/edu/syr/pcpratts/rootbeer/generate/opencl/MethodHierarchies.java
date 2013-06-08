@@ -25,6 +25,7 @@ import soot.rbclassload.HierarchyGraph;
 import soot.rbclassload.MethodEqual;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
+import soot.rbclassload.StringNumbers;
 
 /**
  * Represents all the versions of methods in a class Hierarchy
