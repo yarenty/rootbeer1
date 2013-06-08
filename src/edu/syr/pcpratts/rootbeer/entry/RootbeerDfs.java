@@ -60,8 +60,7 @@ public class RootbeerDfs {
     
     StringToType converter = new StringToType();
     FieldSignatureUtil futil = new FieldSignatureUtil();
-    MethodSignatureUtil mutil = new MethodSignatureUtil();
-
+    
     m_currDfsInfo.addType(signature.getClassName());
     m_currDfsInfo.addType(signature.getReturnType());
     m_currDfsInfo.addMethod(signature.toString());
@@ -86,6 +85,8 @@ public class RootbeerDfs {
     }    
 
     for(HierarchySignature method_sig : value_switch.getMethodRefsHierarchy()){
+      m_currDfsInfo.addMethod(signature.toString());
+      
       if(RootbeerClassLoader.v().dontFollow(method_sig)){
         continue;
       }

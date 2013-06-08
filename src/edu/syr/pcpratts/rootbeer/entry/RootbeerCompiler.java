@@ -181,6 +181,10 @@ public class RootbeerCompiler {
       RootbeerClassLoader.v().loadField(field_sig);
     }
     
+    ListMethodTester to_sig_methods = new ListMethodTester();
+    to_sig_methods.addSignature("<java.lang.Object: int hashCode()>");
+    RootbeerClassLoader.v().addToSignaturesMethodTester(to_sig_methods);
+    
     RootbeerClassLoader.v().loadNecessaryClasses();
   }
   
