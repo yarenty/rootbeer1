@@ -26,11 +26,7 @@ public class ParallelCompile implements Runnable {
     m_toCores = new BlockingQueue<ParallelCompileJob>();
     m_fromCores = new BlockingQueue<ParallelCompileJob>();
     
-    int num_cores = Runtime.getRuntime().availableProcessors();
-    if(num_cores > 2){
-      num_cores = 2;
-    }
-    
+    int num_cores = 2;
     for(int i = 0; i < num_cores; ++i){
       Thread thread = new Thread(this);
       thread.setDaemon(true);
