@@ -38,6 +38,9 @@ public class LiveMethodDetector {
       }
       visited.add(name);
       Method method = method_map.get(name);
+      if(method == null){
+        continue;
+      }
       queue.addAll(method.getInvoked());
     }
     return visited;

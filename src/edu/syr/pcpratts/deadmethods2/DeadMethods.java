@@ -92,7 +92,7 @@ public class DeadMethods {
   
   public static void main(String[] args){
     DeadMethods dead_methods = new DeadMethods();
-    dead_methods.parseFile("/home/pcpratts/.rootbeer/pre_dead_unix.c");
+    dead_methods.parseFile("/home/pcpratts/.rootbeer/pre_dead.cu");
     String ret = dead_methods.getResult();
     //System.out.println(ret);
   }
