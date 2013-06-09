@@ -10,8 +10,6 @@ static void * run(void * data){
   lock_thread_id();
   thread_idxx = global_thread_id;
 
-  printf("thread_idxx: %d\n", thread_idxx);
-
   ++global_thread_id;
   unlock_thread_id();
   
@@ -19,12 +17,11 @@ static void * run(void * data){
     thread_gate_mutex_lock();
 
     if(thread_idxx < global_thread_gate_count){
-      printf("thread_idxx %d > global_thread_gate_count: %d", thread_idxx, global_thread_gate_count);
       thread_gate_mutex_unlock();
       break;
     } 
 
-    edu_syr_pcpratts_sleep(2);
+    edu_syr_pcpratts_sleep(200);
     thread_gate_mutex_unlock();
   }
 
@@ -40,7 +37,6 @@ static void * run(void * data){
   handle = (int) lhandle;
   exception = 0;
 
-  printf("running: %d\n", index);
   %%invoke_run%%(global_gc_info, handle, &exception);
 
   global_exceptions[index] = exception;
@@ -76,9 +72,6 @@ void entry(char * gc_info_space,
   gc_info = edu_syr_pcpratts_gc_init(gc_info_space, to_space,
     *to_space_free_ptr, space_size);
 
-  printf("grid_dimx: %d\n", grid_dimx);
-  printf("block_dimx: %d\n", block_dimx);
-
   global_grid_dimx = grid_dimx;
   global_block_dimx = block_dimx;
   global_gc_info = gc_info;
@@ -87,16 +80,13 @@ void entry(char * gc_info_space,
   global_class_refs = java_lang_class_refs;
 
   pthread_mutex_init(&atom_add_mutex, NULL);
-  pthread_key_create(&threadIdxxKey, NULL);
   pthread_key_create(&blockIdxxKey, NULL);
+  pthread_key_create(&blockDimxKey, NULL);
+  pthread_key_create(&threadIdxxKey, NULL);
   pthread_mutex_init(&thread_id_mutex, NULL);
   pthread_mutex_init(&barrier_mutex, NULL);
   pthread_mutex_init(&thread_gate_mutex, NULL);
   
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-  printf("step #3\n");
   for(block_i = 0; block_i < grid_dimx; ++block_i){
     thread_start = block_i * block_dimx;
     thread_stop = (block_i + 1) * block_dimx;
@@ -107,8 +97,6 @@ void entry(char * gc_info_space,
 
     threads = (pthread_t **) malloc(sizeof(pthread_t *) * thread_count);
     
-    printf("step #4\n");
-
     global_num_cores = 4;
     global_thread_count = thread_count;
     global_block_idxx = block_i;
@@ -118,28 +106,18 @@ void entry(char * gc_info_space,
     global_barrier_count3 = 0;
     global_thread_gate_count = global_num_cores;
 
-    printf("step #5. thread_count: %d\n", thread_count);
-
     for(i = 0; i < thread_count; ++i){
-      printf("step #6\n");
       thread = (pthread_t *) malloc(sizeof(pthread_t));
-      pthread_create(thread, &attr, &run, NULL);
+      pthread_create(thread, NULL, &run, NULL);
       threads[i] = thread;
     }
   
-    printf("step #7\n");
-
     for(i = 0; i < thread_count; ++i){
       thread = threads[i];
-      rc = pthread_join(*thread, NULL);
-      if (rc) {
-        printf("ERROR; return code from pthread_join() is %d\n", rc);
-        exit(-1);
-      }
+      pthread_join(*thread, NULL);
     } 
-    free(threads);
 
-    printf("step #8\n");
+    free(threads);
   }
 
   fflush(stdout);

@@ -51,7 +51,7 @@ public class NativeCpuDevice implements GpuDevice {
   public void run(Kernel kernel_template, ThreadConfig thread_config){
     int block_shape = thread_config.getGridShapeX();
     int thread_shape = thread_config.getBlockShapeX();
-    int num_threads = block_shape * thread_shape;
+    int num_threads = thread_config.getNumThreads();
     NativeCpuGcHeap heap = new NativeCpuGcHeap(this);
     int size = heap.writeRuntimeBasicBlock(kernel_template, num_threads);
     m_Blocks = heap.getBlocks();
@@ -68,7 +68,7 @@ public class NativeCpuDevice implements GpuDevice {
     runOnCpu(to_space.getBuffer(), to_space.getBuffer().size(), 
       handles.getBuffer().get(0), heap_end_ptr.getBuffer().get(0),
       gc_info.getBuffer().get(0), exceptions.getBuffer().get(0), 
-      serializer.getClassRefArray(), size, block_shape, thread_shape, 
+      serializer.getClassRefArray(), num_threads, block_shape, thread_shape, 
       lib_name);
     
     heap.readRuntimeBasicBlock(kernel_template);

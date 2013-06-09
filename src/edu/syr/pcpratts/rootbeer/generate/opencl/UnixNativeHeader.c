@@ -13,7 +13,6 @@ pthread_mutex_t atom_add_mutex;
 pthread_mutex_t thread_id_mutex;
 pthread_mutex_t barrier_mutex;
 pthread_mutex_t thread_gate_mutex;
-pthread_attr_t attr;
 
 void lock_atom_add(){
   pthread_mutex_lock(&atom_add_mutex);

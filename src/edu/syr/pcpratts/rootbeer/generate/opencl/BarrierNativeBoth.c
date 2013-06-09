@@ -5,7 +5,13 @@ void edu_syr_pcpratts_barrier(){
   barrier_mutex_lock();
   global_barrier_count2 = 0;
   global_barrier_count1++;
-  printf("global_barrier_count1: %d\n", global_barrier_count1);
+  printf("global_barrier_count1: %d thread_id: %d\n", global_barrier_count1, getThreadId());
+  while(1){
+    edu_syr_pcpratts_sleep(2);
+    if(0){
+      break;
+    }
+  }
   barrier_mutex_unlock();
 
   thread_gate_mutex_lock();

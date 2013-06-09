@@ -45,13 +45,15 @@ edu_syr_pcpratts_gc_malloc(char * gc_info, int size){
 
   addr = (long long *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
   space_size = edu_syr_pcpratts_getlong(gc_info, 16);
-  size += 8;
+
+  mod = size % 16;
+  if(mod != 0){
+    size += (16 - mod);
+  }
+
   while(1){
     ret = atom_add(addr, (long) size);
-    mod = ret % 8;
-    if(mod != 0)
-      ret += (8 - mod);
-
+    
     start_array = ret / space_size;
     end_array = (ret + size) / space_size;
 
