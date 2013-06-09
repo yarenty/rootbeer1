@@ -10,11 +10,12 @@ void edu_syr_pcpratts_barrier(){
   while(1){
     barrier_mutex_lock();
     count = global_barrier_count1;
-    barrier_mutex_unlock();
 
-    if(count == global_thread_count){
+    if(count >= global_thread_count){
+      barrier_mutex_unlock();
       break;
     } else {
+      barrier_mutex_unlock();
       edu_syr_pcpratts_sleep(100);
     }
   }
@@ -27,11 +28,12 @@ void edu_syr_pcpratts_barrier(){
   while(1){
     barrier_mutex_lock();
     count = global_barrier_count2;
-    barrier_mutex_unlock();
 
-    if(count == global_thread_count){
+    if(count >= global_thread_count){
+      barrier_mutex_unlock();
       break;
     } else {
+      barrier_mutex_unlock();
       edu_syr_pcpratts_sleep(100);
     }
   }
@@ -44,11 +46,11 @@ void edu_syr_pcpratts_barrier(){
   while(1){
     barrier_mutex_lock();
     count = global_barrier_count3;
-    barrier_mutex_unlock();
-
-    if(count == global_thread_count){
+    if(count >= global_thread_count){
+      barrier_mutex_unlock();
       break;
     } else {
+      barrier_mutex_unlock();
       edu_syr_pcpratts_sleep(100);
     }
   }
