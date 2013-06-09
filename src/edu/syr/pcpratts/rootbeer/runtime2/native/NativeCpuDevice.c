@@ -78,22 +78,16 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
     (jlong *) nexceptions, (jint *) nclass_refs, 100*1024*1024, num_threads,
     block_shape, thread_shape);  
 
-  printf("NativeCpuDevice: #5\n");
-
 #if (defined linux || defined __APPLE_CC__)  
   dlclose(lib_handle);
 #else
   FreeLibrary(lib_handle);
 #endif
 
-  printf("NativeCpuDevice: #6\n");
-
   for(i = 0; i < to_space_count; ++i){
     curr_to_space = array_get(env, to_space_array, i);
     (*env)->ReleaseByteArrayElements(env, curr_to_space, (jbyte *) to_space[i], 0);
   }
-
-  printf("NativeCpuDevice: #7\n");
   
   (*env)->ReleaseByteArrayElements(env, handles, nhandles, 0);
   (*env)->ReleaseByteArrayElements(env, heap_end_ptr, nheap_end_ptr, 0);
@@ -101,9 +95,5 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   (*env)->ReleaseByteArrayElements(env, exceptions, nexceptions, 0);
   (*env)->ReleaseIntArrayElements(env, java_lang_class_refs, nclass_refs, 0);
 
-  printf("NativeCpuDevice: #8\n");
-
   free(to_space);
-
-  printf("NativeCpuDevice: #9\n");
 }

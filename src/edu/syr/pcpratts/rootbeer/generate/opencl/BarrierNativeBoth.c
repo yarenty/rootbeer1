@@ -5,19 +5,7 @@ void edu_syr_pcpratts_barrier(){
   barrier_mutex_lock();
   global_barrier_count2 = 0;
   global_barrier_count1++;
-  printf("global_barrier_count1: %d thread_id: %d\n", global_barrier_count1, getThreadId());
-  while(1){
-    edu_syr_pcpratts_sleep(2);
-    if(0){
-      break;
-    }
-  }
   barrier_mutex_unlock();
-
-  thread_gate_mutex_lock();
-  global_thread_gate_count++;
-  printf("global_thread_gate_count: %d\n", global_thread_gate_count);
-  thread_gate_mutex_unlock();
 
   while(1){
     barrier_mutex_lock();
@@ -27,7 +15,7 @@ void edu_syr_pcpratts_barrier(){
     if(count == global_thread_count){
       break;
     } else {
-      edu_syr_pcpratts_sleep(2);
+      edu_syr_pcpratts_sleep(100);
     }
   }
 
@@ -44,7 +32,7 @@ void edu_syr_pcpratts_barrier(){
     if(count == global_thread_count){
       break;
     } else {
-      edu_syr_pcpratts_sleep(2);
+      edu_syr_pcpratts_sleep(100);
     }
   }
 
@@ -52,10 +40,6 @@ void edu_syr_pcpratts_barrier(){
   global_barrier_count1 = 0;
   global_barrier_count3++;
   barrier_mutex_unlock();
-
-  thread_gate_mutex_lock();
-  global_thread_gate_count = global_num_cores;
-  thread_gate_mutex_unlock();
 
   while(1){
     barrier_mutex_lock();
@@ -65,7 +49,7 @@ void edu_syr_pcpratts_barrier(){
     if(count == global_thread_count){
       break;
     } else {
-      edu_syr_pcpratts_sleep(2);
+      edu_syr_pcpratts_sleep(100);
     }
   }
 }

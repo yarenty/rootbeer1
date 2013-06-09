@@ -13,18 +13,6 @@ static void * run(void * data){
   ++global_thread_id;
   unlock_thread_id();
   
-  while(1){
-    thread_gate_mutex_lock();
-
-    if(thread_idxx < global_thread_gate_count){
-      thread_gate_mutex_unlock();
-      break;
-    } 
-
-    edu_syr_pcpratts_sleep(200);
-    thread_gate_mutex_unlock();
-  }
-
   block_idxx = global_block_idxx;
     
   pthread_setspecific(blockIdxxKey, (void *) block_idxx);
@@ -41,10 +29,10 @@ static void * run(void * data){
 
   global_exceptions[index] = exception;
 
-  thread_gate_mutex_lock();
-  global_thread_gate_count++;
-  thread_gate_mutex_unlock();
-  
+  barrier_mutex_lock();
+  global_thread_count--;
+  barrier_mutex_unlock();
+
   return NULL;
 }
 
