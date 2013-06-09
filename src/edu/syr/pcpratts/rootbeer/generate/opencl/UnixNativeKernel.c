@@ -18,11 +18,11 @@ static void * run(void * data){
   while(1){
     thread_gate_mutex_lock();
 
-    if(thread_idxx > global_thread_gate_count){
+    if(thread_idxx < global_thread_gate_count){
       printf("thread_idxx %d > global_thread_gate_count: %d", thread_idxx, global_thread_gate_count);
       thread_gate_mutex_unlock();
       break;
-    }
+    } 
 
     edu_syr_pcpratts_sleep(2);
     thread_gate_mutex_unlock();
@@ -73,14 +73,13 @@ void entry(char * gc_info_space,
   int thread_stop;
   int thread_count;
 
-  printf("step #1\n");
-
   gc_info = edu_syr_pcpratts_gc_init(gc_info_space, to_space,
     *to_space_free_ptr, space_size);
 
-  printf("step #2\n");
+  printf("grid_dimx: %d\n", grid_dimx);
+  printf("block_dimx: %d\n", block_dimx);
 
-  global_grid_dimx = block_dimx;
+  global_grid_dimx = grid_dimx;
   global_block_dimx = block_dimx;
   global_gc_info = gc_info;
   global_handles = handles;
@@ -119,7 +118,7 @@ void entry(char * gc_info_space,
     global_barrier_count3 = 0;
     global_thread_gate_count = global_num_cores;
 
-    printf("step #5\n");
+    printf("step #5. thread_count: %d\n", thread_count);
 
     for(i = 0; i < thread_count; ++i){
       printf("step #6\n");

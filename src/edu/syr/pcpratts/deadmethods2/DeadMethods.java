@@ -37,7 +37,9 @@ public class DeadMethods {
     BlockParser block_parser = new BlockParser();
     List<Block> blocks = block_parser.parse(segments);
     //for(Block block : blocks){
+    //  System.out.println("<block>");
     //  System.out.println(block.toString());
+    //  System.out.println("</block>");
     //}
     
     MethodNameParser name_parser = new MethodNameParser();

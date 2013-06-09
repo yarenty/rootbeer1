@@ -46,8 +46,6 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
   HMODULE lib_handle;
 #endif
 
-  printf("NativeCpuDevice.c #1\n");
-
   nhandles = (*env)->GetByteArrayElements(env, handles, JNI_FALSE);
   nheap_end_ptr = (*env)->GetByteArrayElements(env, heap_end_ptr, JNI_FALSE);
   ngc_info = (*env)->GetByteArrayElements(env, gc_info, JNI_FALSE);
@@ -56,16 +54,10 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
 
   str = (char *) (*env)->GetStringUTFChars(env, lib_name, NULL);
 
-  printf("NativeCpuDevice.c #2\n");
-
 #if (defined linux || defined __APPLE_CC__)  
   lib_handle = dlopen(str, RTLD_LAZY);
 #else
   lib_handle = LoadLibrary(str);
-#endif
-
-#if (defined linux || defined __APPLE_CC__)  
-  printf("NativeCpuDevice.c #3 %p\n", lib_handle);
 #endif
 
   (*env)->ReleaseStringUTFChars(env, lib_name, str);
@@ -76,18 +68,12 @@ JNIEXPORT void JNICALL Java_edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCp
     to_space[i] = (jlong) (*env)->GetByteArrayElements(env, curr_to_space, JNI_FALSE);
   }
   
-  printf("NativeCpuDevice.c #4\n");
-
 #if (defined linux || defined __APPLE_CC__)  
   entry = dlsym(lib_handle, "entry");
 #else
   entry = GetProcAddress(lib_handle, "entry");
 #endif
   
-#if (defined linux || defined __APPLE_CC__)  
-  printf("NativeCpuDevice.c #5 %p\n", entry);
-#endif
-
   (*entry)((char *) ngc_info, to_space, (jlong *) nhandles, (jlong *) nheap_end_ptr,
     (jlong *) nexceptions, (jint *) nclass_refs, 100*1024*1024, num_threads,
     block_shape, thread_shape);  
