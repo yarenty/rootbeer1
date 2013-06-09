@@ -14,6 +14,7 @@ import java.util.Set;
 public class DeadMethods {
   
   private List<Block> m_blocks;
+  private Set<String> m_live;
   
   public void parseFile(String filename) {
     ReadFile reader = new ReadFile(filename);
@@ -44,7 +45,6 @@ public class DeadMethods {
     
     MethodNameParser name_parser = new MethodNameParser();
     List<String> method_names = name_parser.parse(blocks);
-    
     //for(Block block : blocks){
     //  if(block.isMethod()){
     //    Method method = block.getMethod();
@@ -54,7 +54,6 @@ public class DeadMethods {
     
     MethodAnnotator annotator = new MethodAnnotator();
     annotator.parse(blocks, method_names);
-    
     //for(Block block : blocks){
     //  if(block.isMethod()){
     //    Method method = block.getMethod();
@@ -68,12 +67,9 @@ public class DeadMethods {
     m_blocks = blocks;
   }
   
-  public String getResult(){
-    LiveMethodDetector detector = new LiveMethodDetector();
-    Set<String> live = detector.parse(m_blocks);
-    
+  private String outputLive(List<Block> blocks, Set<String> live){
     StringBuilder ret = new StringBuilder();
-    for(Block block : m_blocks){
+    for(Block block : blocks){
       if(block.isMethod()){
         Method method = block.getMethod();
         String name = method.getName();
@@ -87,12 +83,33 @@ public class DeadMethods {
         ret.append("\n");
       }
     }
-    return ret.toString();
+    return ret.toString();  
+  }
+  
+  public String getResult(){
+    if(m_live == null){
+      LiveMethodDetector detector = new LiveMethodDetector();
+      m_live = detector.parse(m_blocks);
+    }
+    
+    return outputLive(m_blocks, m_live);
+  }
+  
+  public String getCompressedResult(){
+    if(m_live == null){
+      LiveMethodDetector detector = new LiveMethodDetector();
+      m_live = detector.parse(m_blocks);
+    }
+    
+    MethodNameCompressor compressor = new MethodNameCompressor();
+    List<Block> blocks = compressor.parse(m_blocks, m_live);
+    
+    return outputLive(blocks, m_live);
   }
   
   public static void main(String[] args){
     DeadMethods dead_methods = new DeadMethods();
-    dead_methods.parseFile("/home/pcpratts/.rootbeer/pre_dead.cu");
+    dead_methods.parseFile("/home/pcpratts/.rootbeer/generated_unix.cu");
     String ret = dead_methods.getResult();
     //System.out.println(ret);
   }

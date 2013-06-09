@@ -39,7 +39,7 @@ public class MethodAnnotator {
           break;
         }
         char c1 = str.charAt(pos - 1);
-        if(c1 != ' ' && c1 != '\n'){
+        if(Character.isLetter(c1) || Character.isDigit(c1)){
           start_pos += method_name.length();
           continue;
         }
