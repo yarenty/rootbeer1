@@ -27,7 +27,6 @@ public class MethodNameParser {
 
   private String parseMethodName(Block block) {
     String str = block.getFullString();
-    System.out.println("str: "+str);
     int pos = str.indexOf('(');
     int first_char_pos = pos - 1;
     while(first_char_pos >= 0){

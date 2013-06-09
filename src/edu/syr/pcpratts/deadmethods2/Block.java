@@ -76,7 +76,6 @@ public class Block {
     if(m_type == BlockParser.TYPE_DECLARE || m_type == BlockParser.TYPE_DEFINE){
       ret.append(m_segments.get(0).getString());
     } else {
-      ret.append("METHOD: ");
       for(int i = 0; i < m_segments.size(); ++i){
         Segment segment = m_segments.get(i);
         Segment nsegment = null;
@@ -89,7 +88,6 @@ public class Block {
           ret.append("\n");
         }
       }
-      ret.append("END");
     }
     return ret.toString();
   }

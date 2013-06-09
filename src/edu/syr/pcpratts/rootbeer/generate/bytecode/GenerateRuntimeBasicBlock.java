@@ -7,7 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
-import edu.syr.pcpratts.deadmethods.DeadMethods;
+import edu.syr.pcpratts.deadmethods2.DeadMethods;
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
@@ -185,13 +185,14 @@ public class GenerateRuntimeBasicBlock {
       writer.close();
       
       System.out.println("removing dead methods...");
-      DeadMethods dead_methods = new DeadMethods("entry");
-      code[0] = dead_methods.filter(code[0]);
-      dead_methods = new DeadMethods("entry");
-      code[1] = dead_methods.filter(code[1]);
+      DeadMethods dead_methods = new DeadMethods();
+      dead_methods.parseString(code[0]);
+      code[0] = dead_methods.getResult();
+      dead_methods.parseString(code[1]);
+      code[1] = dead_methods.getResult();
       
       //jpp can't handle declspec very well
-      code[1] = code[1].replace("void entry ( char * gc_info_space ,", "__declspec(dllexport)\nvoid entry ( char * gc_info_space ,");
+      code[1] = code[1].replace("void entry(char * gc_info_space,", "__declspec(dllexport)\nvoid entry(char * gc_info_space,");
       
       makeGetCodeMethodThatReturnsString(code[0], true);
       makeGetCodeMethodThatReturnsString(code[1], false);

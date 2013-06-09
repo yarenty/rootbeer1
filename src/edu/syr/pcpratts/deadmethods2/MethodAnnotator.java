@@ -41,6 +41,7 @@ public class MethodAnnotator {
       while(pos < str.length()){
         char c = str.charAt(pos);
         if(c == ' '){
+          pos++;
           continue;
         } else if(c == '('){
           invoked.add(method_name);

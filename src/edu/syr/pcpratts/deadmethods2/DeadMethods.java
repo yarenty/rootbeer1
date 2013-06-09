@@ -15,7 +15,7 @@ public class DeadMethods {
   
   private List<Block> m_blocks;
   
-  private void parseFile(String filename) {
+  public void parseFile(String filename) {
     ReadFile reader = new ReadFile(filename);
     String contents = "";
     try {
@@ -27,7 +27,7 @@ public class DeadMethods {
     parseString(contents);
   }
   
-  private void parseString(String contents){
+  public void parseString(String contents){
     SegmentParser segment_parser = new SegmentParser();
     List<Segment> segments = segment_parser.parse(contents);
     //for(Segment segment : segments){
@@ -36,32 +36,32 @@ public class DeadMethods {
     
     BlockParser block_parser = new BlockParser();
     List<Block> blocks = block_parser.parse(segments);
-    for(Block block : blocks){
-      System.out.println(block.toString());
-    }
+    //for(Block block : blocks){
+    //  System.out.println(block.toString());
+    //}
     
     MethodNameParser name_parser = new MethodNameParser();
     List<String> method_names = name_parser.parse(blocks);
     
-    for(Block block : blocks){
-      if(block.isMethod()){
-        Method method = block.getMethod();
-        System.out.println(method.getName());
-      }
-    }
+    //for(Block block : blocks){
+    //  if(block.isMethod()){
+    //    Method method = block.getMethod();
+    //    System.out.println(method.getName());
+    //  }
+    //}
     
     MethodAnnotator annotator = new MethodAnnotator();
     annotator.parse(blocks, method_names);
     
-    for(Block block : blocks){
-      if(block.isMethod()){
-        Method method = block.getMethod();
-        System.out.println("name: "+method.getName());
-        for(String invoked : method.getInvoked()){
-          System.out.println("  invoked: "+invoked);
-        }
-      }
-    }
+    //for(Block block : blocks){
+    //  if(block.isMethod()){
+    //    Method method = block.getMethod();
+    //    System.out.println("name: "+method.getName());
+    //    for(String invoked : method.getInvoked()){
+    //      System.out.println("  invoked: "+invoked);
+    //    }
+    //  }
+    //}
     
     m_blocks = blocks;
   }
@@ -78,10 +78,10 @@ public class DeadMethods {
         if(live.contains(name) == false){
           continue;
         }
-        ret.append(block.getFullString());
+        ret.append(block.toString());
         ret.append("\n");
       } else {
-        ret.append(block.getSegments().get(0).getString());
+        ret.append(block.toString());
         ret.append("\n");
       }
     }
@@ -92,6 +92,6 @@ public class DeadMethods {
     DeadMethods dead_methods = new DeadMethods();
     dead_methods.parseFile("/home/pcpratts/.rootbeer/pre_dead_unix.c");
     String ret = dead_methods.getResult();
-    System.out.println(ret);
+    //System.out.println(ret);
   }
 }

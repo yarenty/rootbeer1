@@ -9,7 +9,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl.tweaks;
 
 import edu.syr.pcpratts.rootbeer.util.WindowsCompile;
 import edu.syr.pcpratts.compressor.Compressor;
-import edu.syr.pcpratts.deadmethods.DeadMethods;
+import edu.syr.pcpratts.deadmethods2.DeadMethods;
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.util.CompilerRunner;
@@ -81,8 +81,9 @@ public class CudaTweaks extends Tweaks {
       writer.flush();
       writer.close();
 
-      DeadMethods dead_methods = new DeadMethods("entry");
-      cuda_code = dead_methods.filter(cuda_code);
+      DeadMethods dead_methods = new DeadMethods();
+      dead_methods.parseString(cuda_code);
+      cuda_code = dead_methods.getResult();
 
       //Compressor compressor = new Compressor();
       //cuda_code = compressor.compress(cuda_code);
