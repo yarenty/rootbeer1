@@ -47,6 +47,13 @@ public class RootbeerDfs {
     
     visited.add(new HierarchySignature("<java.lang.StringBuilder: java.lang.StringBuilder append(double)>"));
     visited.add(new HierarchySignature("<java.lang.StringBuilder: java.lang.StringBuilder append(float)>"));
+    visited.add(new HierarchySignature("<java.io.PrintStream: void println()>"));
+    visited.add(new HierarchySignature("<java.io.PrintStream: void println(java.lang.String)>"));
+    visited.add(new HierarchySignature("<java.io.PrintStream: void println(double)>"));
+    visited.add(new HierarchySignature("<java.io.PrintStream: void println(float)>"));
+    visited.add(new HierarchySignature("<java.io.PrintStream: void print(java.lang.String)>"));
+    visited.add(new HierarchySignature("<java.io.PrintStream: void print(double)>"));
+    visited.add(new HierarchySignature("<java.io.PrintStream: void print(float)>"));
     
     while(queue.isEmpty() == false){
       HierarchySignature curr = queue.removeFirst();

@@ -292,7 +292,7 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedDouble($$__global$$ 
 }
 
 $$__device__$$
-void java_io_PrintStream_println($$__global$$ char * gc_info, int thisref, int str_ret, int * exception){
+void java_io_PrintStream_println0_9_($$__global$$ char * gc_info, int thisref, int str_ret, int * exception){
   int valueref;
   int count;
   int offset;
@@ -319,6 +319,60 @@ void java_io_PrintStream_println($$__global$$ char * gc_info, int thisref, int s
     printf("%c", valueref_deref[curr_offset]);
   }
   printf("\n");
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_($$__global$$ char * gc_info, int thisref, int * exception){
+  printf("\n");
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_7_($$__global$$ char * gc_info, int thisref, float value, int * exception){
+  printf("%e\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_8_($$__global$$ char * gc_info, int thisref, double value, int * exception){
+  printf("%e\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_print0_9_($$__global$$ char * gc_info, int thisref, int str_ret, int * exception){
+  int valueref;
+  int count;
+  int offset;
+  int i;
+  int curr_offset;
+
+  char * valueref_deref;
+
+  valueref = instance_getter_java_lang_String_value(gc_info, str_ret, exception);  
+  if(*exception != 0){
+    return; 
+  } 
+  count = instance_getter_java_lang_String_count(gc_info, str_ret, exception);
+  if(*exception != 0){
+    return; 
+  } 
+  offset = instance_getter_java_lang_String_offset(gc_info, str_ret, exception);
+  if(*exception != 0){
+    return; 
+  } 
+  valueref_deref = (char *) edu_syr_pcpratts_gc_deref(gc_info, valueref);
+  for(i = offset; i < count; ++i){
+    curr_offset = 32 + (i * 4);
+    printf("%c", valueref_deref[curr_offset]);
+  }
+}
+
+$$__device__$$
+void java_io_PrintStream_print0_7_($$__global$$ char * gc_info, int thisref, float value, int * exception){
+  printf("%e", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_print0_8_($$__global$$ char * gc_info, int thisref, double value, int * exception){
+  printf("%e", value);
 }
 
 $$__device__$$
