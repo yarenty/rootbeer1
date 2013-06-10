@@ -40,9 +40,13 @@ public class RootbeerDfs {
     LinkedList<HierarchySignature> queue = new LinkedList<HierarchySignature>();
     queue.add(new HierarchySignature(signature));
     queue.add(new HierarchySignature("<java.lang.Integer: java.lang.String toString(int)>"));
+    queue.add(new HierarchySignature("<java.lang.Long: java.lang.String toString(long)>"));
     queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtime.Sentinal: void <init>()>"));
     queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void <init>()>"));
     queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>"));
+    
+    visited.add(new HierarchySignature("<java.lang.StringBuilder: java.lang.StringBuilder append(double)>"));
+    visited.add(new HierarchySignature("<java.lang.StringBuilder: java.lang.StringBuilder append(float)>"));
     
     while(queue.isEmpty() == false){
       HierarchySignature curr = queue.removeFirst();
@@ -57,7 +61,7 @@ public class RootbeerDfs {
       return;
     }
     visited.add(signature);
-    
+        
     StringToType converter = new StringToType();
     FieldSignatureUtil futil = new FieldSignatureUtil();
     

@@ -229,12 +229,12 @@ int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedInteger($$__global$$ 
   int ret = m_shared[index] & 0x000000ff;
   ret |= (m_shared[index + 1] << 8)  & 0x0000ff00;
   ret |= (m_shared[index + 2] << 16) & 0x00ff0000;
-  ret |= (m_shared[index + 3] << 24) & 0xff000000;
+  ret |= (m_shared[index + 3] << 24) & 0xff000000; 
   return ret;
 }
 
 $$__device__$$
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger($$__global$$ char * gc_info, int index, int value, int * exception){
+void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger($$__global$$ char * gc_info, int index, int value, int * exception){  
   m_shared[index] = (char) (value & 0xff);
   m_shared[index + 1] = (char) ((value >> 8)  & 0xff);
   m_shared[index + 2] = (char) ((value >> 16) & 0xff);
