@@ -24,9 +24,7 @@ static void * run(void * data){
   lhandle = lhandle >> 4;
   handle = (int) lhandle;
   exception = 0;
-
   %%invoke_run%%(global_gc_info, handle, &exception);
-
   global_exceptions[index] = exception;
 
   barrier_mutex_lock();

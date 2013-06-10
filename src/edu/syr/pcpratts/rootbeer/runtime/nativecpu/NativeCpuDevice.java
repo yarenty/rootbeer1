@@ -71,7 +71,7 @@ public class NativeCpuDevice implements GpuDevice {
       serializer.getClassRefArray(), num_threads, block_shape, thread_shape, 
       lib_name);
     
-    heap.readRuntimeBasicBlock(kernel_template);
+    heap.readRuntimeBasicBlock(kernel_template, num_threads);
   }
 
   public PartiallyCompletedParallelJob run(Iterator<Kernel> blocks) {

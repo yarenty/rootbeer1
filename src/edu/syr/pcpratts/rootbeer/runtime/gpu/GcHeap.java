@@ -148,6 +148,7 @@ public abstract class GcHeap {
 
     writeOneRuntimeBasicBlock(first_block);
     for(int i = 1; i < num_threads; ++i){
+      mHandlesMemory.writeLong(m_PreviousRef);
       m_HandlesList.add(m_PreviousRef);
     }
     
@@ -234,7 +235,7 @@ public abstract class GcHeap {
   protected abstract void allocateMemory();
 
 
-  public void readRuntimeBasicBlock(Kernel kernel_template) {
+  public void readRuntimeBasicBlock(Kernel kernel_template, int num_threads) {
     if(Configuration.getPrintMem()){
       BufferPrinter printer1 = new BufferPrinter();
       printer1.print(mToSpaceMemory, 0, 1024);
@@ -253,7 +254,7 @@ public abstract class GcHeap {
     mGcObjectVisitor.readStaticsFromHeap();
     
     mExceptionsMemory.setAddress(0);
-    for(int i = 0; i < m_CountWritten; ++i){
+    for(int i = 0; i < num_threads; ++i){
       long ref = mExceptionsMemory.readLong();
       if(ref != 0){
         long ref_num = ref >> 4;
