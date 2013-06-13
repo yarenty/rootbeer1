@@ -34,6 +34,11 @@ int getBlockDimx(){
 }
 
 __device__
+int getGridDimx(){
+  return blockDim.x;
+}
+
+__device__
 void edu_syr_pcpratts_syncthreads(){
   __syncthreads();
 }

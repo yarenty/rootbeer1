@@ -60,6 +60,10 @@ public class RootbeerGpu {
     return 0;
   }
   
+  public static int getGridDimx(){
+    return 0;
+  }
+  
   public static void syncthreads(){ 
   }
 

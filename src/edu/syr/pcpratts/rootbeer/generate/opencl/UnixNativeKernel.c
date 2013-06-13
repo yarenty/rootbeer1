@@ -17,6 +17,7 @@ static void * run(void * data){
     
   pthread_setspecific(blockIdxxKey, (void *) block_idxx);
   pthread_setspecific(blockDimxKey, (void *) global_block_dimx);
+  pthread_setspecific(gridDimxKey, (void *) global_grid_dimx);
   pthread_setspecific(threadIdxxKey, (void *) thread_idxx);
 
   index = block_idxx * global_block_dimx + thread_idxx;
@@ -68,6 +69,7 @@ void entry(char * gc_info_space,
   pthread_mutex_init(&atom_add_mutex, NULL);
   pthread_key_create(&blockIdxxKey, NULL);
   pthread_key_create(&blockDimxKey, NULL);
+  pthread_key_create(&gridDimxKey, NULL);
   pthread_key_create(&threadIdxxKey, NULL);
   pthread_mutex_init(&thread_id_mutex, NULL);
   pthread_mutex_init(&barrier_mutex, NULL);

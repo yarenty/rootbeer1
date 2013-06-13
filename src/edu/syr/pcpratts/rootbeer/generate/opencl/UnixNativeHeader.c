@@ -9,6 +9,7 @@
 pthread_key_t threadIdxxKey = 0;
 pthread_key_t blockIdxxKey = 0;
 pthread_key_t blockDimxKey = 0;
+pthread_key_t gridDimxKey = 0;
 pthread_mutex_t atom_add_mutex;
 pthread_mutex_t thread_id_mutex;
 pthread_mutex_t barrier_mutex;
@@ -60,6 +61,10 @@ int getBlockIdxx(){
 
 int getBlockDimx(){
   return (int) pthread_getspecific(blockDimxKey);
+}
+
+int getGridDimx(){
+  return (int) pthread_getspecific(gridDimxKey);
 }
 
 long long java_lang_System_nanoTime(char * gc_info, int * exception){

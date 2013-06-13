@@ -176,6 +176,12 @@ int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getBlockDimx($$__global$$ char
 }
 
 $$__device__$$ 
+int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getGridDimx($$__global$$ char * gc_info, int * exception){
+  return getGridDimx();
+}
+
+
+$$__device__$$ 
 long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef($$__global$$ char * gc_info, int ref, int * exception){
   return ref;
 }
@@ -244,7 +250,7 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger($$__global$$
 $$__device__$$
 long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedLong($$__global$$ char * gc_info, int index, int * exception){
   long long ret = 0;
-  ret |=  (long long) m_shared[index] & 0x00000000000000ffL;
+  ret |=  ((long long) m_shared[index]) & 0x00000000000000ffL;
   ret |= ((long long) m_shared[index + 1] << 8)  & 0x000000000000ff00L;
   ret |= ((long long) m_shared[index + 2] << 16) & 0x0000000000ff0000L;
   ret |= ((long long) m_shared[index + 3] << 24) & 0x00000000ff000000L;
@@ -257,14 +263,14 @@ long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedLong($$__global
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedLong($$__global$$ char * gc_info, int index, long long value, int * exception){
-  m_shared[index] = (char) (value & 0xff);
-  m_shared[index + 1] = (char) ((value >> 8)  & 0xff);
-  m_shared[index + 2] = (char) ((value >> 16) & 0xff);
-  m_shared[index + 3] = (char) ((value >> 24) & 0xff);
-  m_shared[index + 4] = (char) ((value >> 32) & 0xff);
-  m_shared[index + 5] = (char) ((value >> 40) & 0xff);
-  m_shared[index + 6] = (char) ((value >> 48) & 0xff);
-  m_shared[index + 7] = (char) ((value >> 56) & 0xff);
+  m_shared[index] = (char) (value & 0x00000000000000ffL);
+  m_shared[index + 1] = (char) ((value >> 8)  & 0x00000000000000ffL);
+  m_shared[index + 2] = (char) ((value >> 16) & 0x00000000000000ffL);
+  m_shared[index + 3] = (char) ((value >> 24) & 0x00000000000000ffL);
+  m_shared[index + 4] = (char) ((value >> 32) & 0x00000000000000ffL);
+  m_shared[index + 5] = (char) ((value >> 40) & 0x00000000000000ffL);
+  m_shared[index + 6] = (char) ((value >> 48) & 0x00000000000000ffL);
+  m_shared[index + 7] = (char) ((value >> 56) & 0x00000000000000ffL);
 }
   
 $$__device__$$

@@ -43,6 +43,7 @@ int getThreadId();
 int getThreadIdxx();
 int getBlockIdxx();
 int getBlockDimx();
+int getGridDimx();
 
 void edu_syr_pcpratts_syncthreads();
 void edu_syr_pcpratts_threadfence();

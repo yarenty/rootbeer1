@@ -46,6 +46,7 @@ public class Configuration {
   private boolean m_doubles;
   private boolean m_recursion;
   private boolean m_exceptions;
+  private boolean m_keepMains;
   
   static {
     m_printMem = false;
@@ -59,6 +60,7 @@ public class Configuration {
     m_doubles = true;
     m_recursion = true;
     m_exceptions = true;
+    m_keepMains = false;
   }
 
   private Configuration(boolean load) {
@@ -147,5 +149,13 @@ public class Configuration {
   
   public boolean getExceptions(){
     return m_exceptions;
+  }
+
+  public boolean getKeepMains() {
+    return m_keepMains;
+  }
+  
+  public void setKeepMains(boolean value){
+    m_keepMains = value;
   }
 }

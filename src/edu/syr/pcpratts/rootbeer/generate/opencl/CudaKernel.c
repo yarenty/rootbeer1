@@ -39,7 +39,7 @@ edu_syr_pcpratts_gc_malloc_no_fail(char * gc_info, int size){
 
 __device__  void
 edu_syr_pcpratts_gc_init(char * to_space, size_t space_size, int * java_lang_class_refs){
-  ig(threadIdx.x == 0){
+  if(threadIdx.x == 0){
     m_Local[0] = (size_t) to_space;
     m_Local[1] = (size_t) space_size;
     m_Local[2] = (size_t) java_lang_class_refs;
