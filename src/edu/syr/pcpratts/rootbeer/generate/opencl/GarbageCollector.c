@@ -383,9 +383,12 @@ void java_io_PrintStream_print0_8_($$__global$$ char * gc_info, int thisref, dou
 
 $$__device__$$
 int edu_syr_pcpratts_rootbeer_runtime_RootbeerAtomicInt_atomicAdd($$__global$$ char * gc_info, int thisref, int value, int * exception){
-  char * thisref_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref ) ;
+  char * thisref_deref;
+  int * array;
+
+  thisref_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref ) ;
   thisref_deref += 32;
-  int * array = (int *) thisref_deref;
+  array = (int *) thisref_deref;
   return atomicAdd(array, value);
 }
 
@@ -830,10 +833,13 @@ $$__device__$$
 int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(char * gc_info, 
   int str ,int * exception){
  
-  int r0 =-1 ; 
-  int thisref ; 
-  char * thisref_deref ; 
-  thisref =-1 ; 
+  int r0 = -1; 
+  int thisref; 
+  int str_value;
+  int str_count;  
+
+  char * thisref_deref; 
+  thisref = -1;
   edu_syr_pcpratts_gc_assign ( gc_info , & thisref , edu_syr_pcpratts_gc_malloc ( gc_info , 48 ) ) ; 
   if ( thisref ==-1 ) { 
     * exception = %%java_lang_NullPointerException_TypeNumber%%; 
@@ -847,8 +853,8 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(char * gc_
   edu_syr_pcpratts_gc_set_size ( thisref_deref , 44 ) ; 
   edu_syr_pcpratts_gc_init_monitor ( thisref_deref ) ; 
 
-  int str_value = instance_getter_java_lang_String_value(gc_info, str, exception);
-  int str_count = instance_getter_java_lang_String_count(gc_info, str, exception);
+  str_value = instance_getter_java_lang_String_value(gc_info, str, exception);
+  str_count = instance_getter_java_lang_String_count(gc_info, str, exception);
 
   instance_setter_java_lang_AbstractStringBuilder_value(gc_info, thisref, str_value, exception); 
   instance_setter_java_lang_AbstractStringBuilder_count(gc_info, thisref, str_count, exception); 
