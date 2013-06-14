@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 __shared__ size_t m_Local[3];
-__shared__ char m_shared[40*1024];
+__shared__ char m_shared[%%shared_mem_size%%];
 
 __device__
 int getThreadId(){

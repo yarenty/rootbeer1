@@ -100,6 +100,11 @@ public class Main {
         Configuration.compilerInstance().setExceptions(false);
       } else if(arg.equals("-keepmains")){
         Configuration.compilerInstance().setKeepMains(true);
+      } else if(arg.equals("-shared-mem-size")){
+        String size = safeGet(args, i+1, "-shared-mem-size");
+        ++i;
+        int int_size = Integer.parseInt(size);
+        Configuration.compilerInstance().setSharedMemSize(int_size);
       } else if(m_simpleCompile == false){      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);

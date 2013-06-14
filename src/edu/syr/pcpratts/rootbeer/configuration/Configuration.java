@@ -47,6 +47,7 @@ public class Configuration {
   private boolean m_recursion;
   private boolean m_exceptions;
   private boolean m_keepMains;
+  private int m_sharedMemSize;
   
   static {
     m_printMem = false;
@@ -61,6 +62,7 @@ public class Configuration {
     m_recursion = true;
     m_exceptions = true;
     m_keepMains = false;
+    m_sharedMemSize = 40*1024;
   }
 
   private Configuration(boolean load) {
@@ -157,5 +159,13 @@ public class Configuration {
   
   public void setKeepMains(boolean value){
     m_keepMains = value;
+  }
+
+  public void setSharedMemSize(int size) {
+    m_sharedMemSize = size;
+  }
+  
+  public int getSharedMemSize(){
+    return m_sharedMemSize;
   }
 }

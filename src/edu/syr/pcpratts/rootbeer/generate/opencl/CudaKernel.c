@@ -43,10 +43,6 @@ edu_syr_pcpratts_gc_init(char * to_space, size_t space_size, int * java_lang_cla
     m_Local[0] = (size_t) to_space;
     m_Local[1] = (size_t) space_size;
     m_Local[2] = (size_t) java_lang_class_refs;
-
-    for(int i = 0; i < 40*1024; ++i){
-      m_shared[i] = 0;
-    }
   }
 }
 

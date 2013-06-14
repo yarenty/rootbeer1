@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.entry.ExtraFields;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
@@ -306,6 +307,10 @@ public class OpenCLScene {
     int null_pointer_number = RootbeerClassLoader.v().getClassNumber("java.lang.NullPointerException");
     String np_str = "" + null_pointer_number;
     cuda_code = cuda_code.replaceAll("%%java_lang_NullPointerException_TypeNumber%%", np_str);
+    
+    int size = Configuration.compilerInstance().getSharedMemSize();
+    String size_str = ""+size;
+    cuda_code = cuda_code.replaceAll("%%shared_mem_size%%", size_str);
     
     return cuda_code;
   }
