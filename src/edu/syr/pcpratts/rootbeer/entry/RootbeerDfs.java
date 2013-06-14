@@ -43,7 +43,9 @@ public class RootbeerDfs {
     queue.add(new HierarchySignature("<java.lang.Long: java.lang.String toString(long)>"));
     queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtime.Sentinal: void <init>()>"));
     queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void <init>()>"));
-    queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>"));
+    queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>")); 
+    queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException exception()>"));
+    queue.add(new HierarchySignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void addStackTrace(java.lang.String)>"));
     
     visited.add(new HierarchySignature("<java.lang.StringBuilder: java.lang.StringBuilder append(double)>"));
     visited.add(new HierarchySignature("<java.lang.StringBuilder: java.lang.StringBuilder append(float)>"));

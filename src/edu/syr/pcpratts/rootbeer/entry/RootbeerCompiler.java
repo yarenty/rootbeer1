@@ -159,6 +159,9 @@ public class RootbeerCompiler {
     follow_tester.addSignature("<edu.syr.pcpratts.rootbeer.runtime.Sentinal: void <init>()>");
     follow_tester.addSignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void <init>()>");
     follow_tester.addSignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
+    follow_tester.addSignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException exception()>");
+    follow_tester.addSignature("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void addStackTrace(java.lang.String)>");
+    
     follow_tester.addSignature("<edu.syr.pcpratts.rootbeer.runtime.Serializer: void <init>(edu.syr.pcpratts.rootbeer.runtime.memory.Memory,edu.syr.pcpratts.rootbeer.runtime.memory.Memory)>");
     follow_tester.addSignature("<edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.CovarientTest: void <init>()>");
     RootbeerClassLoader.v().addFollowMethodTester(follow_tester);

@@ -13,6 +13,7 @@ import edu.syr.pcpratts.rootbeer.generate.bytecode.StaticOffsets;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
 import edu.syr.pcpratts.rootbeer.generate.opencl.body.OpenCLBody;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
+import edu.syr.pcpratts.rootbeer.runtimegpu.GpuException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -485,7 +486,9 @@ public class OpenCLMethod {
     m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtime.RootbeerAtomicInt: int atomicAdd(int)>");
     m_dontMangleMethods.add("<java.lang.String: void <init>(char[])>");
     m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
-  
+    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException exception()>");
+    m_dontMangleMethods.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void addStackTrace(java.lang.String)>");
+
     m_dontEmitMethods.add("<java.lang.StringBuilder: java.lang.StringBuilder append(boolean)>");
     m_dontEmitMethods.add("<java.lang.StringBuilder: java.lang.StringBuilder append(char)>");
     m_dontEmitMethods.add("<java.lang.StringBuilder: java.lang.StringBuilder append(double)>");
@@ -498,6 +501,8 @@ public class OpenCLMethod {
     m_dontEmitMethods.add("<java.lang.Float: java.lang.String toString(float)>");
     
     m_emitUnmangled.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
+    m_emitUnmangled.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: edu.syr.pcpratts.rootbeer.runtimegpu.GpuException exception()>");
+    m_emitUnmangled.add("<edu.syr.pcpratts.rootbeer.runtimegpu.GpuException: void addStackTrace(java.lang.String)>");
   }
 
   public String getSignature() {

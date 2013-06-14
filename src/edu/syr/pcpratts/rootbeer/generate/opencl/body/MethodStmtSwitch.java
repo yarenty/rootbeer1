@@ -359,6 +359,13 @@ public class MethodStmtSwitch implements StmtSwitch {
     if(m_sootMethod.isSynchronized()){
       m_output.append("edu_syr_pcpratts_exitMonitorMem(gc_info, mem, old);\n");
     }
+    if(m_trapItems == null){
+      m_output.append("  int ex2 = 0;");
+      m_output.append("  edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_addStackTrace(gc_info, *exception, ");
+      m_output.append("edu_syr_pcpratts_string_constant(gc_info, \"  ");
+      m_output.append(m_sootMethod.getSignature());
+      m_output.append("\\n\", &ex2), &ex2);\n");
+    }
     m_output.append("return ");
     if(methodReturnsAValue())
       m_output.append("0");
