@@ -24,6 +24,7 @@ public class CudaPath {
     m_windowsSearchPaths.add("C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\");
     m_windowsSearchPaths.add("C:\\Program Files (x86)\\NVIDIA GPU Computing Toolkit\\CUDA\\");
     m_unixSearchPaths.add("/usr/local/cuda/bin/");
+    m_unixSearchPaths.add("/usr/lib/nvidia-cuda-toolkit/bin/");
   }
           
   public String get(){
