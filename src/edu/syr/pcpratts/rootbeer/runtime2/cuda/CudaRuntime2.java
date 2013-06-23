@@ -307,6 +307,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_writeBlocksStopwatch.start();
     for(Memory mem : m_ToSpace){
       mem.setAddress(0);
+      mem.clearHeapEndPtr();
     }
     m_Handles.activate();
     m_Handles.resetPointer();
@@ -356,6 +357,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     m_writeBlocksStopwatch.start();
     for(Memory mem : m_ToSpace){
       mem.setAddress(0);
+      mem.clearHeapEndPtr();
     }
     m_Handles.activate();
     m_Handles.resetPointer();
@@ -596,8 +598,9 @@ public class CudaRuntime2 implements ParallelRuntime {
   private long getHeapEndPtr() {
     long max = Long.MIN_VALUE;
     for(Memory mem : m_ToSpace){
-      if(mem.getHeapEndPtr() > max)
+      if(mem.getHeapEndPtr() > max){
         max = mem.getHeapEndPtr();
+      }
     }
     return max;
   }
