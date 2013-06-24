@@ -18,7 +18,6 @@ import soot.rbclassload.DfsInfo;
 import soot.rbclassload.FieldSignatureUtil;
 import soot.rbclassload.HierarchySignature;
 import soot.rbclassload.HierarchyValueSwitch;
-import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.StringNumbers;
 import soot.rbclassload.StringToType;

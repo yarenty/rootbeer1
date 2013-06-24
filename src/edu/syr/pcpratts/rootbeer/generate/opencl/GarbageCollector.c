@@ -151,6 +151,22 @@ $$__device__$$ double java_lang_StrictMath_tanh( char * gc_info , double paramet
 } 
 
 $$__device__$$ 
+void edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_start($$__global$$ char * gc_info, int thisref, int * exception){
+  long long int time;
+  
+  time = clock64();
+  instance_setter_edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_m_start(gc_info, thisref, time, exception);
+}
+
+$$__device__$$ 
+void edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_stop($$__global$$ char * gc_info, int thisref, int * exception){
+  long long int time;
+  
+  time = clock64();
+  instance_setter_edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_m_stop(gc_info, thisref, time, exception);
+}
+
+$$__device__$$ 
 char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu($$__global$$ char * gc_info, int * exception){
   return 1;
 }
