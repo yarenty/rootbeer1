@@ -12,11 +12,6 @@ public class GpuStopwatch {
   private long m_start;
   private long m_stop;
   
-  public GpuStopwatch(){
-    m_start = 0;
-    m_stop = 0;
-  }
-  
   public void start(){
   }
   

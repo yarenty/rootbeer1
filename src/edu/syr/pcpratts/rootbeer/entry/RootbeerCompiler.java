@@ -30,6 +30,7 @@ import pack.Pack;
 import soot.*;
 import soot.options.Options;
 import soot.rbclassload.DfsInfo;
+import soot.rbclassload.HierarchySignature;
 import soot.rbclassload.ListClassTester;
 import soot.rbclassload.ListMethodTester;
 import soot.rbclassload.MethodTester;
@@ -178,8 +179,16 @@ public class RootbeerCompiler {
     }
     dont_dfs_tester.addSignature("<java.io.PrintStream: void println()>");
     dont_dfs_tester.addSignature("<java.io.PrintStream: void println(java.lang.String)>");
-    dont_dfs_tester.addSignature("<java.io.PrintStream: void println(double)>");
+    
+    dont_dfs_tester.addSignature("<java.io.PrintStream: void println(boolean)>");   
+    dont_dfs_tester.addSignature("<java.io.PrintStream: void println(byte)>");   
+    dont_dfs_tester.addSignature("<java.io.PrintStream: void println(char)>");    
+    dont_dfs_tester.addSignature("<java.io.PrintStream: void println(short)>");   
+    dont_dfs_tester.addSignature("<java.io.PrintStream: void println(int)>");     
+    dont_dfs_tester.addSignature("<java.io.PrintStream: void println(long)>");   
+    
     dont_dfs_tester.addSignature("<java.io.PrintStream: void println(float)>");
+    dont_dfs_tester.addSignature("<java.io.PrintStream: void println(double)>");
     dont_dfs_tester.addSignature("<java.io.PrintStream: void print(java.lang.String)>");
     dont_dfs_tester.addSignature("<java.io.PrintStream: void print(double)>");
     dont_dfs_tester.addSignature("<java.io.PrintStream: void print(float)>");

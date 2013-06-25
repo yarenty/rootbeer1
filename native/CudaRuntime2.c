@@ -718,7 +718,7 @@ JNIEXPORT jint JNICALL Java_edu_syr_pcpratts_rootbeer_runtime2_cuda_CudaRuntime2
   cuMemcpyDtoH(exceptionsMemory, gpuExceptionsMemory, num_blocks * sizeof(jlong));
   free(infoSpace);
   cuCtxPopCurrent(&cuContext);
-  
+
   return 0;
 }
 

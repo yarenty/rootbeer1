@@ -419,6 +419,36 @@ void java_io_PrintStream_println0_($$__global$$ char * gc_info, int thisref, int
 }
 
 $$__device__$$
+void java_io_PrintStream_println0_1_($$__global$$ char * gc_info, int thisref, int value, int * exception){
+  printf("%d\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_2_($$__global$$ char * gc_info, int thisref, char value, int * exception){
+  printf("%d\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_3_($$__global$$ char * gc_info, int thisref, char value, int * exception){
+  printf("%c\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_4_($$__global$$ char * gc_info, int thisref, short value, int * exception){
+  printf("%d\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_5_($$__global$$ char * gc_info, int thisref, int value, int * exception){
+  printf("%d\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_6_($$__global$$ char * gc_info, int thisref, long long value, int * exception){
+  printf("%lld\n", value);
+}
+
+$$__device__$$
 void java_io_PrintStream_println0_7_($$__global$$ char * gc_info, int thisref, float value, int * exception){
   printf("%e\n", value);
 }

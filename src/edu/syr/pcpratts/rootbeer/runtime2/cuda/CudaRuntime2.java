@@ -452,7 +452,12 @@ public class CudaRuntime2 implements ParallelRuntime {
       for(byte[] sub_buffer : buffer){
         total_len += sub_buffer.length;
       }
-      loadFunction(getHeapEndPtr(), buffer, buffer.size(), total_len, m_NumThreads);
+      long ptr = getHeapEndPtr();
+      //align ptr on 4 bit boundry
+      if(ptr % 16 != 0){
+        ptr += (16 - (ptr % 16));
+      }
+      loadFunction(ptr, buffer, buffer.size(), total_len, m_NumThreads);
     } catch(Exception ex){
       ex.printStackTrace();
     }
