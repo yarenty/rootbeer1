@@ -41,10 +41,9 @@ competative speed when using single-dimensional arrays of primitive types.
 
 1. Clone the github repo to `rootbeer1/`
 2. `cd rootbeer1/`
-3. `git checkout feature/rbclassload2`  
-4. `ant`
-5. `./pack-rootbeer` (linux) or `./pack-rootbeer.bat` (windows)
-6. Use the `rootbeer1/Rootbeer.jar` (not `dist/Rootbeer1.jar`)
+3. `ant jar`
+4. `./pack-rootbeer` (linux) or `./pack-rootbeer.bat` (windows)
+5. Use the `rootbeer1/Rootbeer.jar` (not `dist/Rootbeer1.jar`)
 
 ## Pre-Built Binaries  
 
@@ -55,11 +54,12 @@ See here: http://rbcompiler.com/download.html
 You need to have the CUDA Toolkit and CUDA Driver installed to use Rootbeer.
 Download it from http://www.nvidia.com/content/cuda/cuda-downloads.html
 
-## Clarifications
+## API
 
-Rootbeer does NOT automatically parallelize code. It provides help serializing
-state and writing CUDA code, but you still must specify what each GPU core
-is going to do.
+See the following links for help on the API:  
+1. http://rbcompiler.com/  
+2. http://rbcompiler.com/features.html  
+3. https://github.com/pcpratts/rootbeer1/tree/develop/gtc2013/Matrix  
 
 ## About
 
