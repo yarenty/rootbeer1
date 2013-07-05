@@ -8,14 +8,22 @@
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import soot.RefType;
+import soot.SootClass;
 import soot.Type;
 import soot.jimple.InstanceOfExpr;
 import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.HierarchyGraph;
 import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
+import soot.rbclassload.StringNumbers;
 
 public class OpenCLInstanceof {
 
@@ -49,7 +57,7 @@ public class OpenCLInstanceof {
       throw new RuntimeException("not supported yet");
     }
     RefType ref_type = (RefType) m_type;    
-    List<NumberedType> type_list = RootbeerClassLoader.v().getDfsInfo().getNumberedHierarchyUp(ref_type.getSootClass());
+    List<NumberedType> type_list = getTypeList(ref_type.getSootClass());
     
     String ret = getDecl();
     ret += "{\n";
@@ -95,5 +103,39 @@ public class OpenCLInstanceof {
     int hash = 5;
     hash = 29 * hash + (this.m_type != null ? this.m_type.hashCode() : 0);
     return hash;
+  }
+
+  private List<NumberedType> getTypeList(SootClass soot_class) {
+    
+    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph(soot_class);
+
+    Set<Integer> visited = new TreeSet<Integer>();
+    visited.add(StringNumbers.v().addString(soot_class.getName()));
+    LinkedList<String> queue = new LinkedList<String>();
+    queue.add(soot_class.getName());
+    
+    Set<Integer> new_invokes = RootbeerClassLoader.v().getNewInvokes();
+    List<NumberedType> ret = new ArrayList<NumberedType>();
+    
+    while(queue.isEmpty() == false){
+      String entry = queue.removeFirst();
+      Integer num = StringNumbers.v().addString(entry);
+      if(new_invokes.contains(num)){
+        NumberedType ntype = class_hierarchy.getNumberedType(entry);
+        ret.add(ntype);
+      }
+      
+      Set<Integer> children = hgraph.getChildren(num);
+      for(Integer child : children){
+        if(visited.contains(child)){
+          continue;
+        }
+        visited.add(child);
+        queue.add(StringNumbers.v().getString(child));
+      }
+    }
+    
+    return ret;
   }
 }
