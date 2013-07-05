@@ -26,6 +26,8 @@ public class ExtraFields {
     m_fields.add("<java.lang.String: int offset>");
     m_fields.add("<java.lang.StringBuilder: char[] value>");
     m_fields.add("<java.lang.StringBuilder: int count>");
+    m_fields.add("<edu.syr.pcpratts.rootbeer.runtime.GpuStopwatch: long m_start>");
+    m_fields.add("<edu.syr.pcpratts.rootbeer.runtime.GpuStopwatch: long m_stop>");
   }
   
   public List<String> get(){

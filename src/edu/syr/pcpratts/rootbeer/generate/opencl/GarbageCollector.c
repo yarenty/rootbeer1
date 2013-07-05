@@ -151,6 +151,22 @@ $$__device__$$ double java_lang_StrictMath_tanh( char * gc_info , double paramet
 } 
 
 $$__device__$$ 
+void edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_start($$__global$$ char * gc_info, int thisref, int * exception){
+  long long int time;
+  
+  time = clock64();
+  instance_setter_edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_m_start(gc_info, thisref, time, exception);
+}
+
+$$__device__$$ 
+void edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_stop($$__global$$ char * gc_info, int thisref, int * exception){
+  long long int time;
+  
+  time = clock64();
+  instance_setter_edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_m_stop(gc_info, thisref, time, exception);
+}
+
+$$__device__$$ 
 char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu($$__global$$ char * gc_info, int * exception){
   return 1;
 }
@@ -188,71 +204,85 @@ long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef($$__global$$ char
 
 $$__device__$$
 char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedByte($$__global$$ char * gc_info, int index, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }
+#endif
   return m_shared[index]; 
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedByte($$__global$$ char * gc_info, int index, char value, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
+#endif
   m_shared[index] = value;
 }
   
 $$__device__$$
 char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedChar($$__global$$ char * gc_info, int index, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }
+#endif
   return m_shared[index]; 
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedChar($$__global$$ char * gc_info, int index, char value, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
+#endif
   m_shared[index] = value;
 }
   
 $$__device__$$
 char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedBoolean($$__global$$ char * gc_info, int index, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }
+#endif
   return m_shared[index]; 
 }
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedBoolean($$__global$$ char * gc_info, int index, char value, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
+#endif
   m_shared[index] = value;
 }
   
 $$__device__$$
 short edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedShort($$__global$$ char * gc_info, int index, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index + 2 >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }  
+#endif
   short ret = 0;
   ret |= m_shared[index] & 0xff;
   ret |= (m_shared[index + 1] << 8) & 0xff00;
@@ -261,22 +291,26 @@ short edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedShort($$__global$$ 
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedShort($$__global$$ char * gc_info, int index, short value, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index + 2 >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
+#endif
   m_shared[index] = (char) (value & 0xff);
   m_shared[index + 1] = (char) ((value >> 8) & 0xff);
 }
 
 $$__device__$$
 int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedInteger($$__global$$ char * gc_info, int index, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index + 4 >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }
+#endif
   int ret = m_shared[index] & 0x000000ff;
   ret |= (m_shared[index + 1] << 8)  & 0x0000ff00;
   ret |= (m_shared[index + 2] << 16) & 0x00ff0000;
@@ -286,11 +320,13 @@ int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedInteger($$__global$$ 
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger($$__global$$ char * gc_info, int index, int value, int * exception){  
+#ifdef ARRAY_CHECKS
   if(index < 0 || index + 4 >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
+#endif
   m_shared[index] = (char) (value & 0xff);
   m_shared[index + 1] = (char) ((value >> 8)  & 0xff);
   m_shared[index + 2] = (char) ((value >> 16) & 0xff);
@@ -299,11 +335,13 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger($$__global$$
 
 $$__device__$$
 long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedLong($$__global$$ char * gc_info, int index, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index + 8 >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }
+#endif
   long long ret = 0;
   ret |=  ((long long) m_shared[index]) & 0x00000000000000ffL;
   ret |= ((long long) m_shared[index + 1] << 8)  & 0x000000000000ff00L;
@@ -318,11 +356,13 @@ long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedLong($$__global
 
 $$__device__$$
 void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedLong($$__global$$ char * gc_info, int index, long long value, int * exception){
+#ifdef ARRAY_CHECKS
   if(index < 0 || index + 8 >= %%shared_mem_size%%){
     *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
+#endif
   m_shared[index] = (char) (value & 0x00000000000000ffL);
   m_shared[index + 1] = (char) ((value >> 8)  & 0x00000000000000ffL);
   m_shared[index + 2] = (char) ((value >> 16) & 0x00000000000000ffL);
@@ -400,6 +440,36 @@ void java_io_PrintStream_println0_9_($$__global$$ char * gc_info, int thisref, i
 $$__device__$$
 void java_io_PrintStream_println0_($$__global$$ char * gc_info, int thisref, int * exception){
   printf("\n");
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_1_($$__global$$ char * gc_info, int thisref, int value, int * exception){
+  printf("%d\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_2_($$__global$$ char * gc_info, int thisref, char value, int * exception){
+  printf("%d\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_3_($$__global$$ char * gc_info, int thisref, char value, int * exception){
+  printf("%c\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_4_($$__global$$ char * gc_info, int thisref, short value, int * exception){
+  printf("%d\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_5_($$__global$$ char * gc_info, int thisref, int value, int * exception){
+  printf("%d\n", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_println0_6_($$__global$$ char * gc_info, int thisref, long long value, int * exception){
+  printf("%lld\n", value);
 }
 
 $$__device__$$

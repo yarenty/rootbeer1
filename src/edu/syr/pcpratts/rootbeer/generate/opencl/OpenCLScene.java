@@ -326,6 +326,11 @@ public class OpenCLScene {
   }
 
   private String headerString(boolean unix) throws IOException {
+    String defines = "";
+    if(Configuration.compilerInstance().getArrayChecks()){
+      defines += "#define ARRAY_CHECKS\n"; 
+    }
+    
     String specific_path;
     if(unix){
       specific_path = Tweaks.v().getUnixHeaderPath();
@@ -347,7 +352,7 @@ public class OpenCLScene {
       barrier_code = ResourceReader.getResource(barrier_path);
     }
     
-    return specific_header + "\n" + both_header + "\n" + barrier_code;
+    return defines + "\n" + specific_header + "\n" + both_header + "\n" + barrier_code;
   }
   
   private String kernelString(boolean unix) throws IOException {
