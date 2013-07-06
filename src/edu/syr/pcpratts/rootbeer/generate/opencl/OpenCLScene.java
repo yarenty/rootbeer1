@@ -312,6 +312,10 @@ public class OpenCLScene {
     String size_str = ""+size;
     cuda_code = cuda_code.replaceAll("%%shared_mem_size%%", size_str);
     
+    int string_number = RootbeerClassLoader.v().getClassNumber("java.lang.String");
+    String string_str = "" + string_number;
+    cuda_code = cuda_code.replaceAll("%%java_lang_String_TypeNumber%%", string_str);
+    
     return cuda_code;
   }
   

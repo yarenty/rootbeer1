@@ -337,8 +337,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     Local type_id = bcl_mem.readInt();
     bcl_mem.setAddress(start);
     
-    //m_Bcl.top().println("searching null creators for:");
-    //m_Bcl.top().println(type_id);
+    //m_bcl.top().println("searching null creators for:");
+    //m_bcl.top().println(type_id);
         
     for(Type type : m_OrderedHistory){
       makeReadForNullForType(type, type_id);

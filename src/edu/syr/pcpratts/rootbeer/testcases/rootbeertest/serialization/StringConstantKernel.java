@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
 
 public class StringConstantKernel implements Kernel {
 
@@ -19,6 +20,7 @@ public class StringConstantKernel implements Kernel {
 
   boolean compare(StringConstantKernel rhs) {
     if(m_string.equals(rhs.m_string) == false){
+      System.out.println("m_string: "+m_string);
       System.out.println("rhs.m_string: "+rhs.m_string);
       return false;
     }

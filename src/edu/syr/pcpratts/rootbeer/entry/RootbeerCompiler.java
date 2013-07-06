@@ -147,6 +147,7 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addNewInvoke("java.lang.StringBuilder");
     
     ListMethodTester follow_tester = new ListMethodTester();
+    follow_tester.addSignature("<java.lang.String: void <init>()>");
     follow_tester.addSignature("<java.lang.String: void <init>(char[])>");
     follow_tester.addSignature("<java.lang.StringBuilder: void <init>()>");
     follow_tester.addSignature("<java.lang.Boolean: java.lang.String toString(boolean)>");
@@ -203,6 +204,8 @@ public class RootbeerCompiler {
     
     ListMethodTester to_sig_methods = new ListMethodTester();
     to_sig_methods.addSignature("<java.lang.Object: int hashCode()>");
+    to_sig_methods.addSignature("<java.io.PrintStream: void println(java.lang.String)>");
+    to_sig_methods.addSignature("<java.io.PrintStream: void println(int)>");
     RootbeerClassLoader.v().addToSignaturesMethodTester(to_sig_methods);
     
     RootbeerClassLoader.v().loadNecessaryClasses();
