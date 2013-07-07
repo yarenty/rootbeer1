@@ -64,8 +64,13 @@ public class ToSpaceReader {
           Kernel item = input_item.m_Items.get(i);
           long handle = input_item.m_HandlesCache.get(i);
           
-          Kernel new_item = (Kernel) input_item.m_Visitor.readFromHeap(item, true, handle);
-          input_item.m_Items.set(i, new_item);
+          try {
+            Kernel new_item = (Kernel) input_item.m_Visitor.readFromHeap(item, true, handle);
+            input_item.m_Items.set(i, new_item);
+          } catch(Exception ex){
+            ex.printStackTrace();
+            input_item.m_Items.set(i, null);
+          }
         }
         m_OutputQueue.put(input_item);
       }

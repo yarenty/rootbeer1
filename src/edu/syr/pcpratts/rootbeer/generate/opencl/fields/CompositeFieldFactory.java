@@ -18,32 +18,32 @@ import soot.SootField;
 
 public class CompositeFieldFactory {
 
-  private List<TreeNode> m_Hierarchy;
-  private List<CompositeField> m_Fields;
-  private Set<String> m_ProcessNodeVisited;
+  private List<TreeNode> m_hierarchy;
+  private List<CompositeField> m_fields;
+  private Set<String> m_processNodeVisited;
   
   public void setup(Map<String, OpenCLClass> classes) {
-    m_ProcessNodeVisited = new HashSet<String>();
+    m_processNodeVisited = new HashSet<String>();
     createHierarchy(classes);
-    m_Fields = new ArrayList<CompositeField>();
-    for(TreeNode node : m_Hierarchy){
+    m_fields = new ArrayList<CompositeField>();
+    for(TreeNode node : m_hierarchy){
       CompositeField composite = new CompositeField();
       processNode(node, composite);
       if(composite.getClasses().isEmpty()){
         composite.getClasses().add(node.getSootClass());          
       }
       composite.sort();
-      m_Fields.add(composite);
+      m_fields.add(composite);
     }
   }
   
   public List<CompositeField> getCompositeFields(){
-    return m_Fields; 
+    return m_fields; 
   }
         
   private void createHierarchy(Map<String, OpenCLClass> classes){
     ReverseClassHierarchy creator = new ReverseClassHierarchy(classes);
-    m_Hierarchy = creator.get();
+    m_hierarchy = creator.get();
   }
   
   private void processNode(TreeNode node, CompositeField composite) {
@@ -84,9 +84,9 @@ public class CompositeFieldFactory {
       field = new_field;
     }
     
-    String hash = soot_class.getName()+"."+soot_field.getName();
-    if(m_ProcessNodeVisited.contains(hash) == false){
-      m_ProcessNodeVisited.add(hash);
+    String hash = soot_field.toString();
+    if(m_processNodeVisited.contains(hash) == false){
+      m_processNodeVisited.add(hash);
       if(ref_field){
         composite.addRefField(new_field, soot_class);
       } else {
