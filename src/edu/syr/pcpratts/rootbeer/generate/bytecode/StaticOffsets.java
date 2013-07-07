@@ -17,9 +17,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import soot.RefType;
+import soot.Scene;
 import soot.SootClass;
+import soot.Type;
 import soot.Value;
+import soot.rbclassload.RootbeerClassLoader;
 
 public class StaticOffsets {
   
@@ -93,11 +97,14 @@ public class StaticOffsets {
       index += leftover;
     }
     m_LockStart = index;
-    Map<String, OpenCLClass> map = OpenCLScene.v().getClassMap();
-    Iterator<String> cls_iter = map.keySet().iterator();
-    while(cls_iter.hasNext()){
-      String curr = cls_iter.next();
-      SootClass soot_class = map.get(curr).getSootClass();
+    Set<Type> types = RootbeerClassLoader.v().getDfsInfo().getDfsTypes();
+    for(Type type : types){
+      if(type instanceof RefType == false){
+        continue;
+      }
+      RefType ref_type = (RefType) type;
+      String curr = ref_type.getClassName();
+      SootClass soot_class = Scene.v().getSootClass(curr);
       m_ClassToOffsetMap.put(soot_class, index);
       index += 4;
     }

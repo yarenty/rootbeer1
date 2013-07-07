@@ -15,8 +15,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import soot.RefType;
 import soot.Scene;
 import soot.SootClass;
+import soot.Type;
 import soot.options.Options;
 import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.HierarchyGraph;
@@ -24,8 +26,7 @@ import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.StringNumbers;
 
 public class ReverseClassHierarchy {
-  private List<TreeNode> m_Hierarchy;
-  private Map<String, OpenCLClass> m_Classes;
+  private List<TreeNode> m_hierarchy;
   
   /**
    * Builds a List<TreeNode> where each is a class just below Object. The 
@@ -34,87 +35,90 @@ public class ReverseClassHierarchy {
    * @param classes 
    */
   public ReverseClassHierarchy(Map<String, OpenCLClass> classes){
-    m_Hierarchy = new ArrayList<TreeNode>();
-    m_Classes = classes;
-        
-    Set<String> key_set = classes.keySet();
-    Set<String> roots = new HashSet<String>();
-    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+    m_hierarchy = new ArrayList<TreeNode>();
     
+    List<TreeNode> all_tree_nodes = new ArrayList<TreeNode>();
+    
+    Set<Type> dfs_types = RootbeerClassLoader.v().getDfsInfo().getDfsTypes();
+    Set<String> dfs_string_types = getRefTypes(dfs_types);
+    
+    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
     SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
     HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph(obj_class);
+    Set<Integer> roots = hgraph.getChildren(0);   //java.lang.Object is 0
     
-    List<Integer> queue = new LinkedList<Integer>();
-    queue.add(0);                         //java.lang.Object is number 0
-    
-    while(!queue.isEmpty()){
-      Integer class_num = queue.get(0);
-      queue.remove(0);
-      
-      String class_name = StringNumbers.v().getString(class_num);
-      if(key_set.contains(class_name) && !class_name.equals("java.lang.Object")){
-        if(roots.contains(class_name)){
-          continue;
-        } else {
-          SootClass soot_class = Scene.v().getSootClass(class_name);
-          OpenCLClass ocl_class = classes.get(class_name);
-          TreeNode tree = new TreeNode(soot_class, ocl_class);
-          m_Hierarchy.add(tree);
-          roots.add(class_name);
-        }
-      } else {
-        queue.addAll(hgraph.getChildren(class_num));
+    for(Integer root : roots){    
+      String root_name = StringNumbers.v().getString(root);
+      SootClass root_class = Scene.v().getSootClass(root_name);
+ 
+      if(root_class.isInterface()){
+        continue;
       }
-      if(roots.size() == m_Classes.size()){
-        break;
+      
+      OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(root_class);
+      TreeNode tree_node = new TreeNode(root_class, ocl_class);
+      
+      LinkedList<TreeNode> queue = new LinkedList<TreeNode>();
+      queue.add(tree_node);
+      all_tree_nodes.add(tree_node);
+      
+      while(queue.isEmpty() == false){
+        TreeNode curr = queue.removeFirst();
+        SootClass soot_class = curr.getSootClass();
+        int num = StringNumbers.v().addString(soot_class.getName());
+        
+        Set<Integer> children = hgraph.getChildren(num);
+        for(Integer child : children){
+          String child_str = StringNumbers.v().getString(child);
+          SootClass child_class = Scene.v().getSootClass(child_str);
+          if(child_class.isInterface()){
+            continue;
+          }
+          if(dfs_string_types.contains(child_str) == false){
+            continue;
+          }
+          OpenCLClass ocl_class2 = OpenCLScene.v().getOpenCLClass(child_class);
+          TreeNode child_node = new TreeNode(child_class, ocl_class2);
+          curr.addChild(child_node);
+          queue.add(child_node);
+        }
       }
     }
     
-    for(String class_name : m_Classes.keySet()){
-      if(roots.contains(class_name)){
-        continue;
-      }
-      List<String> up_queue = new LinkedList<String>();
-      up_queue.add(class_name);
-      
-      while(up_queue.isEmpty() == false){
-        String curr_class = up_queue.get(0);
-        up_queue.remove(0);
-        
-        if(roots.contains(curr_class)){
-          SootClass root = Scene.v().getSootClass(curr_class);
-          TreeNode node = getNode(root);
-          SootClass soot_class = Scene.v().getSootClass(class_name);
-          OpenCLClass ocl_class = classes.get(class_name);
-          node.addChild(soot_class, ocl_class);
-          break;
-        } else {
-          int num = StringNumbers.v().addString(curr_class);
-          Set<Integer> parents = hgraph.getParents(num);
-          for(Integer parent : parents){
-            up_queue.add(StringNumbers.v().getString(parent));
-          }
-        }
+    for(TreeNode tree_node : all_tree_nodes){
+      if(hasNewInvoke(tree_node, dfs_string_types)){
+        m_hierarchy.add(tree_node);
       }
     }
   }
   
   public List<TreeNode> get(){
-    return m_Hierarchy;
+    return m_hierarchy;
   }
   
-  private TreeNode getNode(SootClass soot_class){
-    for(TreeNode root : m_Hierarchy){
-      TreeNode ret = root.find(soot_class);
-      if(ret != null)
-        return ret;
+  private Set<String> getRefTypes(Set<Type> dfs_types){
+    Set<String> ret = new HashSet<String>();
+    for(Type type : dfs_types){
+      if(type instanceof RefType){
+        RefType ref_type = (RefType) type;
+        String name = ref_type.getSootClass().getName();
+        ret.add(name);
+      }
     }
-    return null;
+    return ret;
   }
-
-  private void addClass(String cls) {
-    SootClass soot_class = Scene.v().getSootClass(cls);
-    OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(soot_class);
-    m_Classes.put(cls, ocl_class);
+  
+  private boolean hasNewInvoke(TreeNode tree_node, Set<String> dfs_types) {
+    SootClass soot_class = tree_node.getSootClass();
+    if(dfs_types.contains(soot_class.getName())){
+      return true;
+    }
+    List<TreeNode> children = tree_node.getChildren();
+    for(TreeNode child : children){
+      if(hasNewInvoke(child, dfs_types)){
+        return true;
+      }
+    }
+    return false;
   }
 }

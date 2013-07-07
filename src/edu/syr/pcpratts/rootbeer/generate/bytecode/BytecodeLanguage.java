@@ -534,6 +534,13 @@ public class BytecodeLanguage {
     pushMethod(out, "println", VoidType.v(), IntType.v());
     invokeMethodNoRet(out, number);
   }
+  
+  void printlnLong(Local number) {
+    Type system = RefType.v("java.lang.System");
+    Local out = refStaticField(system, "out");
+    pushMethod(out, "println", VoidType.v(), LongType.v());
+    invokeMethodNoRet(out, number);
+  }
 
   SootClass getSootClass() {
     return mCurrClass;

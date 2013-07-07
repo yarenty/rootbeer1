@@ -953,7 +953,7 @@ java_util_Arrays_copyOf(char * gc_info, int object_array, int new_size, int * ex
   length = edu_syr_pcpratts_getint(object_array_deref, 12);
   edu_syr_pcpratts_setint(ret_deref, 8, 32 + (4 * new_size));
   edu_syr_pcpratts_setint(ret_deref, 12, new_size);
-      
+
   if(length < new_size){
     for(i = 0; i < length * 4; ++i){
       ret_deref[32+i], object_array_deref[32+i];
@@ -967,6 +967,7 @@ java_util_Arrays_copyOf(char * gc_info, int object_array, int new_size, int * ex
       ret_deref[32+i], object_array_deref[32+i];
     }
   }
+
   return ret; 
 }
 

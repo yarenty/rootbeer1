@@ -15,9 +15,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.body.OpenCLBody;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import soot.*;
@@ -25,7 +23,6 @@ import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
 import soot.options.Options;
-import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -263,6 +260,9 @@ public class OpenCLMethod {
           ret.append("return 0;\n");
         else
           ret.append("\n");
+      }
+      if(returnsAValue()){
+        ret.append("  return 0;\n");
       }
       ret.append("}\n");
       if(isConstructor()){

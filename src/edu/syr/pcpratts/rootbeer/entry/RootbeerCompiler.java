@@ -206,6 +206,7 @@ public class RootbeerCompiler {
     to_sig_methods.addSignature("<java.lang.Object: int hashCode()>");
     to_sig_methods.addSignature("<java.io.PrintStream: void println(java.lang.String)>");
     to_sig_methods.addSignature("<java.io.PrintStream: void println(int)>");
+    to_sig_methods.addSignature("<java.io.PrintStream: void println(long)>");
     RootbeerClassLoader.v().addToSignaturesMethodTester(to_sig_methods);
     
     RootbeerClassLoader.v().loadNecessaryClasses();

@@ -29,6 +29,10 @@ public class TreeNode {
     m_Children.add(new_node);
   }
   
+  public void addChild(TreeNode new_node){
+    m_Children.add(new_node);
+  }
+  
   public SootClass getSootClass(){
     return m_Curr;
   }

@@ -21,6 +21,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CompileResult;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
+import edu.syr.pcpratts.rootbeer.util.ReadFile;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
 import soot.rbclassload.MethodSignatureUtil;
 import java.io.BufferedReader;
@@ -62,13 +63,16 @@ public class OpenCLScene {
   }
 
   public OpenCLScene(){
+  }
+  
+  public void init(){
     m_codeSegment = null;
     m_classes = new LinkedHashMap<String, OpenCLClass>();
     m_arrayTypes = new LinkedHashSet<OpenCLArrayType>();
     m_methodHierarchies = new MethodHierarchies();
     m_instanceOfs = new HashSet<OpenCLInstanceof>();
     m_methods = new ArrayList<SootMethod>();
-    loadTypes();
+    loadTypes(); 
   }
 
   public static OpenCLScene v(){
@@ -286,10 +290,24 @@ public class OpenCLScene {
     
     NameMangling.v().writeTypesToFile();
     
+    if(false){
+      cuda_unix = readCode(RootbeerPaths.v().getRootbeerHome()+"generated_debug.cu");
+    }
+    
     String[] ret = new String[2];
     ret[0] = cuda_unix;
     ret[1] = cuda_windows;
     return ret;
+  }
+  
+  private String readCode(String filename){
+    ReadFile reader = new ReadFile(filename);
+    try {
+      return reader.read();
+    } catch(Exception ex){
+      ex.printStackTrace(System.out);
+      throw new RuntimeException(ex);
+    }
   }
 
   private String setupEntryPoint(StringBuilder builder){
