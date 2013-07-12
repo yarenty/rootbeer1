@@ -399,18 +399,32 @@ public class RootbeerCompiler {
   
   private void writeFileToOutput(ZipInputStream jin, ZipEntry jar_entry, ZipOutputStream zos) throws Exception {
     if(jar_entry.isDirectory() == false){
-      ZipEntry entry = new ZipEntry(jar_entry.getName());
-      entry.setSize(jar_entry.getSize());
-      entry.setCrc(jar_entry.getCrc());
-      zos.putNextEntry(entry);
-
+      
+      List<byte[]> buffered = new ArrayList<byte[]>();
+      int total_size = 0;
       while(true){
         byte[] buffer = new byte[4096];
         int len = jin.read(buffer);
-        if(len == -1)
+        if(len == -1){
           break;
-        zos.write(buffer, 0, len);
+        }
+        total_size += len;
+        byte[] truncated = new byte[len];
+        for(int i = 0; i < len; ++i){
+          truncated[i] = buffer[i];
+        }
+        buffered.add(truncated);
       }
+
+      ZipEntry entry = new ZipEntry(jar_entry.getName());
+      entry.setSize(total_size);
+      entry.setCrc(jar_entry.getCrc());
+      zos.putNextEntry(entry);
+
+      for(byte[] buffer : buffered){
+        zos.write(buffer);
+      }
+      
       zos.flush();
     } else {
       zos.putNextEntry(jar_entry);
