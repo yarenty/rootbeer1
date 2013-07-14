@@ -17,7 +17,7 @@ public class StringTest implements TestSerialization {
   @Override
   public List<Kernel> create() {
     List<Kernel> jobs = new ArrayList<Kernel>();
-    for(int i = 0; i < 100; ++i){
+    for(int i = 0; i < 1; ++i){
       StringRunOnGpu curr = new StringRunOnGpu(i);
       jobs.add(curr);
     }

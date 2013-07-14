@@ -24,7 +24,8 @@ public class CompositeClass6 extends CompositeClass5 {
     m_Shared = 50;
     m_Modified = 40;
     m_HelloStrings += "hello";
-    return super.go() + m_HelloStrings.length();
+    //return super.go() + m_HelloStrings.length();
+    return super.go();
   }
   
   @Override

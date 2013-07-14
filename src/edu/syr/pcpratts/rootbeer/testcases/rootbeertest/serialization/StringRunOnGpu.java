@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
 
 public class StringRunOnGpu implements Kernel {
   private int index;
@@ -28,8 +29,10 @@ public class StringRunOnGpu implements Kernel {
 
   boolean compare(StringRunOnGpu brhs) {
     if(str.equals(brhs.str) == false){
-      System.out.println(str);
-      System.out.println(brhs.str);
+      System.out.println("lhs str: ["+str.toCharArray()+"]");
+      System.out.println("rhs str: ["+brhs.str.toCharArray()+"]");
+      System.out.println("lhs length: "+str.length());
+      System.out.println("rhs length: "+brhs.str.length());
       return false;
     }
     return true;

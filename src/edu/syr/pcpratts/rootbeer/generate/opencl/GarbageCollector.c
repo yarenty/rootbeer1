@@ -768,31 +768,57 @@ edu_syr_pcpratts_array_length($$__global$$ char * gc_info, int thisref){
 }
 
 $$__device__$$
-int java_lang_String_initab850b60f96d11de8a390800200c9a66 ( char * gc_info , int parameter0 , int * exception ) { 
-  int r0 =-1 ; 
-  int r1 =-1 ; 
-  int i0 ; 
-  int $r2 =-1 ; 
-  int thisref ; 
-  char * thisref_deref ; 
+int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a660_(char * gc_info, int * exception){ 
+  int thisref;
+  char * thisref_deref;
+  int chars;
+
+  thisref = edu_syr_pcpratts_gc_malloc(gc_info , 48);
+  if(thisref == -1){
+    *exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    return -1; 
+  }
+
+  thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
+  edu_syr_pcpratts_gc_set_count(thisref_deref, 1); 
+  edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY); 
+  edu_syr_pcpratts_gc_set_type(thisref_deref, %%java_lang_String_TypeNumber%%); 
+  edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1); 
+  edu_syr_pcpratts_gc_set_size(thisref_deref, 48); 
+  edu_syr_pcpratts_gc_init_monitor(thisref_deref); 
+
+  chars = char__array_new(gc_info, 0, exception);
+  instance_setter_java_lang_AbstractStringBuilder_value(gc_info, thisref, chars, exception); 
+  instance_setter_java_lang_AbstractStringBuilder_count(gc_info, thisref, 0, exception);
+  return thisref; 
+}
+
+$$__device__$$
+int java_lang_String_initab850b60f96d11de8a390800200c9a66(char * gc_info, int parameter0, int * exception) { 
+  int r0 = -1; 
+  int r1 = -1; 
+  int i0; 
+  int $r2 = -1; 
+  int thisref; 
+  char * thisref_deref; 
   int i;
   int len;
   int characters_copy;
   char ch;
   
-  thisref =-1 ; 
-  edu_syr_pcpratts_gc_assign ( gc_info , & thisref , edu_syr_pcpratts_gc_malloc ( gc_info , 48 ) ) ; 
-  if ( thisref ==-1 ) { 
-    * exception = 21164 ; 
-    return-1 ; 
+  thisref = -1; 
+  edu_syr_pcpratts_gc_assign(gc_info, &thisref, edu_syr_pcpratts_gc_malloc(gc_info, 48)); 
+  if(thisref == -1) { 
+    *exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    return -1; 
   } 
-  thisref_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref ) ; 
-  edu_syr_pcpratts_gc_set_count ( thisref_deref , 1 ) ; 
-  edu_syr_pcpratts_gc_set_color ( thisref_deref , COLOR_GREY ) ; 
-  edu_syr_pcpratts_gc_set_type ( thisref_deref , %%java_lang_String_TypeNumber%% ) ; 
-  edu_syr_pcpratts_gc_set_ctor_used ( thisref_deref , 1 ) ; 
-  edu_syr_pcpratts_gc_set_size ( thisref_deref , 48 ) ; 
-  edu_syr_pcpratts_gc_init_monitor ( thisref_deref ) ; 
+  thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref); 
+  edu_syr_pcpratts_gc_set_count(thisref_deref, 1); 
+  edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY); 
+  edu_syr_pcpratts_gc_set_type(thisref_deref, %%java_lang_String_TypeNumber%%); 
+  edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1); 
+  edu_syr_pcpratts_gc_set_size(thisref_deref, 48); 
+  edu_syr_pcpratts_gc_init_monitor(thisref_deref); 
 
   len = edu_syr_pcpratts_array_length(gc_info, parameter0);
   characters_copy = char__array_new(gc_info, len, exception);
@@ -800,10 +826,10 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a66 ( char * gc_info , int
     ch = char__array_get(gc_info, parameter0, i, exception);
     char__array_set(gc_info, characters_copy, i, ch, exception);
   }
-  instance_setter_java_lang_String_value ( gc_info , thisref , characters_copy , exception ) ; 
-  instance_setter_java_lang_String_count ( gc_info , thisref , len, exception) ; 
-  instance_setter_java_lang_String_offset ( gc_info , thisref , 0 , exception ) ; 
-  return thisref ; 
+  instance_setter_java_lang_String_value(gc_info, thisref, characters_copy, exception); 
+  instance_setter_java_lang_String_count(gc_info, thisref, len, exception); 
+  instance_setter_java_lang_String_offset(gc_info, thisref, 0, exception); 
+  return thisref; 
 } 
 
 $$__device__$$ int 
@@ -1033,7 +1059,6 @@ int java_lang_StringBuilder_append10_9_(char * gc_info, int thisref,
     exception);
 
   new_count = sb_count + str_count;
-
   new_sb_value = char__array_new(gc_info, new_count, exception);
   for(i = 0; i < sb_count; ++i){
     ch = char__array_get(gc_info, sb_value, i, exception);
