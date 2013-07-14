@@ -97,6 +97,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new StringBuilderTest2());
     ret.add(new DoubleToStringTest());
     ret.add(new FloatToStringTest());
+    ret.add(new ZeroLengthArrayTest());
             
     if(m_hardTests){
       ret.add(new SimpleSynchronizedTest());

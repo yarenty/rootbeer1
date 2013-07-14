@@ -165,8 +165,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl_mem.incrementAddress(8);
     
     Local size = bcl_mem.readInt();
-    //m_Bcl.top().println("reading size: ");
-    //m_Bcl.top().println(size);
+    bcl.println("reading size: ");
+    bcl.println(size);
     Local ret = bcl.local(type);
 
     //pad for 16 bytes
@@ -377,7 +377,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
       
       BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top());   
       Local start = bcl_mem.getPointer();
-      bcl_mem.incrementAddress(8);
+      bcl_mem.incrementAddress(12);
       Local size = bcl_mem.readInt();
       bcl_mem.setAddress(start);
     
