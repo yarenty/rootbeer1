@@ -390,7 +390,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   public void caseClassConstant(ClassConstant arg0) {
     String value = arg0.getValue();
     Type type = m_classConstantReader.stringToType(value);
-    int num = RootbeerClassLoader.v().getClassNumber(type.toString());
+    int num = OpenCLScene.v().getClassConstantNumbers().get(type);
     m_output.append("edu_syr_pcpratts_classConstant("+num+")");
   }
  

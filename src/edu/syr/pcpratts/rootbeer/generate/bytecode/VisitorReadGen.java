@@ -165,8 +165,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl_mem.incrementAddress(8);
     
     Local size = bcl_mem.readInt();
-    bcl.println("reading size: ");
-    bcl.println(size);
+    //bcl.println("reading size: ");
+    //bcl.println(size);
     Local ret = bcl.local(type);
 
     //pad for 16 bytes
@@ -178,6 +178,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     String label_after_new_float = getNextLabel();
     
     bcl.ifStmt(ctor_used, "==", IntConstant.v(1), label_new_float);
+    bcl.ifStmt(size, "!=", previous_size, label_new_float);
     
     bcl.assign(ret, object_to_read_from);
     bcl.gotoLabel(label_after_new_float);

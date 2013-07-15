@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.generate.bytecode;
 
+import edu.syr.pcpratts.rootbeer.generate.opencl.ClassConstantNumbers;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraph;
 import edu.syr.pcpratts.rootbeer.generate.bytecode.permissiongraph.PermissionGraphNode;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -193,7 +194,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     if(reachesJavaLangClass() == false){
       return;
     }
-    int number = RootbeerClassLoader.v().getClassNumber(type.toString());
+    int number = OpenCLScene.v().getClassConstantNumbers().get(type);
     Local gc_visit = m_gcObjVisitor.top();
     Local class_obj = null;
     

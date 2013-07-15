@@ -75,7 +75,6 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     m_EndIndex = m_bcl.top().refParameter(3);
     m_Core = m_bcl.top().refParameter(4);
     
-    
     List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
     for(Type type : types){
       if(type instanceof ArrayType)

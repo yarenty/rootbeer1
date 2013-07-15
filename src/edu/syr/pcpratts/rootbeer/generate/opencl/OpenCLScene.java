@@ -57,6 +57,7 @@ public class OpenCLScene {
   private Set<OpenCLInstanceof> m_instanceOfs;
   private List<CompositeField> m_compositeFields;
   private List<SootMethod> m_methods;
+  private ClassConstantNumbers m_constantNumbers;
   
   static {
     m_curentIdent = 0;
@@ -72,6 +73,7 @@ public class OpenCLScene {
     m_methodHierarchies = new MethodHierarchies();
     m_instanceOfs = new HashSet<OpenCLInstanceof>();
     m_methods = new ArrayList<SootMethod>();
+    m_constantNumbers = new ClassConstantNumbers();
     loadTypes(); 
   }
 
@@ -516,5 +518,9 @@ public class OpenCLScene {
     CompositeFieldFactory factory = new CompositeFieldFactory();
     factory.setup(m_classes);
     m_compositeFields = factory.getCompositeFields();
+  }
+  
+  public ClassConstantNumbers getClassConstantNumbers(){
+    return m_constantNumbers;
   }
 }
