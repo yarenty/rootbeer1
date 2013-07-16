@@ -9,6 +9,7 @@ package edu.syr.pcpratts.rootbeer.generate.opencl;
 
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import soot.*;
 import soot.rbclassload.ClassHierarchy;
@@ -89,6 +90,7 @@ public class OpenCLPolymorphicMethod {
     if(ret.contains(m_sootMethod) == false){
       ret.add(m_sootMethod);
     }
+    Collections.sort(ret, new SootMethodSorter());
     return ret;
   }
   
@@ -131,6 +133,7 @@ public class OpenCLPolymorphicMethod {
         ret.append("derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
         ret.append("if(0){}\n");
         int count = 0;
+        
         for(SootMethod method : virtual_methods){
           SootClass sclass = method.getDeclaringClass();
           if(sclass.isInterface()){

@@ -73,7 +73,7 @@ public class RootbeerDfs {
       return;
     }
     visited.add(signature);
-        
+
     StringToType converter = new StringToType();
     FieldSignatureUtil futil = new FieldSignatureUtil();
     
@@ -101,9 +101,20 @@ public class RootbeerDfs {
     }    
 
     for(HierarchySignature method_sig : value_switch.getMethodRefsHierarchy()){
-      m_currDfsInfo.addMethod(signature.toString());
+      m_currDfsInfo.addMethod(method_sig.toString());
       
       if(RootbeerClassLoader.v().dontFollow(method_sig)){
+        //add virtual methods of dont follow
+        virt_methods = class_hierarchy.getVirtualMethods(method_sig);
+        for(HierarchySignature virt_method : virt_methods){
+          if(RootbeerClassLoader.v().dontFollow(virt_method)){
+            continue;
+          }
+
+          if(virt_method.equals(method_sig) == false){
+            queue.add(virt_method);
+          }
+        }
         continue;
       }
          	      

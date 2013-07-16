@@ -23,6 +23,8 @@ import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
 import soot.options.Options;
+import soot.rbclassload.ClassHierarchy;
+import soot.rbclassload.HierarchySootClass;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -413,10 +415,20 @@ public class OpenCLMethod {
     if(ctor_body){
       ret += "_body";  
     }
-    String signature = m_sootMethod.getSignature();
+    try {
+    SootMethod soot_method = getMethodBySubSig();
+    String signature = soot_method.getSignature();
     if(m_dontMangleMethods.contains(signature) == false)
-      ret += NameMangling.v().mangleArgs(m_sootMethod);
+      ret += NameMangling.v().mangleArgs(soot_method);
     return ret;
+    } catch(Exception x){
+      x.printStackTrace();
+      List<SootMethod> methods = m_sootClass.getMethods();
+      for(SootMethod method : methods){
+        System.out.println("  "+method.getSignature());
+      }
+      return null;
+    }
   }
 
   private String getBaseMethodName(){
@@ -507,5 +519,24 @@ public class OpenCLMethod {
 
   public SootMethod getSootMethod() {
     return m_sootMethod;
+  }
+
+  private SootMethod getMethodBySubSig() {
+    String desired_sig = getCovarientSubSig(m_sootMethod);
+    List<SootMethod> methods = m_sootClass.getMethods();
+    for(SootMethod method : methods){
+      String sig = getCovarientSubSig(method);
+      if(sig.equals(desired_sig)){
+        return method;
+      }
+    }
+    return null;
+  }
+  
+  private String getCovarientSubSig(SootMethod soot_method){
+    String sig = soot_method.getSubSignature();
+    String[] tokens = sig.split(" ");
+    String ret = tokens[1].trim();
+    return ret;
   }
 }

@@ -147,6 +147,7 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addNewInvoke("java.lang.StringBuilder");
     
     ListMethodTester follow_tester = new ListMethodTester();
+    follow_tester.addSignature("<java.lang.System: void arraycopy(java.lang.Object,int,java.lang.Object,int,int)>");
     follow_tester.addSignature("<java.lang.String: void <init>()>");
     follow_tester.addSignature("<java.lang.String: void <init>(char[])>");
     follow_tester.addSignature("<java.lang.StringBuilder: void <init>()>");
