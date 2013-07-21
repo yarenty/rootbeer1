@@ -93,7 +93,7 @@ public class MatrixKernel implements Kernel {
           RootbeerGpu.setSharedFloat((1024 + thread_idxx) * 4, b_value);
 
           //sync the threads within a block
-          RootbeerGpu.synchthreads();
+          RootbeerGpu.syncthreads();
 
           //loop over all of shared_a[] and shared_b[]
           for(int k = 0; k < 32; ++k){
@@ -105,7 +105,7 @@ public class MatrixKernel implements Kernel {
             sum += a_value * b_value;
           }
           //sync threads within a block
-          RootbeerGpu.synchthreads();
+          RootbeerGpu.syncthreads();
         }
         //increment c[dest_index] with the sum
         c[dest_index] += sum;
