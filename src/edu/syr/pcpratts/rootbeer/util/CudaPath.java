@@ -7,7 +7,10 @@
 
 package edu.syr.pcpratts.rootbeer.util;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,15 +39,68 @@ public class CudaPath {
   }
 
   private String getUnix() {
+
+    // Search for the environment variable
     if(System.getenv().containsKey("CUDA_BIN_PATH")){
-      return System.getenv("CUDA_BIN_PATH");
+      String s = System.getenv("CUDA_BIN_PATH");
+      if(!s.endsWith("/")) {
+        return s + "/";
+      }
+      return s;
     }
+    
+    // Search path
+    BufferedReader input = null;
+    try {
+      Process p = Runtime.getRuntime().exec("which nvcc");
+      input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      String output = input.readLine();
+      if(output != null && !output.isEmpty()) {
+        output = output.trim();
+        return output.substring(0, output.lastIndexOf("nvcc"));
+      }
+    } catch (IOException e) {
+      // Do nothing, go to next part
+    } finally {
+      try {
+        input.close();
+      } catch (Exception e) {
+        // If this fails there is nothing we can do
+      }
+    }
+    
+    // Search globally
+    input = null;
+    try {
+      Process p = Runtime.getRuntime().exec("whereis nvcc");
+      input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      String output = input.readLine();
+      String[] sp = output.split(" ");
+      for(String s: sp) {
+        s = s.trim();
+        if(s.endsWith("nvcc")) {
+          return s.substring(0, s.lastIndexOf("nvcc"));
+        }
+      }
+    } catch (IOException e) {
+      // Do nothing, go to next part
+    } finally {
+      try {
+        input.close();
+      } catch (Exception e) {
+        // If this fails there is nothing we can do
+      }
+    }
+    
+    // Search given paths
     for(String path : m_unixSearchPaths){
       File file = new File(path+"nvcc");
       if(file.exists()){
         return path;
       }
     }
+    
+    // Last resort...
     return "/usr/local/cuda/bin/";
   }
 
