@@ -7,15 +7,13 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.tweaks;
 
-import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
-import edu.syr.pcpratts.rootbeer.runtime2.cuda.BlockingQueue;
-import edu.syr.pcpratts.rootbeer.util.CompilerRunner;
-import edu.syr.pcpratts.rootbeer.util.CudaPath;
-import edu.syr.pcpratts.rootbeer.util.WindowsCompile;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.GencodeOptions.CompileArchitecture;
+import edu.syr.pcpratts.rootbeer.runtime2.cuda.BlockingQueue;
+import edu.syr.pcpratts.rootbeer.util.CudaPath;
 
 public class ParallelCompile implements Runnable {
 
@@ -34,26 +32,43 @@ public class ParallelCompile implements Runnable {
     }
   }
   
+  /**
+   * @return an array containing compilation results. You can use <tt>is32Bit()</tt> on each element 
+   * to determine if it is 32 bit or 64bit code. If compilation for an architecture fails, only the 
+   * offending element is returned.
+   */
   public CompileResult[] compile(File generated, CudaPath cuda_path, 
-    String gencode_options){
+    String gencode_options, CompileArchitecture compileArch){
     
-    System.out.println("compiling CUDA code for 32bit and 64bit...");
-    
-    m_toCores.put(new ParallelCompileJob(generated, cuda_path, gencode_options, true));
-    m_toCores.put(new ParallelCompileJob(generated, cuda_path, gencode_options, false));
-    
-    ParallelCompileJob ret1 = m_fromCores.take();
-    ParallelCompileJob ret2 = m_fromCores.take();
-    
-    CompileResult[] ret = new CompileResult[2];
-    if(ret1.getResult().is32Bit()){
-      ret[0] = ret1.getResult();
-      ret[1] = ret2.getResult();
-    } else {
-      ret[0] = ret2.getResult();
-      ret[1] = ret1.getResult();
+    switch (compileArch) {
+      case Arch32bit:
+        System.out.println("compiling CUDA code for 32bit only...");
+        m_toCores.put(new ParallelCompileJob(generated, cuda_path, gencode_options, true));
+        break;
+      case Arch64bit:
+        System.out.println("compiling CUDA code for 64bit only...");
+        m_toCores.put(new ParallelCompileJob(generated, cuda_path, gencode_options, false));
+        break;
+      case Arch32bit64bit:
+        System.out.println("compiling CUDA code for 32bit and 64bit...");
+        m_toCores.put(new ParallelCompileJob(generated, cuda_path, gencode_options, true));
+        m_toCores.put(new ParallelCompileJob(generated, cuda_path, gencode_options, false));
+        break;
     }
-    return ret;
+    
+    ParallelCompileJob[] compJobs = new ParallelCompileJob[m_toCores.size()];
+    for(int i = 0; i < m_toCores.size(); i++) {
+      compJobs[i] = m_fromCores.take();
+    }
+
+    List<CompileResult> compResults = new LinkedList<CompileResult>();
+    for(ParallelCompileJob j: compJobs) {
+      if(j != null) {
+        compResults.add(j.getResult());
+      }
+    }
+    
+    return compResults.toArray(new CompileResult[compResults.size()]);
   }
 
   public void run() {

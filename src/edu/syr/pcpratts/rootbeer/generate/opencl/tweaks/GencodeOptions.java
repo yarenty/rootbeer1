@@ -17,6 +17,10 @@ import java.util.List;
 
 public class GencodeOptions {
 
+  public enum CompileArchitecture {
+    Arch32bit, Arch64bit, Arch32bit64bit;
+  }
+  
   public String getOptions(){
     String version = getVersion();
     String sm_35;

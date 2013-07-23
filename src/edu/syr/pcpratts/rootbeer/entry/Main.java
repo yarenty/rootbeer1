@@ -8,6 +8,7 @@
 package edu.syr.pcpratts.rootbeer.entry;
 
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
+import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.GencodeOptions.CompileArchitecture;
 import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaLoader;
 import edu.syr.pcpratts.rootbeer.runtime2.cuda.CudaRuntime2;
 import java.io.File;
@@ -45,6 +46,8 @@ public class Main {
   private void parseArgs(String[] args) {
     m_num_args = args.length;
     
+    boolean arch32bit = false;
+    boolean arch64bit = false;
     for(int i = 0; i < args.length; ++i){
       String arg = args[i];
       if(arg.equals("-nemu")){
@@ -105,6 +108,10 @@ public class Main {
         ++i;
         int int_size = Integer.parseInt(size);
         Configuration.compilerInstance().setSharedMemSize(int_size);
+      } else if(arg.equals("-32bit")) {
+        arch32bit = true;
+      } else if(arg.equals("-64bit")) {
+        arch64bit = true;
       } else if(m_simpleCompile == false){      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);
@@ -119,6 +126,15 @@ public class Main {
         m_simpleCompile = true;
       }
     }
+    
+    if(arch32bit && !arch64bit) {
+      Configuration.compilerInstance().setCompileArchitecture(CompileArchitecture.Arch32bit);
+    } else if(!arch32bit && arch64bit) {
+      Configuration.compilerInstance().setCompileArchitecture(CompileArchitecture.Arch64bit);
+    } else {
+      Configuration.compilerInstance().setCompileArchitecture(CompileArchitecture.Arch32bit64bit);
+    }
+    
     Configuration.compilerInstance().setMode(m_mode);
   }
   

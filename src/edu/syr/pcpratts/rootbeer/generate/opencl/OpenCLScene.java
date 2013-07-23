@@ -346,7 +346,7 @@ public class OpenCLScene {
 
   public CompileResult[] getCudaCode() throws Exception {
     String[] source_code = makeSourceCode();
-    return new CudaTweaks().compileProgram(source_code[0]);
+    return new CudaTweaks().compileProgram(source_code[0], Configuration.compilerInstance().getCompileArchitecture());
   }
 
   private String headerString(boolean unix) throws IOException {

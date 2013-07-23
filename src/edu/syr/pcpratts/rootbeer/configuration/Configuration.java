@@ -7,6 +7,7 @@
 
 package edu.syr.pcpratts.rootbeer.configuration;
 
+import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.GencodeOptions.CompileArchitecture;
 import edu.syr.pcpratts.rootbeer.util.ResourceReader;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -48,12 +49,13 @@ public class Configuration {
   private boolean m_exceptions;
   private boolean m_keepMains;
   private int m_sharedMemSize;
+  private CompileArchitecture m_arch;
   
   static {
     m_printMem = false;
   }
   
-  private Configuration(){
+  private Configuration() {
     m_compilerInstance = true;
     m_remapAll = true;
     m_maxRegCountSet = false;
@@ -63,6 +65,7 @@ public class Configuration {
     m_exceptions = true;
     m_keepMains = false;
     m_sharedMemSize = 40*1024;
+    m_arch = CompileArchitecture.Arch32bit64bit;
   }
 
   private Configuration(boolean load) {
@@ -80,23 +83,23 @@ public class Configuration {
     m_mode = mode;
   }
   
-  public int getMode(){
+  public int getMode() {
     return m_mode;
   }
   
-  public void setRemapSparse(){
+  public void setRemapSparse() {
     m_remapAll = false;
   }
   
-  public boolean getRemapAll(){
+  public boolean getRemapAll() {
     return m_remapAll;
   }
   
-  public static void setRunAllTests(boolean run_all){
+  public static void setRunAllTests(boolean run_all) {
     m_runAll = run_all;
   }
   
-  public static boolean getRunAllTests(){
+  public static boolean getRunAllTests() {
     return m_runAll;
   }
   
@@ -104,7 +107,7 @@ public class Configuration {
     return m_printMem;
   }
   
-  public static void setPrintMem(boolean print){
+  public static void setPrintMem(boolean print) {
     m_printMem = print;
   }
 
@@ -113,11 +116,11 @@ public class Configuration {
     m_maxRegCountSet = true;
   }
   
-  public boolean isMaxRegCountSet(){
+  public boolean isMaxRegCountSet() {
     return m_maxRegCountSet;
   }
   
-  public int getMaxRegCount(){
+  public int getMaxRegCount() {
     return m_maxRegCount;
   }
 
@@ -125,15 +128,15 @@ public class Configuration {
     m_arrayChecks = value;
   }
   
-  public boolean getArrayChecks(){
+  public boolean getArrayChecks() {
     return m_arrayChecks;
   }
   
-  public void setDoubles(boolean value){
+  public void setDoubles(boolean value) {
     m_doubles = value;
   }
 
-  public void setRecursion(boolean value){
+  public void setRecursion(boolean value) {
     m_recursion = value;
   }
   
@@ -149,7 +152,7 @@ public class Configuration {
     m_exceptions = value;
   }
   
-  public boolean getExceptions(){
+  public boolean getExceptions() {
     return m_exceptions;
   }
 
@@ -157,7 +160,7 @@ public class Configuration {
     return m_keepMains;
   }
   
-  public void setKeepMains(boolean value){
+  public void setKeepMains(boolean value) {
     m_keepMains = value;
   }
 
@@ -165,7 +168,15 @@ public class Configuration {
     m_sharedMemSize = size;
   }
   
-  public int getSharedMemSize(){
+  public int getSharedMemSize() {
     return m_sharedMemSize;
+  }
+
+  public CompileArchitecture getCompileArchitecture() {
+    return m_arch;
+  }
+
+  public void setCompileArchitecture(CompileArchitecture arch) {
+    m_arch = arch;
   }
 }
