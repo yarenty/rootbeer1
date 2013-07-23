@@ -40,35 +40,47 @@ public class ParallelCompile implements Runnable {
   public CompileResult[] compile(File generated, CudaPath cuda_path, 
     String gencode_options, CompileArchitecture compileArch){
     
+    boolean single_result = false;
+    
     switch (compileArch) {
       case Arch32bit:
         System.out.println("compiling CUDA code for 32bit only...");
         m_toCores.put(new ParallelCompileJob(generated, cuda_path, gencode_options, true));
+        single_result = true;
         break;
       case Arch64bit:
         System.out.println("compiling CUDA code for 64bit only...");
         m_toCores.put(new ParallelCompileJob(generated, cuda_path, gencode_options, false));
+        single_result = true;
         break;
       case Arch32bit64bit:
         System.out.println("compiling CUDA code for 32bit and 64bit...");
         m_toCores.put(new ParallelCompileJob(generated, cuda_path, gencode_options, true));
         m_toCores.put(new ParallelCompileJob(generated, cuda_path, gencode_options, false));
+        single_result = false;
         break;
     }
     
-    ParallelCompileJob[] compJobs = new ParallelCompileJob[m_toCores.size()];
-    for(int i = 0; i < m_toCores.size(); i++) {
-      compJobs[i] = m_fromCores.take();
-    }
-
-    List<CompileResult> compResults = new LinkedList<CompileResult>();
-    for(ParallelCompileJob j: compJobs) {
-      if(j != null) {
-        compResults.add(j.getResult());
-      }
-    }
+    if(single_result){
+      ParallelCompileJob job = m_fromCores.take();
+      CompileResult result = job.getResult();
+      CompileResult[] ret = new CompileResult[1];
+      ret[0] = result;
+      return ret;
+    } else {
+      ParallelCompileJob ret1 = m_fromCores.take();
+      ParallelCompileJob ret2 = m_fromCores.take();
     
-    return compResults.toArray(new CompileResult[compResults.size()]);
+      CompileResult[] ret = new CompileResult[2];
+      if(ret1.getResult().is32Bit()){
+        ret[0] = ret1.getResult();
+        ret[1] = ret2.getResult();
+      } else {
+        ret[0] = ret2.getResult();
+        ret[1] = ret1.getResult();
+      }
+      return ret;
+    }
   }
 
   public void run() {
