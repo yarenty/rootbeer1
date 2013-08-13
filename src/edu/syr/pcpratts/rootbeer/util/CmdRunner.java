@@ -24,17 +24,31 @@ public class CmdRunner {
   public int run(String cmd, File dir){
     try {
       m_process = Runtime.getRuntime().exec(cmd, new String[0], dir);
-      StreamEater out_eater = new StreamEater(m_process.getInputStream());
-      StreamEater err_eater = new StreamEater(m_process.getErrorStream());
-      m_outputLines = out_eater.get();
-      m_errorLines = err_eater.get();
-      int ret = m_process.waitFor();
-      m_process.destroy();
-      return ret;
+      return processExec();
     } catch(Exception ex){
       ex.printStackTrace();
       throw new RuntimeException(ex);
     }
+  }
+  
+  public int run(String cmd[], File dir){
+    try {
+      m_process = Runtime.getRuntime().exec(cmd, new String[0], dir);
+      return processExec();
+    } catch(Exception ex){
+      ex.printStackTrace();
+      throw new RuntimeException(ex);
+    }
+  }
+  
+  private int processExec() throws InterruptedException{
+    StreamEater out_eater = new StreamEater(m_process.getInputStream());
+    StreamEater err_eater = new StreamEater(m_process.getErrorStream());
+    m_outputLines = out_eater.get();
+    m_errorLines = err_eater.get();
+    int ret = m_process.waitFor();
+    m_process.destroy();
+    return ret;
   }
 
   public List<String> getOutput(){
