@@ -56,10 +56,10 @@ public class ParallelCompileJob {
       } else {
         WindowsCompile compile = new WindowsCompile();
         String nvidia_path = m_cudaPath.get();
-        command = "\"" + nvidia_path + "\" " + m_gencodeOptions +
+        command = "\"" + nvidia_path + "\" " + model_string + " " + m_gencodeOptions +
           " -fatbin \"" + m_generated.getAbsolutePath() + "\" -o \"" +
           code_file.getAbsolutePath() + "\"" + compile.endl();
-        List<String> errors = compile.compile(command);
+        List<String> errors = compile.compile(command, !m_m32);
         if (errors.isEmpty() == false) {
           m_result =  new CompileResult(m_m32, null, errors);
           return;
