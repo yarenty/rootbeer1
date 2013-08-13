@@ -75,10 +75,16 @@ public class GencodeOptions {
 
   private String getVersion() {
     CudaPath cuda_path = new CudaPath();
-    String[] cmd = new String[2];
-    String nvcc_path = cuda_path.get() + "nvcc";
-    cmd[0] = nvcc_path;
-    cmd[1] = " --version";
+    String cmd[] = new String[2];
+    if(File.separator.equals("/")){
+      String nvcc_path = cuda_path.get() + "nvcc";
+      cmd[1] = nvcc_path;
+      cmd[2] = "--version";
+    } else {
+      String nvcc_path = cuda_path.get();
+      cmd[1] = nvcc_path;
+      cmd[2] = "--version";
+    }
     
     CmdRunner runner = new CmdRunner();
     runner.run(cmd, new File("."));
