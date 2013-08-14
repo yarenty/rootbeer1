@@ -33,8 +33,8 @@ public class WindowsCompile {
     m_jdkPaths.add("C:\\Program Files (x86)\\Java\\");
   }
   
-  public List<String> compile(String cmd){
-    File cl_script = generateScript(cmd);
+  public List<String> compile(String cmd, boolean arch64){
+    File cl_script = generateScript(cmd, arch64);
     
     String command = "cmd /c \""+cl_script.getAbsolutePath()+"\"";
     CompilerRunner runner = new CompilerRunner();
@@ -75,7 +75,7 @@ public class WindowsCompile {
     return ret;
   }
   
-  private File generateScript(String cmd){
+  private File generateScript(String cmd, boolean arch64){
     String vs_path = findPath(m_visualStudioPaths, "Visual Studio");
     
     String file_text = "";
@@ -93,7 +93,13 @@ public class WindowsCompile {
     
     file_text += "@call \""+vs_path+"\" "+amd64+endl();
     file_text += cmd;
-    File cl_script = new File(RootbeerPaths.v().getRootbeerHome()+"cl_script.bat");
+    String version_str;
+    if(arch64){
+      version_str = "_64";
+    } else {
+      version_str = "_32";
+    }
+    File cl_script = new File(RootbeerPaths.v().getRootbeerHome()+"cl_script"+version_str+".bat");
     try {
       PrintWriter writer = new PrintWriter(cl_script);
       writer.println(file_text);

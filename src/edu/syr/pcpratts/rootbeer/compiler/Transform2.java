@@ -46,6 +46,8 @@ public class Transform2 {
     SootClass iface_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.CompiledKernel");
     soot_class.addInterface(iface_class);
     
+    System.out.println("added interface CompiledKernel");
+    
     OpenCLScene.releaseV();
   }
   

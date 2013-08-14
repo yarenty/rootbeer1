@@ -43,6 +43,7 @@ public class Rootbeer implements IRootbeer {
   
   public void runAll(Kernel job_template){
     if(job_template instanceof CompiledKernel == false){
+      System.out.println("m_ranGpu = false #1");
       m_ranGpu = false;
     }
     //this must happen above Rootbeer.runAll in case exceptions are thrown
@@ -60,6 +61,7 @@ public class Rootbeer implements IRootbeer {
   
   public void runAll(List<Kernel> jobs) {
     if(jobs.isEmpty()){
+      System.out.println("m_ranGpu = false #2");
       m_ranGpu = false;
       return;
     }
@@ -67,6 +69,13 @@ public class Rootbeer implements IRootbeer {
       for(Kernel job : jobs){
         job.gpuMethod();
       }
+      Kernel first = jobs.get(0);
+      Class cls = first.getClass();
+      Class[] ifaces = cls.getInterfaces();
+      for(Class iface : ifaces){
+        System.out.println("iface: "+iface.getName());
+      }
+      System.out.println("m_ranGpu = false 3");
       m_ranGpu = false;
     } else {
       //this must happen above Rootbeer.runAll in case exceptions are thrown
