@@ -37,26 +37,36 @@
       <groupId>rootbeer</groupId>
       <artifactId>pack</artifactId>
       <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/pack.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>soot</groupId>
       <artifactId>soot</artifactId>
       <version>rb-1.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/sootclasses-rbclassload.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>soot</groupId>
       <artifactId>jasmin</artifactId>
       <version>2.5.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/jasminclasses-2.5.0.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>soot</groupId>
       <artifactId>polyglot</artifactId>
       <version>1.3.5</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/polyglotclasses-1.3.5.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>soot</groupId>
       <artifactId>axmlprinter</artifactId>
       <version>2.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/AXMLPrinter2.jar</systemPath>
     </dependency>
     <!-- pulled from central maven repo -->
     <dependency>
