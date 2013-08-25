@@ -12,10 +12,13 @@ import edu.syr.pcpratts.rootbeer.test.TestSerialization;
 import edu.syr.pcpratts.rootbeer.test.TestSerializationFactory;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.SuperClass;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.arraysum.ArraySumTest;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.exception.NullPointer4Test;
+import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.ArraysSortTest;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization.GpuMethodTest;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.*;
 import edu.syr.pcpratts.rootbeer.testcases.rootbeertest.kerneltemplate.FastMatrixTest;
@@ -98,6 +101,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new DoubleToStringTest());
     ret.add(new FloatToStringTest());
     ret.add(new ZeroLengthArrayTest());
+    ret.add(new ArraysSortTest());
             
     if(m_hardTests){
       ret.add(new SimpleSynchronizedTest());

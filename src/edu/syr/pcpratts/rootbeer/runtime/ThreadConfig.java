@@ -7,8 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.runtime;
 
-import sun.awt.windows.ThemeReader;
-
 public class ThreadConfig {
 
   private int m_blockShapeX;
