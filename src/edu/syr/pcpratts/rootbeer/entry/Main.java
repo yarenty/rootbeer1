@@ -112,6 +112,11 @@ public class Main {
         arch32bit = true;
       } else if(arg.equals("-64bit")) {
         arch64bit = true;
+      } else if(arg.equals("-manualcuda")){
+        String filename = safeGet(args, i+1, "-manualcuda");
+        ++i;
+        Configuration.compilerInstance().setManualCuda();
+        Configuration.compilerInstance().setManualCudaFilename(filename);
       } else if(m_simpleCompile == false){      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);

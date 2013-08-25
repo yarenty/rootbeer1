@@ -251,6 +251,16 @@ public class OpenCLScene {
   }
   
   private String[] makeSourceCode() throws Exception {
+    if(Configuration.compilerInstance().isManualCuda()){
+      String filename = Configuration.compilerInstance().getManualCudaFilename();
+      String cuda_code = readCode(filename);
+          
+      String[] ret = new String[2];
+      ret[0] = cuda_code;
+      ret[1] = cuda_code;
+      return ret;
+    }
+    
     m_usesGarbageCollector = false;
     
     List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedTypes();
@@ -291,11 +301,7 @@ public class OpenCLScene {
     writer.close();
     
     NameMangling.v().writeTypesToFile();
-    
-    if(false){
-      cuda_unix = readCode(RootbeerPaths.v().getRootbeerHome()+"generated_debug.cu");
-    }
-    
+        
     String[] ret = new String[2];
     ret[0] = cuda_unix;
     ret[1] = cuda_windows;

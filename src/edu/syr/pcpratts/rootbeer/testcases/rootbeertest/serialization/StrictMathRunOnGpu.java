@@ -9,7 +9,7 @@ package edu.syr.pcpratts.rootbeer.testcases.rootbeertest.serialization;
 
 import edu.syr.pcpratts.rootbeer.runtime.Kernel;
 
-public class StrictMatchRunOnGpu implements Kernel {
+public class StrictMathRunOnGpu implements Kernel {
   
   private double m_pow;
   private double m_floor;
@@ -17,7 +17,7 @@ public class StrictMatchRunOnGpu implements Kernel {
   private double m_sqrt;
   private double m_round;
   
-  public StrictMatchRunOnGpu(){
+  public StrictMathRunOnGpu(){
   }
   
   @Override
@@ -29,7 +29,7 @@ public class StrictMatchRunOnGpu implements Kernel {
     m_pow = StrictMath.pow(StrictMath.PI, 2.0/3.0);
   }
 
-  public boolean compare(StrictMatchRunOnGpu rhs){
+  public boolean compare(StrictMathRunOnGpu rhs){
     //System.out.println("floor: "+m_floor+" "+rhs.m_floor);
     //System.out.println("abs: "+m_abs+" "+rhs.m_abs);
     //System.out.println("sqrt: "+m_sqrt+" "+rhs.m_sqrt);

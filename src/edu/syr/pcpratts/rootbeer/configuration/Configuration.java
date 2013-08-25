@@ -50,6 +50,8 @@ public class Configuration {
   private boolean m_keepMains;
   private int m_sharedMemSize;
   private CompileArchitecture m_arch;
+  private boolean m_manualCuda;
+  private String m_manualCudaFilename;
   
   static {
     m_printMem = false;
@@ -66,6 +68,7 @@ public class Configuration {
     m_keepMains = false;
     m_sharedMemSize = 40*1024;
     m_arch = CompileArchitecture.Arch32bit64bit;
+    m_manualCuda = false;
   }
 
   private Configuration(boolean load) {
@@ -178,5 +181,21 @@ public class Configuration {
 
   public void setCompileArchitecture(CompileArchitecture arch) {
     m_arch = arch;
+  }
+
+  public void setManualCuda() {
+    m_manualCuda = true;  
+  }
+
+  public void setManualCudaFilename(String filename) {
+    m_manualCudaFilename = filename;
+  }
+  
+  public boolean isManualCuda(){
+    return m_manualCuda;
+  }
+  
+  public String getManualCudaFilename(){
+    return m_manualCudaFilename;
   }
 }
