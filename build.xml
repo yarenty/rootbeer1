@@ -10,7 +10,7 @@
       debugLevel="lines,vars,source" />
   </target>
   <target name="jar" depends="compile">
-    <jar destfile="Rootbeer.jar" basedir="build/classes">
+    <jar destfile="dist/Rootbeer1.jar" basedir="build/classes">
       <manifest>
         <attribute name="Main-Class" value="edu.syr.pcpratts.rootbeer.entry.Main"/>
       </manifest>

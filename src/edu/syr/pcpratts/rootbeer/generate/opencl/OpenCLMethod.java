@@ -16,6 +16,7 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import soot.*;
@@ -44,7 +45,7 @@ public class OpenCLMethod {
     m_util = new MethodSignatureUtil();
     createDontMangleMethods();
   }
-  
+    
   public String getReturnString(){
     StringBuilder ret = new StringBuilder();
     if(isConstructor()){
@@ -413,7 +414,7 @@ public class OpenCLMethod {
     if(ctor_body){
       ret += "_body";  
     }
-    String signature = m_sootMethod.getSignature();
+    String signature = getSignature();
     if(m_dontMangleMethods.contains(signature) == false)
       ret += NameMangling.v().mangleArgs(m_sootMethod);
     return ret;
@@ -433,8 +434,9 @@ public class OpenCLMethod {
     String ret = ocl_class.getName()+"_"+method_name;
     return ret;
   }
+  
   private boolean shouldEmitBody(){
-    String signature = m_sootMethod.getSignature();
+    String signature = getSignature();
     if(m_emitUnmangled.contains(signature)){
       return true;
     }
@@ -502,7 +504,10 @@ public class OpenCLMethod {
   }
 
   public String getSignature() {
-    return m_sootMethod.getSignature();
+    MethodSignatureUtil util = new MethodSignatureUtil();
+    util.parse(m_sootMethod.getSignature());
+    util.setClassName(m_sootClass.getName());
+    return util.getSignature();
   }
 
   public SootMethod getSootMethod() {

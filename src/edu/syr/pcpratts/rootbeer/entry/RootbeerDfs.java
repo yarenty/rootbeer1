@@ -77,22 +77,25 @@ public class RootbeerDfs {
     StringToType converter = new StringToType();
     FieldSignatureUtil futil = new FieldSignatureUtil();
     
-    m_currDfsInfo.addType(signature.getClassName());
-    m_currDfsInfo.addType(signature.getReturnType());
-    m_currDfsInfo.addMethod(signature.toString());
-    
+    //load all virtual methods to be followed
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
     List<HierarchySignature> virt_methods = class_hierarchy.getVirtualMethods(signature);
     for(HierarchySignature virt_method : virt_methods){
-      if(RootbeerClassLoader.v().dontFollow(virt_method)){
-        continue;
-      }
-
       if(virt_method.equals(signature) == false){
     	  queue.add(virt_method);
       }
     }
 
+    //if we should follow into method, don't
+    if(RootbeerClassLoader.v().dontFollow(signature)){
+      return;
+    }
+    
+    m_currDfsInfo.addType(signature.getClassName());
+    m_currDfsInfo.addType(signature.getReturnType());
+    m_currDfsInfo.addMethod(signature.toString());
+    
+    //go into the method
     HierarchyValueSwitch value_switch = RootbeerClassLoader.v().getValueSwitch(signature);
     for(Integer num : value_switch.getAllTypesInteger()){
       String type_str = StringNumbers.v().getString(num);
@@ -102,11 +105,6 @@ public class RootbeerDfs {
 
     for(HierarchySignature method_sig : value_switch.getMethodRefsHierarchy()){
       m_currDfsInfo.addMethod(signature.toString());
-      
-      if(RootbeerClassLoader.v().dontFollow(method_sig)){
-        continue;
-      }
-         	      
       queue.add(method_sig);
     }
 
