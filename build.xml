@@ -1,13 +1,29 @@
-<project>
+<project default="jar">
   <target name="clean">
     <delete dir="build"/>
   </target>
   <target name="compile">
     <mkdir dir="build/classes"/>
     <javac srcdir="src" destdir="build/classes" 
-      classpath="lib/antlr-3.1.3.jar:lib/AXMLPrinter2.jar:lib/baksmali-1.3.2.jar:lib/commons-codec-1.6.jar:lib/commons-io-2.4.jar:lib/jasminclasses-2.5.0.jar:lib/polyglotclasses-1.3.5.jar:lib/sootclasses-rbclassload.jar"
+      classpath="lib/antlr-3.1.3.jar:lib/AXMLPrinter2.jar:lib/baksmali-1.3.2.jar:lib/commons-codec-1.6.jar:lib/commons-io-2.4.jar:lib/jasminclasses-2.5.0.jar:lib/pack.jar:lib/polyglotclasses-1.3.5.jar:lib/sootclasses-rbclassload.jar"
       debug="true"
       debugLevel="lines,vars,source" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/BarrierNativeBoth.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeKernel.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/CudaHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/GarbageCollector.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/UnixNativeHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/UnixNativeKernel.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/WindowsNativeHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/WindowsNativeKernel.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/cudaruntime_x64.dll" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/cudaruntime_x64.so.1" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/cudaruntime_x86.dll" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/cudaruntime_x64.so.1" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/cudaruntime.dylib" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCpuDevice.h" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/NativeCpuDevice.c" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
   </target>
   <target name="jar" depends="compile">
     <jar destfile="dist/Rootbeer1.jar" basedir="build/classes">
