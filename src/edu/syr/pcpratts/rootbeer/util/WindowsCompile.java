@@ -23,10 +23,17 @@ public class WindowsCompile {
   
   public WindowsCompile(){
     m_visualStudioPaths = new ArrayList<String>();
-    m_visualStudioPaths.add("D:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat");
-    m_visualStudioPaths.add("D:\\Program Files\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat");
-    m_visualStudioPaths.add("C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat");
+    m_visualStudioPaths.add("C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\vcvarsall.bat");
+    m_visualStudioPaths.add("C:\\Program Files (x86)\\Microsoft Visual Studio 9.0\\VC\\vcvarsall.bat");
+    
     m_visualStudioPaths.add("C:\\Program Files\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat");
+    m_visualStudioPaths.add("C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat");
+    
+    m_visualStudioPaths.add("D:\\Program Files\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat");
+    m_visualStudioPaths.add("D:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat");
+    
+    m_visualStudioPaths.add("C:\\Program Files\\Microsoft Visual Studio 11.0\\VC\\vcvarsall.bat");
+    m_visualStudioPaths.add("C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\VC\\vcvarsall.bat");
     
     m_jdkPaths = new ArrayList<String>();
     m_jdkPaths.add("C:\\Program Files\\Java\\");
