@@ -14,6 +14,7 @@
     <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
     <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeKernel.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
     <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/CudaHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
+    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/CudaKernel.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
     <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/GarbageCollector.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
     <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/UnixNativeHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
     <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/UnixNativeKernel.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
