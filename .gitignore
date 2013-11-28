@@ -68,3 +68,5 @@ raylib-GPU.jar
 ArrayMultApp-GPU.jar
 ArrayMultApp.jar
 bin/
+KeepMainTest.jar
+KeepMainTest-GPU.jar
