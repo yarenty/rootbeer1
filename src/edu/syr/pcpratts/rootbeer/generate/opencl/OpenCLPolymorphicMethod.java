@@ -29,10 +29,6 @@ import soot.rbclassload.RootbeerClassLoader;
 public class OpenCLPolymorphicMethod {
 
   private final SootMethod m_sootMethod;
-
-  //for hashcode
-  private HierarchyGraph m_hierarchyGraph;
-  
   private MethodSignatureUtil m_util;
 
   public OpenCLPolymorphicMethod(SootMethod soot_method){
@@ -218,35 +214,6 @@ public class OpenCLPolymorphicMethod {
     return ret;
   }
 
-  @Override
-  public boolean equals(Object o){
-    if(o instanceof OpenCLPolymorphicMethod == false)
-      return false;
-    OpenCLPolymorphicMethod other = (OpenCLPolymorphicMethod) o;
-    if(m_sootMethod.getName().equals(other.m_sootMethod.getName()) == false)
-      return false;    
-    if(getHierarchyGraph().equals(other.getHierarchyGraph()))
-      return true;
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    m_hierarchyGraph = getHierarchyGraph();
-    int hash = 5;
-    hash = 53 * hash + (this.m_sootMethod != null ? this.m_sootMethod.hashCode() : 0);
-    hash = 53 * hash + (this.m_hierarchyGraph != null ? this.m_hierarchyGraph.hashCode() : 0);
-    return hash;
-  }
-
-  private HierarchyGraph getHierarchyGraph(){
-    if(m_hierarchyGraph == null){
-      ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-      m_hierarchyGraph = class_hierarchy.getHierarchyGraph(m_sootMethod.getSignature());
-    }
-    return m_hierarchyGraph;
-  }
-  
   public class VirtualMethodComparator implements
       Comparator<SootMethod> {
 

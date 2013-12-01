@@ -108,7 +108,7 @@ public class OpenCLInstanceof {
   private List<NumberedType> getTypeList(SootClass soot_class) {
     
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph(soot_class);
+    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph();
 
     Set<Integer> visited = new TreeSet<Integer>();
     visited.add(StringNumbers.v().addString(soot_class.getName()));

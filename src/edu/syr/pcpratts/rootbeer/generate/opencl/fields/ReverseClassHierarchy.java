@@ -44,7 +44,7 @@ public class ReverseClassHierarchy {
     
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
     SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
-    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph(obj_class);
+    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph();
     Set<Integer> roots = hgraph.getChildren(0);   //java.lang.Object is 0
     
     for(Integer root : roots){    

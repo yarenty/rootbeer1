@@ -118,7 +118,7 @@ public class FieldReadWriteInspector {
     mWritenOnGpuFieldsClassesChecked.add(soot_type.toString());
 
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph(soot_class);
+    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph();
     Set<Integer> classes = hgraph.getAllClasses();
     
     for(Integer class_num : classes){
