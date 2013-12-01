@@ -512,6 +512,36 @@ void java_io_PrintStream_print0_9_($$__global$$ char * gc_info, int thisref, int
 }
 
 $$__device__$$
+void java_io_PrintStream_print0_1_($$__global$$ char * gc_info, int thisref, int value, int * exception){
+  printf("%d", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_print0_2_($$__global$$ char * gc_info, int thisref, char value, int * exception){
+  printf("%d", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_print0_3_($$__global$$ char * gc_info, int thisref, char value, int * exception){
+  printf("%c", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_print0_4_($$__global$$ char * gc_info, int thisref, short value, int * exception){
+  printf("%d", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_print0_5_($$__global$$ char * gc_info, int thisref, int value, int * exception){
+  printf("%d", value);
+}
+
+$$__device__$$
+void java_io_PrintStream_print0_6_($$__global$$ char * gc_info, int thisref, long long value, int * exception){
+  printf("%lld", value);
+}
+
+$$__device__$$
 void java_io_PrintStream_print0_7_($$__global$$ char * gc_info, int thisref, float value, int * exception){
   printf("%e", value);
 }
