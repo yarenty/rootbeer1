@@ -463,6 +463,8 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   public void doWriter(String class_name, boolean do_ref_fields, boolean is_application){      
         
     BytecodeLanguage bcl = m_bcl.top();
+    BclMemory bcl_mem = new BclMemory(bcl, m_CurrentMem.top());
+    
     SootClass soot_class = Scene.v().getSootClass(class_name);
     List<OpenCLField> ref_fields = getRefFields(soot_class);
     List<OpenCLField> non_ref_fields = getNonRefFields(soot_class); 
@@ -477,7 +479,13 @@ public class VisitorWriteGen extends AbstractVisitorGen {
           constant = 0;
         }
         Local local;
-        if(ref_field.isInstance()){
+        if(ref_field.isInstance()){   
+          
+          int offset = OpenCLScene.v().getOffsetMap().get(class_name).get(ref_field);
+          Value start = bcl_mem.readObjectStart();
+          bcl_mem.setAddress(start);
+          bcl_mem.incrementAddress(offset);       
+          
           local = writeRefField(ref_field, IntConstant.v(constant));
           m_ValuesWritten.add(local);
         } else {
@@ -491,6 +499,12 @@ public class VisitorWriteGen extends AbstractVisitorGen {
       }
     } else {
       for(OpenCLField ocl_field : non_ref_fields){
+        
+        int offset = OpenCLScene.v().getOffsetMap().get(class_name).get(ocl_field);
+        Value start = bcl_mem.readObjectStart();
+        bcl_mem.setAddress(start);
+        bcl_mem.incrementAddress(offset);       
+        
         writeNonRefField(ocl_field);
       }
     }

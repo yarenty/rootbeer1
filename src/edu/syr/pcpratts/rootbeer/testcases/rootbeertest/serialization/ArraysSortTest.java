@@ -11,7 +11,7 @@ public class ArraysSortTest implements TestSerialization {
   @Override
 	public List<Kernel> create() {
 	  List<Kernel> ret = new ArrayList<Kernel>();
-	  for(int i = 0; i < 5; ++i){
+	  for(int i = 0; i < 1; ++i){
 	    ret.add(new ArraysSortRunOnGpu());
 	  }
 	  return ret;

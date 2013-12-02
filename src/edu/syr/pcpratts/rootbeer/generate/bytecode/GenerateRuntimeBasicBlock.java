@@ -10,11 +10,8 @@ package edu.syr.pcpratts.rootbeer.generate.bytecode;
 import edu.syr.pcpratts.deadmethods2.DeadMethods;
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
-import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
-import edu.syr.pcpratts.rootbeer.generate.codesegment.LoopCodeSegment;
-import edu.syr.pcpratts.rootbeer.generate.codesegment.MethodCodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
-import edu.syr.pcpratts.rootbeer.generate.misc.BasicBlock;
+import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CompileResult;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,6 +19,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.Jimple;
@@ -31,18 +30,12 @@ import soot.options.Options;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class GenerateRuntimeBasicBlock {
-  private CodeSegment codeSegment;
+  private MethodCodeSegment codeSegment;
   private SootClass mSootClass;
   private List<Local> mFirstIterationLocals;
   private Jimple jimple;
   private String runtimeBasicBlockClassName;
   private String gcObjectVisitorClassName;
-
-  public GenerateRuntimeBasicBlock(BasicBlock block, String uuid) {
-    codeSegment = new LoopCodeSegment(block);
-    jimple = Jimple.v();
-    mFirstIterationLocals = new ArrayList<Local>();
-  }
 
   public GenerateRuntimeBasicBlock(SootMethod method, String uuid){
     jimple = Jimple.v();
@@ -58,19 +51,28 @@ public class GenerateRuntimeBasicBlock {
   public void makeClass() throws Exception {
     gcObjectVisitorClassName = codeSegment.getSootClass().getName()+"GcObjectVisitor";
     
-    makeCpuBody();
+    makeOffsets();
     makeGpuBody();
     makeIsUsingGarbageCollectorBody();
     makeIsReadOnly();    
     makeExceptionNumbers();
-                            
-    GcHeapReadWriteAdder adder = new GcHeapReadWriteAdder();
-    adder.add(codeSegment);
+    makeSerializationCode();
   }
+  
+  private void makeOffsets(){
+    OffsetCreator creator = new OffsetCreator();
+    Map<String, Map<OpenCLField, Integer>> offsets = creator.createOffsets();
+    OpenCLScene.v().setOffsets(offsets);
+  }
+  
+  private void makeSerializationCode(){
+    System.out.println("generating serialization bytecode...");
+    SootClass block_class = codeSegment.getRootSootClass();
 
-  private void makeCpuBody() {
-    codeSegment.makeCpuBodyForRuntimeBasicBlock(mSootClass);
-  }  
+    VisitorGen generate_visitor = new VisitorGen(codeSegment.getReadWriteFieldInspector(), block_class);
+    generate_visitor.generate();
+    gcObjectVisitorClassName = generate_visitor.getClassName();
+  }
   
   private void makeGetCodeMethodThatReturnsBytes(boolean m32, String filename) {
     BytecodeLanguage bcl = new BytecodeLanguage();
@@ -260,10 +262,7 @@ public class GenerateRuntimeBasicBlock {
     bcl.openClass(mSootClass);
     bcl.startMethod("isReadOnly", BooleanType.v());
     bcl.refThis();
-    if(OpenCLScene.v().getReadOnlyTypes().isRootReadOnly())
-      bcl.returnValue(IntConstant.v(1));
-    else
-      bcl.returnValue(IntConstant.v(0));
+    bcl.returnValue(IntConstant.v(0));
     bcl.endMethod();
   }
 

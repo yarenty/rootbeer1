@@ -125,7 +125,7 @@ public class AbstractVisitorGen {
     bcl_mem.pushAddress();
     bcl_mem.setAddress(ref);
 
-    //bcl.println("reading field: "+ref_field.getName());
+    bcl.println("reading field: "+ref_field.getName()+" from: "+soot_class.getName());
     
     SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
     SootClass string = Scene.v().getSootClass("java.lang.String");

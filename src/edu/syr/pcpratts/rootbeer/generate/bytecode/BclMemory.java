@@ -89,6 +89,21 @@ public class BclMemory {
     }
   }
 
+  public Value readObjectStart() {
+    mBcl.pushMethod(mBcl.getTypeString(mMem), "readObjectStart", LongType.v());
+    return mBcl.invokeMethodRet(mMem);
+  }
+
+  public void pushObjectStart(Value start) {
+    mBcl.pushMethod(mBcl.getTypeString(mMem), "pushObjectStart", VoidType.v(), LongType.v());
+    mBcl.invokeMethodNoRet(mMem, start);
+  }
+  
+  public void popObjectStart() {
+    mBcl.pushMethod(mBcl.getTypeString(mMem), "popObjectStart", VoidType.v());
+    mBcl.invokeMethodNoRet(mMem);
+  }
+  
   void pushAddress() {
     mBcl.pushMethod(mBcl.getTypeString(mMem), "pushAddress", VoidType.v());
     mBcl.invokeMethodNoRet(mMem);
@@ -116,6 +131,11 @@ public class BclMemory {
   void setAddress(Value address) {
     mBcl.pushMethod(mBcl.getTypeString(mMem), "setAddress", VoidType.v(), LongType.v());
     mBcl.invokeMethodNoRet(mMem, address);
+  }
+
+  void setAddress(long address) {
+    mBcl.pushMethod(mBcl.getTypeString(mMem), "setAddress", VoidType.v(), LongType.v());
+    mBcl.invokeMethodNoRet(mMem, LongConstant.v(address));
   }
 
   public void useInstancePointer(){
@@ -238,7 +258,4 @@ public class BclMemory {
     mBcl.pushMethod(mBcl.getTypeString(mMem), "mallocWithSize", LongType.v(), IntType.v());
     mBcl.invokeMethodNoRet(mMem, size);
   }
-
-
-
 }

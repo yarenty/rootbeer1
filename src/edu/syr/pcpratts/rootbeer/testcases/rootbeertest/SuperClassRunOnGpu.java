@@ -48,14 +48,12 @@ public class SuperClassRunOnGpu implements Kernel {
       System.out.println("rhs: "+brhs.ret);
       return false;
     }
-    /*
     if(m_Class.getModified() != brhs.m_Class.getModified()){
       System.out.println("Failed at m_Class");
       System.out.println("lhs: "+m_Class.getModified());
       System.out.println("rhs: "+brhs.m_Class.getModified());
       return false;
     }
-    */
     return true;
   }
 }

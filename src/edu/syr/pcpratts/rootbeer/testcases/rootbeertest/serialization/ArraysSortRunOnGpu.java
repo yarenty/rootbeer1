@@ -19,6 +19,18 @@ public class ArraysSortRunOnGpu implements Kernel {
 	public void gpuMethod() {
 	  Arrays.sort(m_array);
 	}
+	
+	private String toString(int[] array){
+	  String ret = "[";
+	  for(int i = 0; i < array.length; ++i){
+	    ret += array[i];
+	    if(i < array.length - 1){
+	      ret += ",";
+	    }
+	  }
+	  ret += "]";
+	  return ret;
+	}
 
   public boolean compare(ArraysSortRunOnGpu rhs) {
     if(m_array.length != rhs.m_array.length){
@@ -30,6 +42,8 @@ public class ArraysSortRunOnGpu implements Kernel {
       int rhs_value = rhs.m_array[i];
       if(lhs_value != rhs_value){
         System.out.println("value");
+        System.out.println("lhs: "+toString(m_array));
+        System.out.println("rhs: "+toString(rhs.m_array));
         return false;
       }
     }

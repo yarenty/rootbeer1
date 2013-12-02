@@ -9,7 +9,6 @@ package edu.syr.pcpratts.rootbeer.entry;
 
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
-import edu.syr.pcpratts.rootbeer.compiler.*;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.NativeCpuTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;

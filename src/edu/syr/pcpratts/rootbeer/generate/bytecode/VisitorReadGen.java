@@ -149,6 +149,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
       ret = makeReadFromHeapBodyForSootClass((RefType) type);
     }
     m_ReadFromHeapMethodsMade.put(type, ret);
+
     bcl.returnValue(ret);
     bcl.label(label);
   }
@@ -480,44 +481,33 @@ public class VisitorReadGen extends AbstractVisitorGen {
     SootClass soot_class = Scene.v().getSootClass(class_name);
     
     //read all the ref fields
-    int inc_size = 0;
     if(do_ref_fields){
       List<OpenCLField> ref_fields = getRefFields(soot_class);
       for(OpenCLField ref_field : ref_fields){
         if(m_fieldInspector.fieldIsWrittenOnGpu(ref_field)){
-          //increment the address to get to this location
-          bcl_mem.incrementAddress(inc_size);
-          inc_size = 0;
+          int offset = OpenCLScene.v().getOffsetMap().get(class_name).get(ref_field);
+          Value start = bcl_mem.readObjectStart();
+          bcl_mem.setAddress(start);
+          bcl_mem.incrementAddress(offset);
 
           //read the field
           readRefField(ref_field);
-        } else {
-          inc_size += ref_field.getSize();
-        }
-      }
-
-      if(inc_size > 0){
-        bcl_mem.incrementAddress(inc_size);
+        } 
       }
     } else {
       List<OpenCLField> non_ref_fields = getNonRefFields(soot_class);
       for(OpenCLField non_ref_field : non_ref_fields){
         if(m_fieldInspector.fieldIsWrittenOnGpu(non_ref_field)){
-          //increment the address to get to this location
-          if(inc_size > 0){
-            bcl_mem.incrementAddress(inc_size);
-            inc_size = 0;
-          }
+          int offset = OpenCLScene.v().getOffsetMap().get(class_name).get(non_ref_field);
+          Value start = bcl_mem.readObjectStart();
+          bcl_mem.setAddress(start);
+          bcl_mem.incrementAddress(offset);
+
           //read the field
           readNonRefField(non_ref_field);
-        } else {
-          inc_size += non_ref_field.getSize();
-        }
+        } 
       }
-      if(inc_size > 0)
-        bcl_mem.incrementAddress(inc_size);
     }
-    bcl_mem.align();
   }  
   
   public void callBaseClassReader(String class_name, boolean ref_types) {

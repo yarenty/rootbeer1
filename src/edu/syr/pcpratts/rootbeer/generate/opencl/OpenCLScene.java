@@ -10,14 +10,12 @@ package edu.syr.pcpratts.rootbeer.generate.opencl;
 import edu.syr.pcpratts.rootbeer.configuration.Configuration;
 import edu.syr.pcpratts.rootbeer.configuration.RootbeerPaths;
 import edu.syr.pcpratts.rootbeer.entry.ExtraFields;
+import edu.syr.pcpratts.rootbeer.generate.bytecode.MethodCodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
-import edu.syr.pcpratts.rootbeer.generate.bytecode.ReadOnlyTypes;
-import edu.syr.pcpratts.rootbeer.generate.codesegment.CodeSegment;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.CompositeField;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.CompositeFieldFactory;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldCodeGeneration;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.FieldTypeSwitch;
-import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CompileResult;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
@@ -35,6 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,16 +47,16 @@ public class OpenCLScene {
   private static int m_curentIdent;
   private Map<String, OpenCLClass> m_classes;
   private Set<OpenCLArrayType> m_arrayTypes;
-  private CodeSegment m_codeSegment;
+  private MethodCodeSegment m_codeSegment;
   private MethodHierarchies m_methodHierarchies;
   private boolean m_usesGarbageCollector;
   private SootClass m_rootSootClass;
   private int m_endOfStatics;
-  private ReadOnlyTypes m_readOnlyTypes;
   private Set<OpenCLInstanceof> m_instanceOfs;
   private List<CompositeField> m_compositeFields;
   private List<SootMethod> m_methods;
   private ClassConstantNumbers m_constantNumbers;
+  private Map<String, Map<OpenCLField, Integer>> m_fieldOffsets;
   
   static {
     m_curentIdent = 0;
@@ -141,6 +140,25 @@ public class OpenCLScene {
     } else {
       OpenCLClass ocl_class = new OpenCLClass(soot_class);
       m_classes.put(class_name, ocl_class);
+      
+      //add all parents as OpenCL classes.
+      LinkedList<SootClass> queue = new LinkedList<SootClass>();
+      queue.add(soot_class);
+      while(queue.isEmpty() == false){
+        SootClass curr = queue.removeFirst();
+        if(m_classes.containsKey(curr.getName()) == false){
+          OpenCLClass ocl_class2 = new OpenCLClass(curr);
+          m_classes.put(curr.getName(), ocl_class2);
+        }
+        
+        if(curr.hasOuterClass()){
+          queue.add(curr.getOuterClass());
+        }
+        if(curr.hasSuperclass()){
+          queue.add(curr.getSuperclass());
+        }
+      }
+      
       return ocl_class;
     }
   }
@@ -482,32 +500,13 @@ public class OpenCLScene {
     }
     return ret.toString();
   }
-  
-  public OffsetCalculator getOffsetCalculator(SootClass soot_class){
-    List<CompositeField> composites = getCompositeFields();
-    for(CompositeField composite : composites){
-      List<SootClass> classes = composite.getClasses();
-      if(classes.contains(soot_class))
-        return new OffsetCalculator(composite);
-    }
-    throw new RuntimeException("Cannot find composite field for soot_class");
-  }
 
-  public void addCodeSegment(CodeSegment codeSegment){
+  public void addCodeSegment(MethodCodeSegment codeSegment){
     this.m_codeSegment = codeSegment;
     m_rootSootClass = codeSegment.getRootSootClass();    
-    m_readOnlyTypes = new ReadOnlyTypes(codeSegment.getRootMethod());
     getOpenCLClass(m_rootSootClass);
   }
-
-  public boolean isArrayLocalWrittenTo(Local local){
-    return m_codeSegment.getReadWriteFieldInspector().localRepresentingArrayIsWrittenOnGpu(local);
-  }
   
-  public ReadOnlyTypes getReadOnlyTypes(){
-    return m_readOnlyTypes;
-  }
-
   public boolean isRootClass(SootClass soot_class) {
     return soot_class.getName().equals(m_rootSootClass.getName());
   }
@@ -528,5 +527,13 @@ public class OpenCLScene {
   
   public ClassConstantNumbers getClassConstantNumbers(){
     return m_constantNumbers;
+  }
+
+  public void setOffsets(Map<String, Map<OpenCLField, Integer>> offsets) {
+    m_fieldOffsets = offsets;
+  }
+  
+  public Map<String, Map<OpenCLField, Integer>> getOffsetMap() {
+    return m_fieldOffsets;
   }
 }

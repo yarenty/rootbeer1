@@ -7,11 +7,12 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl;
 
+import edu.syr.pcpratts.rootbeer.generate.bytecode.Constants;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OpenCLField;
-import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import soot.SootClass;
 import soot.SootField;
@@ -67,26 +68,14 @@ public class OpenCLClass {
   }
 
   public int getSize(){
-    int max = edu.syr.pcpratts.rootbeer.generate.bytecode.Constants.SizeGcInfo;
-    try {
-      SootClass soot_class = m_sootClass;
-      
-      //find the largest size from all super classes
-      while(true){
-        OffsetCalculator calc = OpenCLScene.v().getOffsetCalculator(soot_class);
-        int size = calc.getSize(soot_class);
-        if(size > max){
-          max = size;
-        }
-        if(soot_class.hasSuperclass()){
-          soot_class = soot_class.getSuperclass();
-        } else {
-          return max;
-        }
+    Map<OpenCLField, Integer> map = OpenCLScene.v().getOffsetMap().get(m_sootClass.getName());
+    int max = Constants.SizeGcInfo;
+    for(Integer value : map.values()){
+      if(value < max){
+        max = value;
       }
-    } catch(RuntimeException ex){
-      return max;
     }
+    return max + 8;
   }
   
   public String getName(){

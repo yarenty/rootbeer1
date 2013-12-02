@@ -438,7 +438,7 @@ public class CudaRuntime2 implements ParallelRuntime {
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
-      printer.print(m_ToSpace.get(0), 0, 896);
+      printer.print(m_ToSpace.get(0), 0, 2048);
     }
 
     return true;

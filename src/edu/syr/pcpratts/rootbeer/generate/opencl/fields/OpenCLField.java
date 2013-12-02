@@ -13,7 +13,6 @@ import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLType;
 import edu.syr.pcpratts.rootbeer.generate.opencl.fields.CompositeField;
-import edu.syr.pcpratts.rootbeer.generate.opencl.fields.OffsetCalculator;
 import edu.syr.pcpratts.rootbeer.generate.opencl.tweaks.Tweaks;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -117,10 +116,14 @@ public class OpenCLField {
   }
 
   private void calculateOffsets(CompositeField composite){    
-    OffsetCalculator calc = new OffsetCalculator(composite);
     m_offsets = new TreeMap<Integer, List<SootClass>>();
     for(SootClass sclass : composite.getClasses()){
-      int field_offset = calc.getOffset(this, sclass);
+      System.out.println("calc offsets: "+sclass.getName());
+      Map<OpenCLField, Integer> map = OpenCLScene.v().getOffsetMap().get(sclass.getName());
+      int field_offset = -1;
+      if(map.containsKey(this)){
+        field_offset = map.get(this);
+      }
       List<SootClass> classes;
       if(m_offsets.containsKey(field_offset)){
         classes = m_offsets.get(field_offset);
@@ -207,7 +210,7 @@ public class OpenCLField {
       ret.append("*(("+address_qual+" "+cast_string+" *) &thisref_deref["+Integer.toString(field_offset)+"]) = parameter0;\n");
     } else {
       ret.append("derived_type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n");
-      ret.append("offset = "+type_switch.typeSwitchName(m_offsets)+"(derived_type);\n");     
+      ret.append("offset = "+type_switch.typeSwitchName(m_offsets)+"(derived_type);\n");   
       ret.append("*(("+address_qual+" "+cast_string+" *) &thisref_deref[offset]) = parameter0;\n");
     }
     ret.append("}\n");

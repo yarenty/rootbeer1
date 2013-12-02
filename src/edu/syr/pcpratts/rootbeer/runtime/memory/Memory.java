@@ -16,12 +16,14 @@ public abstract class Memory {
   private Pointer m_InstancePointer;
   private Pointer m_CurrPointer;
   private List<List<Long>> m_IntegerList;
+  private List<Long> m_objectStarts;
 
   public Memory(){
     m_StaticPointer = new Pointer();
     m_InstancePointer = new Pointer();
     m_CurrPointer = m_InstancePointer;
     m_IntegerList = new ArrayList<List<Long>>();
+    m_objectStarts = new ArrayList<Long>();
   }
 
   public void startIntegerList(){
@@ -116,6 +118,18 @@ public abstract class Memory {
     return ret;
   }
   
+  public long readObjectStart(){
+    return m_objectStarts.get(m_objectStarts.size()-1);
+  }
+  
+  public void pushObjectStart(long address){
+    m_objectStarts.add(address);
+  }
+  
+  public void popObjectStart() {
+    m_objectStarts.remove(m_objectStarts.size()-1);
+  }
+  
   private class Pointer {
     public long m_Pointer;
     public long m_EndPointer;
@@ -174,4 +188,5 @@ public abstract class Memory {
   
   public void checkAlignment(int alignment){
   }
+
 }

@@ -17,7 +17,7 @@ public class SuperClass implements TestSerialization {
   @Override
   public List<Kernel> create() {
     List<Kernel> jobs = new ArrayList<Kernel>();
-    for(int i = 0; i < 100; ++i){
+    for(int i = 0; i < 1; ++i){
       SuperClassRunOnGpu curr = new SuperClassRunOnGpu();
       jobs.add(curr);
     }

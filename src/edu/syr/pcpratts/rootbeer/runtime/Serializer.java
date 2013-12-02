@@ -120,12 +120,14 @@ public abstract class Serializer {
     if(result.m_NeedToWrite == false){
       return result.m_Ref;
     }
-    //if(o == null){
-    //  System.out.println("writeToHeap: null at addr: "+result.m_Ref);
-    //} else {
-    //  System.out.println("writeToHeap: "+o.toString()+" at addr: "+result.m_Ref);
-    //}
+    if(o == null){
+      System.out.println("writeToHeap: null at addr: "+result.m_Ref);
+    } else {
+      System.out.println("writeToHeap: "+o.toString()+" at addr: "+result.m_Ref);
+    }
+    mMem.pushObjectStart(result.m_Ref);
     doWriteToHeap(o, write_data, result.m_Ref, read_only);
+    mMem.popObjectStart();
     //BufferPrinter printer = new BufferPrinter();
     //printer.print(mMem, result.m_Ref, 128);
     return result.m_Ref;
@@ -145,22 +147,31 @@ public abstract class Serializer {
   public Object readFromHeap(Object o, boolean read_data, long address){
     synchronized(mReadFromGpuCache){
       if(mReadFromGpuCache.containsKey(address)){
-        Object ret = mReadFromGpuCache.get(address);  
+        Object ret = mReadFromGpuCache.get(address);
+        if(ret == null){
+          System.out.println("cache contains: null. addr: "+address);
+        } else {
+          System.out.println("cache contains: "+ret.toString()+". addr: "+address);
+        }
         return ret;
       }
     }
     long null_ptr_check = address >> 4;
     if(null_ptr_check == -1){
+      System.out.println("null pointer");
       return null;
     }
-    //if(o == null){
-    //  System.out.println("readFromHeap: null. addr: "+address);
-    //} else {
-    //  System.out.println("readFromHeap: "+o.toString()+". addr: "+address);
-    //}
-    //BufferPrinter printer = new BufferPrinter();
-    //printer.print(mMem, address, 128);
-    return doReadFromHeap(o, read_data, address);
+    if(o == null){
+      System.out.println("readFromHeap: null. addr: "+address);
+    } else {
+      System.out.println("readFromHeap: "+o.toString()+". addr: "+address);
+    }
+    BufferPrinter printer = new BufferPrinter();
+    printer.print(mMem, address, 128);
+    mMem.pushObjectStart(address);
+    Object ret = doReadFromHeap(o, read_data, address);
+    mMem.popObjectStart();
+    return ret;
   }
 
   public void readStaticsFromHeap(){
