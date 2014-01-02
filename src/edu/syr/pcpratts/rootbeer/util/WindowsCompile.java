@@ -83,7 +83,20 @@ public class WindowsCompile {
   }
   
   private File generateScript(String cmd, boolean arch64){
-    String vs_path = findPath(m_visualStudioPaths, "Visual Studio");
+    String vs_path = "";
+    if(System.getenv().containsKey("VS_VCVARSALL_PATH")){
+      vs_path = System.getenv("VS_VCVARSALL_PATH");
+      if(vs_path.trim().equals("")){
+        vs_path = findPath(m_visualStudioPaths, "Visual Studio");
+      } else {
+        if(vs_path.endsWith("\\\\") == false){
+          vs_path += "\\";
+        }
+        vs_path += "vcvarsall.bat";
+      }
+    } else {
+      vs_path = findPath(m_visualStudioPaths, "Visual Studio");
+    }
     
     String file_text = "";
     String amd64 = "amd64";
