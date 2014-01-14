@@ -35,7 +35,7 @@ int getBlockDimx(){
 
 __device__
 int getGridDimx(){
-  return blockDim.x;
+  return gridDim.x;
 }
 
 __device__
