@@ -60,14 +60,18 @@ __global__ void entry(char * gc_info, char * to_space, int * handles,
 
   int loop_control = blockIdx.x * blockDim.x + threadIdx.x;
   if(loop_control >= num_blocks){  
+    __syncthreads();
     return;
   } else {
     int handle = handles[loop_control];
     int exception = 0;   
     %%invoke_run%%(gc_info, handle, &exception);
     exceptions[loop_control] = exception;
-  
-    unsigned long long * addr = ( unsigned long long * ) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
-    *to_space_free_ptr = *addr;
+    __syncthreads();
+
+    if(loop_control == 0){
+      unsigned long long * addr = ( unsigned long long * ) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
+      *to_space_free_ptr = *addr;    
+    }
   }
 }
