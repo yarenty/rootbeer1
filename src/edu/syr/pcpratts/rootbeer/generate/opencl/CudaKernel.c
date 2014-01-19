@@ -59,8 +59,7 @@ __global__ void entry(char * gc_info, char * to_space, int * handles,
   __syncthreads();
 
   int loop_control = blockIdx.x * blockDim.x + threadIdx.x;
-  if(loop_control >= num_blocks){  
-    __syncthreads();
+  if(loop_control >= num_blocks){
     return;
   } else {
     int handle = handles[loop_control];
