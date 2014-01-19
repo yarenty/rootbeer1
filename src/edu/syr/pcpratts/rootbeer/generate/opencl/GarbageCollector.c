@@ -812,7 +812,7 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a660_(char * gc_inf
   thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
   edu_syr_pcpratts_gc_set_count(thisref_deref, 1); 
   edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY); 
-  edu_syr_pcpratts_gc_set_type(thisref_deref, %%java_lang_String_TypeNumber%%); 
+  edu_syr_pcpratts_gc_set_type(thisref_deref, %%java_lang_StringBuilder_TypeNumber%%); 
   edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1); 
   edu_syr_pcpratts_gc_set_size(thisref_deref, 48); 
   edu_syr_pcpratts_gc_init_monitor(thisref_deref); 

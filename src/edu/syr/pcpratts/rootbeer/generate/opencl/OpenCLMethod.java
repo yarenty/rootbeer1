@@ -37,12 +37,10 @@ public class OpenCLMethod {
   private Set<String> m_dontMangleMethods;
   private Set<String> m_dontEmitMethods;
   private Set<String> m_emitUnmangled;
-  private MethodSignatureUtil m_util;
   
   public OpenCLMethod(SootMethod soot_method, SootClass soot_class){
     m_sootMethod = soot_method;
     m_sootClass = soot_class;
-    m_util = new MethodSignatureUtil();
     createDontMangleMethods();
   }
     
@@ -233,7 +231,7 @@ public class OpenCLMethod {
             ret.append(synchronizedEnter()); 
           }
           try {
-          ret.append(ocl_body.getBodyNoLocals());
+            ret.append(ocl_body.getBodyNoLocals());
           } catch(Exception ex){
             ex.printStackTrace();
             System.out.println("soot_method: "+m_sootMethod.getSignature());
