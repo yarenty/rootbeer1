@@ -28,7 +28,8 @@ public class ExtraFields {
     m_fields.add("<java.lang.StringBuilder: int count>");
     m_fields.add("<edu.syr.pcpratts.rootbeer.runtime.GpuStopwatch: long m_start>");
     m_fields.add("<edu.syr.pcpratts.rootbeer.runtime.GpuStopwatch: long m_stop>");
-  }
+    m_fields.add("<java.lang.Integer: int value>");
+    }
   
   public List<String> get(){
     return m_fields;

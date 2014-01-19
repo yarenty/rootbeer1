@@ -798,32 +798,6 @@ edu_syr_pcpratts_array_length($$__global$$ char * gc_info, int thisref){
 }
 
 $$__device__$$
-int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a660_(char * gc_info, int * exception){ 
-  int thisref;
-  char * thisref_deref;
-  int chars;
-
-  thisref = edu_syr_pcpratts_gc_malloc(gc_info , 48);
-  if(thisref == -1){
-    *exception = %%java_lang_NullPointerException_TypeNumber%%; 
-    return -1; 
-  }
-
-  thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
-  edu_syr_pcpratts_gc_set_count(thisref_deref, 1); 
-  edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY); 
-  edu_syr_pcpratts_gc_set_type(thisref_deref, %%java_lang_StringBuilder_TypeNumber%%); 
-  edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1); 
-  edu_syr_pcpratts_gc_set_size(thisref_deref, 48); 
-  edu_syr_pcpratts_gc_init_monitor(thisref_deref); 
-
-  chars = char__array_new(gc_info, 0, exception);
-  instance_setter_java_lang_AbstractStringBuilder_value(gc_info, thisref, chars, exception); 
-  instance_setter_java_lang_AbstractStringBuilder_count(gc_info, thisref, 0, exception);
-  return thisref; 
-}
-
-$$__device__$$
 int java_lang_String_initab850b60f96d11de8a390800200c9a66(char * gc_info, int parameter0, int * exception) { 
   int r0 = -1; 
   int r1 = -1; 
@@ -1027,11 +1001,38 @@ java_util_Arrays_copyOf(char * gc_info, int object_array, int new_size, int * ex
   return ret; 
 }
 
+//<java.lang.StringBuilder: java.lang.StringBuilder init()>
+$$__device__$$
+int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a660_(char * gc_info, int * exception){ 
+  int thisref;
+  char * thisref_deref;
+  int chars;
+
+  thisref = edu_syr_pcpratts_gc_malloc(gc_info , 48);
+  if(thisref == -1){
+    *exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    return -1; 
+  }
+
+  thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
+  edu_syr_pcpratts_gc_set_count(thisref_deref, 1); 
+  edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY); 
+  edu_syr_pcpratts_gc_set_type(thisref_deref, %%java_lang_StringBuilder_TypeNumber%%); 
+  edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1); 
+  edu_syr_pcpratts_gc_set_size(thisref_deref, 48); 
+  edu_syr_pcpratts_gc_init_monitor(thisref_deref); 
+
+  chars = char__array_new(gc_info, 0, exception);
+  instance_setter_java_lang_AbstractStringBuilder_value(gc_info, thisref, chars, exception); 
+  instance_setter_java_lang_AbstractStringBuilder_count(gc_info, thisref, 0, exception);
+  return thisref; 
+}
+
+//<java.lang.StringBuilder: java.lang.StringBuilder void(java.lang.String)>
 $$__device__$$ 
 int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(char * gc_info, 
   int str ,int * exception){
  
-  int r0 = -1; 
   int thisref; 
   int str_value;
   int str_count;  
@@ -1172,6 +1173,48 @@ int java_lang_StringBuilder_toString9_(char * gc_info, int thisref,
   return java_lang_String_initab850b60f96d11de8a390800200c9a66(gc_info, value, 
     exception);
 }
+
+//<java.lang.Integer: java.lang.Integer init()>
+$$__device__$$
+int java_lang_Integer_initab850b60f96d11de8a390800200c9a660_5_(char * gc_info, 
+  int int_value, int * exception){
+  int thisref;
+  char * thisref_deref;
+
+  thisref = -1;
+  thisref = edu_syr_pcpratts_gc_malloc(gc_info , 48);
+  if ( thisref ==-1 ) { 
+    * exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    return-1 ; 
+  }
+  thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
+  edu_syr_pcpratts_gc_set_count(thisref_deref, 0);
+  edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY);
+  edu_syr_pcpratts_gc_set_type(thisref_deref, %%java_lang_Integer_TypeNumber%%);
+  edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1);
+  edu_syr_pcpratts_gc_set_size(thisref_deref, 48);
+  edu_syr_pcpratts_gc_init_monitor(thisref_deref);
+
+  // instance_setter_java_lang_Integer_value(gc_info, thisref, 0, exception);
+  instance_setter_java_lang_Integer_value(gc_info, thisref, int_value, exception);
+  return thisref;
+}
+
+//<java.lang.Integer: java.lang.Integer valueOf(int)>
+$$__device__$$
+int java_lang_Integer_valueOf(char * gc_info, int int_value, int * exception) {
+  int return_obj = -1;
+  
+  edu_syr_pcpratts_gc_assign (gc_info, 
+    &return_obj, java_lang_Integer_initab850b60f96d11de8a390800200c9a660_5_(gc_info,
+    int_value, exception));
+  
+  if(*exception != 0) {
+    return 0; 
+  }
+  return return_obj;
+}
+
 
 //<java.lang.Double: java.lang.String toString(double)>
 $$__device__$$ 
