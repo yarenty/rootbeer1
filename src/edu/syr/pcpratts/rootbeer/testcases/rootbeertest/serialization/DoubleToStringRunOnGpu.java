@@ -29,7 +29,6 @@ public class DoubleToStringRunOnGpu implements Kernel {
       return false;
     }
     String lhs_str = m_toString;
-    lhs_str = pad(lhs_str);
     if(rhs.m_toString.equals(lhs_str) == false){
       System.out.println("m_toString");
       System.out.println("  lhs: "+m_toString);
@@ -37,21 +36,5 @@ public class DoubleToStringRunOnGpu implements Kernel {
       return false;
     }
     return true;
-  }
-
-  private String pad(String lhs_str) {
-    while(needPad(lhs_str)){
-      lhs_str += "0";
-    }
-    return lhs_str;
-  }
-
-  private boolean needPad(String lhs_str) {
-    String[] tokens = lhs_str.split("\\.");
-    String token1 = tokens[1];
-    if(token1.length() < 7){
-      return true;
-    }
-    return false;
   }
 }

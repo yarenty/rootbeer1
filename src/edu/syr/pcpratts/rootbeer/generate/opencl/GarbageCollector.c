@@ -1213,65 +1213,169 @@ int java_lang_Integer_valueOf(char * gc_info, int int_value, int * exception) {
     return 0; 
   }
 
-  int value = instance_getter_java_lang_Integer_value(gc_info, return_obj, exception);
-  printf("value: %d\n", value);
-
   return return_obj;
 }
 
+$$__device__$$
+double at_illecker_abs_val(double value) {
+  double result = value;
+  if (value < 0) {
+    result = -value;
+  }
+  return result;
+}
+
+$$__device__$$
+double at_illecker_pow10(int exp) {
+  double result = 1;
+  while (exp) {
+    result *= 10;
+    exp--;
+  }
+  return result;
+}
+
+$$__device__$$
+long long at_illecker_round(double value) {
+  long long intpart;
+  intpart = value;
+  value = value - intpart;
+  if (value >= 0.5) {
+    intpart++;
+  }
+  return intpart;
+}
+
+$$__device__$$
+void at_illecker_set_char(char *buffer, int *currlen, int maxlen, char c) {
+  if (*currlen < maxlen) {
+    buffer[(*currlen)++] = c;
+  }
+}
+
+// local double to string method
+// http://www.opensource.apple.com/source/srm/srm-6/srm/lib/snprintf.c
+$$__device__$$
+int at_illecker_double_to_string(char * gc_info, double fvalue, int max, int * exception) {
+  int signvalue = 0;
+  double ufvalue;
+  long long intpart;
+  long long fracpart;
+  char iconvert[20];
+  char fconvert[20];
+  int iplace = 0;
+  int fplace = 0;
+  int zpadlen = 0; // lasting zeros
+
+  char buffer[64];
+  int maxlen = 64;
+  int currlen = 0;
+
+  // Max digits after decimal point, default is 6
+  if (max < 0) {
+    max = 6;
+  }
+  // Sorry, we only support 9 digits past the decimal because of our 
+  // conversion method
+  if (max > 9) {
+    max = 9;
+  }
+
+  // Set sign if negative
+  if (fvalue < 0) {
+    signvalue = '-';
+  }
+
+  ufvalue = at_illecker_abs_val(fvalue);
+  intpart = ufvalue;
+
+  // We "cheat" by converting the fractional part to integer by
+  // multiplying by a factor of 10
+  fracpart = at_illecker_round(at_illecker_pow10(max) * (ufvalue - intpart));
+
+  if (fracpart >= at_illecker_pow10(max)) {
+    intpart++;
+    fracpart -= at_illecker_pow10(max);
+  }
+
+  // Convert integer part
+  do {
+    iconvert[iplace++] = "0123456789abcdef"[intpart % 10];
+    intpart = (intpart / 10);
+  } while(intpart && (iplace < 20));
+
+  if (iplace == 20) {
+    iplace--;
+  }
+  iconvert[iplace] = 0;
+
+  // Convert fractional part
+  do {
+    fconvert[fplace++] = "0123456789abcdef"[fracpart % 10];
+    fracpart = (fracpart / 10);
+  } while(fracpart && (fplace < 20));
+  
+  if (fplace == 20) {
+    fplace--;
+  }
+  fconvert[fplace] = 0;
+
+  // Calc lasting zeros for padding
+  zpadlen = max - fplace;
+  if (zpadlen < 0) {
+    zpadlen = 0;
+  }
+
+  // Set sign
+  if (signvalue) {
+    at_illecker_set_char(buffer, &currlen, maxlen, signvalue);
+  }
+
+  // Set integer part
+  while (iplace > 0) {
+    at_illecker_set_char(buffer, &currlen, maxlen, iconvert[--iplace]);
+  }
+
+  // Check if decimal point is needed
+  if (max > 0) {
+    // Set decimal point
+    // This should probably use locale to find the correct
+    // char to print out.
+    at_illecker_set_char(buffer, &currlen, maxlen, '.');
+
+    // Add lasting zeros
+    while (zpadlen > 0) {
+      at_illecker_set_char(buffer, &currlen, maxlen, '0');
+      --zpadlen;
+    }
+
+    while (fplace > 0) {
+      at_illecker_set_char(buffer, &currlen, maxlen, fconvert[--fplace]);
+    }
+  }
+
+  // Terminate string
+  if (currlen < maxlen - 1) {
+    buffer[currlen] = '\0';
+  } else {
+    buffer[maxlen - 1] = '\0';
+  }
+
+  return edu_syr_pcpratts_string_constant(gc_info, buffer, exception);
+}
 
 //<java.lang.Double: java.lang.String toString(double)>
 $$__device__$$ 
-int java_lang_Double_toString9_8_(char * gc_info, double parameter0, int * exception){
+int java_lang_Double_toString9_8_(char * gc_info, double double_val, int * exception) {
 
-  long long long_value;
-  long long fraction;
-  int part1;
-  int part2;
-  int part3;
-  int string_builder;
-
-  long_value = (long) parameter0;
-  long_value *= 10000000;
-  fraction = (long) (parameter0 * 10000000);
-  fraction -= long_value;
-    
-  part1 = java_lang_Long_toString9_6_(gc_info, long_value, exception);
-  part2 = edu_syr_pcpratts_string_constant(gc_info, ".", exception);
-  part3 = java_lang_Long_toString9_6_(gc_info, fraction, exception);
-
-  string_builder = java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(gc_info,
-    part1, exception);
-  java_lang_StringBuilder_append10_9_(gc_info, string_builder, part2, exception);
-  java_lang_StringBuilder_append10_9_(gc_info, string_builder, part3, exception);
-
-  return java_lang_StringBuilder_toString9_(gc_info, string_builder, exception);
+  // Default is 6 digits after decimal point
+  return at_illecker_double_to_string(gc_info, double_val, 6, exception);
 }
 
 //<java.lang.Float: java.lang.String toString(float)>
 $$__device__$$ 
-int java_lang_Float_toString9_7_(char * gc_info, float parameter0, int * exception){
+int java_lang_Float_toString9_7_(char * gc_info, float float_val, int * exception){
 
-  long long long_value;
-  long long fraction;
-  int part1;
-  int part2;
-  int part3;
-  int string_builder;
-
-  long_value = (long) parameter0;
-  long_value *= 10000000;
-  fraction = (long) (parameter0 * 10000000);
-  fraction -= long_value;
-    
-  part1 = java_lang_Long_toString9_6_(gc_info, long_value, exception);
-  part2 = edu_syr_pcpratts_string_constant(gc_info, ".", exception);
-  part3 = java_lang_Long_toString9_6_(gc_info, fraction, exception);
-
-  string_builder = java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(gc_info,
-    part1, exception);
-  java_lang_StringBuilder_append10_9_(gc_info, string_builder, part2, exception);
-  java_lang_StringBuilder_append10_9_(gc_info, string_builder, part3, exception);
-
-  return java_lang_StringBuilder_toString9_(gc_info, string_builder, exception);
+  // Default is 6 digits after decimal point
+  return at_illecker_double_to_string(gc_info, (double)float_val, 6, exception);
 }
