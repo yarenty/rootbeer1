@@ -29,9 +29,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
   private StaticOffsets m_StaticOffsets;
   private Set<String> m_AttachedWriters;
     
-  public VisitorWriteGenStatic(BytecodeLanguage bcl, FieldReadWriteInspector inspector){
-    super(inspector);
-    
+  public VisitorWriteGenStatic(BytecodeLanguage bcl){   
     m_bcl.push(bcl);
     m_StaticOffsets = new StaticOffsets();
     m_AttachedWriters = new HashSet<String>();

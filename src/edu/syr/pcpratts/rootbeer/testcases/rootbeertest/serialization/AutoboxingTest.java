@@ -9,7 +9,7 @@ public class AutoboxingTest implements TestSerialization {
 
   public List<Kernel> create() {
     List<Kernel> ret = new ArrayList<Kernel>();
-    for(int i = 0; i < 10; ++i){
+    for(int i = 0; i < 1; ++i){
       ret.add(new AutoboxingRunOnGpu());
     }
     return ret;

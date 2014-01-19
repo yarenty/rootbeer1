@@ -35,8 +35,7 @@ public class VisitorGen extends AbstractVisitorGen {
   private Local m_endIndex;
   private Local m_core;
 
-  public VisitorGen(FieldReadWriteInspector field_inspector, SootClass runtime_basic_block){
-    super(field_inspector);
+  public VisitorGen(SootClass runtime_basic_block){
     m_runtimeBasicBlock = runtime_basic_block;
     m_getSizeMethodsMade = new HashSet<Type>();
     m_sentinalCtorsCreated = new HashSet<String>();
@@ -169,24 +168,24 @@ public class VisitorGen extends AbstractVisitorGen {
   private void makeWriteToHeapMethod() {
     List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
     VisitorWriteGen write_gen = new VisitorWriteGen(types, 
-      m_className, m_bcl.top(), m_fieldInspector);
+      m_className, m_bcl.top());
     write_gen.makeWriteToHeapMethod();
   }
       
   private void makeReadFromHeapMethod() {
     List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
     VisitorReadGen read_gen = new VisitorReadGen(types, 
-      m_className, m_bcl.top(), m_fieldInspector);
+      m_className, m_bcl.top());
     read_gen.makeReadFromHeapMethod();
   }
 
   private void makeWriteStaticsToHeapMethod() {
-    VisitorWriteGenStatic static_write_gen = new VisitorWriteGenStatic(m_bcl.top(), m_fieldInspector);
+    VisitorWriteGenStatic static_write_gen = new VisitorWriteGenStatic(m_bcl.top());
     static_write_gen.makeMethod();
   }
 
   private void makeReadStaticsFromHeapMethod() {
-    VisitorReadGenStatic static_read_gen = new VisitorReadGenStatic(m_bcl.top(), m_fieldInspector);
+    VisitorReadGenStatic static_read_gen = new VisitorReadGenStatic(m_bcl.top());
     static_read_gen.makeMethod();
   }
   

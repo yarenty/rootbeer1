@@ -7,7 +7,6 @@
 
 package edu.syr.pcpratts.rootbeer.generate.opencl.fields;
 
-import edu.syr.pcpratts.rootbeer.generate.bytecode.FieldReadWriteInspector;
 import edu.syr.pcpratts.rootbeer.generate.opencl.FieldPackingSorter;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLClass;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
@@ -20,11 +19,9 @@ import soot.SootClass;
 
 public class FieldCodeGeneration {
   
-  private FieldReadWriteInspector m_Inspector;
   private FieldTypeSwitch m_TypeSwitch;
  
-  public String prototypes(Map<String, OpenCLClass> classes, FieldReadWriteInspector inspector) {
-    m_Inspector = inspector;
+  public String prototypes(Map<String, OpenCLClass> classes) {
     Set<String> set = new HashSet<String>();
     List<CompositeField> fields = OpenCLScene.v().getCompositeFields();
     for(CompositeField field : fields){
@@ -33,8 +30,7 @@ public class FieldCodeGeneration {
     return setToString(set);
   }
   
-  public String bodies(Map<String, OpenCLClass> classes, FieldReadWriteInspector inspector, FieldTypeSwitch type_switch) {
-    m_Inspector = inspector;
+  public String bodies(Map<String, OpenCLClass> classes, FieldTypeSwitch type_switch) {
     m_TypeSwitch = type_switch;
     Set<String> set = new HashSet<String>();
     List<CompositeField> fields = OpenCLScene.v().getCompositeFields();
@@ -50,11 +46,11 @@ public class FieldCodeGeneration {
     List<OpenCLField> ref_sorted = sorter.sort(composite.getRefFields());
     List<OpenCLField> nonref_sorted = sorter.sort(composite.getNonRefFields());
     for(OpenCLField field : ref_sorted){
-      boolean writable = m_Inspector.fieldIsWrittenOnGpu(field);
+      boolean writable = true;
       ret.add(field.getGetterSetterBodies(composite, writable, m_TypeSwitch));
     }
     for(OpenCLField field : nonref_sorted){
-      boolean writable = m_Inspector.fieldIsWrittenOnGpu(field);
+      boolean writable = true;
       ret.add(field.getGetterSetterBodies(composite, writable, m_TypeSwitch));
     }
     return ret;

@@ -31,8 +31,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
   private Set<String> m_attachedReaders;
   private StaticOffsets m_staticOffsets;
   
-  public VisitorReadGenStatic(BytecodeLanguage bcl, FieldReadWriteInspector inspector){
-    super(inspector);
+  public VisitorReadGenStatic(BytecodeLanguage bcl){
     m_bcl.push(bcl);
     
     m_orderedHistory = RootbeerClassLoader.v().getDfsInfo().getOrderedRefTypes();
@@ -40,7 +39,6 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     m_attachedReaders = new HashSet<String>();
     m_objSerializing = new Stack<Local>();
     m_staticOffsets = new StaticOffsets();
-    m_fieldInspector = inspector;
     m_currMem = new Stack<Local>();
   }
   
@@ -98,9 +96,6 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     
     BclMemory bcl_mem = new BclMemory(bcl, memory);
     for(OpenCLField field : static_fields){
-      if(m_fieldInspector.fieldIsWrittenOnGpu(field) == false)
-        continue;
-      
       int index = m_staticOffsets.getIndex(field);
       bcl_mem.setAddress(LongConstant.v(index));
       if(field.getType().isRefType()){

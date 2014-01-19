@@ -39,8 +39,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
   private Set<String> m_VisitedReader;
   
   public VisitorReadGen(List<Type> ordered_history, String class_name, 
-    BytecodeLanguage bcl, FieldReadWriteInspector inspector){
-    super(inspector);
+    BytecodeLanguage bcl){
     
     m_ReadFromHeapMethodsMade = new HashMap<Type, Local>();
     m_OrderedHistory = ordered_history;
@@ -48,7 +47,6 @@ public class VisitorReadGen extends AbstractVisitorGen {
     m_bcl = new Stack<BytecodeLanguage>();
     m_bcl.push(bcl);
     m_gcObjVisitor = new Stack<Local>();
-    m_fieldInspector = inspector;
     m_objSerializing = new Stack<Local>();
     m_currMem = new Stack<Local>();
     m_CurrObj = new Stack<Local>();
@@ -484,16 +482,12 @@ public class VisitorReadGen extends AbstractVisitorGen {
     if(do_ref_fields){
       List<OpenCLField> ref_fields = getRefFields(soot_class);
       for(OpenCLField ref_field : ref_fields){
-        if(m_fieldInspector.fieldIsWrittenOnGpu(ref_field)){
-          //increment the address to get to this location
-          bcl_mem.incrementAddress(inc_size);
-          inc_size = 0;
+        //increment the address to get to this location
+        bcl_mem.incrementAddress(inc_size);
+        inc_size = 0;
 
-          //read the field
-          readRefField(ref_field);
-        } else {
-          inc_size += ref_field.getSize();
-        }
+        //read the field
+        readRefField(ref_field);
       }
 
       if(inc_size > 0){
@@ -502,20 +496,17 @@ public class VisitorReadGen extends AbstractVisitorGen {
     } else {
       List<OpenCLField> non_ref_fields = getNonRefFields(soot_class);
       for(OpenCLField non_ref_field : non_ref_fields){
-        if(m_fieldInspector.fieldIsWrittenOnGpu(non_ref_field)){
-          //increment the address to get to this location
-          if(inc_size > 0){
-            bcl_mem.incrementAddress(inc_size);
-            inc_size = 0;
-          }
-          //read the field
-          readNonRefField(non_ref_field);
-        } else {
-          inc_size += non_ref_field.getSize();
+        //increment the address to get to this location
+        if(inc_size > 0){
+          bcl_mem.incrementAddress(inc_size);
+          inc_size = 0;
         }
+        //read the field
+        readNonRefField(non_ref_field);  
       }
-      if(inc_size > 0)
+      if(inc_size > 0){
         bcl_mem.incrementAddress(inc_size);
+      }
     }
     bcl_mem.align();
   }  

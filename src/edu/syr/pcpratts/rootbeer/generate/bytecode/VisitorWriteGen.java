@@ -47,8 +47,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   private Local m_Core;
   
   public VisitorWriteGen(List<Type> ordered_history, String class_name, 
-    BytecodeLanguage bcl, FieldReadWriteInspector inspector){
-    super(inspector);
+    BytecodeLanguage bcl){
     
     m_bcl = new Stack<BytecodeLanguage>();
     m_CurrObj = new Stack<Local>();
@@ -58,7 +57,6 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     m_ClassName = class_name;
     m_ValuesWritten = new ArrayList<Value>();
     m_bcl.push(bcl);
-    m_fieldInspector = inspector;
     
     m_CurrentMem = new Stack<Local>();
     m_gcObjVisitor = new Stack<Local>();
@@ -470,12 +468,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     if(do_ref_fields){
       int count = 0;
       for(OpenCLField ref_field : ref_fields){
-        int constant;
-        if(m_fieldInspector.fieldIsReadOnGpu(ref_field)) {
-          constant = 1;
-        } else {
-          constant = 0;
-        }
+        int constant = 1;
         Local local;
         if(ref_field.isInstance()){
           local = writeRefField(ref_field, IntConstant.v(constant));

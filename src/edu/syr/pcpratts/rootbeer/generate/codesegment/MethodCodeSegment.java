@@ -9,7 +9,6 @@ package edu.syr.pcpratts.rootbeer.generate.codesegment;
 
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLMethod;
 import edu.syr.pcpratts.rootbeer.generate.opencl.OpenCLScene;
-import edu.syr.pcpratts.rootbeer.generate.bytecode.FieldReadWriteInspector;
 import java.util.ArrayList;
 import java.util.List;
 import soot.Local;
@@ -21,13 +20,11 @@ import soot.jimple.internal.JimpleLocal;
 
 public class MethodCodeSegment implements CodeSegment {
   private SootMethod existingMethod;
-  private FieldReadWriteInspector fieldReadWriteInspector;
   private SootMethod clonedMethod;
   private SootClass mClonedClass;
 
   public MethodCodeSegment(SootMethod method){
     this.existingMethod = method;
-    fieldReadWriteInspector = new FieldReadWriteInspector(method);
   }
 
   public List<Local> getInputArguments() {
@@ -40,10 +37,6 @@ public class MethodCodeSegment implements CodeSegment {
 
   public List<Local> getOutputArguments() {
     return new ArrayList<Local>();
-  }
-
-  public FieldReadWriteInspector getReadWriteFieldInspector() {
-    return fieldReadWriteInspector;
   }
 
   public SootClass getSootClass() {

@@ -27,17 +27,15 @@ public class AbstractVisitorGen {
   protected Stack<Local> m_gcObjVisitor;
   protected Stack<Local> m_currMem;
   protected Stack<Local> m_objSerializing;
-  protected FieldReadWriteInspector m_fieldInspector;
   protected List<String> m_classesToIgnore;
   
-  public AbstractVisitorGen(FieldReadWriteInspector inspector){
+  public AbstractVisitorGen(){
     m_labelI = 0; 
     m_bcl = new Stack<BytecodeLanguage>();
     m_gcObjVisitor = new Stack<Local>();
     m_currMem = new Stack<Local>();
     m_currThisRef = new Stack<Local>();
     m_objSerializing = new Stack<Local>();
-    m_fieldInspector = inspector;
     m_classesToIgnore = new ArrayList<String>();
     m_classesToIgnore.add("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
     m_classesToIgnore.add("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
@@ -148,9 +146,7 @@ public class AbstractVisitorGen {
       } 
     }
     bcl.pushMethod(gc_obj_visit, "readFromHeap", obj_class.getType(), obj_class.getType(), BooleanType.v(), LongType.v());
-    int should_read = 0;
-    if(m_fieldInspector.fieldIsWrittenOnGpu(ref_field))
-      should_read = 1;
+    int should_read = 1;
     Local ret_obj = bcl.invokeMethodRet(gc_obj_visit, original_field_value, IntConstant.v(should_read), ref);
     
     Type type = soot_field.getType();

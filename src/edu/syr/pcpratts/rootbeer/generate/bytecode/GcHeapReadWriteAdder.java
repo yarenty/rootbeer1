@@ -27,7 +27,7 @@ public class GcHeapReadWriteAdder {
     System.out.println("generating serialization bytecode...");
     SootClass block_class = block.getRootSootClass();
 
-    VisitorGen generate_visitor = new VisitorGen(block.getReadWriteFieldInspector(), block_class);
+    VisitorGen generate_visitor = new VisitorGen(block_class);
     generate_visitor.generate();
     gcObjectVisitorClassName = generate_visitor.getClassName();
   }
