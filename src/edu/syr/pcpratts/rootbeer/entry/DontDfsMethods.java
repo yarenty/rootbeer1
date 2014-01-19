@@ -87,7 +87,7 @@ public class DontDfsMethods {
     m_methods.add("<java.lang.String: void <init>(char[])>");
     m_methods.add("<java.lang.Integer: void(int)>");
     m_methods.add("<java.lang.Integer: java.lang.Integer valueOf(int)>");
-    }
+  }
   
   public Set<String> get(){
     return m_methods;

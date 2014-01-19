@@ -1174,7 +1174,7 @@ int java_lang_StringBuilder_toString9_(char * gc_info, int thisref,
     exception);
 }
 
-//<java.lang.Integer: java.lang.Integer init()>
+//<java.lang.Integer: java.lang.Integer init(int)>
 $$__device__$$
 int java_lang_Integer_initab850b60f96d11de8a390800200c9a660_5_(char * gc_info, 
   int int_value, int * exception){
