@@ -85,6 +85,8 @@ public class DontDfsMethods {
     m_methods.add("<java.lang.StringValue: char[] 'from'(char[])>");
     m_methods.add("<java.util.Arrays: java.lang.Object[] copyOf(java.lang.Object[],int)>");
     m_methods.add("<java.lang.String: void <init>(char[])>");
+    m_methods.add("<java.lang.Integer: void(int)>");
+    m_methods.add("<java.lang.Integer: java.lang.Integer valueOf(int)>");
   }
   
   public Set<String> get(){
