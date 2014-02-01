@@ -1,0 +1,7 @@
+#!/bin/sh
+
+gcc -fPIC -g -c -I/usr/lib/jvm/java-6-openjdk-amd64/include/ -I/usr/lib/jvm/java-6-openjdk-amd64/include/linux -I/usr/local/cuda/include/ org/trifort/rootbeer/runtime/CUDARuntime.c -o CUDARuntime.o
+gcc -shared -Wl,-soname,rootbeer_cuda_runtime -o rootbeer_cuda_runtime_x64.so.1 CUDARuntime.o -lc -lcuda
+
+gcc -fPIC -g -c -I/usr/lib/jvm/java-6-openjdk-amd64/include/ -I/usr/lib/jvm/java-6-openjdk-amd64/include/linux -I/usr/local/cuda/targets/x86_64-linux/include/ org/trifort/rootbeer/runtime/OpenCLRuntime.c -o OpenCLRuntime.o
+gcc -shared -Wl,-soname,rootbeer_opencl_runtime -o rootbeer_opencl_runtime_x64.so.1 OpenCLRuntime.o -lc -lopencl
