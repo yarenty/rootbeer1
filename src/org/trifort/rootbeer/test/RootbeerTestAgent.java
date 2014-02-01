@@ -192,8 +192,9 @@ public class RootbeerTestAgent {
       List<Kernel> testing_items = creator.create();
       Stopwatch watch = new Stopwatch();
       watch.start();
-      rootbeer.runAll(testing_items);
-      if(rootbeer.getRanGpu() == false){
+      try {
+        rootbeer.run(testing_items);
+      } catch(Exception ex){
         m_message = "Ran on CPU";
         m_passed = false;
         return;
@@ -240,8 +241,9 @@ public class RootbeerTestAgent {
       ThreadConfig thread_config = creator.getThreadConfig();
       Stopwatch watch = new Stopwatch();
       watch.start();
-      rootbeer.runAll(testing_item, thread_config);
-      if(rootbeer.getRanGpu() == false){
+      try {
+        rootbeer.run(testing_item, thread_config);
+      } catch(Exception ex){
         m_message = "Ran on CPU";
         m_passed = false;
         return;
@@ -282,20 +284,10 @@ public class RootbeerTestAgent {
     Configuration.setPrintMem(print_mem);
     List<Kernel> testing_items = creator.create();
     try {
-      rootbeer.runAll(testing_items);
-      if(rootbeer.getRanGpu() == false){
-        m_message = "Ran on CPU";
-        m_passed = false;
-        return;
-      }
+      rootbeer.run(testing_items);
       m_passed = false;
       m_message = "No exception thrown when expecting one.";
     } catch(Throwable ex){
-      if(rootbeer.getRanGpu() == false){
-        m_message = "Ran on CPU";
-        m_passed = false;
-        return;
-      }
       m_passed = creator.catchException(ex);
       if(m_passed == false){
         m_message = "Exception is: "+ex.toString(); 
@@ -333,8 +325,9 @@ public class RootbeerTestAgent {
         List<Kernel> testing_items = m_creator.create();
         Stopwatch watch = new Stopwatch();
         watch.start();
-        m_rootbeer.runAll(testing_items);
-        if(m_rootbeer.getRanGpu() == false){
+        try {
+          m_rootbeer.run(testing_items);
+        } catch(Exception ex){
           m_message = "Ran on CPU";
           m_passed = false;
           return;

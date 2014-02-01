@@ -17,8 +17,6 @@ import org.trifort.rootbeer.runtime.CompiledKernel;
 import org.trifort.rootbeer.runtime.Kernel;
 import org.trifort.rootbeer.runtime.Serializer;
 import org.trifort.rootbeer.runtime.ThreadConfig;
-import org.trifort.rootbeer.runtime.gpu.GcHeap;
-import org.trifort.rootbeer.runtime.gpu.GpuDevice;
 import org.trifort.rootbeer.runtime.memory.BasicMemory;
 import org.trifort.rootbeer.runtime.memory.Memory;
 import org.trifort.rootbeer.runtime2.cuda.BlockShaper;
@@ -37,11 +35,6 @@ public class NativeCpuDevice {
     m_blockShaper = new BlockShaper();
   }
   
-  public GcHeap CreateHeap() {
-    //return new NativeCpuGcHeap(this);
-    return null;
-  }
-
   public long getMaxEnqueueSize() {
     return 1024*1024*1024;
   }

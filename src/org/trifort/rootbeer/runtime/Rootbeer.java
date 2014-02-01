@@ -36,22 +36,42 @@ public class Rootbeer {
     } catch(Exception ex){
       //ignore
     }
-    try {
-      Class c = Class.forName("org.trifort.rootbeer.runtime.OpenCLRuntime");
-      Constructor<IRuntime> ctor = c.getConstructor();
-      m_openCLRuntime = ctor.newInstance();
-      m_cards.addAll(m_openCLRuntime.getGpuDevices());
-    } catch(Exception ex){
-      //ignore
-    }
+    
+    //TODO: complete the OpenCL runtime
+    //try {
+    //  Class c = Class.forName("org.trifort.rootbeer.runtime.OpenCLRuntime");
+    //  Constructor<IRuntime> ctor = c.getConstructor();
+    //  m_openCLRuntime = ctor.newInstance();
+    //  m_cards.addAll(m_openCLRuntime.getGpuDevices());
+    //} catch(Exception ex){
+    //  //ignore
+    //}
+    
     return m_cards;
   }
   
-  public void runAll(Kernel job_template, ThreadConfig thread_config){
+  
+  public void run(Kernel template, ThreadConfig thread_config){
     
   }
 
-  public void runAll(List<Kernel> jobs) {
+  public void run(List<Kernel> work, ThreadConfig thread_config) {
+    
+  }
+
+  public void run(List<Kernel> work) {
+    
+  }
+  
+  public void run(Kernel template, ThreadConfig thread_config, GpuContext context){
+    context.run(template, thread_config);
+  }
+
+  public void run(List<Kernel> work, ThreadConfig thread_config, GpuContext context) {
+    
+  }
+
+  public void run(List<Kernel> work, GpuContext context) {
     
   }
   
@@ -132,11 +152,4 @@ public class Rootbeer {
     }
   }
   
-  public List<StatsRow> getStats(){
-    return m_stats;
-  }
-  
-  public boolean getRanGpu(){
-    return m_ranGpu;  
-  }
 }

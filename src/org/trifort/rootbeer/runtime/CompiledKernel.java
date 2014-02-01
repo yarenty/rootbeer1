@@ -16,6 +16,6 @@ public interface CompiledKernel {
   public int getOutOfMemoryNumber();
   public String getCubin32();
   public String getCubin64();
-  public Serializer getSerializer(Memory mem, Memory texture_mem);
+  public Serializer getSerializer(GpuMemory mem);
   public boolean isUsingGarbageCollector();
 }

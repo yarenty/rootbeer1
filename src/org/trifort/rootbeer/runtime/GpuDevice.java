@@ -42,8 +42,9 @@ public class GpuDevice {
     return ret;
   }
   
-  public static GpuDevice newOpenCLDevice(){
+  public static GpuDevice newOpenCLDevice(String device_name){
     GpuDevice ret = new GpuDevice(DEVICE_TYPE_OPENCL);
+    ret.setDeviceName(device_name);
     return ret;
   }
  
@@ -75,6 +76,14 @@ public class GpuDevice {
 
   public GpuDevice(int device_type) {
     m_deviceType = device_type;
+  }
+  
+  public GpuContext createContext(){
+    if(m_deviceType == DEVICE_TYPE_CUDA){
+      return new CUDAGpuContext(this);
+    } else {
+      throw new UnsupportedOperationException();
+    }
   }
   
   public int getDeviceType(){

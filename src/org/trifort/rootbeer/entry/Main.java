@@ -13,8 +13,9 @@ import java.util.List;
 
 import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.generate.opencl.tweaks.GencodeOptions.CompileArchitecture;
+import org.trifort.rootbeer.runtime.GpuDevice;
+import org.trifort.rootbeer.runtime.Rootbeer;
 import org.trifort.rootbeer.runtime2.cuda.CudaLoader;
-import org.trifort.rootbeer.runtime2.cuda.CudaRuntime2;
 
 public class Main {
   
@@ -156,9 +157,7 @@ public class Main {
     // Now we have loaded the dll's if we need to print the device details to it
     if(m_printDeviceInfo){
       if(m_num_args == 1){
-        CudaLoader loader = new CudaLoader();
-        loader.load();
-        CudaRuntime2.printDeviceInfo();
+        printDeviceInfo();
       } else {
         System.out.println("-printdeviceinfo can only be used by itself. Remove other arguments.");  
         System.out.flush();
@@ -192,6 +191,19 @@ public class Main {
     }
   }
   
+  private void printDeviceInfo() {
+    Rootbeer rootbeer = new Rootbeer();
+    List<GpuDevice> devices = rootbeer.getGpuDevices();
+    System.out.println("device count: "+devices.size());
+    for(GpuDevice device : devices){
+      System.out.println("device: "+device.getDeviceName());
+      System.out.println("  total_global_memory: "+device.getTotalGlobalMemoryBytes()+" bytes");
+      System.out.println("  num_multiprocessors: "+device.getMultiProcessorCount());
+      System.out.println("  max_threads_per_multiprocessor: "+device.getMaxThreadsPerMultiprocessor());
+      System.out.println("  clock_rate: "+device.getClockRateHz()+" Hz");
+    }
+  }
+
   public static void main(String[] args){
     Main main = new Main();
     main.parseArgs(args);
