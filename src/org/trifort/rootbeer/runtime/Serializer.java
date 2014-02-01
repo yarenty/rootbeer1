@@ -12,10 +12,6 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import org.trifort.rootbeer.runtime.memory.BufferPrinter;
-import org.trifort.rootbeer.runtime.memory.Memory;
-
-
 public abstract class Serializer {
 
   public Memory mMem;

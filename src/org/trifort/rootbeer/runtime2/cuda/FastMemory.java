@@ -7,15 +7,13 @@
 
 package org.trifort.rootbeer.runtime2.cuda;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.trifort.rootbeer.generate.bytecode.Constants;
-import org.trifort.rootbeer.runtime.memory.Memory;
+import org.trifort.rootbeer.runtime.Memory_old;
 
 
-public class FastMemory extends Memory {
+public class FastMemory extends Memory_old {
 
   private long m_CpuBase;
   private long m_SpaceSize;

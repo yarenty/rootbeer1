@@ -7,15 +7,14 @@
 
 package org.trifort.rootbeer.test;
 
-import org.trifort.rootbeer.runtime.memory.BasicSwappedMemory;
+import org.trifort.rootbeer.runtime.FixedMemory;
 
-public class AlignmentCheckedMemory extends BasicSwappedMemory {
+public class AlignmentCheckedMemory extends FixedMemory {
 
   public AlignmentCheckedMemory(int size){
     super(size);
   }
 
-  @Override
   public void checkAlignment(int alignment){
     long ptr = getPointer();
     if(ptr % alignment != 0){

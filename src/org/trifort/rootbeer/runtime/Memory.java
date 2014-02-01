@@ -1,6 +1,6 @@
 package org.trifort.rootbeer.runtime;
 
-public interface GpuMemory {
+public interface Memory {
 
   public void reset();
   public void setAddress(long pos);
@@ -37,4 +37,8 @@ public interface GpuMemory {
   public void writeArray(float[] array);
   public void writeArray(double[] array);
   public void writeArray(long[] array);
+  
+  public void close();
+  public long mallocWithSize(int size);
+  public long getHeapEnd();
 }

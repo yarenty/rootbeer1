@@ -2,7 +2,7 @@ package org.trifort.rootbeer.runtime;
 
 import java.util.List;
 
-public interface GpuContext {
+public interface Context {
 
   public void init();
   public void close();

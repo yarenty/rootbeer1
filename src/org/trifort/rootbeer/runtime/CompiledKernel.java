@@ -7,8 +7,6 @@
 
 package org.trifort.rootbeer.runtime;
 
-import org.trifort.rootbeer.runtime.memory.Memory;
-
 public interface CompiledKernel {
   public String getCodeUnix();
   public String getCodeWindows();
@@ -16,6 +14,6 @@ public interface CompiledKernel {
   public int getOutOfMemoryNumber();
   public String getCubin32();
   public String getCubin64();
-  public Serializer getSerializer(GpuMemory mem);
+  public Serializer getSerializer(Memory memory);
   public boolean isUsingGarbageCollector();
 }

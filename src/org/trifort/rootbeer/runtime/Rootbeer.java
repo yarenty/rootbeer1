@@ -63,15 +63,15 @@ public class Rootbeer {
     
   }
   
-  public void run(Kernel template, ThreadConfig thread_config, GpuContext context){
+  public void run(Kernel template, ThreadConfig thread_config, Context context){
     context.run(template, thread_config);
   }
 
-  public void run(List<Kernel> work, ThreadConfig thread_config, GpuContext context) {
+  public void run(List<Kernel> work, ThreadConfig thread_config, Context context) {
     
   }
 
-  public void run(List<Kernel> work, GpuContext context) {
+  public void run(List<Kernel> work, Context context) {
     
   }
   

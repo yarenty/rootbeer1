@@ -5,19 +5,19 @@
  * See the file LICENSE for copying permission.
  */
 
-package org.trifort.rootbeer.runtime.memory;
+package org.trifort.rootbeer.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Memory {
+public abstract class Memory_old {
 
   private Pointer m_StaticPointer;
   private Pointer m_InstancePointer;
   private Pointer m_CurrPointer;
   private List<List<Long>> m_IntegerList;
 
-  public Memory(){
+  public Memory_old(){
     m_StaticPointer = new Pointer();
     m_InstancePointer = new Pointer();
     m_CurrPointer = m_InstancePointer;

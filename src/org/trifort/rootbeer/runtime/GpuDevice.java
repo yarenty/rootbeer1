@@ -78,9 +78,9 @@ public class GpuDevice {
     m_deviceType = device_type;
   }
   
-  public GpuContext createContext(){
+  public Context createContext(){
     if(m_deviceType == DEVICE_TYPE_CUDA){
-      return new CUDAGpuContext(this);
+      return new CUDAContext(this);
     } else {
       throw new UnsupportedOperationException();
     }

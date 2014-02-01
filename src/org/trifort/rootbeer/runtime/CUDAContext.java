@@ -5,22 +5,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.trifort.rootbeer.configuration.Configuration;
-import org.trifort.rootbeer.runtime.memory.BufferPrinter;
 import org.trifort.rootbeer.runtimegpu.GpuException;
 import org.trifort.rootbeer.util.ResourceReader;
 
-public class CUDAGpuContext implements GpuContext {
+public class CUDAContext implements Context {
 
   private GpuDevice m_device;
   private List<StatsRow> m_stats;
   private boolean m_32bit;
   private Map<String, byte[]> m_cubinFiles;
   
-  private GpuMemory m_objectMemory;
-  private GpuMemory m_handlesMemory;
-  private GpuMemory m_exceptionsMemory;
+  private Memory m_objectMemory;
+  private Memory m_handlesMemory;
+  private Memory m_exceptionsMemory;
+  private Memory m_classMemory;
   
-  public CUDAGpuContext(GpuDevice device){
+  public CUDAContext(GpuDevice device){
     m_device = device;    
     
     String arch = System.getProperty("os.arch");
@@ -31,13 +31,18 @@ public class CUDAGpuContext implements GpuContext {
 
   @Override
   public void init() {
-    m_objectMemory = new CUDAMemory(1000);
-    m_handlesMemory = new CUDAMemory(1000);
-    m_exceptionsMemory = new CUDAMemory(1000);
+    m_objectMemory = new FixedMemory(1024*1024);
+    m_handlesMemory = new FixedMemory(1024*1024);
+    m_exceptionsMemory = new FixedMemory(1024*1024);
+    m_classMemory = new FixedMemory(1024*1024);
   }
 
   @Override
   public void close() {
+    m_objectMemory.close();
+    m_handlesMemory.close();
+    m_exceptionsMemory.close();
+    m_classMemory.close();
   }
   
   public List<StatsRow> getStats(){
@@ -74,13 +79,15 @@ public class CUDAGpuContext implements GpuContext {
     }
     
     writeBlocksTemplate(compiled_kernel);
-    runBlocks(thread_config);
+    runBlocks(thread_config, cubin_file);
     readBlocksTemplate(compiled_kernel, thread_config);
   }
   
-  private void runBlocks(ThreadConfig thread_config){    
-    cudaRun(thread_config.getBlockShapeX(), thread_config.getGridShapeX(), 
-      thread_config.getNumThreads(), m_objectMemory, m_handlesMemory);
+  private void runBlocks(ThreadConfig thread_config, byte[] cubin_file){    
+    cudaRun(m_device.getDeviceId(), cubin_file, cubin_file.length, 
+      thread_config.getBlockShapeX(), thread_config.getGridShapeX(), 
+      thread_config.getNumThreads(), m_objectMemory, m_handlesMemory,
+      m_exceptionsMemory, m_classMemory);
   }  
   
   private void writeBlocksTemplate(CompiledKernel compiled_kernel){
@@ -156,6 +163,7 @@ public class CUDAGpuContext implements GpuContext {
     
   }
   
-  private native void cudaRun(int block_shape_x, int grid_shape_x, 
-    int num_threads, GpuMemory object_mem, GpuMemory handles_mem);
+  private native void cudaRun(int device_index, byte[] cubin_file, int cubin_length,
+    int block_shape_x, int grid_shape_x, int num_threads, Memory object_mem,
+    Memory handles_mem, Memory exceptions_mem, Memory class_mem);
 }

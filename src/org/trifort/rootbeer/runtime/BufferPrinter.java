@@ -5,12 +5,11 @@
  * See the file LICENSE for copying permission.
  */
 
-package org.trifort.rootbeer.runtime.memory;
+package org.trifort.rootbeer.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.trifort.rootbeer.runtime.GpuMemory;
 
 public class BufferPrinter {
 
@@ -41,7 +40,7 @@ public class BufferPrinter {
     }
   }
   
-  public void print(GpuMemory mem, long start_ptr, int length){
+  public void print(Memory mem, long start_ptr, int length){
     long previous = mem.getPointer();
     mem.setAddress(start_ptr);
 

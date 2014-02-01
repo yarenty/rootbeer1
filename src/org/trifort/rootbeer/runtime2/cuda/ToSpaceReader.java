@@ -10,8 +10,8 @@ package org.trifort.rootbeer.runtime2.cuda;
 import java.util.List;
 
 import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Memory_old;
 import org.trifort.rootbeer.runtime.Serializer;
-import org.trifort.rootbeer.runtime.memory.Memory;
 
 
 public class ToSpaceReader {

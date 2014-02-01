@@ -1,16 +1,27 @@
 package org.trifort.rootbeer.runtime;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-public class CUDAMemory implements GpuMemory {
+public class FixedMemory implements Memory {
 
   private long m_size;
   private long m_reserve;
   private long m_address;
     
-  public CUDAMemory(long size){
+  public FixedMemory(long size){
     m_size = size;
     m_reserve = 1024;
+    m_address = malloc(size);
+  }
+  
+  public long getAddress(){
+    return m_address;
+  }
+  
+  public long getSize(){
+    return m_size;
+  }
+  
+  public void close(){
+    free(m_address);
   }
   
   private long currPointer(){
@@ -228,6 +239,9 @@ public class CUDAMemory implements GpuMemory {
   public native void doWriteDouble(long ptr, double value, long cpu_base);
   public native void doWriteLong(long ptr, long value, long cpu_base);
 
+  private native long malloc(long size);
+  private native void free(long ptr);
+  
   @Override
   public void reset() {
     // TODO Auto-generated method stub
@@ -242,6 +256,18 @@ public class CUDAMemory implements GpuMemory {
 
   @Override
   public long getPointer() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public long mallocWithSize(int size) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public long getHeapEnd() {
     // TODO Auto-generated method stub
     return 0;
   }
