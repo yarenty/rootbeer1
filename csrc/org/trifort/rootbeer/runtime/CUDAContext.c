@@ -85,7 +85,6 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   jlong cpu_exceptions_mem_size;
   jlong cpu_class_mem_size;
   jlong cpu_heap_end;
-  jlong cpu_buffer_size;  
 
   jclass cuda_memory_class;
   jmethodID get_address_method;
@@ -222,7 +221,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   status = cuMemcpyHtoD(gpu_heap_end, &cpu_heap_end, sizeof(jlong));
   CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_heap_end", status, device)
 
-  status = cuMemcpyHtoD(gpu_buffer_size, &cpu_buffer_size, sizeof(jlong));
+  status = cuMemcpyHtoD(gpu_buffer_size, &cpu_object_mem_size, sizeof(jlong));
   CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_buffer_size", status, device)
 
   //----------------------------------------------------------------------------

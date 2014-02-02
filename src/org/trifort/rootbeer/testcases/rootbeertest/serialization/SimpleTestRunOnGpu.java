@@ -19,7 +19,6 @@ public class SimpleTestRunOnGpu implements Kernel {
   
   @Override
   public void gpuMethod() {
-    //System.out.println("hello world");
     m_value = 5;
   }
   
