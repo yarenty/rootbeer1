@@ -1,10 +1,8 @@
 package org.trifort.rootbeer.runtime;
 
-public interface Memory {
+import java.util.List;
 
-  public void reset();
-  public void setAddress(long pos);
-  public long getPointer();
+public interface Memory {
   
   public byte readByte();
   public boolean readBoolean();
@@ -38,7 +36,22 @@ public interface Memory {
   public void writeArray(double[] array);
   public void writeArray(long[] array);
   
-  public void close();
+  public void incrementAddress(int offset);
   public long mallocWithSize(int size);
-  public long getHeapEnd();
+  public void setPointer(long ptr);
+  public void incPointer(long value);
+  public void pushAddress();
+  public void popAddress();
+  public List<byte[]> getBuffer();
+  public void finishCopy(long size);
+  public void finishRead();
+  public void readIntArray(int[] array, int size);
+  public void useInstancePointer();
+  public void useStaticPointer();
+  public void align();
+  public void clearHeapEndPtr();
+  public long getHeapEndPtr();
+  public long getPointer();
+  public void setAddress(long address);
+  public void close();
 }

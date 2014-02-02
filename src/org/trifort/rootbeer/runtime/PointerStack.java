@@ -5,7 +5,7 @@
  * See the file LICENSE for copying permission.
  */
 
-package org.trifort.rootbeer.runtime2.cuda;
+package org.trifort.rootbeer.runtime;
 
 import java.util.ArrayList;
 import java.util.List;

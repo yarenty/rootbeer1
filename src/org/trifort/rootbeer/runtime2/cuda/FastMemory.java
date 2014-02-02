@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.trifort.rootbeer.runtime.Memory_old;
+import org.trifort.rootbeer.runtime.PointerStack;
 
 
 public class FastMemory extends Memory_old {

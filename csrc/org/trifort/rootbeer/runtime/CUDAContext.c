@@ -74,17 +74,23 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   int handles_mem_size;
   int exceptions_mem_size;
   int class_mem_size;
+  int heap_end;
 
   void * cpu_object_mem;
   void * cpu_handles_mem;
   void * cpu_exceptions_mem;
   void * cpu_class_mem;
+  jlong cpu_object_mem_size;
+  jlong cpu_handles_mem_size;
+  jlong cpu_exceptions_mem_size;
+  jlong cpu_class_mem_size;
   jlong cpu_heap_end;
   jlong cpu_buffer_size;  
 
   jclass cuda_memory_class;
   jmethodID get_address_method;
   jmethodID get_size_method;
+  jmethodID get_heap_end_method;
 
   //----------------------------------------------------------------------------
   //init device and function
@@ -186,16 +192,16 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   get_size_method = (*env)->GetMethodID(env, cuda_memory_class, "getSize", "()J");
   get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEnd", "()J");
 
-  cpu_object_mem = (*env)->CallLongMethod(env, object_mem, get_address_method);
+  cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
   cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
 
-  cpu_handles_mem = (*env)->CallLongMethod(env, handles_mem, get_address_method);
+  cpu_handles_mem = (void *) (*env)->CallLongMethod(env, handles_mem, get_address_method);
   cpu_handles_mem_size = (*env)->CallLongMethod(env, handles_mem, get_size_method);
 
-  cpu_exceptions_mem = (*env)->CallLongMethod(env, exceptions_mem, get_address_method);
+  cpu_exceptions_mem = (void *) (*env)->CallLongMethod(env, exceptions_mem, get_address_method);
   cpu_exceptions_mem_size = (*env)->CallLongMethod(env, exceptions_mem, get_size_method);
 
-  cpu_class_mem = (*env)->CallLongMethod(env, class_mem, get_address_method);
+  cpu_class_mem = (void *) (*env)->CallLongMethod(env, class_mem, get_address_method);
   cpu_class_mem_size = (*env)->CallLongMethod(env, class_mem, get_size_method);
 
   jlong * info_space = (jlong *) malloc(info_space_size);
@@ -224,9 +230,9 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   //----------------------------------------------------------------------------
 
   status = cuFuncSetBlockShape(function, block_shape_x, 1, 1);
-  CHECK_STATUS(env, "Error in cuFuncSetBlockShape", statuss);
+  CHECK_STATUS(env, "Error in cuFuncSetBlockShape", status, device);
 
-  status = cuLaunchGrid(cuFunction, grid_shape_x, 1);
+  status = cuLaunchGrid(function, grid_shape_x, 1);
   CHECK_STATUS(env, "Error in cuLaunchGrid", status, device)
 
   status = cuCtxSynchronize();  

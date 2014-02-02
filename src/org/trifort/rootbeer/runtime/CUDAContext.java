@@ -91,8 +91,8 @@ public class CUDAContext implements Context {
   }  
   
   private void writeBlocksTemplate(CompiledKernel compiled_kernel){
-    m_objectMemory.reset();
-    m_handlesMemory.reset();
+    m_objectMemory.clearHeapEndPtr();
+    m_handlesMemory.clearHeapEndPtr();
     
     Serializer serializer = compiled_kernel.getSerializer(m_objectMemory);
     serializer.writeStaticsToHeap();
@@ -160,7 +160,6 @@ public class CUDAContext implements Context {
   
   @Override
   public void run(List<Kernel> work, ThreadConfig thread_config) {
-    
   }
   
   private native void cudaRun(int device_index, byte[] cubin_file, int cubin_length,
