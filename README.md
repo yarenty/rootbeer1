@@ -23,7 +23,6 @@ between thread count, shared memory size and register count. All of these are co
 using Rootbeer.
 
 ## Programming  
-<br />
 <b>Kernel Interface:</b> Your code that will run on the GPU will implement the Kernel interface.
 You send data to the gpu by adding a field to the object implementing kernel. `gpuMethod` will access the data.
 
@@ -33,7 +32,6 @@ You send data to the gpu by adding a field to the object implementing kernel. `g
       void gpuMethod();
     }
     
-***
 ###Simple Example:
 <br />
 This simple example uses kernel lists and no thread config or context. Rootbeer will create a thread config and select the best device automatically. If you wish to use multiple GPUs you need to pass in a RootbeerContext.
@@ -80,12 +78,19 @@ This simple example uses kernel lists and no thread config or context. Rootbeer 
       }
     }
 
-***
 ### MultiGPU Example
 
 ### Shared Memory Example
 
-### Building
+### Compiling Rootbeer Enabled Projects
+1. Download the latest Rootbeer.jar from the releases
+2. Program using the Kernel, Rootbeer, GpuDevice and Context class.
+3. Compile your program normally with javac.
+4. Pack all the classes used into a single jar using [pack](https://github.com/pcpratts/pack/)
+5. Compile with Rootbeer to enable the GPU
+   `java -Xmx8g -jar Rootbeer.jar App.jar App-GPU.jar`
+
+### Building Rootbeer from Source
 
 1. Clone the github repo to `rootbeer1/`
 2. `cd rootbeer1/`
