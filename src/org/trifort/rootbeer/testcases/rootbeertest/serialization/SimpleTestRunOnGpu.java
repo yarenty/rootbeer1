@@ -11,18 +11,19 @@ import org.trifort.rootbeer.runtime.Kernel;
 
 public class SimpleTestRunOnGpu implements Kernel {
 
-  private int m_Value;
+  private int m_value;
 
   SimpleTestRunOnGpu(int index) {
-    m_Value = index;
+    m_value = index;
   }
   
   @Override
   public void gpuMethod() {
-    m_Value = 5;
+    //System.out.println("hello world");
+    m_value = 5;
   }
   
   public int getValue(){
-    return m_Value;
+    return m_value;
   }
 }

@@ -1,74 +1,77 @@
 package org.trifort.rootbeer.runtime;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FixedMemory implements Memory {
 
-  private long m_CpuBase;
-  private long m_SpaceSize;
-  private long m_Reserve;
-  private MemPointer m_StaticMemPointer;
-  private MemPointer m_InstanceMemPointer;
-  private MemPointer m_CurrMemPointer;
+  private long m_address;
+  private long m_size;
+  private long m_reserve;
+  private MemPointer m_staticPointer;
+  private MemPointer m_instancePointer;
+  private MemPointer m_currentPointer;  
+  private List<List<Long>> m_integerList;
     
   public FixedMemory(long size){
-    m_CpuBase = malloc(size);    
-    m_SpaceSize = size;
-    m_InstanceMemPointer = new MemPointer();
-    m_StaticMemPointer = new MemPointer();
-    m_CurrMemPointer = m_InstanceMemPointer;
-    m_Reserve = 1024;
+    m_address = malloc(size);    
+    m_size = size;
+    m_instancePointer = new MemPointer();
+    m_staticPointer = new MemPointer();
+    m_currentPointer = m_instancePointer;
+    m_reserve = 1024;
+    m_integerList = new ArrayList<List<Long>>();
   }
   
   private long currPointer(){
-    return m_CurrMemPointer.m_Pointer;
+    return m_currentPointer.m_pointer;
   }  
   
   @Override
   public byte readByte() {
-    byte ret = doReadByte(currPointer(), m_CpuBase);
+    byte ret = doReadByte(currPointer(), m_address);
     incrementAddress(1);
     return ret;
   }
 
   @Override
   public boolean readBoolean() {
-    boolean ret = doReadBoolean(currPointer(), m_CpuBase);
+    boolean ret = doReadBoolean(currPointer(), m_address);
     incrementAddress(1);
     return ret;
   }
 
   @Override
   public short readShort() {
-    short ret = doReadShort(currPointer(), m_CpuBase);
+    short ret = doReadShort(currPointer(), m_address);
     incrementAddress(2);
     return ret;
   }
 
   @Override
   public int readInt() {
-    int ret = doReadInt(currPointer(), m_CpuBase);
+    int ret = doReadInt(currPointer(), m_address);
     incrementAddress(4);
     return ret;
   }
 
   @Override
   public float readFloat() {
-    float ret = doReadFloat(currPointer(), m_CpuBase);
+    float ret = doReadFloat(currPointer(), m_address);
     incrementAddress(4);
     return ret;
   }
 
   @Override
   public double readDouble() {
-    double ret = doReadDouble(currPointer(), m_CpuBase);
+    double ret = doReadDouble(currPointer(), m_address);
     incrementAddress(8);
     return ret;
   }
 
   @Override
   public long readLong() {
-    long ret = doReadLong(currPointer(), m_CpuBase);
+    long ret = doReadLong(currPointer(), m_address);
     incrementAddress(8);
     return ret;
   }
@@ -83,25 +86,25 @@ public class FixedMemory implements Memory {
 
   @Override
   public void writeByte(byte value) {
-    doWriteByte(currPointer(), value, m_CpuBase);
+    doWriteByte(currPointer(), value, m_address);
     incrementAddress(1);
   }
 
   @Override
   public void writeBoolean(boolean value) {
-    doWriteBoolean(currPointer(), value, m_CpuBase);
+    doWriteBoolean(currPointer(), value, m_address);
     incrementAddress(1);
   }
 
   @Override
   public void writeShort(short value) {
-    doWriteShort(currPointer(), value, m_CpuBase);
+    doWriteShort(currPointer(), value, m_address);
     incrementAddress(2);
   }
 
   @Override
   public void writeInt(int value) {
-    doWriteInt(currPointer(), value, m_CpuBase);
+    doWriteInt(currPointer(), value, m_address);
     incrementAddress(4);
   }
 
@@ -113,92 +116,104 @@ public class FixedMemory implements Memory {
   
   @Override
   public void writeFloat(float value) {
-    doWriteFloat(currPointer(), value, m_CpuBase);
+    doWriteFloat(currPointer(), value, m_address);
     incrementAddress(4);
   }
 
   @Override
   public void writeDouble(double value) {
-    doWriteDouble(currPointer(), value, m_CpuBase);
+    doWriteDouble(currPointer(), value, m_address);
     incrementAddress(8);
   }
 
   @Override
   public void writeLong(long value) {
-    doWriteLong(currPointer(), value, m_CpuBase);
+    doWriteLong(currPointer(), value, m_address);
     incrementAddress(8);
   }
   
   @Override
   public void readArray(byte[] array){
-    doReadByteArray(array, m_CpuBase+currPointer(), 0, array.length);  
+    doReadByteArray(array, m_address+currPointer(), 0, array.length);  
   }
   
   @Override
   public void readArray(boolean[] array){
-    doReadBooleanArray(array, m_CpuBase+currPointer(), 0, array.length);  
+    doReadBooleanArray(array, m_address+currPointer(), 0, array.length);  
   }
     
   @Override
   public void readArray(short[] array){
-    doReadShortArray(array, m_CpuBase+currPointer(), 0, array.length);  
+    doReadShortArray(array, m_address+currPointer(), 0, array.length);  
   }
       
   @Override
   public void readArray(int[] array){
-    doReadIntArray(array, m_CpuBase+currPointer(), 0, array.length);  
+    doReadIntArray(array, m_address+currPointer(), 0, array.length);  
   }
     
   @Override
   public void readArray(float[] array){
-    doReadFloatArray(array, m_CpuBase+currPointer(), 0, array.length);  
+    doReadFloatArray(array, m_address+currPointer(), 0, array.length);  
   }
   
   @Override
   public void readArray(double[] array){
-    doReadDoubleArray(array, m_CpuBase+currPointer(), 0, array.length);  
+    doReadDoubleArray(array, m_address+currPointer(), 0, array.length);  
   }
     
   @Override
   public void readArray(long[] array){
-    doReadLongArray(array, m_CpuBase+currPointer(), 0, array.length);  
+    doReadLongArray(array, m_address+currPointer(), 0, array.length);  
   }
     
   @Override
   public void writeArray(byte[] array){
-    doWriteByteArray(array, m_CpuBase+currPointer(), 0, array.length);
+    doWriteByteArray(array, m_address+currPointer(), 0, array.length);
   }
     
   @Override
   public void writeArray(boolean[] array){
-    doWriteBooleanArray(array, m_CpuBase+currPointer(), 0, array.length);
+    doWriteBooleanArray(array, m_address+currPointer(), 0, array.length);
   }
     
   @Override
   public void writeArray(short[] array){
-    doWriteShortArray(array, m_CpuBase+currPointer(), 0, array.length);
+    doWriteShortArray(array, m_address+currPointer(), 0, array.length);
   }
     
   @Override
   public void writeArray(int[] array){
-    doWriteIntArray(array, m_CpuBase+currPointer(), 0, array.length);
+    doWriteIntArray(array, m_address+currPointer(), 0, array.length);
   }
     
   @Override
   public void writeArray(float[] array){
-    doWriteFloatArray(array, m_CpuBase+currPointer(), 0, array.length);
+    doWriteFloatArray(array, m_address+currPointer(), 0, array.length);
   }
   
   @Override
   public void writeArray(double[] array){
-    doWriteDoubleArray(array, m_CpuBase+currPointer(), 0, array.length);
+    doWriteDoubleArray(array, m_address+currPointer(), 0, array.length);
   }
     
   @Override
   public void writeArray(long[] array){
-    doWriteLongArray(array, m_CpuBase+currPointer(), 0, array.length);
+    doWriteLongArray(array, m_address+currPointer(), 0, array.length);
   }
     
+  @Override
+  public char readChar(){
+    int value = readInt();
+    char ret = (char) value;
+    return ret;
+  }
+
+  @Override
+  public void writeChar(char value){
+    writeInt(value);
+  }
+  
   public native void doReadByteArray(byte[] array, long addr, int start, int len);
   public native void doReadBooleanArray(boolean[] array, long addr, int start, int len);
   public native void doReadShortArray(short[] array, long addr, int start, int len);
@@ -236,32 +251,42 @@ public class FixedMemory implements Memory {
 
   @Override
   public void clearHeapEndPtr() {
-    m_CurrMemPointer.clearHeapEndPtr();
+    m_currentPointer.clearHeapEndPtr();
   }
 
   @Override
   public long getHeapEndPtr() {
-    return m_CurrMemPointer.m_HeapEnd;
+    return m_currentPointer.m_heapEnd;
+  }
+  
+  @Override
+  public long getSize() {
+    return m_size;
+  }
+  
+  @Override
+  public long getAddress() {
+    return m_address;
   }
 
   @Override
   public long getPointer(){
-    return m_CurrMemPointer.m_Pointer;
+    return m_currentPointer.m_pointer;
   }
   
   @Override
   public void setAddress(long address) {
-    m_CurrMemPointer.setAddress(address);
+    m_currentPointer.setAddress(address);
   }
 
   @Override
   public void incrementAddress(int offset) {
-    m_CurrMemPointer.incrementAddress(offset);
+    m_currentPointer.incrementAddress(offset);
   }
     
   @Override
   public long mallocWithSize(int size){
-    return m_CurrMemPointer.mallocWithSize(size);
+    return m_currentPointer.mallocWithSize(size);
   }
   
   @Override
@@ -276,12 +301,12 @@ public class FixedMemory implements Memory {
 
   @Override
   public void pushAddress() {
-    m_CurrMemPointer.pushAddress();
+    m_currentPointer.pushAddress();
   }
 
   @Override
   public void popAddress() {
-    m_CurrMemPointer.popAddress();
+    m_currentPointer.popAddress();
   }
 
   @Override
@@ -308,37 +333,70 @@ public class FixedMemory implements Memory {
 
   @Override
   public void useInstancePointer() {
-    m_CurrMemPointer = m_InstanceMemPointer;
+    m_currentPointer = m_instancePointer;
   }
 
   @Override
   public void useStaticPointer() {
-    m_CurrMemPointer = m_StaticMemPointer;
+    m_currentPointer = m_staticPointer;
   }
   
   @Override
   public void align(){
-    m_CurrMemPointer.align();
+    m_currentPointer.align();
+  }
+
+  @Override
+  public void close() {
+    free(m_address);
+  }
+  
+  public void startIntegerList(){
+    m_integerList.add(new ArrayList<Long>());
+    pushAddress();
+  }
+
+  public void addIntegerToList(long value){
+    List<Long> top = m_integerList.get(m_integerList.size()-1);
+    top.add(value);
+  }
+
+  public void endIntegerList(){
+    popAddress();
+    List<Long> top = m_integerList.get(m_integerList.size()-1);
+    for(Long curr : top){
+      writeRef(curr);
+    }
+    m_integerList.remove(m_integerList.size()-1);
+  }
+  
+  public void finishReading(){
+    long ptr = m_currentPointer.m_pointer / 8;
+    ptr *= 8;
+    if(ptr != m_currentPointer.m_pointer){
+      ptr += 8;
+    }
+    setPointer(ptr);
   }
   
   private class MemPointer {
    
-    private PointerStack m_Stack; 
-    private long m_EndPointer;
-    private long m_Pointer;
-    private long m_HeapEnd;
+    private PointerStack m_stack; 
+    private long m_endPointer;
+    private long m_pointer;
+    private long m_heapEnd;
     
     public MemPointer(){
-      m_Stack = new PointerStack();
-      m_EndPointer = 0;
+      m_stack = new PointerStack();
+      m_endPointer = 0;
     }
     
     public void popAddress() {
-      m_Pointer = m_Stack.pop();
+      m_pointer = m_stack.pop();
     }
     
     public void pushAddress() {
-      m_Stack.push(m_Pointer);
+      m_stack.push(m_pointer);
     }
 
     public long mallocWithSize(int size){
@@ -347,63 +405,57 @@ public class FixedMemory implements Memory {
       if(mod != 0)
         size += (16 - mod);
 
-      long ret = m_EndPointer;
-      m_EndPointer += size;              
-      if(ret + size + m_Reserve > m_SpaceSize){
+      long ret = m_endPointer;
+      m_endPointer += size;              
+      if(ret + size + m_reserve > m_size){
         throw new OutOfMemoryError();
       }        
-      m_Pointer = ret;
-      if(ret > m_HeapEnd)
-        m_HeapEnd = ret;
+      m_pointer = ret;
+      if(ret > m_heapEnd)
+        m_heapEnd = ret;
       
       return ret;
     }
   
     public long malloc(){
       //align all new items on 8 bytes
-      long mod = m_HeapEnd % 8;
+      long mod = m_heapEnd % 8;
       if(mod != 0)
-        m_HeapEnd += (8 - mod);
-      m_Pointer = m_HeapEnd;
-      return m_HeapEnd;
+        m_heapEnd += (8 - mod);
+      m_pointer = m_heapEnd;
+      return m_heapEnd;
     }
 
     private void clearHeapEndPtr() {      
-      m_HeapEnd = 0;
-      m_Pointer = 0;
-      m_EndPointer = 0;
+      m_heapEnd = 0;
+      m_pointer = 0;
+      m_endPointer = 0;
     }
 
     private void setAddress(long address) {
-      m_Pointer = address;
-      if(address > m_HeapEnd)
-        m_HeapEnd = address;
+      m_pointer = address;
+      if(address > m_heapEnd)
+        m_heapEnd = address;
     }
 
     private void incrementAddress(int offset) { 
-      m_Pointer += offset;
-      if(m_Pointer > m_HeapEnd){
-        m_HeapEnd = m_Pointer;
+      m_pointer += offset;
+      if(m_pointer > m_heapEnd){
+        m_heapEnd = m_pointer;
       } 
     }
 
     private void align() {
-      long mod = m_Pointer % 8;
+      long mod = m_pointer % 8;
       if(mod != 0){
-        m_Pointer += (8 - mod);
+        m_pointer += (8 - mod);
       }
-      if(m_Pointer > m_HeapEnd){
-        m_HeapEnd = m_Pointer;
+      if(m_pointer > m_heapEnd){
+        m_heapEnd = m_pointer;
       }
-      if(m_Pointer > m_EndPointer){
-        m_EndPointer = m_Pointer;
+      if(m_pointer > m_endPointer){
+        m_endPointer = m_pointer;
       }
     }
-  }
-
-  @Override
-  public void close() {
-    // TODO Auto-generated method stub
-    
   }
 }

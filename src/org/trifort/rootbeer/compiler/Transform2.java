@@ -32,7 +32,7 @@ public class Transform2 {
     SootClass soot_class1 = Scene.v().getSootClass(cls);
     SootMethod method = soot_class1.getMethod("void gpuMethod()");
     
-    //generate RuntimeBasicBlock and GcObjectVisitor
+    //generate RuntimeBasicBlock and Serializer
     String uuid = getUuid();
     GenerateRuntimeBasicBlock generate = new GenerateRuntimeBasicBlock(method, uuid);
     try {

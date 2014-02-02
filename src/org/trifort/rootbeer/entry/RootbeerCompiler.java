@@ -160,7 +160,7 @@ public class RootbeerCompiler {
     follow_tester.addSignature("<org.trifort.rootbeer.runtime.Sentinal: void <init>()>");
     follow_tester.addSignature("<org.trifort.rootbeer.runtimegpu.GpuException: void <init>()>");
     follow_tester.addSignature("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
-    follow_tester.addSignature("<org.trifort.rootbeer.runtime.Serializer: void <init>(org.trifort.runtime.memory.Memory,org.trifort.runtime.memory.Memory)>");
+    follow_tester.addSignature("<org.trifort.rootbeer.runtime.Serializer: void <init>(org.trifort.rootbeer.runtime.Memory,org.trifort.rootbeer.runtime.Memory)>");
     follow_tester.addSignature("<org.trifort.rootbeer.testcases.rootbeertest.serialization.CovarientTest: void <init>()>");
     RootbeerClassLoader.v().addFollowMethodTester(follow_tester);
     
@@ -375,7 +375,7 @@ public class RootbeerCompiler {
   }
 
   private void addConfigurationFile(ZipOutputStream zos) throws IOException {
-    String folder_name = "edu/syr/pcpratts/rootbeer/runtime/";
+    String folder_name = "org/trifort/rootbeer/runtime/";
     String name = folder_name + "config.txt";
     ZipEntry entry = new ZipEntry(name);
     entry.setSize(1);

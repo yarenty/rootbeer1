@@ -7,6 +7,7 @@ public interface Memory {
   public byte readByte();
   public boolean readBoolean();
   public short readShort();
+  public char readChar();
   public int readInt();
   public float readFloat();
   public double readDouble();
@@ -22,6 +23,7 @@ public interface Memory {
   
   public void writeByte(byte value);
   public void writeBoolean(boolean value);
+  public void writeChar(char value);
   public void writeShort(short value);
   public void writeInt(int value);
   public void writeFloat(float value);
@@ -52,6 +54,13 @@ public interface Memory {
   public void clearHeapEndPtr();
   public long getHeapEndPtr();
   public long getPointer();
+  public long getSize();
+  public long getAddress();
   public void setAddress(long address);
   public void close();
+
+  public void startIntegerList();
+  public void addIntegerToList(long value);
+  public void endIntegerList();
+  public void finishReading();
 }

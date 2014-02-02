@@ -31,26 +31,26 @@ import soot.options.Options;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class GenerateRuntimeBasicBlock {
-  private CodeSegment codeSegment;
-  private SootClass mSootClass;
-  private List<Local> mFirstIterationLocals;
-  private Jimple jimple;
-  private String runtimeBasicBlockClassName;
-  private String gcObjectVisitorClassName;
+  private CodeSegment m_codeSegment;
+  private SootClass m_sootClass;
+  private List<Local> m_firstIterationLocals;
+  private Jimple m_jimple;
+  private String m_runtimeBasicBlockClassName;
+  private String m_serializerClassName;
 
   public GenerateRuntimeBasicBlock(SootMethod method, String uuid){
-    jimple = Jimple.v();
-    mFirstIterationLocals = new ArrayList<Local>();
-    mSootClass = method.getDeclaringClass();
-    codeSegment = new MethodCodeSegment(method);
+    m_jimple = Jimple.v();
+    m_firstIterationLocals = new ArrayList<Local>();
+    m_sootClass = method.getDeclaringClass();
+    m_codeSegment = new MethodCodeSegment(method);
   }
 
   public Type getType(){
-    return mSootClass.getType();
+    return m_sootClass.getType();
   }
 
   public void makeClass() throws Exception {
-    gcObjectVisitorClassName = codeSegment.getSootClass().getName()+"GcObjectVisitor";
+    m_serializerClassName = m_codeSegment.getSootClass().getName()+"Serializer";
     
     makeCpuBody();
     makeGpuBody();
@@ -58,17 +58,17 @@ public class GenerateRuntimeBasicBlock {
     makeIsReadOnly();    
     makeExceptionNumbers();
                             
-    GcHeapReadWriteAdder adder = new GcHeapReadWriteAdder();
-    adder.add(codeSegment);
+    SerializerAdder adder = new SerializerAdder();
+    adder.add(m_codeSegment);
   }
 
   private void makeCpuBody() {
-    codeSegment.makeCpuBodyForRuntimeBasicBlock(mSootClass);
+    m_codeSegment.makeCpuBodyForRuntimeBasicBlock(m_sootClass);
   }  
   
   private void makeGetCodeMethodThatReturnsBytes(boolean m32, String filename) {
     BytecodeLanguage bcl = new BytecodeLanguage();
-    bcl.openClass(mSootClass);
+    bcl.openClass(m_sootClass);
     SootClass string = Scene.v().getSootClass("java.lang.String");
     bcl.startMethod("getCubin"  + (m32 ? "32" : "64"), string.getType());
     Local thisref = bcl.refThis();
@@ -85,36 +85,36 @@ public class GenerateRuntimeBasicBlock {
       name += "Windows";
     }
     SootMethod getCode = new SootMethod(name, new ArrayList(), RefType.v("java.lang.String"), Modifier.PUBLIC);
-    getCode.setDeclaringClass(mSootClass);
-    mSootClass.addMethod(getCode);
+    getCode.setDeclaringClass(m_sootClass);
+    m_sootClass.addMethod(getCode);
     
     RootbeerClassLoader.v().addGeneratedMethod(getCode.getSignature());
 
-    JimpleBody body = jimple.newBody(getCode);
+    JimpleBody body = m_jimple.newBody(getCode);
     UnitAssembler assembler = new UnitAssembler();
 
     //create an instance of self
-    Local thislocal = jimple.newLocal("this0", mSootClass.getType());
-    Unit thisid = jimple.newIdentityStmt(thislocal, jimple.newThisRef(mSootClass.getType()));
+    Local thislocal = m_jimple.newLocal("this0", m_sootClass.getType());
+    Unit thisid = m_jimple.newIdentityStmt(thislocal, m_jimple.newThisRef(m_sootClass.getType()));
     assembler.add(thisid);
 
     //java string constants encoded in a class file have a maximum size of 65535...
     //$r1 = new java.lang.StringBuilder;
     SootClass string_builder_soot_class = Scene.v().getSootClass("java.lang.StringBuilder");
-    Local r1 = jimple.newLocal("r1", string_builder_soot_class.getType());
-    Value r1_assign_rhs = jimple.newNewExpr(string_builder_soot_class.getType());
-    Unit r1_assign = jimple.newAssignStmt(r1, r1_assign_rhs);
+    Local r1 = m_jimple.newLocal("r1", string_builder_soot_class.getType());
+    Value r1_assign_rhs = m_jimple.newNewExpr(string_builder_soot_class.getType());
+    Unit r1_assign = m_jimple.newAssignStmt(r1, r1_assign_rhs);
     assembler.add(r1_assign);
 
     //specialinvoke $r1.<java.lang.StringBuilder: void <init>()>();
     SootMethod string_builder_ctor = string_builder_soot_class.getMethod("void <init>()");
-    Value r1_ctor = jimple.newSpecialInvokeExpr(r1, string_builder_ctor.makeRef(), new ArrayList());
-    Unit r1_ctor_unit = jimple.newInvokeStmt(r1_ctor);
+    Value r1_ctor = m_jimple.newSpecialInvokeExpr(r1, string_builder_ctor.makeRef(), new ArrayList());
+    Unit r1_ctor_unit = m_jimple.newInvokeStmt(r1_ctor);
     assembler.add(r1_ctor_unit);
     
     //r2 = $r1;
-    Local r2 = jimple.newLocal("r2", string_builder_soot_class.getType());
-    Unit r2_assign_r1 = jimple.newAssignStmt(r2, r1);
+    Local r2 = m_jimple.newLocal("r2", string_builder_soot_class.getType());
+    Unit r2_assign_r1 = m_jimple.newAssignStmt(r2, r1);
     assembler.add(r2_assign_r1);
     
     SootClass string_class = Scene.v().getSootClass("java.lang.String");
@@ -129,26 +129,26 @@ public class GenerateRuntimeBasicBlock {
       //virtualinvoke r2.<java.lang.StringBuilder: java.lang.StringBuilder append(java.lang.String)>("gpu code");
       List args = new ArrayList();
       args.add(curr_string_constant);
-      Value invoke_expr = jimple.newVirtualInvokeExpr(r2, string_builder_append.makeRef(), args);
-      Unit invoke_stmt = jimple.newInvokeStmt(invoke_expr);
+      Value invoke_expr = m_jimple.newVirtualInvokeExpr(r2, string_builder_append.makeRef(), args);
+      Unit invoke_stmt = m_jimple.newInvokeStmt(invoke_expr);
       assembler.add(invoke_stmt);
     }
 
     //$r5 = virtualinvoke r2.<java.lang.StringBuilder: java.lang.String toString()>();
-    Local r5 = jimple.newLocal("r5", string_class.getType());
+    Local r5 = m_jimple.newLocal("r5", string_class.getType());
     SootMethod to_string = string_builder_soot_class.getMethod("java.lang.String toString()");
-    Value r5_rhs = jimple.newVirtualInvokeExpr(r2, to_string.makeRef());
-    Unit r5_assign = jimple.newAssignStmt(r5, r5_rhs);
+    Value r5_rhs = m_jimple.newVirtualInvokeExpr(r2, to_string.makeRef());
+    Unit r5_assign = m_jimple.newAssignStmt(r5, r5_rhs);
     assembler.add(r5_assign);
 
-    assembler.add(jimple.newReturnStmt(r5));
+    assembler.add(m_jimple.newReturnStmt(r5));
 
     assembler.assemble(body);
     getCode.setActiveBody(body);
   }
 
   private void makeGpuBody() throws Exception {
-    OpenCLScene.v().addCodeSegment(codeSegment);
+    OpenCLScene.v().addCodeSegment(m_codeSegment);
     if(Configuration.compilerInstance().getMode() == Configuration.MODE_GPU){
       CompileResult[] result = OpenCLScene.v().getCudaCode();
       for (CompileResult res : result) {
@@ -197,7 +197,7 @@ public class GenerateRuntimeBasicBlock {
   
   private String cubinFilename(boolean use_class_folder, String suffix){
     String class_name = File.separator +
-            gcObjectVisitorClassName.replace(".", File.separator) +
+            m_serializerClassName.replace(".", File.separator) +
             suffix + ".cubin";
     if(use_class_folder)
       return RootbeerPaths.v().getOutputClassFolder() + class_name;
@@ -222,16 +222,16 @@ public class GenerateRuntimeBasicBlock {
   }
   
   public SootField getField(String name, Type type){
-    return mSootClass.getField(name, type);
+    return m_sootClass.getField(name, type);
   }
 
   public void addFirstIterationLocal(Local local) {
-    mFirstIterationLocals.add(local);
+    m_firstIterationLocals.add(local);
   }
 
   private void makeIsUsingGarbageCollectorBody() {
     BytecodeLanguage bcl = new BytecodeLanguage();
-    bcl.openClass(mSootClass);
+    bcl.openClass(m_sootClass);
     bcl.startMethod("isUsingGarbageCollector", BooleanType.v());
     bcl.refThis();
     if(OpenCLScene.v().getUsingGarbageCollector())
@@ -242,16 +242,16 @@ public class GenerateRuntimeBasicBlock {
   }
 
   public String getRuntimeBasicBlockName() {
-    return runtimeBasicBlockClassName;
+    return m_runtimeBasicBlockClassName;
   }
 
-  public String getGcObjectVisitorName() {
-    return gcObjectVisitorClassName;
+  public String getSerializerName() {
+    return m_serializerClassName;
   }
 
   private void makeIsReadOnly() {
     BytecodeLanguage bcl = new BytecodeLanguage();
-    bcl.openClass(mSootClass);
+    bcl.openClass(m_sootClass);
     bcl.startMethod("isReadOnly", BooleanType.v());
     bcl.refThis();
     if(OpenCLScene.v().getReadOnlyTypes().isRootReadOnly())
@@ -275,7 +275,7 @@ public class GenerateRuntimeBasicBlock {
     int number = RootbeerClassLoader.v().getClassNumber(soot_class);
     
     BytecodeLanguage bcl = new BytecodeLanguage();
-    bcl.openClass(mSootClass);
+    bcl.openClass(m_sootClass);
     bcl.startMethod(method_name, IntType.v());
     bcl.refThis();
     bcl.returnValue(IntConstant.v(number));

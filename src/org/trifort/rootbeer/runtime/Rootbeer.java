@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+
 public class Rootbeer {
 
   private IRuntime m_openCLRuntime;
@@ -50,17 +51,51 @@ public class Rootbeer {
     return m_cards;
   }
   
+  public Context createDefaultContext(){
+    List<GpuDevice> devices = getGpuDevices();
+    GpuDevice best = null;
+    for(GpuDevice device : devices){
+      if(best == null){
+        best = device;
+      } else {
+        if(device.getMultiProcessorCount() > best.getMultiProcessorCount()){
+          best = device;
+        }
+      }
+    }
+    if(best == null){
+      return null;
+    } else {
+      return best.createContext();
+    }
+  }
+  
+  public ThreadConfig getThreadConfig(List<Kernel> kernels, GpuDevice device){
+    BlockShaper block_shaper = new BlockShaper();
+    block_shaper.run(kernels.size(), device.getMultiProcessorCount());
+    
+    return new ThreadConfig(block_shaper.getMaxThreadsPerBlock(), 
+                            block_shaper.getMaxBlocksPerProc(),
+                            kernels.size());
+  }
   
   public void run(Kernel template, ThreadConfig thread_config){
-    
+    Context context = createDefaultContext();
+    run(template, thread_config, context);
+    context.close();
   }
 
   public void run(List<Kernel> work, ThreadConfig thread_config) {
-    
+    Context context = createDefaultContext();
+    run(work, thread_config, context);
+    context.close();
   }
 
   public void run(List<Kernel> work) {
-    
+    Context context = createDefaultContext();
+    ThreadConfig thread_config = getThreadConfig(work, context.getDevice());
+    context.run(work, thread_config);
+    context.close();
   }
   
   public void run(Kernel template, ThreadConfig thread_config, Context context){
@@ -68,76 +103,13 @@ public class Rootbeer {
   }
 
   public void run(List<Kernel> work, ThreadConfig thread_config, Context context) {
-    
+    context.run(work, thread_config);
   }
 
   public void run(List<Kernel> work, Context context) {
-    
-  }
-  
-  /*
-  public void setThreadConfig(int block_shape_x, int grid_shape_x, int numThreads){
-    m_threadConfig = new ThreadConfig(block_shape_x, grid_shape_x, numThreads);
-  }
-  
-  public void runAll(Kernel job_template){
-    if(job_template instanceof CompiledKernel == false){
-      System.out.println("m_ranGpu = false #1");
-      m_ranGpu = false;
-    }
-    //this must happen above Rootbeer.runAll in case exceptions are thrown
-    m_ranGpu = true;
-      
-    m_stats = new ArrayList<StatsRow>();
-    if(m_threadConfig != null){
-      m_Rootbeer.setThreadConfig(m_threadConfig);
-      m_threadConfig = null;
-    } else {
-      m_Rootbeer.clearThreadConfig();
-    }
-    m_Rootbeer.runAll(job_template);
-  }
-  
-
-  public void runAll(List<Kernel> jobs) {
-    if(jobs.isEmpty()){
-      System.out.println("m_ranGpu = false #2");
-      m_ranGpu = false;
-      return;
-    }
-    if(jobs.get(0) instanceof CompiledKernel == false){
-      for(Kernel job : jobs){
-        job.gpuMethod();
-      }
-      Kernel first = jobs.get(0);
-      Class cls = first.getClass();
-      Class[] ifaces = cls.getInterfaces();
-      for(Class iface : ifaces){
-        System.out.println("iface: "+iface.getName());
-      }
-      System.out.println("m_ranGpu = false 3");
-      m_ranGpu = false;
-    } else {
-      //this must happen above Rootbeer.runAll in case exceptions are thrown
-      m_ranGpu = true;
-      
-      m_stats = new ArrayList<StatsRow>();
-      if(m_threadConfig != null){
-        m_Rootbeer.setThreadConfig(m_threadConfig);
-        m_threadConfig = null;
-      } else {
-        m_Rootbeer.clearThreadConfig();
-      }
-      m_Rootbeer.runAll(jobs);
-    }
-  }
-  
-  public void printMem(int start, int len){
-    m_Rootbeer.printMem(start, len);
-  }
-
-    
- */ 
+    ThreadConfig thread_config = getThreadConfig(work, context.getDevice());
+    context.run(work, thread_config);
+  } 
   
   public static void main(String[] args){
     Rootbeer rootbeer = new Rootbeer();

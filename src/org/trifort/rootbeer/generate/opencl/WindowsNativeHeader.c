@@ -69,7 +69,7 @@ long long java_lang_System_nanoTime(char * gc_info, int * exception){
   return system_time.wMilliseconds;
 }
 
-void edu_syr_pcpratts_sleep(int micro_seconds){
+void org_trifort_sleep(int micro_seconds){
   int milliseconds;
   milliseconds = micro_seconds / 1000;
   if(milliseconds < 0){

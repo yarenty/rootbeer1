@@ -56,7 +56,7 @@ void entry(char * gc_info_space,
   int thread_stop;
   int thread_count;
 
-  gc_info = edu_syr_pcpratts_gc_init(gc_info_space, to_space,
+  gc_info = org_trifort_gc_init(gc_info_space, to_space,
     *to_space_free_ptr, space_size);
 
   global_grid_dimx = grid_dimx;

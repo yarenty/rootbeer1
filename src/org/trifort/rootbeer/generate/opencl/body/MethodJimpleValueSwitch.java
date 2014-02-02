@@ -112,25 +112,25 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   private void writeBinOpExpr(BinopExpr arg0){
     String symbol = arg0.getSymbol().trim();
     if(needDoubleMod(arg0, symbol)){
-      m_output.append("edu_syr_pcpratts_modulus(");      
+      m_output.append("org_trifort_modulus(");      
       arg0.getOp1().apply(this);
       m_output.append(", ");
       arg0.getOp2().apply(this);
       m_output.append(")");
     } else if(symbol.equals("cmp")){
-      m_output.append("edu_syr_pcpratts_cmp(");      
+      m_output.append("org_trifort_cmp(");      
       arg0.getOp1().apply(this);
       m_output.append(", ");
       arg0.getOp2().apply(this);
       m_output.append(")");
     } else if(symbol.equals("cmpl")){    
-      m_output.append("edu_syr_pcpratts_cmpl((double)");      
+      m_output.append("org_trifort_cmpl((double)");      
       arg0.getOp1().apply(this);
       m_output.append(", (double)");
       arg0.getOp2().apply(this);
       m_output.append(")");
     } else if(symbol.equals("cmpg")){
-      m_output.append("edu_syr_pcpratts_cmpg((double)");      
+      m_output.append("org_trifort_cmpg((double)");      
       arg0.getOp1().apply(this);
       m_output.append(", (double)");
       arg0.getOp2().apply(this);
@@ -334,7 +334,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
 
   public void caseLengthExpr(LengthExpr arg0) {
     Value op = arg0.getOp();
-    m_output.append("edu_syr_pcpratts_array_length(gc_info, ");
+    m_output.append("org_trifort_array_length(gc_info, ");
     op.apply(this);
     m_output.append(")");
   }
@@ -385,14 +385,14 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
   
   public void caseStringConstant(StringConstant arg0) {
-    m_output.append(" edu_syr_pcpratts_string_constant(gc_info, (char *) "+arg0.toString()+", exception) ");
+    m_output.append(" org_trifort_string_constant(gc_info, (char *) "+arg0.toString()+", exception) ");
   }
 
   public void caseClassConstant(ClassConstant arg0) {
     String value = arg0.getValue();
     Type type = m_classConstantReader.stringToType(value);
     int num = OpenCLScene.v().getClassConstantNumbers().get(type);
-    m_output.append("edu_syr_pcpratts_classConstant("+num+")");
+    m_output.append("org_trifort_classConstant("+num+")");
   }
  
   public void caseArrayRef(ArrayRef arg0) {

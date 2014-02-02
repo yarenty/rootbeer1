@@ -187,10 +187,10 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   //copy data
   //----------------------------------------------------------------------------
 
-  cuda_memory_class = (*env)->FindClass(env, "org/trifort/rootbeer/runtime/CUDAMemory");
+  cuda_memory_class = (*env)->FindClass(env, "org/trifort/rootbeer/runtime/FixedMemory");
   get_address_method = (*env)->GetMethodID(env, cuda_memory_class, "getAddress", "()J");
   get_size_method = (*env)->GetMethodID(env, cuda_memory_class, "getSize", "()J");
-  get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEnd", "()J");
+  get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEndPtr", "()J");
 
   cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
   cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);

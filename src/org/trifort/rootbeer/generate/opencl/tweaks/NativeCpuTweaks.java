@@ -16,42 +16,42 @@ public class NativeCpuTweaks extends Tweaks {
 
   @Override
   public String getUnixHeaderPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/UnixNativeHeader.c";
+    return "/org/trifort/rootbeer/generate/opencl/UnixNativeHeader.c";
   }
   
   @Override
   public String getWindowsHeaderPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/WindowsNativeHeader.c";
+    return "/org/trifort/rootbeer/generate/opencl/WindowsNativeHeader.c";
   }
   
   @Override
   public String getBothHeaderPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeHeader.c";
+    return "/org/trifort/rootbeer/generate/opencl/BothNativeHeader.c";
   }
   
   @Override
   public String getBarrierPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/BarrierNativeBoth.c";
+    return "/org/trifort/rootbeer/generate/opencl/BarrierNativeBoth.c";
   }
 
   @Override
   public String getGarbageCollectorPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/GarbageCollector.c";
+    return "/org/trifort/rootbeer/generate/opencl/GarbageCollector.c";
   }
 
   @Override
   public String getUnixKernelPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/UnixNativeKernel.c";
+    return "/org/trifort/rootbeer/generate/opencl/UnixNativeKernel.c";
   }
 
   @Override
   public String getWindowsKernelPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/WindowsNativeKernel.c";
+    return "/org/trifort/rootbeer/generate/opencl/WindowsNativeKernel.c";
   }
 
   @Override
   public String getBothKernelPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeKernel.c";
+    return "/org/trifort/rootbeer/generate/opencl/BothNativeKernel.c";
   }
 
   @Override

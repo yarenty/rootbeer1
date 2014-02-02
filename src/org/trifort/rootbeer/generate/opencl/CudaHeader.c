@@ -39,17 +39,17 @@ int getGridDimx(){
 }
 
 __device__
-void edu_syr_pcpratts_syncthreads(){
+void org_trifort_syncthreads(){
   __syncthreads();
 }
 
 __device__
-void edu_syr_pcpratts_threadfence(){
+void org_trifort_threadfence(){
   __threadfence();
 }
 
 __device__
-void edu_syr_pcpratts_threadfence_block(){
+void org_trifort_threadfence_block(){
   __threadfence_block();
 }
 

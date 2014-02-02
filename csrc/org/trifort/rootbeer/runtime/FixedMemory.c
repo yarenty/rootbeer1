@@ -274,3 +274,15 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doReadLongA
   (*env)->SetLongArrayRegion(env, array, start, len, dest);
 }
 
+JNIEXPORT jlong JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_malloc
+  (JNIEnv *env, jobject this_obj, jlong size){
+
+  return (jlong) malloc(size);
+}
+
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_free
+  (JNIEnv *env, jobject this_obj, jlong address){
+
+  free((void *) address);
+}
+

@@ -84,7 +84,7 @@ public class CudaLoader {
   }
 
   private void extract(String filename) {
-    String path = "/edu/syr/pcpratts/rootbeer/runtime2/native/"+filename;
+    String path = "/org/trifort/rootbeer/runtime2/native/"+filename;
     try {
       InputStream is = CudaLoader.class.getResourceAsStream(path);
       if(is == null){

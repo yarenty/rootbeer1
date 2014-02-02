@@ -39,9 +39,9 @@ public class AbstractVisitorGen {
     m_currThisRef = new Stack<Local>();
     m_objSerializing = new Stack<Local>();
     m_classesToIgnore = new ArrayList<String>();
-    m_classesToIgnore.add("edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu");
-    m_classesToIgnore.add("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
-    m_classesToIgnore.add("edu.syr.pcpratts.rootbeer.runtimegpu.GpuException");
+    m_classesToIgnore.add("org.trifort.rootbeer.runtime.RootbeerGpu");
+    m_classesToIgnore.add("org.trifort.rootbeer.runtime.Sentinal");
+    m_classesToIgnore.add("org.trifort.rootbeer.runtimegpu.GpuException");
   }
   
   protected boolean differentPackageAndPrivate(RefType ref_inspecting) {
@@ -205,7 +205,7 @@ public class AbstractVisitorGen {
         first_param = ClassConstant.v(soot_class.getName());
       }
       String private_field_fun_name = "write"+static_str+getTypeString(soot_field);
-      Local private_fields = bcl.newInstance("edu.syr.pcpratts.rootbeer.runtime.PrivateFields");
+      Local private_fields = bcl.newInstance("org.trifort.rootbeer.runtime.PrivateFields");
       bcl.pushMethod(private_fields, private_field_fun_name, VoidType.v(), first_param_type.getType(), string.getType(), string.getType(), soot_field.getType());       
       bcl.invokeMethodNoRet(private_fields, first_param, StringConstant.v(soot_field.getName()), StringConstant.v(soot_field.getDeclaringClass().getName()), data);
     }

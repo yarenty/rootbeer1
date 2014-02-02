@@ -50,7 +50,7 @@ public class FieldTypeSwitch {
     if(m_BodyToNameMap.containsKey(body)){
       return m_BodyToNameMap.get(body);
     } else {
-      String base_name = "edu_syr_pcpratts_type_switch";
+      String base_name = "org_trifort_type_switch";
       base_name += m_CurrFunctionNum;
       m_CurrFunctionNum++;
       m_BodyToNameMap.put(body, base_name);

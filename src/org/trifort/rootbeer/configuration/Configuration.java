@@ -75,7 +75,7 @@ public class Configuration {
   private Configuration(boolean load) {
     m_compilerInstance = false;
     try {
-      List<byte[]> data = ResourceReader.getResourceArray("edu/syr/pcpratts/rootbeer/runtime/config.txt");
+      List<byte[]> data = ResourceReader.getResourceArray("org/trifort/rootbeer/runtime/config.txt");
       int mode = data.get(0)[0];
       m_mode = mode;
     } catch(Exception ex){

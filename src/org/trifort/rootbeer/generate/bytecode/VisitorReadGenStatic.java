@@ -28,16 +28,12 @@ import soot.rbclassload.RootbeerClassLoader;
 public class VisitorReadGenStatic extends AbstractVisitorGen {
   
   private Local m_mem;
-  private List<RefType> m_orderedHistory;
-  private Set<RefType> m_writeToHeapMethodsMade;
   private Set<String> m_attachedReaders;
   private StaticOffsets m_staticOffsets;
   
   public VisitorReadGenStatic(BytecodeLanguage bcl){
     m_bcl.push(bcl);
     
-    m_orderedHistory = RootbeerClassLoader.v().getDfsInfo().getOrderedRefTypes();
-    m_writeToHeapMethodsMade = new HashSet<RefType>();
     m_attachedReaders = new HashSet<String>();
     m_objSerializing = new Stack<Local>();
     m_staticOffsets = new StaticOffsets();
@@ -74,7 +70,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
   }
 
   private String getReaderName(SootClass soot_class){
-    return "edu_syr_pcpratts_readStaticsFromHeap"+JavaNameToOpenCL.convert(soot_class.getName())+OpenCLScene.v().getIdent();
+    return "org_trifort_readStaticsFromHeap"+JavaNameToOpenCL.convert(soot_class.getName())+OpenCLScene.v().getIdent();
   }
   
   private void attachReader(SootClass soot_class, List<SootClass> children){    
@@ -88,7 +84,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     BytecodeLanguage bcl = new BytecodeLanguage();
     m_bcl.push(bcl);
     bcl.openClass(soot_class);
-    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
     bcl.startStaticMethod(method_name, VoidType.v(), mem.getType(), m_thisRef.getType());
     
     Local memory = bcl.refParameter(0);
@@ -131,7 +127,7 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
   private void callReader(SootClass soot_class) {    
     BytecodeLanguage bcl = m_bcl.top();
     String method_name = getReaderName(soot_class);
-    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
     bcl.pushMethod(soot_class, method_name, VoidType.v(), mem.getType(), m_thisRef.getType());
     bcl.invokeStaticMethodNoRet(m_currMem.top(), m_gcObjVisitor.top());
   }

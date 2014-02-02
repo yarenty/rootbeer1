@@ -1,19 +1,19 @@
 
-void edu_syr_pcpratts_syncthreads()
+void org_trifort_syncthreads()
 {
-  edu_syr_pcpratts_barrier();
+  org_trifort_barrier();
 }
 
-void edu_syr_pcpratts_threadfence()
+void org_trifort_threadfence()
 {
 }
 
-void edu_syr_pcpratts_threadfence_block()
+void org_trifort_threadfence_block()
 {
 }
 
 char *
-edu_syr_pcpratts_gc_deref(char * gc_info, int handle){
+org_trifort_gc_deref(char * gc_info, int handle){
   long long lhandle;
   long long * to_space;
   long space_size;
@@ -24,8 +24,8 @@ edu_syr_pcpratts_gc_deref(char * gc_info, int handle){
 
   lhandle = handle;
   lhandle = lhandle << 4;
-  to_space = edu_syr_pcpratts_gc_get_to_space_address(gc_info);
-  space_size = edu_syr_pcpratts_getlong(gc_info, 16);
+  to_space = org_trifort_gc_get_to_space_address(gc_info);
+  space_size = org_trifort_getlong(gc_info, 16);
   array = lhandle / space_size;
   offset = lhandle % space_size;
 
@@ -35,7 +35,7 @@ edu_syr_pcpratts_gc_deref(char * gc_info, int handle){
 }
 
 int
-edu_syr_pcpratts_gc_malloc(char * gc_info, int size){
+org_trifort_gc_malloc(char * gc_info, int size){
   long long * addr;
   long long space_size;
   long long ret;
@@ -44,7 +44,7 @@ edu_syr_pcpratts_gc_malloc(char * gc_info, int size){
   long long end_array;
 
   addr = (long long *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
-  space_size = edu_syr_pcpratts_getlong(gc_info, 16);
+  space_size = org_trifort_getlong(gc_info, 16);
 
   mod = size % 16;
   if(mod != 0){
@@ -67,19 +67,19 @@ edu_syr_pcpratts_gc_malloc(char * gc_info, int size){
 }
 
 int
-edu_syr_pcpratts_classConstant(int type_num){
+org_trifort_classConstant(int type_num){
   return global_class_refs[type_num];
 }
 
 char *
-edu_syr_pcpratts_gc_init(char * gc_info_space,
+org_trifort_gc_init(char * gc_info_space,
                          long long * to_space,
                          long long to_space_free_ptr,
                          long long space_size){
 
-  edu_syr_pcpratts_setlong(gc_info_space, 0, (long long) to_space);
-  edu_syr_pcpratts_setlong(gc_info_space, 8, to_space_free_ptr);
-  edu_syr_pcpratts_setlong(gc_info_space, 16, space_size);
+  org_trifort_setlong(gc_info_space, 0, (long long) to_space);
+  org_trifort_setlong(gc_info_space, 8, to_space_free_ptr);
+  org_trifort_setlong(gc_info_space, 16, space_size);
     
   return (char *) gc_info_space;
 }

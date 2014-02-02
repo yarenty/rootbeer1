@@ -99,13 +99,13 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
   private void callWriter(SootClass soot_class){    
     BytecodeLanguage bcl = m_bcl.top();
     String method_name = getWriterName(soot_class);
-    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
     bcl.pushMethod(soot_class, method_name, VoidType.v(), mem.getType(), m_gcObjVisitor.top().getType());
     bcl.invokeStaticMethodNoRet(m_currMem.top(), m_gcObjVisitor.top());
   }
   
   private String getWriterName(SootClass soot_class){
-    return "edu_syr_pcpratts_writeStaticsToHeap"+JavaNameToOpenCL.convert(soot_class.getName())+OpenCLScene.v().getIdent();
+    return "org_trifort_writeStaticsToHeap"+JavaNameToOpenCL.convert(soot_class.getName())+OpenCLScene.v().getIdent();
   }
 
   private void attachWriter(SootClass soot_class, List<SootClass> children){    
@@ -118,7 +118,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     BytecodeLanguage bcl = new BytecodeLanguage();
     m_bcl.push(bcl);
     bcl.openClass(soot_class);
-    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
     bcl.startStaticMethod(method_name, VoidType.v(), mem.getType(), m_gcObjVisitor.top().getType());
     
     Local memory = bcl.refParameter(0);

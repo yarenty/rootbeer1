@@ -32,10 +32,6 @@ public class VisitorGen extends AbstractVisitorGen {
 
   //Locals from code generation
   private Local m_param0;
-  private Local m_ref;
-  private Local m_startIndex;
-  private Local m_endIndex;
-  private Local m_core;
 
   public VisitorGen(SootClass runtime_basic_block){
     m_runtimeBasicBlock = runtime_basic_block;
@@ -46,11 +42,11 @@ public class VisitorGen extends AbstractVisitorGen {
   public void generate(){
     m_bcl.push(new BytecodeLanguage());
     makeSentinalCtors();
-    makeGcObjectVisitor();
+    makeSerializer();
     addGetVisitorMethodToRuntimeBasicBlock();
   }
 
-  private void makeGcObjectVisitor() {
+  private void makeSerializer() {
     makeGcObjectClass();
     makeCtor();
     makeWriteStaticsToHeapMethod();
@@ -63,8 +59,8 @@ public class VisitorGen extends AbstractVisitorGen {
 
   private void makeGcObjectClass() {
     String base_name = m_runtimeBasicBlock.getName();
-    m_className = base_name+"GcObjectVisitor";
-    m_bcl.top().makeClass(m_className, "edu.syr.pcpratts.rootbeer.runtime.Serializer");
+    m_className = base_name+"Serializer";
+    m_bcl.top().makeClass(m_className, "org.trifort.rootbeer.runtime.Serializer");
   }
   /*
   public abstract void doWriteArrayToHeap(Object o, long ref, int start_index, int end_index, int core);
@@ -193,8 +189,8 @@ public class VisitorGen extends AbstractVisitorGen {
   
   private void addGetVisitorMethodToRuntimeBasicBlock() {
     m_bcl.top().openClass(m_runtimeBasicBlock);
-    SootClass gc_object_visitor_soot_class = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.Serializer");
-    SootClass mem_cls = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass gc_object_visitor_soot_class = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Serializer");
+    SootClass mem_cls = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
     m_bcl.top().startMethod("getSerializer", gc_object_visitor_soot_class.getType(), mem_cls.getType(), mem_cls.getType());
     Local param0 = m_bcl.top().refParameter(0);
     Local param1 = m_bcl.top().refParameter(1);
@@ -204,13 +200,13 @@ public class VisitorGen extends AbstractVisitorGen {
   }
 
   private void makeCtor() {
-    SootClass mem_cls = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem_cls = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
 
     m_bcl.top().startMethod("<init>", VoidType.v(), mem_cls.getType(), mem_cls.getType());
     Local this_ref = m_bcl.top().refThis();
     Local param0 = m_bcl.top().refParameter(0);
     Local param1 = m_bcl.top().refParameter(1);
-    m_bcl.top().pushMethod("edu.syr.pcpratts.rootbeer.runtime.Serializer", "<init>", VoidType.v(), mem_cls.getType(), mem_cls.getType());
+    m_bcl.top().pushMethod("org.trifort.rootbeer.runtime.Serializer", "<init>", VoidType.v(), mem_cls.getType(), mem_cls.getType());
     m_bcl.top().invokeMethodNoRet(this_ref, param0, param1);
     m_bcl.top().returnVoid();
     m_bcl.top().endMethod();
@@ -226,7 +222,7 @@ public class VisitorGen extends AbstractVisitorGen {
     if(soot_class.isApplicationClass() == false)
       return;
     
-    if(soot_class.declaresMethod("void <init>(edu.syr.pcpratts.rootbeer.runtime.Sentinal)")){
+    if(soot_class.declaresMethod("void <init>(org.trifort.rootbeer.runtime.Sentinal)")){
       return; 
     }
     
@@ -235,7 +231,7 @@ public class VisitorGen extends AbstractVisitorGen {
 
     BytecodeLanguage bcl = new BytecodeLanguage();
     bcl.openClass(soot_class);
-    bcl.startMethod("<init>", VoidType.v(), RefType.v("edu.syr.pcpratts.rootbeer.runtime.Sentinal"));
+    bcl.startMethod("<init>", VoidType.v(), RefType.v("org.trifort.rootbeer.runtime.Sentinal"));
     Local thisref = bcl.refThis();
 
     String parent_name = parent_class.getName();
@@ -248,7 +244,7 @@ public class VisitorGen extends AbstractVisitorGen {
         System.exit(-1);
       }
     } else {
-      bcl.pushMethod(parent_name, "<init>", VoidType.v(), RefType.v("edu.syr.pcpratts.rootbeer.runtime.Sentinal"));
+      bcl.pushMethod(parent_name, "<init>", VoidType.v(), RefType.v("org.trifort.rootbeer.runtime.Sentinal"));
       bcl.invokeMethodNoRet(thisref, NullConstant.v());
     }
     bcl.returnVoid();

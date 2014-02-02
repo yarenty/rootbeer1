@@ -29,12 +29,12 @@ public class CudaTweaks extends Tweaks {
 
   @Override
   public String getUnixHeaderPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/CudaHeader.c";
+    return "/org/trifort/rootbeer/generate/opencl/CudaHeader.c";
   }
   
   @Override
   public String getWindowsHeaderPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/CudaHeader.c";
+    return "/org/trifort/rootbeer/generate/opencl/CudaHeader.c";
   }
   
   @Override
@@ -49,17 +49,17 @@ public class CudaTweaks extends Tweaks {
   
   @Override
   public String getGarbageCollectorPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/GarbageCollector.c";
+    return "/org/trifort/rootbeer/generate/opencl/GarbageCollector.c";
   }
 
   @Override
   public String getUnixKernelPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/CudaKernel.c";
+    return "/org/trifort/rootbeer/generate/opencl/CudaKernel.c";
   }
   
   @Override
   public String getWindowsKernelPath() {
-    return "/edu/syr/pcpratts/rootbeer/generate/opencl/CudaKernel.c";
+    return "/org/trifort/rootbeer/generate/opencl/CudaKernel.c";
   }
 
   @Override

@@ -8,12 +8,12 @@
 #define COLOR_BLACK 1
 #define COLOR_WHITE 2
 
-$$__device__$$ void edu_syr_pcpratts_gc_collect($$__global$$ char * gc_info);
-$$__device__$$ void edu_syr_pcpratts_gc_assign($$__global$$ char * gc_info, int * lhs, int rhs);
-$$__device__$$ $$__global$$ char * edu_syr_pcpratts_gc_deref($$__global$$ char * gc_info, int handle);
-$$__device__$$ int edu_syr_pcpratts_gc_malloc($$__global$$ char * gc_info, int size);
-$$__device__$$ unsigned long long edu_syr_pcpratts_gc_malloc_no_fail($$__global$$ char * gc_info, int size);
-$$__device__$$ int edu_syr_pcpratts_classConstant(int type_num);
+$$__device__$$ void org_trifort_gc_collect($$__global$$ char * gc_info);
+$$__device__$$ void org_trifort_gc_assign($$__global$$ char * gc_info, int * lhs, int rhs);
+$$__device__$$ $$__global$$ char * org_trifort_gc_deref($$__global$$ char * gc_info, int handle);
+$$__device__$$ int org_trifort_gc_malloc($$__global$$ char * gc_info, int size);
+$$__device__$$ unsigned long long org_trifort_gc_malloc_no_fail($$__global$$ char * gc_info, int size);
+$$__device__$$ int org_trifort_classConstant(int type_num);
 $$__device__$$ long long java_lang_System_nanoTime($$__global$$ char * gc_info, int * exception);
 
 #define CACHE_SIZE_BYTES 32
@@ -24,19 +24,19 @@ $$__device__$$ long long java_lang_System_nanoTime($$__global$$ char * gc_info, 
 #define TO_SPACE_FREE_POINTER_OFFSET  8
 
 $$__device__$$
-void edu_syr_pcpratts_exitMonitorRef($$__global$$ char * gc_info, int thisref, int old){
-  char * mem = edu_syr_pcpratts_gc_deref(gc_info, thisref); 
+void org_trifort_exitMonitorRef($$__global$$ char * gc_info, int thisref, int old){
+  char * mem = org_trifort_gc_deref(gc_info, thisref); 
   mem += 16;
   if(old == -1){    
-    edu_syr_pcpratts_threadfence();  
+    org_trifort_threadfence();  
     atomicExch((int *) mem, -1); 
   }
 }
 
 $$__device__$$
-void edu_syr_pcpratts_exitMonitorMem($$__global$$ char * gc_info, char * mem, int old){
+void org_trifort_exitMonitorMem($$__global$$ char * gc_info, char * mem, int old){
   if(old == -1){   
-    edu_syr_pcpratts_threadfence(); 
+    org_trifort_threadfence(); 
     atomicExch((int *) mem, -1);
   }
 }
@@ -151,62 +151,62 @@ $$__device__$$ double java_lang_StrictMath_tanh( char * gc_info , double paramet
 } 
 
 $$__device__$$ 
-void edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_start($$__global$$ char * gc_info, int thisref, int * exception){
+void org_trifort_rootbeer_runtime_GpuStopwatch_start($$__global$$ char * gc_info, int thisref, int * exception){
   long long int time;
   
   time = clock64();
-  instance_setter_edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_m_start(gc_info, thisref, time, exception);
+  instance_setter_org_trifort_rootbeer_runtime_GpuStopwatch_m_start(gc_info, thisref, time, exception);
 }
 
 $$__device__$$ 
-void edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_stop($$__global$$ char * gc_info, int thisref, int * exception){
+void org_trifort_rootbeer_runtime_GpuStopwatch_stop($$__global$$ char * gc_info, int thisref, int * exception){
   long long int time;
   
   time = clock64();
-  instance_setter_edu_syr_pcpratts_rootbeer_runtime_GpuStopwatch_m_stop(gc_info, thisref, time, exception);
+  instance_setter_org_trifort_rootbeer_runtime_GpuStopwatch_m_stop(gc_info, thisref, time, exception);
 }
 
 $$__device__$$ 
-char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_isOnGpu($$__global$$ char * gc_info, int * exception){
+char org_trifort_rootbeer_runtime_RootbeerGpu_isOnGpu($$__global$$ char * gc_info, int * exception){
   return 1;
 }
 
 $$__device__$$ 
-int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadId($$__global$$ char * gc_info, int * exception){
+int org_trifort_rootbeer_runtime_RootbeerGpu_getThreadId($$__global$$ char * gc_info, int * exception){
   return getThreadId();
 }
 
 $$__device__$$ 
-int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getThreadIdxx($$__global$$ char * gc_info, int * exception){
+int org_trifort_rootbeer_runtime_RootbeerGpu_getThreadIdxx($$__global$$ char * gc_info, int * exception){
   return getThreadIdxx();
 }
 
 $$__device__$$ 
-int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getBlockIdxx($$__global$$ char * gc_info, int * exception){
+int org_trifort_rootbeer_runtime_RootbeerGpu_getBlockIdxx($$__global$$ char * gc_info, int * exception){
   return getBlockIdxx();
 }
 
 $$__device__$$ 
-int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getBlockDimx($$__global$$ char * gc_info, int * exception){
+int org_trifort_rootbeer_runtime_RootbeerGpu_getBlockDimx($$__global$$ char * gc_info, int * exception){
   return getBlockDimx();
 }
 
 $$__device__$$ 
-int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getGridDimx($$__global$$ char * gc_info, int * exception){
+int org_trifort_rootbeer_runtime_RootbeerGpu_getGridDimx($$__global$$ char * gc_info, int * exception){
   return getGridDimx();
 }
 
 
 $$__device__$$ 
-long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getRef($$__global$$ char * gc_info, int ref, int * exception){
+long long org_trifort_rootbeer_runtime_RootbeerGpu_getRef($$__global$$ char * gc_info, int ref, int * exception){
   return ref;
 }
 
 $$__device__$$
-char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedByte($$__global$$ char * gc_info, int index, int * exception){
+char org_trifort_rootbeer_runtime_RootbeerGpu_getSharedByte($$__global$$ char * gc_info, int index, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }
@@ -215,10 +215,10 @@ char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedByte($$__global$$ ch
 }
 
 $$__device__$$
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedByte($$__global$$ char * gc_info, int index, char value, int * exception){
+void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedByte($$__global$$ char * gc_info, int index, char value, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
@@ -227,10 +227,10 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedByte($$__global$$ ch
 }
   
 $$__device__$$
-char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedChar($$__global$$ char * gc_info, int index, int * exception){
+char org_trifort_rootbeer_runtime_RootbeerGpu_getSharedChar($$__global$$ char * gc_info, int index, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }
@@ -239,10 +239,10 @@ char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedChar($$__global$$ ch
 }
 
 $$__device__$$
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedChar($$__global$$ char * gc_info, int index, char value, int * exception){
+void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedChar($$__global$$ char * gc_info, int index, char value, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
@@ -251,10 +251,10 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedChar($$__global$$ ch
 }
   
 $$__device__$$
-char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedBoolean($$__global$$ char * gc_info, int index, int * exception){
+char org_trifort_rootbeer_runtime_RootbeerGpu_getSharedBoolean($$__global$$ char * gc_info, int index, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }
@@ -263,10 +263,10 @@ char edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedBoolean($$__global$$
 }
 
 $$__device__$$
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedBoolean($$__global$$ char * gc_info, int index, char value, int * exception){
+void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedBoolean($$__global$$ char * gc_info, int index, char value, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
@@ -275,10 +275,10 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedBoolean($$__global$$
 }
   
 $$__device__$$
-short edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedShort($$__global$$ char * gc_info, int index, int * exception){
+short org_trifort_rootbeer_runtime_RootbeerGpu_getSharedShort($$__global$$ char * gc_info, int index, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 2 >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }  
@@ -290,10 +290,10 @@ short edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedShort($$__global$$ 
 }
 
 $$__device__$$
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedShort($$__global$$ char * gc_info, int index, short value, int * exception){
+void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedShort($$__global$$ char * gc_info, int index, short value, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 2 >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
@@ -303,10 +303,10 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedShort($$__global$$ c
 }
 
 $$__device__$$
-int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedInteger($$__global$$ char * gc_info, int index, int * exception){
+int org_trifort_rootbeer_runtime_RootbeerGpu_getSharedInteger($$__global$$ char * gc_info, int index, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 4 >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }
@@ -319,10 +319,10 @@ int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedInteger($$__global$$ 
 }
 
 $$__device__$$
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger($$__global$$ char * gc_info, int index, int value, int * exception){  
+void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedInteger($$__global$$ char * gc_info, int index, int value, int * exception){  
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 4 >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
@@ -334,10 +334,10 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger($$__global$$
 }
 
 $$__device__$$
-long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedLong($$__global$$ char * gc_info, int index, int * exception){
+long long org_trifort_rootbeer_runtime_RootbeerGpu_getSharedLong($$__global$$ char * gc_info, int index, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 8 >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
   }
@@ -355,10 +355,10 @@ long long edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedLong($$__global
 }
 
 $$__device__$$
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedLong($$__global$$ char * gc_info, int index, long long value, int * exception){
+void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedLong($$__global$$ char * gc_info, int index, long long value, int * exception){
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 8 >= %%shared_mem_size%%){
-    *exception = edu_syr_pcpratts_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, 
       index, 0, %%shared_mem_size%%, exception);
     return;
   }
@@ -374,37 +374,37 @@ void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedLong($$__global$$ ch
 }
   
 $$__device__$$
-float edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedFloat($$__global$$ char * gc_info, int index, int * exception){
-  int int_value = edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedInteger(gc_info, index, exception);
+float org_trifort_rootbeer_runtime_RootbeerGpu_getSharedFloat($$__global$$ char * gc_info, int index, int * exception){
+  int int_value = org_trifort_rootbeer_runtime_RootbeerGpu_getSharedInteger(gc_info, index, exception);
   return *((float *) &int_value);
 }
 
 $$__device__$$
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedFloat($$__global$$ char * gc_info, int index, float value, int * exception){
+void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedFloat($$__global$$ char * gc_info, int index, float value, int * exception){
   int int_value = *((int *) &value);
-  edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger(gc_info, index, int_value, exception);
+  org_trifort_rootbeer_runtime_RootbeerGpu_setSharedInteger(gc_info, index, int_value, exception);
 }
   
 $$__device__$$
-double edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedDouble($$__global$$ char * gc_info, int index, int * exception){
-  long long long_value = edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedLong(gc_info, index, exception);
+double org_trifort_rootbeer_runtime_RootbeerGpu_getSharedDouble($$__global$$ char * gc_info, int index, int * exception){
+  long long long_value = org_trifort_rootbeer_runtime_RootbeerGpu_getSharedLong(gc_info, index, exception);
   return *((double *) &long_value);
 }
 
 $$__device__$$
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedDouble($$__global$$ char * gc_info, int index, double value, int * exception){
+void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedDouble($$__global$$ char * gc_info, int index, double value, int * exception){
   long long long_value = *((long long *) &value);
-  edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedLong(gc_info, index, long_value, exception);
+  org_trifort_rootbeer_runtime_RootbeerGpu_setSharedLong(gc_info, index, long_value, exception);
 }
 
 $$__device__$$
-int edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedObject($$__global$$ char * gc_info, int index, int * exception){
-  return edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_getSharedInteger(gc_info, index, exception);
+int org_trifort_rootbeer_runtime_RootbeerGpu_getSharedObject($$__global$$ char * gc_info, int index, int * exception){
+  return org_trifort_rootbeer_runtime_RootbeerGpu_getSharedInteger(gc_info, index, exception);
 }
 
 $$__device__$$
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedObject($$__global$$ char * gc_info, int index, int value, int * exception){
-  edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_setSharedInteger(gc_info, index, value, exception);
+void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedObject($$__global$$ char * gc_info, int index, int value, int * exception){
+  org_trifort_rootbeer_runtime_RootbeerGpu_setSharedInteger(gc_info, index, value, exception);
 }
   
 $$__device__$$
@@ -429,7 +429,7 @@ void java_io_PrintStream_println0_9_($$__global$$ char * gc_info, int thisref, i
   if(*exception != 0){
     return; 
   } 
-  valueref_deref = (char *) edu_syr_pcpratts_gc_deref(gc_info, valueref);
+  valueref_deref = (char *) org_trifort_gc_deref(gc_info, valueref);
   for(i = offset; i < count; ++i){
     curr_offset = 32 + (i * 4);
     printf("%c", valueref_deref[curr_offset]);
@@ -504,7 +504,7 @@ void java_io_PrintStream_print0_9_($$__global$$ char * gc_info, int thisref, int
   if(*exception != 0){
     return; 
   } 
-  valueref_deref = (char *) edu_syr_pcpratts_gc_deref(gc_info, valueref);
+  valueref_deref = (char *) org_trifort_gc_deref(gc_info, valueref);
   for(i = offset; i < count; ++i){
     curr_offset = 32 + (i * 4);
     printf("%c", valueref_deref[curr_offset]);
@@ -552,38 +552,38 @@ void java_io_PrintStream_print0_8_($$__global$$ char * gc_info, int thisref, dou
 }
 
 $$__device__$$
-int edu_syr_pcpratts_rootbeer_runtime_RootbeerAtomicInt_atomicAdd($$__global$$ char * gc_info, int thisref, int value, int * exception){
+int org_trifort_rootbeer_runtime_RootbeerAtomicInt_atomicAdd($$__global$$ char * gc_info, int thisref, int value, int * exception){
   char * thisref_deref;
   int * array;
 
-  thisref_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref ) ;
+  thisref_deref = org_trifort_gc_deref ( gc_info , thisref ) ;
   thisref_deref += 32;
   array = (int *) thisref_deref;
   return atomicAdd(array, value);
 }
 
 $$__device__$$
-double edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_sin($$__global$$ char * gc_info, double value, int * exception){
+double org_trifort_rootbeer_runtime_RootbeerGpu_sin($$__global$$ char * gc_info, double value, int * exception){
   return sin(value);
 }
 
 $$__device__$$ 
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_syncthreads($$__global$$ char * gc_info, int * exception){
-  edu_syr_pcpratts_syncthreads();
+void org_trifort_rootbeer_runtime_RootbeerGpu_syncthreads($$__global$$ char * gc_info, int * exception){
+  org_trifort_syncthreads();
 }
 
 $$__device__$$ 
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_threadfence($$__global$$ char * gc_info, int * exception){
-  edu_syr_pcpratts_threadfence();
+void org_trifort_rootbeer_runtime_RootbeerGpu_threadfence($$__global$$ char * gc_info, int * exception){
+  org_trifort_threadfence();
 }
 
 $$__device__$$ 
-void edu_syr_pcpratts_rootbeer_runtime_RootbeerGpu_threadfenceBlock($$__global$$ char * gc_info, int * exception){
-  edu_syr_pcpratts_threadfence_block();
+void org_trifort_rootbeer_runtime_RootbeerGpu_threadfenceBlock($$__global$$ char * gc_info, int * exception){
+  org_trifort_threadfence_block();
 }
 
 $$__device__$$ char
-edu_syr_pcpratts_cmp(long long lhs, long long rhs){
+org_trifort_cmp(long long lhs, long long rhs){
   if(lhs > rhs)
     return 1;
   if(lhs < rhs)
@@ -592,7 +592,7 @@ edu_syr_pcpratts_cmp(long long lhs, long long rhs){
 }
 
 $$__device__$$ char
-edu_syr_pcpratts_cmpl(double lhs, double rhs){
+org_trifort_cmpl(double lhs, double rhs){
   if(lhs > rhs)
     return 1;
   if(lhs < rhs)
@@ -603,7 +603,7 @@ edu_syr_pcpratts_cmpl(double lhs, double rhs){
 }
 
 $$__device__$$ char
-edu_syr_pcpratts_cmpg(double lhs, double rhs){
+org_trifort_cmpg(double lhs, double rhs){
   if(lhs > rhs)
     return 1;
   if(lhs < rhs)
@@ -615,21 +615,21 @@ edu_syr_pcpratts_cmpg(double lhs, double rhs){
 
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_memcpy($$__global$$ char * dest, $$__global$$ char * src, int len) {
+org_trifort_gc_memcpy($$__global$$ char * dest, $$__global$$ char * src, int len) {
   int i;
   for(i = 0; i < len; ++i){
     dest[i] = src[i];
   }
 }
 
-$$__device__$$ double edu_syr_pcpratts_modulus(double a, double b)
+$$__device__$$ double org_trifort_modulus(double a, double b)
 {
   long result = (long) ( a / b );
   return a - ((double) result) * b;
 }
 
 $$__device__$$ int
-edu_syr_pcpratts_gc_get_loc($$__global$$ char * mem_loc, int count){
+org_trifort_gc_get_loc($$__global$$ char * mem_loc, int count){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) +
     sizeof(char) + sizeof(GC_OBJ_TYPE_CTOR_USED) + sizeof(GC_OBJ_TYPE_SIZE) +
     sizeof(GC_OBJ_TYPE_TYPE) + count * sizeof(int);
@@ -637,23 +637,23 @@ edu_syr_pcpratts_gc_get_loc($$__global$$ char * mem_loc, int count){
 }
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_set_count($$__global$$ char * mem_loc, GC_OBJ_TYPE_COUNT value){
+org_trifort_gc_set_count($$__global$$ char * mem_loc, GC_OBJ_TYPE_COUNT value){
   mem_loc[0] = value;
 }
 
 $$__device__$$ GC_OBJ_TYPE_COUNT
-edu_syr_pcpratts_gc_get_count($$__global$$ char * mem_loc){
+org_trifort_gc_get_count($$__global$$ char * mem_loc){
   return mem_loc[0];
 }
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_set_color($$__global$$ char * mem_loc, GC_OBJ_TYPE_COLOR value){
+org_trifort_gc_set_color($$__global$$ char * mem_loc, GC_OBJ_TYPE_COLOR value){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT);
   mem_loc[0] = value;
 }
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_init_monitor($$__global$$ char * mem_loc){
+org_trifort_gc_init_monitor($$__global$$ char * mem_loc){
   int * addr;
   mem_loc += 16;
   addr = (int *) mem_loc;
@@ -661,119 +661,119 @@ edu_syr_pcpratts_gc_init_monitor($$__global$$ char * mem_loc){
 }
 
 $$__device__$$ GC_OBJ_TYPE_COLOR
-edu_syr_pcpratts_gc_get_color($$__global$$ char * mem_loc){
+org_trifort_gc_get_color($$__global$$ char * mem_loc){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT);
   return mem_loc[0];
 }
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_set_type($$__global$$ char * mem_loc, GC_OBJ_TYPE_TYPE value){
+org_trifort_gc_set_type($$__global$$ char * mem_loc, GC_OBJ_TYPE_TYPE value){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char) +
     sizeof(GC_OBJ_TYPE_CTOR_USED);
   *(($$__global$$ GC_OBJ_TYPE_TYPE *) &mem_loc[0]) = value;
 }
 
 $$__device__$$ GC_OBJ_TYPE_TYPE
-edu_syr_pcpratts_gc_get_type($$__global$$ char * mem_loc){
+org_trifort_gc_get_type($$__global$$ char * mem_loc){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char) +
     sizeof(GC_OBJ_TYPE_CTOR_USED);
   return *(($$__global$$ GC_OBJ_TYPE_TYPE *) &mem_loc[0]);
 }
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_set_ctor_used($$__global$$ char * mem_loc, GC_OBJ_TYPE_CTOR_USED value){
+org_trifort_gc_set_ctor_used($$__global$$ char * mem_loc, GC_OBJ_TYPE_CTOR_USED value){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char);
   mem_loc[0] = value;
 }
 
 $$__device__$$ GC_OBJ_TYPE_CTOR_USED
-edu_syr_pcpratts_gc_get_ctor_used($$__global$$ char * mem_loc){
+org_trifort_gc_get_ctor_used($$__global$$ char * mem_loc){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char);
   return mem_loc[0];
 }
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_set_size($$__global$$ char * mem_loc, GC_OBJ_TYPE_SIZE value){
+org_trifort_gc_set_size($$__global$$ char * mem_loc, GC_OBJ_TYPE_SIZE value){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char) + 
     sizeof(GC_OBJ_TYPE_CTOR_USED) + sizeof(GC_OBJ_TYPE_TYPE);
   *(($$__global$$ GC_OBJ_TYPE_SIZE *) &mem_loc[0]) = value;
 }
 
 $$__device__$$ GC_OBJ_TYPE_SIZE
-edu_syr_pcpratts_gc_get_size($$__global$$ char * mem_loc){
+org_trifort_gc_get_size($$__global$$ char * mem_loc){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char) + 
     sizeof(GC_OBJ_TYPE_CTOR_USED) + sizeof(GC_OBJ_TYPE_TYPE);
   return *(($$__global$$ GC_OBJ_TYPE_SIZE *) &mem_loc[0]);
 }
 
-$$__device__$$ char edu_syr_pcpratts_getchar($$__global$$ char * buffer, int pos){
+$$__device__$$ char org_trifort_getchar($$__global$$ char * buffer, int pos){
   return buffer[pos];
 }
 
-$$__device__$$ void edu_syr_pcpratts_setchar($$__global$$ char * buffer, int pos, char value){
+$$__device__$$ void org_trifort_setchar($$__global$$ char * buffer, int pos, char value){
   buffer[pos] = value;
 }
 
-$$__device__$$ short edu_syr_pcpratts_getshort($$__global$$ char * buffer, int pos){
+$$__device__$$ short org_trifort_getshort($$__global$$ char * buffer, int pos){
   return *(($$__global$$ short *) &buffer[pos]);
 }
 
-$$__device__$$ void edu_syr_pcpratts_setshort($$__global$$ char * buffer, int pos, short value){
+$$__device__$$ void org_trifort_setshort($$__global$$ char * buffer, int pos, short value){
   *(($$__global$$ short *) &buffer[pos]) = value;
 }
 
-$$__device__$$ int edu_syr_pcpratts_getint($$__global$$ char * buffer, int pos){
+$$__device__$$ int org_trifort_getint($$__global$$ char * buffer, int pos){
   return *(($$__global$$ int *) &buffer[pos]);
 }
 
-$$__device__$$ void edu_syr_pcpratts_setint($$__global$$ char * buffer, int pos, int value){
+$$__device__$$ void org_trifort_setint($$__global$$ char * buffer, int pos, int value){
   *(($$__global$$ int *) &buffer[pos]) = value;
 }
 
-$$__device__$$ long long edu_syr_pcpratts_getlong($$__global$$ char * buffer, int pos){
+$$__device__$$ long long org_trifort_getlong($$__global$$ char * buffer, int pos){
   return *(($$__global$$ long *) &buffer[pos]);
 }
 
-$$__device__$$ void edu_syr_pcpratts_setlong($$__global$$ char * buffer, int pos, long long value){
+$$__device__$$ void org_trifort_setlong($$__global$$ char * buffer, int pos, long long value){
   *(($$__global$$ long long *) &buffer[pos]) = value;
 }
 
-$$__device__$$ size_t edu_syr_pcpratts_getsize_t($$__global$$ char * buffer, int pos){
+$$__device__$$ size_t org_trifort_getsize_t($$__global$$ char * buffer, int pos){
   return *(($$__global$$ size_t *) &buffer[pos]);
 }
 
-$$__device__$$ void edu_syr_pcpratts_setsize_t($$__global$$ char * buffer, int pos, size_t value){
+$$__device__$$ void org_trifort_setsize_t($$__global$$ char * buffer, int pos, size_t value){
   *(($$__global$$ size_t *) &buffer[pos]) = value;
 }
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_set_to_space_address($$__global$$ char * gc_info, $$__global$$ char * value){
-  edu_syr_pcpratts_setlong(gc_info, TO_SPACE_OFFSET, (long long) value);
+org_trifort_gc_set_to_space_address($$__global$$ char * gc_info, $$__global$$ char * value){
+  org_trifort_setlong(gc_info, TO_SPACE_OFFSET, (long long) value);
 }
 
 $$__device__$$ $$__global$$ long long *
-edu_syr_pcpratts_gc_get_to_space_address($$__global$$ char * gc_info){
-  long long value = edu_syr_pcpratts_getlong(gc_info, TO_SPACE_OFFSET);
+org_trifort_gc_get_to_space_address($$__global$$ char * gc_info){
+  long long value = org_trifort_getlong(gc_info, TO_SPACE_OFFSET);
   return ($$__global$$ long long *) value;
 }
 
 $$__device__$$ long long
-edu_syr_pcpratts_gc_get_to_space_free_ptr($$__global$$ char * gc_info){
-  return edu_syr_pcpratts_getlong(gc_info, TO_SPACE_FREE_POINTER_OFFSET);
+org_trifort_gc_get_to_space_free_ptr($$__global$$ char * gc_info){
+  return org_trifort_getlong(gc_info, TO_SPACE_FREE_POINTER_OFFSET);
 }
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_set_to_space_free_ptr($$__global$$ char * gc_info, long long value){
-  edu_syr_pcpratts_setlong(gc_info, TO_SPACE_FREE_POINTER_OFFSET, value);
+org_trifort_gc_set_to_space_free_ptr($$__global$$ char * gc_info, long long value){
+  org_trifort_setlong(gc_info, TO_SPACE_FREE_POINTER_OFFSET, value);
 }
 
 $$__device__$$ int
-edu_syr_pcpratts_gc_get_space_size($$__global$$ char * gc_info){
-  return edu_syr_pcpratts_getint(gc_info, SPACE_SIZE_OFFSET);
+org_trifort_gc_get_space_size($$__global$$ char * gc_info){
+  return org_trifort_getint(gc_info, SPACE_SIZE_OFFSET);
 }
 
 $$__device__$$ int
-edu_syr_pcpratts_strlen(char * str_constant){
+org_trifort_strlen(char * str_constant){
   int ret = 0;
   while(1){
     if(str_constant[ret] != '\0'){
@@ -785,14 +785,14 @@ edu_syr_pcpratts_strlen(char * str_constant){
 }
 
 $$__device__$$ int
-edu_syr_pcpratts_array_length($$__global$$ char * gc_info, int thisref){
+org_trifort_array_length($$__global$$ char * gc_info, int thisref){
   //if(thisref & 0x1000000000000000L){
   //  thisref &= 0x0fffffffffffffffL;
   //  thisref += 8;
-  //  return edu_syr_pcpratts_cache_get_int(thisref);
+  //  return org_trifort_cache_get_int(thisref);
   //} else {
-    $$__global$$ char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
-    int ret = edu_syr_pcpratts_getint(thisref_deref, 12);
+    $$__global$$ char * thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+    int ret = org_trifort_getint(thisref_deref, 12);
     return ret;
   //}
 }
@@ -811,20 +811,20 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a66(char * gc_info, int pa
   char ch;
   
   thisref = -1; 
-  edu_syr_pcpratts_gc_assign(gc_info, &thisref, edu_syr_pcpratts_gc_malloc(gc_info, 48)); 
+  org_trifort_gc_assign(gc_info, &thisref, org_trifort_gc_malloc(gc_info, 48)); 
   if(thisref == -1) { 
     *exception = %%java_lang_NullPointerException_TypeNumber%%; 
     return -1; 
   } 
-  thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref); 
-  edu_syr_pcpratts_gc_set_count(thisref_deref, 1); 
-  edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY); 
-  edu_syr_pcpratts_gc_set_type(thisref_deref, %%java_lang_String_TypeNumber%%); 
-  edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1); 
-  edu_syr_pcpratts_gc_set_size(thisref_deref, 48); 
-  edu_syr_pcpratts_gc_init_monitor(thisref_deref); 
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref); 
+  org_trifort_gc_set_count(thisref_deref, 1); 
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY); 
+  org_trifort_gc_set_type(thisref_deref, %%java_lang_String_TypeNumber%%); 
+  org_trifort_gc_set_ctor_used(thisref_deref, 1); 
+  org_trifort_gc_set_size(thisref_deref, 48); 
+  org_trifort_gc_init_monitor(thisref_deref); 
 
-  len = edu_syr_pcpratts_array_length(gc_info, parameter0);
+  len = org_trifort_array_length(gc_info, parameter0);
   characters_copy = char__array_new(gc_info, len, exception);
   for(i = 0; i < len; ++i){
     ch = char__array_get(gc_info, parameter0, i, exception);
@@ -843,9 +843,9 @@ $$__device__$$ void
 char__array_set($$__global$$ char * gc_info, int thisref, int parameter0, char parameter1, int * exception);
 
 $$__device__$$ int
-edu_syr_pcpratts_string_constant($$__global$$ char * gc_info, char * str_constant, int * exception){
+org_trifort_string_constant($$__global$$ char * gc_info, char * str_constant, int * exception){
   int i;
-  int len = edu_syr_pcpratts_strlen(str_constant);
+  int len = org_trifort_strlen(str_constant);
   int characters = char__array_new(gc_info, len, exception);
   unsigned long long * addr = (unsigned long long *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
   for(i = 0; i < len; ++i){
@@ -856,12 +856,12 @@ edu_syr_pcpratts_string_constant($$__global$$ char * gc_info, char * str_constan
 }
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_assign($$__global$$ char * gc_info, int * lhs_ptr, int rhs){
+org_trifort_gc_assign($$__global$$ char * gc_info, int * lhs_ptr, int rhs){
   *lhs_ptr = rhs;
 }
 
 $$__device__$$ void
-edu_syr_pcpratts_gc_assign_global($$__global$$ char * gc_info, $$__global$$ int * lhs_ptr, int rhs){
+org_trifort_gc_assign_global($$__global$$ char * gc_info, $$__global$$ int * lhs_ptr, int rhs){
   *lhs_ptr = rhs;
 }
  
@@ -891,7 +891,7 @@ $$__device__$$ int java_lang_Throwable_getStackTraceDepth($$__global$$ char * gc
   return 0;
 }
 
-$$__device__$$ void edu_syr_pcpratts_fillInStackTrace($$__global$$ char * gc_info, int exception, char * class_name, char * method_name){
+$$__device__$$ void org_trifort_fillInStackTrace($$__global$$ char * gc_info, int exception, char * class_name, char * method_name){
 }
 
 $$__device__$$ void instance_setter_java_lang_Throwable_cause($$__global$$ char * gc_info, int thisref, int parameter0, int * exception);
@@ -901,22 +901,22 @@ $$__device__$$ void java_lang_VirtualMachineError_initab850b60f96d11de8a39080020
 
 $$__device__$$ int java_lang_OutOfMemoryError_initab850b60f96d11de8a390800200c9a66($$__global$$ char * gc_info, int * exception){
   int r0 = -1;
-  int thisref = edu_syr_pcpratts_gc_malloc(gc_info, 40);
-  char * thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
+  int thisref = org_trifort_gc_malloc(gc_info, 40);
+  char * thisref_deref = org_trifort_gc_deref(gc_info, thisref);
 
   //class info
-  edu_syr_pcpratts_gc_set_count(thisref_deref, 0);
-  edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY);
-  edu_syr_pcpratts_gc_set_type(thisref_deref, 9);
-  edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1);
-  edu_syr_pcpratts_gc_set_size(thisref_deref, 40);
+  org_trifort_gc_set_count(thisref_deref, 0);
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY);
+  org_trifort_gc_set_type(thisref_deref, 9);
+  org_trifort_gc_set_ctor_used(thisref_deref, 1);
+  org_trifort_gc_set_size(thisref_deref, 40);
 
   instance_setter_java_lang_Throwable_cause(gc_info, thisref, -1, exception);
   instance_setter_java_lang_Throwable_detailMessage(gc_info, thisref, -1, exception);
   instance_setter_java_lang_Throwable_stackTrace(gc_info, thisref, -1, exception);
 
   //r0 := @this: java.lang.OutOfMemoryError
-  edu_syr_pcpratts_gc_assign(gc_info, & r0 ,  thisref );
+  org_trifort_gc_assign(gc_info, & r0 ,  thisref );
 
   //specialinvoke r0.<java.lang.VirtualMachineError: void <init>()>()
   java_lang_VirtualMachineError_initab850b60f96d11de8a390800200c9a66_body0_(gc_info,
@@ -942,9 +942,9 @@ java_lang_Class_getName( char * gc_info , int thisref , int * exception ) {
 
 $$__device__$$ int
 java_lang_Object_getClass( char * gc_info , int thisref, int * exception ) { 
-  char * mem_loc = edu_syr_pcpratts_gc_deref(gc_info, thisref);
-  int type = edu_syr_pcpratts_gc_get_type(mem_loc);
-  return edu_syr_pcpratts_classConstant(type);
+  char * mem_loc = org_trifort_gc_deref(gc_info, thisref);
+  int type = org_trifort_gc_get_type(mem_loc);
+  return org_trifort_classConstant(type);
 }
 
 $$__device__$$ int
@@ -952,10 +952,10 @@ java_lang_StringValue_from( char * gc_info , int thisref, int * exception ) {
   int i, size, new_ref;
   char * mem_loc, * new_mem_loc;
   
-  mem_loc = edu_syr_pcpratts_gc_deref(gc_info, thisref);
-  size = edu_syr_pcpratts_gc_get_size(mem_loc);
-  new_ref = edu_syr_pcpratts_gc_malloc(gc_info, size);
-  new_mem_loc = edu_syr_pcpratts_gc_deref(gc_info, new_ref);
+  mem_loc = org_trifort_gc_deref(gc_info, thisref);
+  size = org_trifort_gc_get_size(mem_loc);
+  new_ref = org_trifort_gc_malloc(gc_info, size);
+  new_mem_loc = org_trifort_gc_deref(gc_info, new_ref);
   
   for(i = 0; i < size; ++i){
     new_mem_loc[i] = mem_loc[i];  
@@ -972,17 +972,17 @@ java_util_Arrays_copyOf(char * gc_info, int object_array, int new_size, int * ex
   int length;
   int i;
   
-  ret = edu_syr_pcpratts_gc_malloc(gc_info, 32 + (4 * new_size));
-  ret_deref = edu_syr_pcpratts_gc_deref(gc_info, ret);
-  object_array_deref = edu_syr_pcpratts_gc_deref(gc_info, object_array);
+  ret = org_trifort_gc_malloc(gc_info, 32 + (4 * new_size));
+  ret_deref = org_trifort_gc_deref(gc_info, ret);
+  object_array_deref = org_trifort_gc_deref(gc_info, object_array);
     
   for(i = 0; i < 32; ++i){
     ret_deref[i] = object_array_deref[i];
   }
 
-  length = edu_syr_pcpratts_getint(object_array_deref, 12);
-  edu_syr_pcpratts_setint(ret_deref, 8, 32 + (4 * new_size));
-  edu_syr_pcpratts_setint(ret_deref, 12, new_size);
+  length = org_trifort_getint(object_array_deref, 12);
+  org_trifort_setint(ret_deref, 8, 32 + (4 * new_size));
+  org_trifort_setint(ret_deref, 12, new_size);
 
   if(length < new_size){
     for(i = 0; i < length * 4; ++i){
@@ -1008,19 +1008,19 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a660_(char * gc_inf
   char * thisref_deref;
   int chars;
 
-  thisref = edu_syr_pcpratts_gc_malloc(gc_info , 48);
+  thisref = org_trifort_gc_malloc(gc_info , 48);
   if(thisref == -1){
     *exception = %%java_lang_NullPointerException_TypeNumber%%; 
     return -1; 
   }
 
-  thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
-  edu_syr_pcpratts_gc_set_count(thisref_deref, 1); 
-  edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY); 
-  edu_syr_pcpratts_gc_set_type(thisref_deref, %%java_lang_StringBuilder_TypeNumber%%); 
-  edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1); 
-  edu_syr_pcpratts_gc_set_size(thisref_deref, 48); 
-  edu_syr_pcpratts_gc_init_monitor(thisref_deref); 
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  org_trifort_gc_set_count(thisref_deref, 1); 
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY); 
+  org_trifort_gc_set_type(thisref_deref, %%java_lang_StringBuilder_TypeNumber%%); 
+  org_trifort_gc_set_ctor_used(thisref_deref, 1); 
+  org_trifort_gc_set_size(thisref_deref, 48); 
+  org_trifort_gc_init_monitor(thisref_deref); 
 
   chars = char__array_new(gc_info, 0, exception);
   instance_setter_java_lang_AbstractStringBuilder_value(gc_info, thisref, chars, exception); 
@@ -1039,18 +1039,18 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(char * gc_
 
   char * thisref_deref; 
   thisref = -1;
-  edu_syr_pcpratts_gc_assign ( gc_info , & thisref , edu_syr_pcpratts_gc_malloc ( gc_info , 48 ) ) ; 
+  org_trifort_gc_assign ( gc_info , & thisref , org_trifort_gc_malloc ( gc_info , 48 ) ) ; 
   if ( thisref ==-1 ) { 
     * exception = %%java_lang_NullPointerException_TypeNumber%%; 
     return-1 ; 
   } 
-  thisref_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref ) ; 
-  edu_syr_pcpratts_gc_set_count ( thisref_deref , 0 ) ; 
-  edu_syr_pcpratts_gc_set_color ( thisref_deref , COLOR_GREY ) ; 
-  edu_syr_pcpratts_gc_set_type ( thisref_deref , %%java_lang_StringBuilder_TypeNumber%% ) ; 
-  edu_syr_pcpratts_gc_set_ctor_used ( thisref_deref , 1 ) ; 
-  edu_syr_pcpratts_gc_set_size ( thisref_deref , 44 ) ; 
-  edu_syr_pcpratts_gc_init_monitor ( thisref_deref ) ; 
+  thisref_deref = org_trifort_gc_deref ( gc_info , thisref ) ; 
+  org_trifort_gc_set_count ( thisref_deref , 0 ) ; 
+  org_trifort_gc_set_color ( thisref_deref , COLOR_GREY ) ; 
+  org_trifort_gc_set_type ( thisref_deref , %%java_lang_StringBuilder_TypeNumber%% ) ; 
+  org_trifort_gc_set_ctor_used ( thisref_deref , 1 ) ; 
+  org_trifort_gc_set_size ( thisref_deref , 44 ) ; 
+  org_trifort_gc_init_monitor ( thisref_deref ) ; 
 
   str_value = instance_getter_java_lang_String_value(gc_info, str, exception);
   str_count = instance_getter_java_lang_String_count(gc_info, str, exception);
@@ -1182,18 +1182,18 @@ int java_lang_Integer_initab850b60f96d11de8a390800200c9a660_5_(char * gc_info,
   char * thisref_deref;
 
   thisref = -1;
-  thisref = edu_syr_pcpratts_gc_malloc(gc_info , 48);
+  thisref = org_trifort_gc_malloc(gc_info , 48);
   if ( thisref ==-1 ) { 
     * exception = %%java_lang_NullPointerException_TypeNumber%%; 
     return-1 ; 
   }
-  thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);
-  edu_syr_pcpratts_gc_set_count(thisref_deref, 0);
-  edu_syr_pcpratts_gc_set_color(thisref_deref, COLOR_GREY);
-  edu_syr_pcpratts_gc_set_type(thisref_deref, %%java_lang_Integer_TypeNumber%%);
-  edu_syr_pcpratts_gc_set_ctor_used(thisref_deref, 1);
-  edu_syr_pcpratts_gc_set_size(thisref_deref, 48);
-  edu_syr_pcpratts_gc_init_monitor(thisref_deref);
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  org_trifort_gc_set_count(thisref_deref, 0);
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY);
+  org_trifort_gc_set_type(thisref_deref, %%java_lang_Integer_TypeNumber%%);
+  org_trifort_gc_set_ctor_used(thisref_deref, 1);
+  org_trifort_gc_set_size(thisref_deref, 48);
+  org_trifort_gc_init_monitor(thisref_deref);
 
   // instance_setter_java_lang_Integer_value(gc_info, thisref, 0, exception);
   instance_setter_java_lang_Integer_value(gc_info, thisref, int_value, exception);
@@ -1205,7 +1205,7 @@ $$__device__$$
 int java_lang_Integer_valueOf(char * gc_info, int int_value, int * exception) {
   int return_obj = -1;
   
-  edu_syr_pcpratts_gc_assign(gc_info, 
+  org_trifort_gc_assign(gc_info, 
     &return_obj, java_lang_Integer_initab850b60f96d11de8a390800200c9a660_5_(gc_info,
     int_value, exception));
   
@@ -1361,7 +1361,7 @@ int at_illecker_double_to_string(char * gc_info, double fvalue, int max, int * e
     buffer[maxlen - 1] = '\0';
   }
 
-  return edu_syr_pcpratts_string_constant(gc_info, buffer, exception);
+  return org_trifort_string_constant(gc_info, buffer, exception);
 }
 
 //<java.lang.Double: java.lang.String toString(double)>

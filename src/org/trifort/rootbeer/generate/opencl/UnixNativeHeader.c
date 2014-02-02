@@ -73,6 +73,6 @@ long long java_lang_System_nanoTime(char * gc_info, int * exception){
   return tm.tv_sec * 1000000 + tm.tv_usec;
 }
 
-void edu_syr_pcpratts_sleep(int micro_seconds){
+void org_trifort_sleep(int micro_seconds){
   usleep(micro_seconds);
 }

@@ -51,7 +51,7 @@ public class OpenCLInstanceof {
   }
   
   private String getMethodName(){
-    return "edu_syr_pcpratts_rootbeer_instanceof_"+m_oclType.getDerefString();
+    return "org_trifort_rootbeer_instanceof_"+m_oclType.getDerefString();
   }
 
   public String getBody() {
@@ -68,8 +68,8 @@ public class OpenCLInstanceof {
     ret += "  if(thisref == -1){\n";
     ret += "    return 0;\n";
     ret += "  }\n";
-    ret += "  thisref_deref = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n";
-    ret += "  type = edu_syr_pcpratts_gc_get_type(thisref_deref);\n";
+    ret += "  thisref_deref = org_trifort_gc_deref(gc_info, thisref);\n";
+    ret += "  type = org_trifort_gc_get_type(thisref_deref);\n";
     ret += "  switch(type){\n";
     for(NumberedType ntype : type_list){
       ret += "    case "+ntype.getNumber()+":\n";

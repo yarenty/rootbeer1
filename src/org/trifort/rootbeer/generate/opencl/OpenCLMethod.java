@@ -173,13 +173,13 @@ public class OpenCLMethod {
     int mystery_index = junk_index - 4;
     if(m_sootMethod.isStatic()){
       int offset = static_offsets.getIndex(m_sootClass);
-      ret += "mem = edu_syr_pcpratts_gc_deref(gc_info, 0);\n";
+      ret += "mem = org_trifort_gc_deref(gc_info, 0);\n";
       ret += "trash = mem + "+junk_index+";\n";
       ret += "mystery = mem + "+mystery_index+";\n";
       ret += "mem += "+offset+";\n";
     } else {
-      ret += "mem = edu_syr_pcpratts_gc_deref(gc_info, thisref);\n";
-      ret += "trash = edu_syr_pcpratts_gc_deref(gc_info, 0) + "+junk_index+";\n";
+      ret += "mem = org_trifort_gc_deref(gc_info, thisref);\n";
+      ret += "trash = org_trifort_gc_deref(gc_info, 0) + "+junk_index+";\n";
       ret += "mystery = trash - 8;\n";
       ret += "mem += 16;\n";
     }
@@ -207,7 +207,7 @@ public class OpenCLMethod {
         ret += "  }\n";
 
         ret += "  if ( * exception != 0 ) {\n";
-        ret += "    edu_syr_pcpratts_exitMonitorMem ( gc_info , mem , old ) ;\n";
+        ret += "    org_trifort_exitMonitorMem ( gc_info , mem , old ) ;\n";
         if(returnsAValue()){
           ret += "    return 0;\n";
         } else {
@@ -216,7 +216,7 @@ public class OpenCLMethod {
         ret += "  }\n";
       }
 
-      ret += "  thisref_synch_deref = edu_syr_pcpratts_gc_deref ( gc_info , thisref );\n";
+      ret += "  thisref_synch_deref = org_trifort_gc_deref ( gc_info , thisref );\n";
       ret += "  * ( ( int * ) & thisref_synch_deref [ 20 ] ) = 20 ;\n";
     }
     return ret;
@@ -359,7 +359,7 @@ public class OpenCLMethod {
       throw new UnsupportedOperationException("How do we handle an invoke on a non loca?");
     Local local = (Local) base;
     if(isConstructor()){
-      ret.append("edu_syr_pcpratts_gc_assign (gc_info, \n&"+local.getName()+", ");
+      ret.append("org_trifort_gc_assign (gc_info, \n&"+local.getName()+", ");
     }
 
     String function_name = method_prefix+corrected_this.getPolymorphicName();

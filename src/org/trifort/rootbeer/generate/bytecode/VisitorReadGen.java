@@ -261,7 +261,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
         bcl.assign(object_to_write_to, new_object); 
       }
     } else {
-      Local sentinal = bcl.newInstance("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
+      Local sentinal = bcl.newInstance("org.trifort.rootbeer.runtime.Sentinal");
       Local new_object = bcl.newInstance(name, sentinal);
       bcl.assign(object_to_write_to, new_object);
     }
@@ -370,7 +370,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
           new_object = bcl.newInstanceValueOf(name, StringConstant.v("0"));
         }
       } else {
-        Local sentinal = bcl.newInstance("edu.syr.pcpratts.rootbeer.runtime.Sentinal");
+        Local sentinal = bcl.newInstance("org.trifort.rootbeer.runtime.Sentinal");
         new_object = bcl.newInstance(name, sentinal);    
       }
       
@@ -430,8 +430,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     Local gc_obj_visit = m_gcObjVisitor.top();
     m_bcl.push(bcl);
     bcl.openClass(class_name);
-    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
-    bcl.startMethod("edu_syr_pcpratts_readFromHeap"+specialization, VoidType.v(), mem.getType(), gc_obj_visit.getType());
+    SootClass mem = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
+    bcl.startMethod("org_trifort_readFromHeap"+specialization, VoidType.v(), mem.getType(), gc_obj_visit.getType());
     m_objSerializing.push(bcl.refThis());
     m_currMem.push(bcl.refParameter(0));
     m_gcObjVisitor.push(bcl.refParameter(1));
@@ -522,10 +522,10 @@ public class VisitorReadGen extends AbstractVisitorGen {
     }
     specialization += JavaNameToOpenCL.convert(class_name);
     specialization += OpenCLScene.v().getIdent();
-    SootClass mem = Scene.v().getSootClass("edu.syr.pcpratts.rootbeer.runtime.memory.Memory");
+    SootClass mem = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
     BytecodeLanguage bcl = m_bcl.top();
     Local gc_obj_visit = m_gcObjVisitor.top();
-    bcl.pushMethod(class_name, "edu_syr_pcpratts_readFromHeap"+specialization, VoidType.v(), mem.getType(), gc_obj_visit.getType());
+    bcl.pushMethod(class_name, "org_trifort_readFromHeap"+specialization, VoidType.v(), mem.getType(), gc_obj_visit.getType());
     bcl.invokeMethodNoRet(m_objSerializing.top(), m_currMem.top(), gc_obj_visit); 
   }
 

@@ -3,8 +3,8 @@ package rootbeer.examples.arraymult;
 
 import java.util.List;
 import java.util.ArrayList;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
+import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Rootbeer;
 
 public class ArrayMultApp {
 

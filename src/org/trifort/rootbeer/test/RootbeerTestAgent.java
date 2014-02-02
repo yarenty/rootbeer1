@@ -38,7 +38,7 @@ public class RootbeerTestAgent {
     if(test_case_obj instanceof TestSerialization){
       TestSerialization test_ser = (TestSerialization) test_case_obj;
       System.out.println("[TEST 1/1] "+test_ser.toString());
-      if(test_case.equals("edu.syr.pcpratts.rootbeer.testcases.rootbeertest.gpurequired.ChangeThreadTest")){
+      if(test_case.equals("org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ChangeThreadTest")){
         testChangeThread(test_ser, true);
       } else {
         test(test_ser, true);
@@ -192,13 +192,7 @@ public class RootbeerTestAgent {
       List<Kernel> testing_items = creator.create();
       Stopwatch watch = new Stopwatch();
       watch.start();
-      try {
-        rootbeer.run(testing_items);
-      } catch(Exception ex){
-        m_message = "Ran on CPU";
-        m_passed = false;
-        return;
-      }
+      rootbeer.run(testing_items);
       m_passed = true;
       watch.stop();
       m_gpuTime = watch.elapsedTimeMillis();
@@ -241,13 +235,7 @@ public class RootbeerTestAgent {
       ThreadConfig thread_config = creator.getThreadConfig();
       Stopwatch watch = new Stopwatch();
       watch.start();
-      try {
-        rootbeer.run(testing_item, thread_config);
-      } catch(Exception ex){
-        m_message = "Ran on CPU";
-        m_passed = false;
-        return;
-      }
+      rootbeer.run(testing_item, thread_config);
       m_passed = true;
       watch.stop();
       m_gpuTime = watch.elapsedTimeMillis();
@@ -325,13 +313,7 @@ public class RootbeerTestAgent {
         List<Kernel> testing_items = m_creator.create();
         Stopwatch watch = new Stopwatch();
         watch.start();
-        try {
-          m_rootbeer.run(testing_items);
-        } catch(Exception ex){
-          m_message = "Ran on CPU";
-          m_passed = false;
-          return;
-        }
+        m_rootbeer.run(testing_items);
         m_passed = true;
         watch.stop();
         m_gpuTime = watch.elapsedTimeMillis();
