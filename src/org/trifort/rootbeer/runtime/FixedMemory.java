@@ -14,12 +14,13 @@ public class FixedMemory implements Memory {
   protected List<List<Long>> m_integerList;
     
   public FixedMemory(long size){
+    m_reserve = 1024;
+    size += m_reserve;
     m_address = malloc(size);    
     m_size = size;
     m_instancePointer = new MemPointer();
     m_staticPointer = new MemPointer();
     m_currentPointer = m_instancePointer;
-    m_reserve = 1024;
     m_integerList = new ArrayList<List<Long>>();
   }
   
@@ -407,7 +408,7 @@ public class FixedMemory implements Memory {
 
       long ret = m_endPointer;
       m_endPointer += size;              
-      if(ret + size + m_reserve > m_size){
+      if(ret + size > m_size){
         throw new OutOfMemoryError();
       }        
       m_pointer = ret;

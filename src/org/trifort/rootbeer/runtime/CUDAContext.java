@@ -8,7 +8,7 @@ import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.runtimegpu.GpuException;
 import org.trifort.rootbeer.util.ResourceReader;
 
-public class CUDAContext implements Context {
+public class CUDAContext implements Context, Runnable {
 
   private GpuDevice m_device;
   private List<StatsRow> m_stats;
@@ -23,6 +23,10 @@ public class CUDAContext implements Context {
   
   private Map<Kernel, Long> m_handles;
   
+  private Thread m_thread;
+  private BlockingQueue<KernelLaunch> m_toThread;
+  private BlockingQueue<KernelLaunch> m_fromThread;
+  
   public CUDAContext(GpuDevice device){
     m_device = device;    
     
@@ -32,12 +36,18 @@ public class CUDAContext implements Context {
     m_cubinFiles = new HashMap<String, byte[]>();
     m_handles = new HashMap<Kernel, Long>();
 
-    m_textureMemory = new FixedMemory(64);
+    m_textureMemory = new CheckedFixedMemory(64);
+    
+    m_toThread = new BlockingQueue<KernelLaunch>();
+    m_fromThread = new BlockingQueue<KernelLaunch>();
+    m_thread = new Thread(this);
+    m_thread.setDaemon(true);
+    m_thread.start();
   }
 
   @Override
   public void init(int memory_size) {
-    m_objectMemory = new FixedMemory(memory_size);
+    m_objectMemory = new CheckedFixedMemory(memory_size);
   }
 
   @Override
@@ -47,11 +57,14 @@ public class CUDAContext implements Context {
     free_mem_size -= m_handlesMemory.getSize();
     free_mem_size -= m_exceptionsMemory.getSize();
     free_mem_size -= m_classMemory.getSize();
-    m_objectMemory = new FixedMemory(free_mem_size);
+    m_objectMemory = new CheckedFixedMemory(free_mem_size);
   }
   
   @Override
   public void close() {
+    m_toThread.put(new KernelLaunch(true));
+    m_fromThread.take();
+    
     m_objectMemory.close();
     m_objectMemory = null;
     m_handlesMemory.close();
@@ -92,9 +105,9 @@ public class CUDAContext implements Context {
       m_cubinFiles.put(filename, cubin_file);
     }
     
-    m_handlesMemory = new FixedMemory(8);
-    m_exceptionsMemory = new FixedMemory(8);
-    m_classMemory = new FixedMemory(1024);
+    m_handlesMemory = new CheckedFixedMemory(8);
+    m_exceptionsMemory = new CheckedFixedMemory(8);
+    m_classMemory = new CheckedFixedMemory(1024);
     if(m_objectMemory == null){
       init();
     }
@@ -128,9 +141,9 @@ public class CUDAContext implements Context {
       m_cubinFiles.put(filename, cubin_file);
     }
     
-    m_handlesMemory = new FixedMemory(8*work.size());
-    m_exceptionsMemory = new FixedMemory(8*work.size());
-    m_classMemory = new FixedMemory(1024);
+    m_handlesMemory = new CheckedFixedMemory(8*work.size());
+    m_exceptionsMemory = new CheckedFixedMemory(8*work.size());
+    m_classMemory = new CheckedFixedMemory(1024);
     if(m_objectMemory == null){
       init();
     }
@@ -264,10 +277,13 @@ public class CUDAContext implements Context {
   
   private void runBlocks(ThreadConfig thread_config, byte[] cubin_file){
     
-    cudaRun(m_device.getDeviceId(), cubin_file, cubin_file.length, 
-      thread_config.getBlockShapeX(), thread_config.getGridShapeX(), 
-      thread_config.getNumThreads(), m_objectMemory, m_handlesMemory,
-      m_exceptionsMemory, m_classMemory);
+    KernelLaunch item = new KernelLaunch(m_device.getDeviceId(), cubin_file, 
+      cubin_file.length, thread_config.getBlockShapeX(), 
+      thread_config.getGridShapeX(), thread_config.getNumThreads(), 
+      m_objectMemory, m_handlesMemory, m_exceptionsMemory, m_classMemory);
+    
+    m_toThread.put(item);
+    m_fromThread.take();
   }  
 
   private byte[] readCubinFile(String filename) {
@@ -286,6 +302,34 @@ public class CUDAContext implements Context {
       return cubin_file;
     } catch(Exception ex){
       throw new RuntimeException(ex);
+    }
+  }
+  
+  @Override
+  public void run() {
+    while(true){
+      try {
+        KernelLaunch item = m_toThread.take();
+        
+        if(item.quit()){
+          m_fromThread.put(item);
+          return;
+        }
+        
+        System.out.println("running: ");
+        System.out.println("  device_index: "+item.getDeviceIndex());
+        System.out.println("  block_shape_x: "+item.getBlockShapeX());
+        System.out.println("  grid_shape_x: "+item.getGridShapeX());
+        System.out.println("  num_threads: "+item.getNumThreads());
+        cudaRun(item.getDeviceIndex(), item.getCubinFile(), item.getCubinLength(),
+          item.getBlockShapeX(), item.getGridShapeX(), item.getNumThreads(), 
+          item.getObjectMem(), item.getHandlesMem(), item.getExceptionsMem(),
+          item.getClassMem());
+        
+        m_fromThread.put(item);
+      } catch(Exception ex){
+        //ignore
+      }
     }
   }
   

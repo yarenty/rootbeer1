@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.trifort.rootbeer.generate.opencl.tweaks.GencodeOptions.CompileArchitecture;
-import org.trifort.rootbeer.runtime2.cuda.BlockingQueue;
+import org.trifort.rootbeer.runtime.BlockingQueue;
 import org.trifort.rootbeer.util.CudaPath;
 
 

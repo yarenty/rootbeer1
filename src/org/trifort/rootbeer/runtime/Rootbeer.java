@@ -23,7 +23,7 @@ public class Rootbeer {
     m_stats = new ArrayList<StatsRow>();
   }
   
-  public List<GpuDevice> getGpuDevices(){
+  public List<GpuDevice> getDevices(){
     if(m_cards != null){
       return m_cards;
     }
@@ -53,7 +53,7 @@ public class Rootbeer {
   }
   
   public Context createDefaultContext(){
-    List<GpuDevice> devices = getGpuDevices();
+    List<GpuDevice> devices = getDevices();
     GpuDevice best = null;
     for(GpuDevice device : devices){
       if(best == null){
@@ -114,7 +114,7 @@ public class Rootbeer {
   
   public static void main(String[] args){
     Rootbeer rootbeer = new Rootbeer();
-    List<GpuDevice> devices = rootbeer.getGpuDevices();
+    List<GpuDevice> devices = rootbeer.getDevices();
     System.out.println("count: "+devices.size());
     for(GpuDevice device : devices){
       System.out.println("device: "+device.getDeviceName());
@@ -124,5 +124,4 @@ public class Rootbeer {
       System.out.println("  mp_count: "+device.getMultiProcessorCount());
     }
   }
-  
 }

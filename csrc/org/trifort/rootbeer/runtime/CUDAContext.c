@@ -62,7 +62,6 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   void * fatcubin;
   int offset;
   int info_space_size;
-  int heap_end;
 
   CUdeviceptr gpu_info_space;
   CUdeviceptr gpu_object_mem;
@@ -118,7 +117,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
 
   cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
   cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
-  heap_end = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
+  cpu_heap_end = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
 
   cpu_handles_mem = (void *) (*env)->CallLongMethod(env, handles_mem, get_address_method);
   cpu_handles_mem_size = (*env)->CallLongMethod(env, handles_mem, get_heap_end_method);
@@ -240,9 +239,9 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   status = cuMemcpyDtoH(info_space, gpu_info_space, info_space_size);
   CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_info_space", status, device)
 
-  heap_end = info_space[1];
+  cpu_heap_end = info_space[1];
 
-  status = cuMemcpyDtoH(cpu_object_mem, gpu_object_mem, heap_end);
+  status = cuMemcpyDtoH(cpu_object_mem, gpu_object_mem, cpu_heap_end);
   CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_object_mem", status, device)
 
   status = cuMemcpyDtoH(cpu_exceptions_mem, gpu_exceptions_mem, cpu_exceptions_mem_size);

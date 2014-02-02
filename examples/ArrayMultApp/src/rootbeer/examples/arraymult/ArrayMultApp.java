@@ -15,7 +15,7 @@ public class ArrayMultApp {
     }
 
     Rootbeer rootbeer = new Rootbeer();
-    rootbeer.runAll(jobs);
+    rootbeer.run(jobs);
   }
   
   public static void main(String[] args){

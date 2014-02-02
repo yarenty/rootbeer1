@@ -193,7 +193,7 @@ public class Main {
   
   private void printDeviceInfo() {
     Rootbeer rootbeer = new Rootbeer();
-    List<GpuDevice> devices = rootbeer.getGpuDevices();
+    List<GpuDevice> devices = rootbeer.getDevices();
     System.out.println("device count: "+devices.size());
     for(GpuDevice device : devices){
       System.out.println("device: "+device.getDeviceName());

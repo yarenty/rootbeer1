@@ -5,6 +5,7 @@ public class GpuDevice {
   public static final int DEVICE_TYPE_CUDA = 1;
   public static final int DEVICE_TYPE_OPENCL = 2;
   public static final int DEVICE_TYPE_NEMU = 3;
+  public static final int DEVICE_TYPE_JAVA = 4;
   
   public static GpuDevice newCudaDevice(int device_id, int major_version, 
     int minor_version, String device_name, long free_global_mem_size, 
@@ -279,10 +280,10 @@ public class GpuDevice {
   }
   
   public void setMaxGridDimZ(int value){
-    m_maxBlockDimZ = value;
+    m_maxGridDimZ = value;
   }
   
   public int getMaxGridDimZ(){
-    return m_maxBlockDimZ;
+    return m_maxGridDimZ;
   }
 }
