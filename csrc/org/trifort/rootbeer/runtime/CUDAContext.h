@@ -14,7 +14,7 @@ extern "C" {
  */
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   (JNIEnv *, jobject, jint, jbyteArray, jint, jint, jint, jint, jobject, 
-   jobject, jboolean);
+   jobject);
 
 #ifdef __cplusplus
 }

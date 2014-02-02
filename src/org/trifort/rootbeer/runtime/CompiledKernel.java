@@ -16,5 +16,4 @@ public interface CompiledKernel {
   public String getCubin64();
   public Serializer getSerializer(Memory memory, Memory texture_memory);
   public boolean isUsingGarbageCollector();
-  public boolean getNewUsed();
 }

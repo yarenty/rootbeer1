@@ -44,7 +44,6 @@ public class VisitorGen extends AbstractVisitorGen {
     makeSentinalCtors();
     makeSerializer();
     addGetSerializerMethod();
-    addNewUsedMethod();
   }
 
   private void makeSerializer() {
@@ -193,20 +192,6 @@ public class VisitorGen extends AbstractVisitorGen {
     Local param1 = m_bcl.top().refParameter(1);
     Local ret = m_bcl.top().newInstance(m_className, param0, param1);
     m_bcl.top().returnValue(ret);
-    m_bcl.top().endMethod();
-  }
-  
-  private void addNewUsedMethod() {
-    m_bcl.top().openClass(m_runtimeBasicBlock);
-    m_bcl.top().startMethod("getNewUsed", BooleanType.v());
-    boolean new_used = OpenCLScene.v().getNewUsed();
-    int new_used_int;
-    if(new_used){
-      new_used_int = 1;
-    } else {
-      new_used_int = 0;
-    }
-    m_bcl.top().returnValue(IntConstant.v(new_used_int));
     m_bcl.top().endMethod();
   }
 

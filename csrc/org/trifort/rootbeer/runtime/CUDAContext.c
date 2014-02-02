@@ -52,7 +52,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   (JNIEnv *env, jobject this_ref, jint device_index, jbyteArray cubin_file, 
    jint cubin_length, jint block_shape_x, jint grid_shape_x, jint num_threads, 
    jobject object_mem, jobject handles_mem, jobject exceptions_mem, 
-   jobject class_mem, jboolean new_used)
+   jobject class_mem)
 {
   CUresult status;
   CUdevice device;
@@ -117,12 +117,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEndPtr", "()J");
 
   cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
+  cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
   heap_end = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
-  if(new_used){
-    cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
-  } else {
-    cpu_object_mem_size = heap_end;
-  }
 
   cpu_handles_mem = (void *) (*env)->CallLongMethod(env, handles_mem, get_address_method);
   cpu_handles_mem_size = (*env)->CallLongMethod(env, handles_mem, get_heap_end_method);

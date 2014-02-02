@@ -100,7 +100,7 @@ public class CUDAContext implements Context {
     }
     
     writeBlocksTemplate(compiled_kernel);
-    runBlocks(thread_config, cubin_file, compiled_kernel.getNewUsed());
+    runBlocks(thread_config, cubin_file);
     readBlocksTemplate(compiled_kernel, thread_config);
   }
 
@@ -136,7 +136,7 @@ public class CUDAContext implements Context {
     }
     
     writeBlocks(work);
-    runBlocks(thread_config, cubin_file, compiled_kernel.getNewUsed());
+    runBlocks(thread_config, cubin_file);
     readBlocks(work);
   }
   
@@ -262,13 +262,12 @@ public class CUDAContext implements Context {
     }
   }
   
-  private void runBlocks(ThreadConfig thread_config, byte[] cubin_file, 
-    boolean new_used){
+  private void runBlocks(ThreadConfig thread_config, byte[] cubin_file){
     
     cudaRun(m_device.getDeviceId(), cubin_file, cubin_file.length, 
       thread_config.getBlockShapeX(), thread_config.getGridShapeX(), 
       thread_config.getNumThreads(), m_objectMemory, m_handlesMemory,
-      m_exceptionsMemory, m_classMemory, new_used);
+      m_exceptionsMemory, m_classMemory);
   }  
 
   private byte[] readCubinFile(String filename) {
@@ -292,5 +291,5 @@ public class CUDAContext implements Context {
   
   private native void cudaRun(int device_index, byte[] cubin_file, int cubin_length,
     int block_shape_x, int grid_shape_x, int num_threads, Memory object_mem,
-    Memory handles_mem, Memory exceptions_mem, Memory class_mem, boolean new_used);
+    Memory handles_mem, Memory exceptions_mem, Memory class_mem);
 }
