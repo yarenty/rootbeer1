@@ -61,6 +61,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   CUfunction function;
   void * fatcubin;
   int offset;
+  int info_space_size;
+  int heap_end;
 
   CUdeviceptr gpu_info_space;
   CUdeviceptr gpu_object_mem;
@@ -115,10 +117,11 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEndPtr", "()J");
 
   cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
+  heap_end = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
   if(new_used){
     cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
   } else {
-    cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
+    cpu_object_mem_size = heap_end;
   }
 
   cpu_handles_mem = (void *) (*env)->CallLongMethod(env, handles_mem, get_address_method);
@@ -130,14 +133,13 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   cpu_class_mem = (void *) (*env)->CallLongMethod(env, class_mem, get_address_method);
   cpu_class_mem_size = (*env)->CallLongMethod(env, class_mem, get_heap_end_method);
 
+  info_space_size = 1024;
   jlong * info_space = (jlong *) malloc(info_space_size);
   info_space[1] = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
 
   //----------------------------------------------------------------------------
   //allocate mem
   //----------------------------------------------------------------------------
-
-  info_space_size = 1024;
 
   status = cuMemAlloc(&gpu_info_space, info_space_size);  
   CHECK_STATUS(env, "Error in cuMemAlloc: gpu_info_mem", status, device)
@@ -247,7 +249,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   status = cuMemcpyDtoH(cpu_object_mem, gpu_object_mem, heap_end);
   CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_object_mem", status, device)
 
-  status = cuMemcpyDtoH(cpu_exceptions_mem, gpu_exceptions_mem, num_threads * sizeof(jlong));
+  status = cuMemcpyDtoH(cpu_exceptions_mem, gpu_exceptions_mem, cpu_exceptions_mem_size);
   CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_object_mem", status, device)
 
   //----------------------------------------------------------------------------

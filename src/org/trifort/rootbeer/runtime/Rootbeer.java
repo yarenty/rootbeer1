@@ -38,14 +38,15 @@ public class Rootbeer {
       //ignore
     }
     
-    //TODO: complete the OpenCL runtime
-    //try {
-    //  Class c = Class.forName("org.trifort.rootbeer.runtime.OpenCLRuntime");
-    //  Constructor<IRuntime> ctor = c.getConstructor();
-    //  m_openCLRuntime = ctor.newInstance();
-    //  m_cards.addAll(m_openCLRuntime.getGpuDevices());
-    //} catch(Exception ex){
-    //  //ignore
+    //if(m_cards.isEmpty()){
+    //  try {
+    //    Class c = Class.forName("org.trifort.rootbeer.runtime.OpenCLRuntime");
+    //    Constructor<IRuntime> ctor = c.getConstructor();
+    //    m_openCLRuntime = ctor.newInstance();
+    //    m_cards.addAll(m_openCLRuntime.getGpuDevices());
+    //  } catch(Exception ex){
+    //    //ignore
+    //  }
     //}
     
     return m_cards;

@@ -150,10 +150,25 @@ public class CUDAContext implements Context {
     serializer.writeStaticsToHeap();
     
     for(Kernel kernel : work){
-      long handle = serializer.writeToHeap(compiled_kernel);
+      long handle = serializer.writeToHeap(kernel);
       m_handlesMemory.writeRef(handle);
       m_handles.put(kernel, handle);
     }
+    
+    if(Configuration.getPrintMem()){
+      BufferPrinter printer = new BufferPrinter();
+      printer.print(m_objectMemory, 0, 896);
+    }
+  }
+
+  private void writeBlocksTemplate(CompiledKernel compiled_kernel){
+    m_objectMemory.clearHeapEndPtr();
+    m_handlesMemory.clearHeapEndPtr();
+    
+    Serializer serializer = compiled_kernel.getSerializer(m_objectMemory, m_textureMemory);
+    serializer.writeStaticsToHeap();
+    long handle = serializer.writeToHeap(compiled_kernel);
+    m_handlesMemory.writeRef(handle);
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
@@ -186,7 +201,8 @@ public class CUDAContext implements Context {
           throw except_th;
         } else if(except instanceof GpuException){
           GpuException gpu_except = (GpuException) except;
-          gpu_except.throwArrayOutOfBounds();
+          throw new ArrayIndexOutOfBoundsException("array_index: "+gpu_except.m_arrayIndex+
+            " array_length: "+gpu_except.m_arrayLength+" array: "+gpu_except.m_array);
         } else {
           throw new RuntimeException((Throwable) except);
         }
@@ -198,30 +214,6 @@ public class CUDAContext implements Context {
       long handle = m_handles.get(kernel);
       serializer.readFromHeap(kernel, true, handle);
     }
-    
-    if(Configuration.getPrintMem()){
-      BufferPrinter printer = new BufferPrinter();
-      printer.print(m_objectMemory, 0, 896);
-    }
-  }
-  
-  private void runBlocks(ThreadConfig thread_config, byte[] cubin_file, 
-    boolean new_used){
-    
-    cudaRun(m_device.getDeviceId(), cubin_file, cubin_file.length, 
-      thread_config.getBlockShapeX(), thread_config.getGridShapeX(), 
-      thread_config.getNumThreads(), m_objectMemory, m_handlesMemory,
-      m_exceptionsMemory, m_classMemory, new_used);
-  }  
-  
-  private void writeBlocksTemplate(CompiledKernel compiled_kernel){
-    m_objectMemory.clearHeapEndPtr();
-    m_handlesMemory.clearHeapEndPtr();
-    
-    Serializer serializer = compiled_kernel.getSerializer(m_objectMemory, m_textureMemory);
-    serializer.writeStaticsToHeap();
-    long handle = serializer.writeToHeap(compiled_kernel);
-    m_handlesMemory.writeRef(handle);
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
@@ -253,7 +245,8 @@ public class CUDAContext implements Context {
           throw except_th;
         } else if(except instanceof GpuException){
           GpuException gpu_except = (GpuException) except;
-          gpu_except.throwArrayOutOfBounds();
+          throw new ArrayIndexOutOfBoundsException("array_index: "+gpu_except.m_arrayIndex+
+              " array_length: "+gpu_except.m_arrayLength+" array: "+gpu_except.m_array);
         } else {
           throw new RuntimeException((Throwable) except);
         }
@@ -268,6 +261,15 @@ public class CUDAContext implements Context {
       printer.print(m_objectMemory, 0, 896);
     }
   }
+  
+  private void runBlocks(ThreadConfig thread_config, byte[] cubin_file, 
+    boolean new_used){
+    
+    cudaRun(m_device.getDeviceId(), cubin_file, cubin_file.length, 
+      thread_config.getBlockShapeX(), thread_config.getGridShapeX(), 
+      thread_config.getNumThreads(), m_objectMemory, m_handlesMemory,
+      m_exceptionsMemory, m_classMemory, new_used);
+  }  
 
   private byte[] readCubinFile(String filename) {
     try {

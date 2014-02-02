@@ -33,8 +33,7 @@ You send data to the gpu by adding a field to the object implementing kernel. `g
     }
     
 ###Simple Example:
-<br />
-This simple example uses kernel lists and no thread config or context. Rootbeer will create a thread config and select the best device automatically. If you wish to use multiple GPUs you need to pass in a RootbeerContext.
+This simple example uses kernel lists and no thread config or context. Rootbeer will create a thread config and select the best device automatically. If you wish to use multiple GPUs you need to pass in a Context.
 
 <b>ScalarMult:</b>
 
@@ -57,7 +56,6 @@ This simple example uses kernel lists and no thread config or context. Rootbeer 
       }
     }
     
-<br />
 <b>ScalarMultKernel:</b>
 
     import org.trifort.rootbeer.runtime.Kernel;

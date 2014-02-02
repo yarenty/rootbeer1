@@ -72,8 +72,6 @@ public class RootbeerCompiler {
     m_runtimePackages.add("org.trifort.rootbeer.generate.");
     m_runtimePackages.add("org.trifort.rootbeer.runtime.");
     m_runtimePackages.add("org.trifort.rootbeer.runtime2.");
-    m_runtimePackages.add("org.trifort.rootbeer.runtime2.cuda.ToSpaceWriter");
-    m_runtimePackages.add("org.trifort.rootbeer.runtimegpu.");
     m_runtimePackages.add("org.trifort.rootbeer.test.");
     m_runtimePackages.add("org.trifort.rootbeer.util.");
   }
@@ -283,6 +281,7 @@ public class RootbeerCompiler {
         SootClass iface = ifaces.next();
         if(iface.getName().startsWith("org.trifort.rootbeer.test.")){
           write = false;
+          break;
         }
       }
       if(write){

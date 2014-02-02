@@ -5,13 +5,13 @@ import java.util.List;
 
 public class FixedMemory implements Memory {
 
-  private long m_address;
-  private long m_size;
-  private long m_reserve;
-  private MemPointer m_staticPointer;
-  private MemPointer m_instancePointer;
-  private MemPointer m_currentPointer;  
-  private List<List<Long>> m_integerList;
+  protected long m_address;
+  protected long m_size;
+  protected long m_reserve;
+  protected MemPointer m_staticPointer;
+  protected MemPointer m_instancePointer;
+  protected MemPointer m_currentPointer;  
+  protected List<List<Long>> m_integerList;
     
   public FixedMemory(long size){
     m_address = malloc(size);    
@@ -23,7 +23,7 @@ public class FixedMemory implements Memory {
     m_integerList = new ArrayList<List<Long>>();
   }
   
-  private long currPointer(){
+  protected long currPointer(){
     return m_currentPointer.m_pointer;
   }  
   
