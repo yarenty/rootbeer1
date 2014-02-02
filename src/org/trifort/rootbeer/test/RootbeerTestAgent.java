@@ -89,11 +89,11 @@ public class RootbeerTestAgent {
   
   public void test(ClassLoader cls_loader, boolean run_hard_tests) throws Exception {
     LoadTestSerialization loader = new LoadTestSerialization();
-    List<TestSerialization> creators = loader.load(cls_loader, "edu.syr.pcpratts.rootbeer.test.Main", run_hard_tests);
-    List<TestException> ex_creators = loader.loadException(cls_loader, "edu.syr.pcpratts.rootbeer.test.ExMain");
-    List<TestSerialization> change_thread = loader.load(cls_loader, "edu.syr.pcpratts.rootbeer.test.ChangeThread", run_hard_tests);
-    List<TestKernelTemplate> kernel_template_creators = loader.loadKernelTemplate(cls_loader, "edu.syr.pcpratts.rootbeer.test.KernelTemplateMain");
-    List<TestApplication> application_creators = loader.loadApplication(cls_loader, "edu.syr.pcpratts.rootbeer.test.ApplicationMain");
+    List<TestSerialization> creators = loader.load(cls_loader, "org.trifort.rootbeer.test.Main", run_hard_tests);
+    List<TestException> ex_creators = loader.loadException(cls_loader, "org.trifort.rootbeer.test.ExMain");
+    List<TestSerialization> change_thread = loader.load(cls_loader, "org.trifort.rootbeer.test.ChangeThread", run_hard_tests);
+    List<TestKernelTemplate> kernel_template_creators = loader.loadKernelTemplate(cls_loader, "org.trifort.rootbeer.test.KernelTemplateMain");
+    List<TestApplication> application_creators = loader.loadApplication(cls_loader, "org.trifort.rootbeer.test.ApplicationMain");
     int num_tests = creators.size() + ex_creators.size() + change_thread.size() + 
       kernel_template_creators.size() + application_creators.size();
     int test_num = 1;

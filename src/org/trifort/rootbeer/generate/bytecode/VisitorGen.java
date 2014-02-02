@@ -43,7 +43,8 @@ public class VisitorGen extends AbstractVisitorGen {
     m_bcl.push(new BytecodeLanguage());
     makeSentinalCtors();
     makeSerializer();
-    addGetVisitorMethodToRuntimeBasicBlock();
+    addGetSerializerMethod();
+    addNewUsedMethod();
   }
 
   private void makeSerializer() {
@@ -62,10 +63,6 @@ public class VisitorGen extends AbstractVisitorGen {
     m_className = base_name+"Serializer";
     m_bcl.top().makeClass(m_className, "org.trifort.rootbeer.runtime.Serializer");
   }
-  /*
-  public abstract void doWriteArrayToHeap(Object o, long ref, int start_index, int end_index, int core);
-  public abstract void doReadArrayFromHeap(Object o, long ref, int start_index, int end_index, int core);
-   */
     
   private void makeGetLengthMethod(){    
     SootClass object_soot_class = Scene.v().getSootClass("java.lang.Object");
@@ -187,7 +184,7 @@ public class VisitorGen extends AbstractVisitorGen {
     static_read_gen.makeMethod();
   }
   
-  private void addGetVisitorMethodToRuntimeBasicBlock() {
+  private void addGetSerializerMethod() {
     m_bcl.top().openClass(m_runtimeBasicBlock);
     SootClass gc_object_visitor_soot_class = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Serializer");
     SootClass mem_cls = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
@@ -196,6 +193,20 @@ public class VisitorGen extends AbstractVisitorGen {
     Local param1 = m_bcl.top().refParameter(1);
     Local ret = m_bcl.top().newInstance(m_className, param0, param1);
     m_bcl.top().returnValue(ret);
+    m_bcl.top().endMethod();
+  }
+  
+  private void addNewUsedMethod() {
+    m_bcl.top().openClass(m_runtimeBasicBlock);
+    m_bcl.top().startMethod("getNewUsed", BooleanType.v());
+    boolean new_used = OpenCLScene.v().getNewUsed();
+    int new_used_int;
+    if(new_used){
+      new_used_int = 1;
+    } else {
+      new_used_int = 0;
+    }
+    m_bcl.top().returnValue(IntConstant.v(new_used_int));
     m_bcl.top().endMethod();
   }
 

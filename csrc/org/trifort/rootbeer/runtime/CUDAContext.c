@@ -51,7 +51,8 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error,
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   (JNIEnv *env, jobject this_ref, jint device_index, jbyteArray cubin_file, 
    jint cubin_length, jint block_shape_x, jint grid_shape_x, jint num_threads, 
-   jobject object_mem, jobject handles_mem, jobject exceptions_mem, jobject class_mem)
+   jobject object_mem, jobject handles_mem, jobject exceptions_mem, 
+   jobject class_mem, jboolean new_used)
 {
   CUresult status;
   CUdevice device;
@@ -68,13 +69,6 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   CUdeviceptr gpu_class_mem;
   CUdeviceptr gpu_heap_end;
   CUdeviceptr gpu_buffer_size;
-
-  int info_space_size;
-  int object_mem_size;
-  int handles_mem_size;
-  int exceptions_mem_size;
-  int class_mem_size;
-  int heap_end;
 
   void * cpu_object_mem;
   void * cpu_handles_mem;
@@ -112,28 +106,52 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   CHECK_STATUS(env, "Error in cuModuleGetFunction", status, device)
 
   //----------------------------------------------------------------------------
+  //get handles from java
+  //----------------------------------------------------------------------------
+
+  cuda_memory_class = (*env)->FindClass(env, "org/trifort/rootbeer/runtime/FixedMemory");
+  get_address_method = (*env)->GetMethodID(env, cuda_memory_class, "getAddress", "()J");
+  get_size_method = (*env)->GetMethodID(env, cuda_memory_class, "getSize", "()J");
+  get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEndPtr", "()J");
+
+  cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
+  if(new_used){
+    cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
+  } else {
+    cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
+  }
+
+  cpu_handles_mem = (void *) (*env)->CallLongMethod(env, handles_mem, get_address_method);
+  cpu_handles_mem_size = (*env)->CallLongMethod(env, handles_mem, get_heap_end_method);
+
+  cpu_exceptions_mem = (void *) (*env)->CallLongMethod(env, exceptions_mem, get_address_method);
+  cpu_exceptions_mem_size = (*env)->CallLongMethod(env, exceptions_mem, get_size_method);
+
+  cpu_class_mem = (void *) (*env)->CallLongMethod(env, class_mem, get_address_method);
+  cpu_class_mem_size = (*env)->CallLongMethod(env, class_mem, get_heap_end_method);
+
+  jlong * info_space = (jlong *) malloc(info_space_size);
+  info_space[1] = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
+
+  //----------------------------------------------------------------------------
   //allocate mem
   //----------------------------------------------------------------------------
 
   info_space_size = 1024;
-  object_mem_size = 1024*1024;
-  handles_mem_size = 1024*1024;
-  exceptions_mem_size = num_threads * sizeof(jlong);
-  class_mem_size = sizeof(jint)*1024;
 
   status = cuMemAlloc(&gpu_info_space, info_space_size);  
   CHECK_STATUS(env, "Error in cuMemAlloc: gpu_info_mem", status, device)
 
-  status = cuMemAlloc(&gpu_object_mem, object_mem_size);  
+  status = cuMemAlloc(&gpu_object_mem, cpu_object_mem_size);  
   CHECK_STATUS(env, "Error in cuMemAlloc: gpu_object_mem", status, device)
 
-  status = cuMemAlloc(&gpu_handles_mem, handles_mem_size); 
+  status = cuMemAlloc(&gpu_handles_mem, cpu_handles_mem_size); 
   CHECK_STATUS(env, "Error in cuMemAlloc: gpu_handles_mem", status, device)
     
-  status = cuMemAlloc(&gpu_exceptions_mem, exceptions_mem_size); 
+  status = cuMemAlloc(&gpu_exceptions_mem, cpu_exceptions_mem_size); 
   CHECK_STATUS(env, "Error in cuMemAlloc: gpu_exceptions_mem", status, device)
 
-  status = cuMemAlloc(&gpu_class_mem, class_mem_size);
+  status = cuMemAlloc(&gpu_class_mem, cpu_class_mem_size);
   CHECK_STATUS(env, "Error in cuMemAlloc: gpu_class_mem", status, device)
 
   status = cuMemAlloc(&gpu_heap_end, 8);
@@ -185,26 +203,6 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   //----------------------------------------------------------------------------
   //copy data
   //----------------------------------------------------------------------------
-
-  cuda_memory_class = (*env)->FindClass(env, "org/trifort/rootbeer/runtime/FixedMemory");
-  get_address_method = (*env)->GetMethodID(env, cuda_memory_class, "getAddress", "()J");
-  get_size_method = (*env)->GetMethodID(env, cuda_memory_class, "getSize", "()J");
-  get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEndPtr", "()J");
-
-  cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
-  cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
-
-  cpu_handles_mem = (void *) (*env)->CallLongMethod(env, handles_mem, get_address_method);
-  cpu_handles_mem_size = (*env)->CallLongMethod(env, handles_mem, get_size_method);
-
-  cpu_exceptions_mem = (void *) (*env)->CallLongMethod(env, exceptions_mem, get_address_method);
-  cpu_exceptions_mem_size = (*env)->CallLongMethod(env, exceptions_mem, get_size_method);
-
-  cpu_class_mem = (void *) (*env)->CallLongMethod(env, class_mem, get_address_method);
-  cpu_class_mem_size = (*env)->CallLongMethod(env, class_mem, get_size_method);
-
-  jlong * info_space = (jlong *) malloc(info_space_size);
-  info_space[1] = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
 
   status = cuMemcpyHtoD(gpu_info_space, info_space, info_space_size);
   CHECK_STATUS(env, "Error in cuMemcpyHtoD: info_space", status, device)

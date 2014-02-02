@@ -7,6 +7,7 @@
 
 package org.trifort.rootbeer.generate.opencl;
 
+import soot.jimple.NewExpr;
 import soot.rbclassload.MethodSignatureUtil;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -533,5 +534,21 @@ public class OpenCLScene {
   
   public ClassConstantNumbers getClassConstantNumbers(){
     return m_constantNumbers;
+  }
+
+  public boolean getNewUsed() {
+    for(SootMethod method : m_methods){
+      if(method.hasActiveBody()){
+        Body body = method.getActiveBody();
+        List<UnitBox> boxes = body.getAllUnitBoxes();
+        for(UnitBox box : boxes){
+          Unit unit = box.getUnit();
+          if(unit instanceof NewExpr){
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 }

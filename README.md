@@ -1,43 +1,91 @@
-## Rootbeer
+#Rootbeer
 
-The Rootbeer GPU Compiler makes it easy to use Graphics Processing Units from
-within Java.
+The Rootbeer GPU Compiler lets you use GPUs from within Java. It allows you to use almost anything from Java on the GPU:
 
-Rootbeer is more advanced than CUDA or OpenCL Java Language Bindings. With 
-bindings the developer must serialize complex graphs of objects into arrays
-of primitive types. With Rootbeer this is done automatically. Also with language
-bindings, the developer must write the GPU kernel in CUDA or OpenCL. With
-Rootbeer a static analysis of the Java Bytecode is done (using Soot) and CUDA
-code is automatically generated.
+  1. Composite objects with methods and fields
+  2. Static and instance methods and fields
+  3. Arrays of primitive and reference types of any dimension.
 
-See `doc/hpcc_rootbeer.pdf` for the conference slides from HPCC-2012.
-See `doc/rootbeer1_paper.pdf` for the conference paper from HPCC-2012.
+Be aware that you should not expect to get a speedup using a GPU by doing something simple
+like multiplying each element in an array by a scalar. Serialization time is a large bottleneck
+and usually you need an algorithm that is O(n^2) to O(n^3).
 
-Rootbeer is licensed under the MIT license.
+An experienced GPU developer will look at existing code and find places where control can 
+be transfered to the GPU. Optimal performance in an application will have places with serial
+code and places with parallel code on the GPU. At each place that a cut can be made to transfer
+control to the GPU, the job needs to be sized for the GPU.
 
-## Development notes
+For the best performance, you should be using shared memory (NVIDIA term). The shared memory is
+basically a software managed cache. You want to have more threads per block, but this often
+requires using more shared memory. If you see the [CUDA Occupancy Calculator](http://developer.download.nvidia.com/compute/cuda/CUDA_Occupancy_calculator.xls) you can see
+that for best occupancy you will want more threads and less shared memory. There is a tradeoff 
+between thread count, shared memory size and register count. All of these are configurable
+using Rootbeer.
 
-Rootbeer was created using Test Driven Development and testing is essentially
-important in Rootbeer. Rootbeer is 20k lines of product code and 8.8k of test code
-and 48/58 tests currently pass on Windows, Linux and Mac. The Rootbeer test case suite 
-covers every aspect of the Java Programming language except:
-  1. native methods
-  2. reflection
-  3. dynamic method invocation
-  4. sleeping while inside a monitor. 
-  
-The original publication for Rootbeer was in HPCC-2012.  
-  "Rootbeer: Seamlessly using GPUs from Java"  
-  Philip C. Pratt-Szeliga, James W. Fawcett, Roy D. Welch.  
-  HPCC-2012.  
+## Programming  
+<br />
+<b>Kernel Interface:</b> Your code that will run on the GPU will implement the Kernel interface.
+You send data to the gpu by adding a field to the object implementing kernel. `gpuMethod` will access the data.
 
-This work is supported by the National Science Foundation grant number 
-MCB-0746066 to R.D.W. and God is Most High.
+    package org.trifort.rootbeer.runtime;
+    
+    public interface Kernel {
+      void gpuMethod();
+    }
+    
+***
+###Simple Example:
+<br />
+This simple example uses kernel lists and no thread config or context. Rootbeer will create a thread config and select the best device automatically. If you wish to use multiple GPUs you need to pass in a RootbeerContext.
 
-Work is on-going to improve performance with Rootbeer. Currently Rootbeer has
-competative speed when using single-dimensional arrays of primitive types.
+<b>ScalarMult:</b>
 
-## Building
+    import org.trifort.rootbeer.runtime.Rootbeer;
+    import org.trifort.rootbeer.runtime.Kernel;
+    
+    public class ScalarMult {
+      public void test(){
+        List<Kernel> kernels = new ArrayList<Kernel>();
+          for(int i = 0; i < 10; ++i){
+            kernels.add(new ScalarMultKernel(i));
+          }
+          Rootbeer rootbeer = new Rootbeer();
+          rootbeer.run(kernels);
+          for(int i = 0; i < 10; ++i){
+            ScalarMultKernel kernel = kernels.get(i);
+            System.out.println(kernel.getValue());
+          }
+        }
+      }
+    }
+    
+<br />
+<b>ScalarMultKernel:</b>
+
+    import org.trifort.rootbeer.runtime.Kernel;
+    
+    public class ScalarMultKernel implements Kernel {
+      private int m_value;
+        
+      public ScalarMultKernel(int value){
+        m_value = value;
+      }
+        
+      public void gpuMethod(){
+        m_value++;
+      }
+        
+      public int getValue(){
+        return m_value;
+      }
+    }
+
+***
+### MultiGPU Example
+
+### Shared Memory Example
+
+### Building
 
 1. Clone the github repo to `rootbeer1/`
 2. `cd rootbeer1/`
@@ -45,28 +93,22 @@ competative speed when using single-dimensional arrays of primitive types.
 4. `./pack-rootbeer` (linux) or `./pack-rootbeer.bat` (windows)
 5. Use the `rootbeer1/Rootbeer.jar` (not `dist/Rootbeer1.jar`)
 
-## Pre-Built Binaries  
-
-See here: http://rbcompiler.com/download.html
-
-## CUDA Setup
+### CUDA Setup
 
 You need to have the CUDA Toolkit and CUDA Driver installed to use Rootbeer.
 Download it from http://www.nvidia.com/content/cuda/cuda-downloads.html
 
-## API
+### License
 
-See the following links for help on the API:  
-1. http://rbcompiler.com/  
-2. http://rbcompiler.com/features.html  
-3. https://github.com/pcpratts/rootbeer1/tree/develop/gtc2013/Matrix  
+Rootbeer is licensed under the MIT license. If you use rootbeer for any reason, please
+star the repository and email me your usage and comments. I am preparing my dissertation
+now.
 
-## About
+### Examples
+See [here](https://github.com/pcpratts/rootbeer1/tree/master/examples) for a variety of
+examples.
 
-Rootbeer is written by:
+### Author
 
 Phil Pratt-Szeliga  
-Syracuse University  
-pcpratts@trifort.org  
-http://trifort.org/  
-http://rbcompiler.com/
+http://trifort.org/

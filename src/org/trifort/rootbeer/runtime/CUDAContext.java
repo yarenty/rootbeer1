@@ -31,22 +31,29 @@ public class CUDAContext implements Context {
     
     m_cubinFiles = new HashMap<String, byte[]>();
     m_handles = new HashMap<Kernel, Long>();
-    
-    init();
+
+    m_textureMemory = new FixedMemory(64);
+  }
+
+  @Override
+  public void init(int memory_size) {
+    m_objectMemory = new FixedMemory(memory_size);
   }
 
   @Override
   public void init() {
-    m_objectMemory = new FixedMemory(1024*1024);
-    m_textureMemory = new FixedMemory(1024);
-    m_handlesMemory = new FixedMemory(1024*1024);
-    m_exceptionsMemory = new FixedMemory(1024*1024);
-    m_classMemory = new FixedMemory(1024*1024);
+    long free_mem_size = m_device.getFreeGlobalMemoryBytes();
+    free_mem_size -= 64 * 1024 * 1024;
+    free_mem_size -= m_handlesMemory.getSize();
+    free_mem_size -= m_exceptionsMemory.getSize();
+    free_mem_size -= m_classMemory.getSize();
+    m_objectMemory = new FixedMemory(free_mem_size);
   }
-
+  
   @Override
   public void close() {
     m_objectMemory.close();
+    m_objectMemory = null;
     m_handlesMemory.close();
     m_exceptionsMemory.close();
     m_classMemory.close();
@@ -85,8 +92,15 @@ public class CUDAContext implements Context {
       m_cubinFiles.put(filename, cubin_file);
     }
     
+    m_handlesMemory = new FixedMemory(8);
+    m_exceptionsMemory = new FixedMemory(8);
+    m_classMemory = new FixedMemory(1024);
+    if(m_objectMemory == null){
+      init();
+    }
+    
     writeBlocksTemplate(compiled_kernel);
-    runBlocks(thread_config, cubin_file);
+    runBlocks(thread_config, cubin_file, compiled_kernel.getNewUsed());
     readBlocksTemplate(compiled_kernel, thread_config);
   }
 
@@ -114,8 +128,15 @@ public class CUDAContext implements Context {
       m_cubinFiles.put(filename, cubin_file);
     }
     
+    m_handlesMemory = new FixedMemory(8*work.size());
+    m_exceptionsMemory = new FixedMemory(8*work.size());
+    m_classMemory = new FixedMemory(1024);
+    if(m_objectMemory == null){
+      init();
+    }
+    
     writeBlocks(work);
-    runBlocks(thread_config, cubin_file);
+    runBlocks(thread_config, cubin_file, compiled_kernel.getNewUsed());
     readBlocks(work);
   }
   
@@ -184,11 +205,13 @@ public class CUDAContext implements Context {
     }
   }
   
-  private void runBlocks(ThreadConfig thread_config, byte[] cubin_file){    
+  private void runBlocks(ThreadConfig thread_config, byte[] cubin_file, 
+    boolean new_used){
+    
     cudaRun(m_device.getDeviceId(), cubin_file, cubin_file.length, 
       thread_config.getBlockShapeX(), thread_config.getGridShapeX(), 
       thread_config.getNumThreads(), m_objectMemory, m_handlesMemory,
-      m_exceptionsMemory, m_classMemory);
+      m_exceptionsMemory, m_classMemory, new_used);
   }  
   
   private void writeBlocksTemplate(CompiledKernel compiled_kernel){
@@ -267,5 +290,5 @@ public class CUDAContext implements Context {
   
   private native void cudaRun(int device_index, byte[] cubin_file, int cubin_length,
     int block_shape_x, int grid_shape_x, int num_threads, Memory object_mem,
-    Memory handles_mem, Memory exceptions_mem, Memory class_mem);
+    Memory handles_mem, Memory exceptions_mem, Memory class_mem, boolean new_used);
 }

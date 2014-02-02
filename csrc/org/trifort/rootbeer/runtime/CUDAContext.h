@@ -13,7 +13,8 @@ extern "C" {
  * Signature: (IIILorg/trifort/rootbeer/runtime/GpuMemory;Lorg/trifort/rootbeer/runtime/GpuMemory;)V
  */
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
-  (JNIEnv *, jobject, jint, jbyteArray, jint, jint, jint, jint, jobject, jobject);
+  (JNIEnv *, jobject, jint, jbyteArray, jint, jint, jint, jint, jobject, 
+   jobject, jboolean);
 
 #ifdef __cplusplus
 }

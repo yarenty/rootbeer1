@@ -86,6 +86,16 @@ public class GpuDevice {
     }
   }
   
+  public Context createContext(int memory_size){
+    if(m_deviceType == DEVICE_TYPE_CUDA){
+      CUDAContext ret = new CUDAContext(this);
+      ret.init(memory_size);
+      return ret;
+    } else {
+      throw new UnsupportedOperationException();
+    }
+  }
+  
   public int getDeviceType(){
     return m_deviceType;
   }
