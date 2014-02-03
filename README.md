@@ -77,8 +77,47 @@ This simple example uses kernel lists and no thread config or context. Rootbeer 
     }
 
 ### MultiGPU Example
+See the [example](https://github.com/pcpratts/rootbeer1/tree/master/examples/MultiGpu)
+
+  public void multArray(int[] array1, int[] array2){
+    List<Kernel> work0 = new ArrayList<Kernel>();
+    for(int i = 0; i < array1.length; ++i){
+      work0.add(new ArrayMult(array1, i));
+    }
+    List<Kernel> work1 = new ArrayList<Kernel>();
+    for(int i = 0; i < array2.length; ++i){
+      work1.add(new ArrayMult(array2, i));
+    }
+
+    //////////////////////////////////////////////////////
+    //create the Rootbeer runtime and query the devices
+    //////////////////////////////////////////////////////
+    Rootbeer rootbeer = new Rootbeer();
+    List<GpuDevice> devices = rootbeer.getDevices();
+
+    if(devices.size() >= 2){
+      ///////////////////////////////////////////////////
+      //get two devices and create two contexts. memory
+      //  allocations and launches are per context. you
+      //  can pass in the memory size you would like to
+      //  use or don't and Rootbeer will use all the gpu
+      //  memory
+      ///////////////////////////////////////////////////
+      GpuDevice device0 = devices.get(0);
+      GpuDevice device1 = devices.get(1); 
+      Context context0 = device0.createContext(4096);
+      Context context1 = device1.createContext(4096);
+
+      ///////////////////////////////////////////////////
+      //run the work on the two contexts
+      ///////////////////////////////////////////////////
+      rootbeer.run(work0, context0);
+      rootbeer.run(work1, context1);
+    } 
+  }
 
 ### Shared Memory Example
+See the [example](https://github.com/pcpratts/rootbeer1/tree/master/gtc2013/Matrix)
 
 ### Compiling Rootbeer Enabled Projects
 1. Download the latest Rootbeer.jar from the releases

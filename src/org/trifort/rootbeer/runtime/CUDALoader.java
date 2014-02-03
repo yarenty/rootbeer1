@@ -5,7 +5,7 @@
  * See the file LICENSE for copying permission.
  */
 
-package org.trifort.rootbeer.runtime2.cuda;
+package org.trifort.rootbeer.runtime;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,41 +17,53 @@ import java.util.List;
 
 import org.trifort.rootbeer.configuration.RootbeerPaths;
 
-public class CudaLoader {
+public class CUDALoader {
 
   private List<String> m_libCudas;
-  private List<String> m_rootbeers;
+  private List<String> m_rootbeerRuntimes;
+  private List<String> m_rootbeerCudas;
   
-  public CudaLoader(){
+  public CUDALoader(){
     m_libCudas = new ArrayList<String>();
-    m_rootbeers = new ArrayList<String>();
+    m_rootbeerRuntimes = new ArrayList<String>();
+    m_rootbeerCudas = new ArrayList<String>();
     
     if ("Mac OS X".equals(System.getProperty("os.name"))){
         m_libCudas.add("/usr/local/cuda/lib/libcuda.dylib");
-        m_rootbeers.add(RootbeerPaths.v().getRootbeerHome()+"cudaruntime.dylib");
-        extract("cudaruntime.dylib");
+        m_rootbeerRuntimes.add(RootbeerPaths.v().getRootbeerHome()+"rootbeer.dylib");
+        m_rootbeerCudas.add(RootbeerPaths.v().getRootbeerHome()+"rootbeer_cuda.dylib");
+        extract("rootbeer.dylib");
+        extract("rootbeer_cuda.dylib");
     } else if(File.separator.equals("/")){
       if(is32Bit()){
         m_libCudas.add("/usr/lib/libcuda.so");
         m_libCudas.add("/usr/lib/x86_64-linux-gnu/libcudart.so.5.0");
-        m_rootbeers.add(RootbeerPaths.v().getRootbeerHome()+"cudaruntime_x86.so.1");
-        extract("cudaruntime_x86.so.1");
+        m_rootbeerRuntimes.add(RootbeerPaths.v().getRootbeerHome()+"rootbeer_x86.so.1");
+        m_rootbeerCudas.add(RootbeerPaths.v().getRootbeerHome()+"rootbeer_cuda_x86.so.1");
+        extract("rootbeer_x86.so.1");
+        extract("rootbeer_cuda_x86.so.1");
       } else {
         m_libCudas.add("/usr/lib64/libcuda.so");
         m_libCudas.add("/usr/lib/x86_64-linux-gnu/libcudart.so.5.0");
-        m_rootbeers.add(RootbeerPaths.v().getRootbeerHome()+"cudaruntime_x64.so.1");
-        extract("cudaruntime_x64.so.1");
+        m_rootbeerRuntimes.add(RootbeerPaths.v().getRootbeerHome()+"rootbeer_x64.so.1");
+        m_rootbeerCudas.add(RootbeerPaths.v().getRootbeerHome()+"rootbeer_cuda_x64.so.1");
+        extract("rootbeer_x64.so.1");
+        extract("rootbeer_cuda_x64.so.1");
       }
     } else {
       if(is32Bit()){
         m_libCudas.add("C:\\Windows\\System32\\nvcuda.dll"); 
-        m_rootbeers.add(RootbeerPaths.v().getRootbeerHome()+"cudaruntime_x86.dll");
-        extract("cudaruntime_x86.dll");
+        m_rootbeerRuntimes.add(RootbeerPaths.v().getRootbeerHome()+"rootbeer_x86.dll");
+        m_rootbeerCudas.add(RootbeerPaths.v().getRootbeerHome()+"rootbeer_cuda_x86.dll");
+        extract("rootbeer_x86.dll");
+        extract("rootbeer_cuda_x86.dll");
       } else {
         m_libCudas.add("C:\\Windows\\System32\\nvcuda.dll"); 
         m_libCudas.add("C:\\Windows\\SysWow64\\nvcuda.dll");
-        m_rootbeers.add(RootbeerPaths.v().getRootbeerHome()+"cudaruntime_x64.dll");
-        extract("cudaruntime_x64.dll");
+        m_rootbeerRuntimes.add(RootbeerPaths.v().getRootbeerHome()+"rootbeer_x64.dll");
+        m_rootbeerCudas.add(RootbeerPaths.v().getRootbeerHome()+"rootbeer_cuda_x64.dll");
+        extract("rootbeer_x86.dll");
+        extract("rootbeer_cuda_x86.dll");
       }
     }
   }
@@ -70,7 +82,8 @@ public class CudaLoader {
   
   public void load(){   
     doLoad(m_libCudas);
-    doLoad(m_rootbeers);
+    doLoad(m_rootbeerRuntimes);
+    doLoad(m_rootbeerCudas);
   }
 
   private void doLoad(List<String> paths) {
@@ -84,9 +97,9 @@ public class CudaLoader {
   }
 
   private void extract(String filename) {
-    String path = "/org/trifort/rootbeer/runtime2/native/"+filename;
+    String path = "/org/trifort/rootbeer/runtime/binaries/"+filename;
     try {
-      InputStream is = CudaLoader.class.getResourceAsStream(path);
+      InputStream is = CUDALoader.class.getResourceAsStream(path);
       if(is == null){
         path = "src"+path;
         is = new FileInputStream(path);

@@ -13,9 +13,9 @@ import java.util.List;
 
 import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.generate.opencl.tweaks.GencodeOptions.CompileArchitecture;
+import org.trifort.rootbeer.runtime.CUDALoader;
 import org.trifort.rootbeer.runtime.GpuDevice;
 import org.trifort.rootbeer.runtime.Rootbeer;
-import org.trifort.rootbeer.runtime2.cuda.CudaLoader;
 
 public class Main {
   

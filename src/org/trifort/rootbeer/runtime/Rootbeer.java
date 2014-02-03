@@ -1,5 +1,6 @@
 package org.trifort.rootbeer.runtime;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,6 +19,11 @@ public class Rootbeer {
   private ThreadConfig m_threadConfig;
   
   private List<GpuDevice> m_cards;
+  
+  static {
+    CUDALoader loader = new CUDALoader();
+    loader.load();
+  }
   
   public Rootbeer(){
     m_stats = new ArrayList<StatsRow>();

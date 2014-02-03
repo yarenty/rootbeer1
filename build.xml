@@ -20,11 +20,6 @@
     <copy file="src/org/trifort/rootbeer/generate/opencl/UnixNativeKernel.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
     <copy file="src/org/trifort/rootbeer/generate/opencl/WindowsNativeHeader.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
     <copy file="src/org/trifort/rootbeer/generate/opencl/WindowsNativeKernel.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
-    <copy file="src/org/trifort/rootbeer/runtime2/native/cudaruntime_x64.dll" todir="build/classes/org/trifort/rootbeer/runtime2/native/" />
-    <copy file="src/org/trifort/rootbeer/runtime2/native/cudaruntime_x64.so.1" todir="build/classes/org/trifort/rootbeer/runtime2/native/" />
-    <copy file="src/org/trifort/rootbeer/runtime2/native/cudaruntime_x86.dll" todir="build/classes/org/trifort/rootbeer/runtime2/native/" />
-    <copy file="src/org/trifort/rootbeer/runtime2/native/cudaruntime_x86.so.1" todir="build/classes/org/trifort/rootbeer/runtime2/native/" />
-    <copy file="src/org/trifort/rootbeer/runtime2/native/cudaruntime.dylib" todir="build/classes/org/trifort/rootbeer/runtime2/native/" />
     <copy file="src/org/trifort/rootbeer/runtime/nemu/NativeCpuDevice.h" todir="build/classes/org/trifort/rootbeer/runtime/nemu/" />
     <copy file="src/org/trifort/rootbeer/runtime/nemu/NativeCpuDevice.c" todir="build/classes/org/trifort/rootbeer/runtime/nemu/" /> 
   </target>
