@@ -9,6 +9,118 @@ extern "C" {
 #endif
 /*
  * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doReadByteArray
+ * Signature: ([BJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doReadByteArray
+  (JNIEnv *, jobject, jbyteArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doReadBooleanArray
+ * Signature: ([ZJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doReadBooleanArray
+  (JNIEnv *, jobject, jbooleanArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doReadShortArray
+ * Signature: ([SJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doReadShortArray
+  (JNIEnv *, jobject, jshortArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doReadIntArray
+ * Signature: ([IJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doReadIntArray
+  (JNIEnv *, jobject, jintArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doReadFloatArray
+ * Signature: ([FJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doReadFloatArray
+  (JNIEnv *, jobject, jfloatArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doReadDoubleArray
+ * Signature: ([DJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doReadDoubleArray
+  (JNIEnv *, jobject, jdoubleArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doReadLongArray
+ * Signature: ([JJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doReadLongArray
+  (JNIEnv *, jobject, jlongArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doWriteByteArray
+ * Signature: ([BJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteByteArray
+  (JNIEnv *, jobject, jbyteArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doWriteBooleanArray
+ * Signature: ([ZJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteBooleanArray
+  (JNIEnv *, jobject, jbooleanArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doWriteShortArray
+ * Signature: ([SJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteShortArray
+  (JNIEnv *, jobject, jshortArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doWriteIntArray
+ * Signature: ([IJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteIntArray
+  (JNIEnv *, jobject, jintArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doWriteFloatArray
+ * Signature: ([FJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteFloatArray
+  (JNIEnv *, jobject, jfloatArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doWriteDoubleArray
+ * Signature: ([DJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteDoubleArray
+  (JNIEnv *, jobject, jdoubleArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    doWriteLongArray
+ * Signature: ([JJII)V
+ */
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteLongArray
+  (JNIEnv *, jobject, jlongArray, jlong, jint, jint);
+
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
  * Method:    doReadByte
  * Signature: (JJ)B
  */
@@ -119,18 +231,21 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteDoub
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteLong
   (JNIEnv *, jobject, jlong, jlong, jlong);
 
-JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteIntArray
-  (JNIEnv *, jobject, jintArray, jlong, jint, jint);
-
-JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_doWriteIntArrayEx
-  (JNIEnv *, jobject, jintArray, jlong, jint, jint);
-
-
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    malloc
+ * Signature: (J)J
+ */
 JNIEXPORT jlong JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_malloc
-  (JNIEnv *env, jobject this_obj, jlong size);
+  (JNIEnv *, jobject, jlong);
 
+/*
+ * Class:     org_trifort_rootbeer_runtime_FixedMemory
+ * Method:    free
+ * Signature: (J)V
+ */
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_FixedMemory_free
-  (JNIEnv *env, jobject this_obj, jlong address);
+  (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }
