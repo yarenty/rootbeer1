@@ -133,7 +133,7 @@ See the [example](https://github.com/pcpratts/rootbeer1/tree/master/gtc2013/Matr
 2. `cd rootbeer1/`
 3. `ant jar`
 4. `./pack-rootbeer` (linux) or `./pack-rootbeer.bat` (windows)
-5. Use the `rootbeer1/Rootbeer.jar` (not `dist/Rootbeer1.jar`)
+5. Use the `Rootbeer.jar` (not `dist/Rootbeer1.jar`)
 
 ### CUDA Setup
 
