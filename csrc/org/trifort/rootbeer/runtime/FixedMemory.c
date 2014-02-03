@@ -1,6 +1,5 @@
 #include "FixedMemory.h"
 #include <cuda.h>
-#include <stdlib.h>
 
 /*
  * Class:     org_trifort_rootbeer_runtime_FixedMemory
