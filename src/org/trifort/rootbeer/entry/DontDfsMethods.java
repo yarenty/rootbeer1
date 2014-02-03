@@ -87,12 +87,6 @@ public class DontDfsMethods {
     m_methods.add("<java.lang.String: void <init>(char[])>");
     m_methods.add("<java.lang.Integer: void(int)>");
     m_methods.add("<java.lang.Integer: java.lang.Integer valueOf(int)>");
-    m_methods.add("<java.lang.String: java.lang.String substring(int)>");
-    m_methods.add("<java.lang.String: java.lang.String substring(int,int)>");
-    m_methods.add("<java.lang.String: int indexOf(java.lang.String)>");
-    m_methods.add("<java.lang.String: int indexOf(java.lang.String,int)>");  
-    m_methods.add("<java.lang.String: java.lang.String[] split(java.lang.String)>");
-    m_methods.add("<java.lang.String: java.lang.String[] split(java.lang.String,int)>");
   }
   
   public Set<String> get(){
