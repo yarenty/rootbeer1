@@ -359,6 +359,9 @@ public class CUDAContext implements Context, Runnable {
   public void run() {
     while(true){
       try {
+        //here we are changing to our own thread before launching.
+        //cuda assigns the context to the calling thread, so each
+        //launch will be on its own thread and have it's own context
         KernelLaunch item = m_toThread.take();
         
         if(item.quit()){
@@ -366,11 +369,6 @@ public class CUDAContext implements Context, Runnable {
           return;
         }
         
-        System.out.println("running: ");
-        System.out.println("  device_index: "+item.getDeviceIndex());
-        System.out.println("  block_shape_x: "+item.getBlockShapeX());
-        System.out.println("  grid_shape_x: "+item.getGridShapeX());
-        System.out.println("  num_threads: "+item.getNumThreads());
         cudaRun(item.getDeviceIndex(), item.getCubinFile(), item.getCubinLength(),
           item.getBlockShapeX(), item.getGridShapeX(), item.getNumThreads(), 
           item.getObjectMem(), item.getHandlesMem(), item.getExceptionsMem(),

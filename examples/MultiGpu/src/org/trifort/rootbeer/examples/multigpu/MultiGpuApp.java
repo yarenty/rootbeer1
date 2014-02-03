@@ -6,7 +6,7 @@ import org.trifort.rootbeer.runtime.Kernel;
 import org.trifort.rootbeer.runtime.Rootbeer;
 import org.trifort.rootbeer.runtime.GpuDevice;
 import org.trifort.rootbeer.runtime.Context;
-import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
+import org.trifort.rootbeer.runtime.util.Stopwatch;
 
 public class MultiGpuApp {
 

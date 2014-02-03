@@ -19,7 +19,7 @@ public class StringTest implements TestSerialization {
   public List<Kernel> create() {
     List<Kernel> jobs = new ArrayList<Kernel>();
     for(int i = 0; i < 1; ++i){
-      StringRunOnGpu curr = new StringRunOnGpu(i);
+      StringRunOnGpu curr = new StringRunOnGpu();
       jobs.add(curr);
     }
     return jobs;

@@ -1,5 +1,6 @@
 #!/bin/sh
 
+<<<<<<< HEAD
 gcc -fPIC -g -c -I/usr/lib/jvm/java-6-openjdk-amd64/include/ -I/usr/lib/jvm/java-6-openjdk-amd64/include/linux -I/usr/lib/jvm/default-java/include/ -I/usr/lib/jvm/default-java/include/linux -I/usr/local/cuda/include/ org/trifort/rootbeer/runtime/FixedMemory.c -o FixedMemory.o
 gcc -shared -Wl,-soname,rootbeer -o rootbeer_x64.so.1 FixedMemory.o -lc
 
@@ -8,4 +9,14 @@ gcc -fPIC -g -c -I/usr/lib/jvm/java-6-openjdk-amd64/include/ -I/usr/lib/jvm/java
 gcc -shared -Wl,-soname,rootbeer_cuda -o rootbeer_cuda_x64.so.1 CUDARuntime.o CUDAContext.o -lc -lcuda
 
 gcc -fPIC -g -c -I/usr/lib/jvm/java-6-openjdk-amd64/include/ -I/usr/lib/jvm/java-6-openjdk-amd64/include/linux -I/usr/lib/jvm/default-java/include/ -I/usr/lib/jvm/default-java/include/linux -I/usr/local/cuda/include/ org/trifort/rootbeer/runtime/OpenCLRuntime.c -o OpenCLRuntime.o
+=======
+gcc -fPIC -g -c -I/usr/lib/jvm/default-java/include/ -I/usr/lib/jvm/default-java/include/linux -I/usr/local/cuda/include/ org/trifort/rootbeer/runtime/FixedMemory.c -o FixedMemory.o
+gcc -shared -Wl,-soname,rootbeer -o rootbeer_x64.so.1 FixedMemory.o -lc
+
+gcc -fPIC -g -c -I/usr/lib/jvm/default-java/include/ -I/usr/lib/jvm/default-java/include/linux -I/usr/local/cuda/include/ org/trifort/rootbeer/runtime/CUDARuntime.c -o CUDARuntime.o
+gcc -fPIC -g -c -I/usr/lib/jvm/default-java/include/ -I/usr/lib/jvm/default-java/include/linux -I/usr/local/cuda/include/ org/trifort/rootbeer/runtime/CUDAContext.c -o CUDAContext.o
+gcc -shared -Wl,-soname,rootbeer_cuda -o rootbeer_cuda_x64.so.1 CUDARuntime.o CUDAContext.o -lc -lcuda
+
+gcc -fPIC -g -c -I/usr/lib/jvm/default-java/include/ -I/usr/lib/jvm/default-java/include/linux -I/usr/local/cuda/targets/x86_64-linux/include/ org/trifort/rootbeer/runtime/OpenCLRuntime.c -o OpenCLRuntime.o
+>>>>>>> 6c2555fedc2a2e5dfdccf0ccbdd41e49f7d55706
 gcc -shared -Wl,-soname,rootbeer_opencl -o rootbeer_opencl_x64.so.1 OpenCLRuntime.o -lc -lOpenCL
