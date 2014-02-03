@@ -85,6 +85,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   jmethodID get_address_method;
   jmethodID get_size_method;
   jmethodID get_heap_end_method;
+  
+  jlong * info_space;
 
   //----------------------------------------------------------------------------
   //init device and function
@@ -129,7 +131,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   cpu_class_mem_size = (*env)->CallLongMethod(env, class_mem, get_heap_end_method);
 
   info_space_size = 1024;
-  jlong * info_space = (jlong *) malloc(info_space_size);
+  info_space = (jlong *) malloc(info_space_size);
   info_space[1] = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
 
   //----------------------------------------------------------------------------

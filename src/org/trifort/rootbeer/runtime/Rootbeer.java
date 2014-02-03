@@ -41,6 +41,7 @@ public class Rootbeer {
       m_cudaRuntime = ctor.newInstance();
       m_cards.addAll(m_cudaRuntime.getGpuDevices());
     } catch(Exception ex){
+	  ex.printStackTrace();
       //ignore
     }
     
