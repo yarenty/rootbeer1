@@ -12,7 +12,6 @@ public class StatsRow {
   private long m_serializationTime;
   private long m_executionTime;
   private long m_deserializationTime;
-  private long m_initTime;
   private long m_overallTime;
   
   private int m_gridShape;
@@ -51,14 +50,6 @@ public class StatsRow {
    */
   public long getDeserializationTime(){
     return m_deserializationTime;
-  }
-  
-  /**
-   * Time to init CudaRuntime2.v(). This is the same for an entire program.
-   * @return 
-   */
-  public long getInitTime(){
-    return m_initTime;
   }
 
   /**

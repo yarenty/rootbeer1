@@ -1,6 +1,5 @@
 package org.trifort.rootbeer.runtime;
 
-import java.io.File;
 import java.util.List;
 
 public class CUDARuntime implements IRuntime {
