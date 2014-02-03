@@ -1264,7 +1264,7 @@ int at_illecker_double_to_string(char * gc_info, double fvalue, int max, int * e
   char fconvert[20];
   int iplace = 0;
   int fplace = 0;
-  int zpadlen = 0; // lasting zeros
+  int zprelen = 0; // preceding zeros
 
   char buffer[64];
   int maxlen = 64;
@@ -1289,7 +1289,7 @@ int at_illecker_double_to_string(char * gc_info, double fvalue, int max, int * e
   intpart = ufvalue;
 
   // We "cheat" by converting the fractional part to integer by
-  // multiplying by a factor of 10
+  // multiplying by a factor of 10, this might remove preceding zeros
   fracpart = at_illecker_round(at_illecker_pow10(max) * (ufvalue - intpart));
   if (fracpart < 0) {
     fracpart = 0;
@@ -1316,17 +1316,18 @@ int at_illecker_double_to_string(char * gc_info, double fvalue, int max, int * e
     fconvert[fplace++] = "0123456789abcdef"[fracpart % 10];
     fracpart = (fracpart / 10);
   } while(fracpart && (fplace < 20));
-  
+
+  // Calculate preceding zeros
+  // preceding zeros might be removed in fracpart
+  zprelen = max - fplace;
+  if (zprelen < 0) {
+    zprelen = 0;
+  }
+
   if (fplace == 20) {
     fplace--;
   }
   fconvert[fplace] = 0;
-
-  // Calc lasting zeros for padding
-  zpadlen = max - fplace;
-  if (zpadlen < 0) {
-    zpadlen = 0;
-  }
 
   // Set sign
   if (signvalue) {
@@ -1345,15 +1346,15 @@ int at_illecker_double_to_string(char * gc_info, double fvalue, int max, int * e
     // char to print out.
     at_illecker_set_char(buffer, &currlen, maxlen, '.');
 
+    // Add preceding zeros
+    while (zprelen > 0) {
+      at_illecker_set_char(buffer, &currlen, maxlen, '0');
+      --zprelen;
+    }
+
     // Add digits
     while (fplace > 0) {
       at_illecker_set_char(buffer, &currlen, maxlen, fconvert[--fplace]);
-    }
-
-    // Add lasting zeros
-    while (zpadlen > 0) {
-      at_illecker_set_char(buffer, &currlen, maxlen, '0');
-      --zpadlen;
     }
   }
 
@@ -1368,7 +1369,7 @@ int at_illecker_double_to_string(char * gc_info, double fvalue, int max, int * e
 }
 
 //<java.lang.Double: java.lang.String toString(double)>
-$$__device__$$ 
+$$__device__$$
 int java_lang_Double_toString9_8_(char * gc_info, double double_val, int * exception) {
 
   // Default is 6 digits after decimal point
@@ -1376,8 +1377,8 @@ int java_lang_Double_toString9_8_(char * gc_info, double double_val, int * excep
 }
 
 //<java.lang.Float: java.lang.String toString(float)>
-$$__device__$$ 
-int java_lang_Float_toString9_7_(char * gc_info, float float_val, int * exception){
+$$__device__$$
+int java_lang_Float_toString9_7_(char * gc_info, float float_val, int * exception) {
 
   // Default is 6 digits after decimal point
   return at_illecker_double_to_string(gc_info, (double)float_val, 6, exception);
@@ -1452,14 +1453,14 @@ int at_illecker_long_to_string(char * gc_info, long long value, int max, int bas
 }
 
 //<java.lang.Long: java.lang.String toString(long)>
-$$__device__$$ 
-int java_lang_Long_toString9_6_(char * gc_info, long long long_val, int * exception){
+$$__device__$$
+int java_lang_Long_toString9_6_(char * gc_info, long long long_val, int * exception) {
   return at_illecker_long_to_string(gc_info, long_val, 0, 10, exception);
 }
 
 //<java.lang.Integer: java.lang.String toString(int)>
-$$__device__$$ 
-int java_lang_Integer_toString9_5_(char * gc_info, int int_val, int * exception){
+$$__device__$$
+int java_lang_Integer_toString9_5_(char * gc_info, int int_val, int * exception) {
   return at_illecker_long_to_string(gc_info, (long long)int_val, 0, 10, exception);
 }
 
