@@ -22,7 +22,14 @@
     <copy file="src/org/trifort/rootbeer/generate/opencl/WindowsNativeKernel.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
     <copy file="src/org/trifort/rootbeer/runtime/nemu/NativeCpuDevice.h" todir="build/classes/org/trifort/rootbeer/runtime/nemu/" />
     <copy file="src/org/trifort/rootbeer/runtime/nemu/NativeCpuDevice.c" todir="build/classes/org/trifort/rootbeer/runtime/nemu/" /> 
-  </target>
+    <copy todir="build/classes/org/trifort/rootbeer/runtime/binaries/">
+      <fileset dir="csrc">
+        <include name="*.so.1"/>
+        <include name="*.dll"/>
+        <include name="*.dylib"/>
+      </fileset>
+    </copy>
+ </target>
   <target name="jar" depends="compile">
     <jar destfile="dist/Rootbeer1.jar" basedir="build/classes">
       <manifest>
