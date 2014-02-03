@@ -10,28 +10,23 @@
       debugLevel="lines,vars,source" 
       includeantruntime="false" 
     />
-    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/BarrierNativeBoth.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/BothNativeKernel.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/CudaHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/CudaKernel.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/GarbageCollector.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/UnixNativeHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/UnixNativeKernel.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/WindowsNativeHeader.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/generate/opencl/WindowsNativeKernel.c" todir="build/classes/edu/syr/pcpratts/rootbeer/generate/opencl/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/cudaruntime_x64.dll" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/cudaruntime_x64.so.1" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/cudaruntime_x86.dll" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/cudaruntime_x86.so.1" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/cudaruntime.dylib" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/edu_syr_pcpratts_rootbeer_runtime_nativecpu_NativeCpuDevice.h" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" />
-    <copy file="src/edu/syr/pcpratts/rootbeer/runtime2/native/NativeCpuDevice.c" todir="build/classes/edu/syr/pcpratts/rootbeer/runtime2/native/" /> 
+    <copy file="src/org/trifort/rootbeer/generate/opencl/BarrierNativeBoth.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
+    <copy file="src/org/trifort/rootbeer/generate/opencl/BothNativeHeader.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
+    <copy file="src/org/trifort/rootbeer/generate/opencl/BothNativeKernel.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
+    <copy file="src/org/trifort/rootbeer/generate/opencl/CudaHeader.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
+    <copy file="src/org/trifort/rootbeer/generate/opencl/CudaKernel.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
+    <copy file="src/org/trifort/rootbeer/generate/opencl/GarbageCollector.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
+    <copy file="src/org/trifort/rootbeer/generate/opencl/UnixNativeHeader.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
+    <copy file="src/org/trifort/rootbeer/generate/opencl/UnixNativeKernel.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
+    <copy file="src/org/trifort/rootbeer/generate/opencl/WindowsNativeHeader.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
+    <copy file="src/org/trifort/rootbeer/generate/opencl/WindowsNativeKernel.c" todir="build/classes/org/trifort/rootbeer/generate/opencl/" />
+    <copy file="src/org/trifort/rootbeer/runtime/nemu/NativeCpuDevice.h" todir="build/classes/org/trifort/rootbeer/runtime/nemu/" />
+    <copy file="src/org/trifort/rootbeer/runtime/nemu/NativeCpuDevice.c" todir="build/classes/org/trifort/rootbeer/runtime/nemu/" /> 
   </target>
   <target name="jar" depends="compile">
     <jar destfile="dist/Rootbeer1.jar" basedir="build/classes">
       <manifest>
-        <attribute name="Main-Class" value="edu.syr.pcpratts.rootbeer.entry.Main"/>
+        <attribute name="Main-Class" value="org.trifort.rootbeer.entry.Main"/>
       </manifest>
     </jar>
   </target>

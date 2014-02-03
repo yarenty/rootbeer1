@@ -3,7 +3,7 @@ package rootbeer.examples.arraymult;
 
 import java.util.List;
 import java.util.ArrayList;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Kernel;
 
 public class ArrayMult implements Kernel {
   
