@@ -4,7 +4,7 @@
  * 
  * See the file LICENSE for copying permission.
  */
-package org.trifort.rootbeer.runtime2.cuda;
+package org.trifort.rootbeer.runtime;
 
 /**
  * An exception object that the cudaruntime.dll throws if it can't allocate

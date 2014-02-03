@@ -16,7 +16,6 @@ import org.trifort.rootbeer.configuration.RootbeerPaths;
 import org.trifort.rootbeer.runtime.BlockShaper;
 import org.trifort.rootbeer.runtime.CompiledKernel;
 import org.trifort.rootbeer.runtime.Kernel;
-import org.trifort.rootbeer.runtime.Memory_old;
 import org.trifort.rootbeer.runtime.Serializer;
 import org.trifort.rootbeer.runtime.ThreadConfig;
 import org.trifort.rootbeer.util.ResourceReader;
