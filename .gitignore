@@ -74,9 +74,6 @@ CUDARuntime.o
 CUDAContext.o
 FixedMemory.o
 OpenCLRuntime.o
-csrc/rootbeer_cuda_x64.so.1
-csrc/rootbeer_opencl_x64.so.1
-csrc/rootbeer_x64.so.1
 MultiGpuApp-GPU.jar
 MultiGpuApp.jar
 examples/MultiGpu/csrc/
