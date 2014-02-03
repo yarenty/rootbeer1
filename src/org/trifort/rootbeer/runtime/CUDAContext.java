@@ -1,19 +1,30 @@
 package org.trifort.rootbeer.runtime;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.trifort.rootbeer.configuration.Configuration;
+import org.trifort.rootbeer.runtime.util.Stopwatch;
 import org.trifort.rootbeer.runtimegpu.GpuException;
 import org.trifort.rootbeer.util.ResourceReader;
 
 public class CUDAContext implements Context, Runnable {
 
   private GpuDevice m_device;
-  private List<StatsRow> m_stats;
   private boolean m_32bit;
   private Map<String, byte[]> m_cubinFiles;
+
+  private List<StatsRow> m_stats;
+  private Stopwatch m_writeBlocksStopwatch;
+  private Stopwatch m_runStopwatch;
+  private Stopwatch m_runOnGpuStopwatch;
+  private Stopwatch m_readBlocksStopwatch;
+  private long m_serializationTime;
+  private long m_executionTime;
+  private long m_deserializationTime;
+  private long m_overallTime;
   
   private Memory m_objectMemory;
   private Memory m_textureMemory;
@@ -29,11 +40,18 @@ public class CUDAContext implements Context, Runnable {
   
   public CUDAContext(GpuDevice device){
     m_device = device;    
-    
+       
     String arch = System.getProperty("os.arch");
     m_32bit = arch.equals("x86") || arch.equals("i386");
     
     m_cubinFiles = new HashMap<String, byte[]>();
+    
+    m_stats = new ArrayList<StatsRow>();
+    m_writeBlocksStopwatch = new Stopwatch();
+    m_runStopwatch = new Stopwatch();
+    m_runOnGpuStopwatch = new Stopwatch();
+    m_readBlocksStopwatch = new Stopwatch();
+    
     m_handles = new HashMap<Kernel, Long>();
 
     m_textureMemory = new CheckedFixedMemory(64);
@@ -83,6 +101,7 @@ public class CUDAContext implements Context, Runnable {
 
   @Override
   public void run(Kernel template, ThreadConfig thread_config) {
+    m_runStopwatch.start();
     CompiledKernel compiled_kernel = (CompiledKernel) template;
     
     String filename;
@@ -115,10 +134,18 @@ public class CUDAContext implements Context, Runnable {
     writeBlocksTemplate(compiled_kernel);
     runBlocks(thread_config, cubin_file);
     readBlocksTemplate(compiled_kernel, thread_config);
+    
+    m_runStopwatch.stop();
+    m_overallTime = m_runStopwatch.elapsedTimeMillis();
+    
+    m_stats.add(new StatsRow(m_serializationTime, m_executionTime, 
+        m_deserializationTime, m_overallTime,
+        thread_config.getGridShapeX(), thread_config.getBlockShapeX()));
   }
 
   @Override
   public void run(List<Kernel> work, ThreadConfig thread_config) {
+    m_runStopwatch.start();
     CompiledKernel compiled_kernel = (CompiledKernel) work.get(0);
     
     String filename;
@@ -151,9 +178,17 @@ public class CUDAContext implements Context, Runnable {
     writeBlocks(work);
     runBlocks(thread_config, cubin_file);
     readBlocks(work);
+    
+    m_runStopwatch.stop();
+    m_overallTime = m_runStopwatch.elapsedTimeMillis();
+    
+    m_stats.add(new StatsRow(m_serializationTime, m_executionTime, 
+        m_deserializationTime, m_overallTime,
+        thread_config.getGridShapeX(), thread_config.getBlockShapeX()));
   }
   
   private void writeBlocks(List<Kernel> work){
+    m_writeBlocksStopwatch.start();
     m_objectMemory.clearHeapEndPtr();
     m_handlesMemory.clearHeapEndPtr();
     m_handles.clear();
@@ -172,9 +207,12 @@ public class CUDAContext implements Context, Runnable {
       BufferPrinter printer = new BufferPrinter();
       printer.print(m_objectMemory, 0, 896);
     }
+    m_writeBlocksStopwatch.stop();
+    m_serializationTime = m_writeBlocksStopwatch.elapsedTimeMillis();
   }
 
   private void writeBlocksTemplate(CompiledKernel compiled_kernel){
+    m_writeBlocksStopwatch.start();
     m_objectMemory.clearHeapEndPtr();
     m_handlesMemory.clearHeapEndPtr();
     
@@ -187,9 +225,12 @@ public class CUDAContext implements Context, Runnable {
       BufferPrinter printer = new BufferPrinter();
       printer.print(m_objectMemory, 0, 896);
     }
+    m_writeBlocksStopwatch.stop();
+    m_serializationTime = m_writeBlocksStopwatch.elapsedTimeMillis();
   }
   
   private void readBlocks(List<Kernel> work){
+    m_readBlocksStopwatch.start();
     m_objectMemory.setAddress(0);
     m_handlesMemory.setAddress(0);
     m_exceptionsMemory.setAddress(0);
@@ -232,9 +273,12 @@ public class CUDAContext implements Context, Runnable {
       BufferPrinter printer = new BufferPrinter();
       printer.print(m_objectMemory, 0, 896);
     }
+    m_readBlocksStopwatch.stop();
+    m_deserializationTime = m_readBlocksStopwatch.elapsedTimeMillis();
   }
   
   private void readBlocksTemplate(CompiledKernel compiled_kernel, ThreadConfig thread_config){
+    m_readBlocksStopwatch.start();
     m_handlesMemory.setAddress(0);
     m_exceptionsMemory.setAddress(0);
     m_exceptionsMemory.setAddress(0);
@@ -273,9 +317,12 @@ public class CUDAContext implements Context, Runnable {
       BufferPrinter printer = new BufferPrinter();
       printer.print(m_objectMemory, 0, 896);
     }
+    m_readBlocksStopwatch.stop();
+    m_deserializationTime = m_readBlocksStopwatch.elapsedTimeMillis();
   }
   
-  private void runBlocks(ThreadConfig thread_config, byte[] cubin_file){
+  private void runBlocks(ThreadConfig thread_config, byte[] cubin_file){    
+    m_runOnGpuStopwatch.start();
     
     KernelLaunch item = new KernelLaunch(m_device.getDeviceId(), cubin_file, 
       cubin_file.length, thread_config.getBlockShapeX(), 
@@ -284,6 +331,9 @@ public class CUDAContext implements Context, Runnable {
     
     m_toThread.put(item);
     m_fromThread.take();
+    
+    m_runOnGpuStopwatch.stop();
+    m_executionTime = m_runOnGpuStopwatch.elapsedTimeMillis();
   }  
 
   private byte[] readCubinFile(String filename) {
