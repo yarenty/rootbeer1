@@ -26,7 +26,7 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error,
     return;
   }
 
-  exp = (*env)->FindClass(env,"edu/syr/pcpratts/rootbeer/runtime2/cuda/CudaErrorException");
+  exp = (*env)->FindClass(env,"org/trifort/rootbeer/runtime2/cuda/CudaErrorException");
 
   // we truncate the message to 900 characters to stop any buffer overflow
   switch(error){
