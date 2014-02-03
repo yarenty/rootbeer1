@@ -194,6 +194,8 @@ public class RootbeerCompiler {
     dont_dfs_tester.addSignature("<java.io.PrintStream: void print(float)>");
     dont_dfs_tester.addSignature("<java.lang.Double: java.lang.String toString(double)>");
     dont_dfs_tester.addSignature("<java.lang.Float: java.lang.String toString(float)>");
+    dont_dfs_tester.addSignature("<java.lang.Integer: java.lang.String toString(int)>");
+    dont_dfs_tester.addSignature("<java.lang.Long: java.lang.String toString(long)>");
     RootbeerClassLoader.v().addDontFollowMethodTester(dont_dfs_tester);
     
     ExtraFields extra_fields = new ExtraFields();
