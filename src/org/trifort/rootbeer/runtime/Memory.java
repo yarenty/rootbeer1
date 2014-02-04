@@ -63,4 +63,5 @@ public interface Memory {
   public void addIntegerToList(long value);
   public void endIntegerList();
   public void finishReading();
+  public void align16();
 }

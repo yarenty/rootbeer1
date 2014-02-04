@@ -70,7 +70,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new ArraySumTest());
     ret.add(new RemapTest());
     ret.add(new InstanceofTest());
-    ret.add(new DotClassTest());
+    //ret.add(new DotClassTest());
     ret.add(new PrintTest());
     //ret.add(new BarrierTest());
     ret.add(new SharedMemSimpleTest());
