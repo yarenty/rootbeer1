@@ -3,6 +3,8 @@ package org.trifort.rootbeer.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.omg.CORBA._IDLTypeStub;
+
 public class FixedMemory implements Memory {
 
   protected long m_address;
@@ -380,6 +382,12 @@ public class FixedMemory implements Memory {
     setPointer(ptr);
   }
   
+  @Override
+  public void align16(){ 
+    m_instancePointer.align16();
+    m_staticPointer.align16();
+  }
+  
   private class MemPointer {
    
     private PointerStack m_stack; 
@@ -391,7 +399,7 @@ public class FixedMemory implements Memory {
       m_stack = new PointerStack();
       m_endPointer = 0;
     }
-    
+
     public void popAddress() {
       m_pointer = m_stack.pop();
     }
@@ -450,6 +458,19 @@ public class FixedMemory implements Memory {
       long mod = m_pointer % 8;
       if(mod != 0){
         m_pointer += (8 - mod);
+      }
+      if(m_pointer > m_heapEnd){
+        m_heapEnd = m_pointer;
+      }
+      if(m_pointer > m_endPointer){
+        m_endPointer = m_pointer;
+      }
+    }
+    
+    public void align16() {
+      long mod = m_pointer % 16;
+      if(mod != 16){
+        m_pointer += (16 - mod);
       }
       if(m_pointer > m_heapEnd){
         m_heapEnd = m_pointer;
