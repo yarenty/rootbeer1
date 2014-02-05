@@ -4,6 +4,11 @@ import java.util.Arrays;
 
 import org.trifort.rootbeer.runtime.Kernel;
 
+/**
+ * See https://github.com/pcpratts/rootbeer1/issues/112
+ * @author pcpratts
+ *
+ */
 public class ArraysSortComparatorRunOnGpu implements Kernel {
 
   private Integer[] m_array;
