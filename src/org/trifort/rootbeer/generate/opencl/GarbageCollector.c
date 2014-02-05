@@ -1389,7 +1389,7 @@ int java_lang_Float_toString9_7_(char * gc_info, float float_val, int * exceptio
 $$__device__$$
 int at_illecker_long_to_string(char * gc_info, long long value, int max, int base, int * exception) {
   int signvalue = 0;
-  unsigned long uvalue;
+  unsigned long long uvalue;
   char convert[20];
   int place = 0;
   int zpadlen = 0; // lasting zeros
