@@ -124,14 +124,14 @@ public class CUDAContext implements Context, Runnable {
       m_cubinFiles.put(filename, cubin_file);
     }
     
-    m_handlesMemory = new CheckedFixedMemory(8);
-    m_exceptionsMemory = new CheckedFixedMemory(8);
+    m_handlesMemory = new CheckedFixedMemory(8*thread_config.getNumThreads());
+    m_exceptionsMemory = new CheckedFixedMemory(8*thread_config.getNumThreads());
     m_classMemory = new CheckedFixedMemory(1024);
     if(m_objectMemory == null){
       init();
     }
     
-    writeBlocksTemplate(compiled_kernel);
+    writeBlocksTemplate(compiled_kernel, thread_config);
     runBlocks(thread_config, cubin_file);
     readBlocksTemplate(compiled_kernel, thread_config);
     
@@ -212,7 +212,9 @@ public class CUDAContext implements Context, Runnable {
     m_serializationTime = m_writeBlocksStopwatch.elapsedTimeMillis();
   }
 
-  private void writeBlocksTemplate(CompiledKernel compiled_kernel){
+  private void writeBlocksTemplate(CompiledKernel compiled_kernel,
+    ThreadConfig thread_config){
+    
     m_writeBlocksStopwatch.start();
     m_objectMemory.clearHeapEndPtr();
     m_handlesMemory.clearHeapEndPtr();
@@ -221,8 +223,11 @@ public class CUDAContext implements Context, Runnable {
     serializer.writeStaticsToHeap();
     
     long handle = serializer.writeToHeap(compiled_kernel);
+    for(int i = 0; i < thread_config.getNumThreads(); ++i){
+      m_handlesMemory.writeRef(handle);
+    }
     m_objectMemory.align16();
-    m_handlesMemory.writeRef(handle);
+   
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
@@ -274,7 +279,7 @@ public class CUDAContext implements Context, Runnable {
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
-      printer.print(m_objectMemory, 0, 896);
+      printer.print(m_objectMemory, 0, 256);
     }
     m_readBlocksStopwatch.stop();
     m_deserializationTime = m_readBlocksStopwatch.elapsedTimeMillis();
@@ -282,8 +287,8 @@ public class CUDAContext implements Context, Runnable {
   
   private void readBlocksTemplate(CompiledKernel compiled_kernel, ThreadConfig thread_config){
     m_readBlocksStopwatch.start();
+    m_objectMemory.setAddress(0);
     m_handlesMemory.setAddress(0);
-    m_exceptionsMemory.setAddress(0);
     m_exceptionsMemory.setAddress(0);
     
     Serializer serializer = compiled_kernel.getSerializer(m_objectMemory, m_textureMemory);
@@ -318,7 +323,7 @@ public class CUDAContext implements Context, Runnable {
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
-      printer.print(m_objectMemory, 0, 896);
+      printer.print(m_objectMemory, 0, 256);
     }
     m_readBlocksStopwatch.stop();
     m_deserializationTime = m_readBlocksStopwatch.elapsedTimeMillis();

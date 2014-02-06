@@ -409,7 +409,6 @@ public class FixedMemory implements Memory {
     }
 
     public long mallocWithSize(int size){
-      malloc();
       int mod = size % 16;
       if(mod != 0)
         size += (16 - mod);
@@ -424,15 +423,6 @@ public class FixedMemory implements Memory {
         m_heapEnd = ret;
       
       return ret;
-    }
-  
-    public long malloc(){
-      //align all new items on 8 bytes
-      long mod = m_heapEnd % 8;
-      if(mod != 0)
-        m_heapEnd += (8 - mod);
-      m_pointer = m_heapEnd;
-      return m_heapEnd;
     }
 
     private void clearHeapEndPtr() {      
