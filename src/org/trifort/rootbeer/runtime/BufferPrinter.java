@@ -60,8 +60,9 @@ public class BufferPrinter {
         item_count++;
       }
     }
-    if(curr_line.equals("") == false)
+    if(curr_line.equals("") == false){
       lines.add(curr_line);
+    }
 
     List<String> line_numbers = createLineNumbers(lines.size(), elements_per_line, start_ptr);
     for(int i = 0; i < lines.size(); ++i){

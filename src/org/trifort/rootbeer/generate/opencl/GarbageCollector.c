@@ -1099,13 +1099,13 @@ int java_lang_StringBuilder_append10_9_(char * gc_info, int thisref,
     char__array_set(gc_info, new_sb_value, sb_count + i, ch, exception);
   }
 
-  //make new String
-  new_str = java_lang_String_initab850b60f96d11de8a390800200c9a66(gc_info, 
+  instance_setter_java_lang_AbstractStringBuilder_value(gc_info, thisref,
     new_sb_value, exception);
 
-  //return new StringBuilder from String
-  return java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(gc_info,
-    new_str, exception);
+  instance_setter_java_lang_AbstractStringBuilder_count(gc_info, thisref,
+    new_count, exception);
+
+  return thisref;
 }
 
 //<java.lang.StringBuilder: java.lang.StringBuilder append(boolean)>

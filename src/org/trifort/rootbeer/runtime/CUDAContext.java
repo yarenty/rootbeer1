@@ -206,7 +206,7 @@ public class CUDAContext implements Context, Runnable {
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
-      printer.print(m_objectMemory, 0, 896);
+      printer.print(m_objectMemory, 0, 256);
     }
     m_writeBlocksStopwatch.stop();
     m_serializationTime = m_writeBlocksStopwatch.elapsedTimeMillis();
@@ -231,7 +231,7 @@ public class CUDAContext implements Context, Runnable {
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
-      printer.print(m_objectMemory, 0, 896);
+      printer.print(m_objectMemory, 0, 256);
     }
     m_writeBlocksStopwatch.stop();
     m_serializationTime = m_writeBlocksStopwatch.elapsedTimeMillis();

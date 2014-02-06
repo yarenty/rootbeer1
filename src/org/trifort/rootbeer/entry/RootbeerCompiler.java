@@ -144,7 +144,7 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addToSignaturesClassTester(keep_packages);
     
     RootbeerClassLoader.v().addNewInvoke("java.lang.StringBuilder");
-    
+  
     ListMethodTester follow_tester = new ListMethodTester();
     follow_tester.addSignature("<java.lang.String: void <init>()>");
     follow_tester.addSignature("<java.lang.String: void <init>(char[])>");
