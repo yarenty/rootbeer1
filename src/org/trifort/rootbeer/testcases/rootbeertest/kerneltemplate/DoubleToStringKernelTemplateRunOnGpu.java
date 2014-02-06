@@ -21,6 +21,9 @@ public class DoubleToStringKernelTemplateRunOnGpu implements Kernel {
   
   public void gpuMethod() {
     int thread_id = RootbeerGpu.getThreadId();
+    
+    System.out.println(thread_id);
+    
     double value = m_value[thread_id];
     value += thread_id;
     m_value[thread_id] = value;

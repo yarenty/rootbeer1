@@ -13,6 +13,9 @@ public class RootbeerGpu {
   private static byte[] m_sharedMem;
   private static int m_blockIdxx;
   private static int m_threadIdxx;
+  private static int m_threadId;
+  private static int m_gridDimx;
+  private static int m_blockDimx;
   
   static {
     m_isOnGpu = false;
@@ -31,7 +34,7 @@ public class RootbeerGpu {
    * @return blockIdx.x * blockDim.x + threadIdx.x;
    */
   public static int getThreadId() {
-    return 0;
+    return m_threadId;
   }
  
   public static int getThreadIdxx() {
@@ -40,6 +43,18 @@ public class RootbeerGpu {
 
   public static int getBlockIdxx() {
     return m_blockIdxx;
+  }
+  
+  public static int getBlockDimx(){
+    return m_blockDimx;
+  }
+  
+  public static int getGridDimx(){
+    return m_gridDimx;
+  }
+  
+  public static void setThreadId(int thread_id){
+    m_threadId = thread_id;
   }
 
   public static void setThreadIdxx(int thread_idxx){
@@ -50,12 +65,12 @@ public class RootbeerGpu {
     m_blockIdxx = block_idxx;
   }
   
-  public static int getBlockDimx(){
-    return 0;
+  public static void setBlockDimx(int block_dimx){
+    m_blockDimx = block_dimx;
   }
   
-  public static int getGridDimx(){
-    return 0;
+  public static void setGridDimx(int grid_dimx){
+    m_gridDimx = grid_dimx;
   }
   
   public static void syncthreads(){ 
