@@ -147,8 +147,14 @@ star the repository and email me your usage and comments. I am preparing my diss
 now.
 
 ### Examples
+
 See [here](https://github.com/pcpratts/rootbeer1/tree/master/examples) for a variety of
 examples.
+
+### Credit
+
+Rootbeer was partially supported by both the National Science Foundation and
+Syracuse University and God is Most High.
 
 ### Author
 
