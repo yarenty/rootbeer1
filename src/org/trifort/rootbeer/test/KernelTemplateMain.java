@@ -13,6 +13,7 @@ import java.util.List;
 import org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.DoubleToStringKernelTemplateBuilderTest;
 import org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.DoubleToStringKernelTemplateTest;
 import org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.FastMatrixTest;
+import org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.GpuParametersTest;
 
 public class KernelTemplateMain implements TestKernelTemplateFactory {
 
@@ -21,6 +22,7 @@ public class KernelTemplateMain implements TestKernelTemplateFactory {
     //ret.add(new FastMatrixTest());
     ret.add(new DoubleToStringKernelTemplateTest());
     ret.add(new DoubleToStringKernelTemplateBuilderTest());
+    ret.add(new GpuParametersTest());
     return ret;
   }
 
