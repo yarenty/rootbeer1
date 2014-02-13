@@ -92,6 +92,25 @@ public class VisitorReadGen extends AbstractVisitorGen {
     String null_readers = getNextLabel();
     bcl.ifStmt(m_Param0, "==", NullConstant.v(), null_readers);    
     
+    //create readers for String and char[]
+    Local ret;
+    SootClass string_class = Scene.v().getSootClass("java.lang.String");
+    RefType string_type = string_class.getType();
+    String label = getNextLabel();
+    bcl.ifInstanceOfStmt(m_Param0, string_type, label);
+    ret = makeReadFromHeapBodyForString(string_type);
+    m_ReadFromHeapMethodsMade.put(string_type, ret);
+    bcl.returnValue(ret);
+    bcl.label(label);
+    
+    ArrayType array_type = ArrayType.v(CharType.v(), 1);
+    label = getNextLabel();
+    bcl.ifInstanceOfStmt(m_Param0, array_type, label);
+    ret = makeReadFromHeapBodyForArrayType(array_type);
+    m_ReadFromHeapMethodsMade.put(array_type, ret);
+    bcl.returnValue(ret);
+    bcl.label(label);
+    
     for(Type type : m_OrderedHistory){
       makeReadFromHeapMethodForType(type, false);
     }
@@ -237,6 +256,29 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl_mem.finishReading();
 
     return ret;
+  }
+  
+  private Local makeReadFromHeapBodyForString(RefType type){
+    SootClass object_class = Scene.v().getSootClass("java.lang.Object"); 
+    SootClass string_class = Scene.v().getSootClass("java.lang.String");
+    ArrayType char_array_type = ArrayType.v(CharType.v(), 1);
+    
+    BytecodeLanguage bcl = m_bcl.top();
+    BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top());
+
+    bcl_mem.incrementAddress(Constants.SizeGcInfo);   
+    Local ref = bcl_mem.readRef();
+    
+    bcl.pushMethod(m_gcObjVisitor.top(), "readFromHeap", object_class.getType(), 
+        object_class.getType(), BooleanType.v(), LongType.v());
+    Local new_char_array_obj = bcl.invokeMethodRet(m_gcObjVisitor.top(), NullConstant.v(),
+        IntConstant.v(1), ref);
+    
+    Local new_char_array = bcl.cast(char_array_type, new_char_array_obj);
+    Local new_string = bcl.newInstance(string_class.getName(), new_char_array);
+    bcl_mem.finishReading();
+    
+    return new_string;
   }
 
   private Local makeReadFromHeapBodyForSootClass(RefType type){

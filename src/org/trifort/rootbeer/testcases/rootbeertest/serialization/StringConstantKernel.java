@@ -14,6 +14,10 @@ public class StringConstantKernel implements Kernel {
 
   private String m_string;
   
+  public StringConstantKernel(){
+    m_string = "abc";
+  }
+  
   public void gpuMethod() {
     m_string = "hello world";
   }
