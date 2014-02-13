@@ -21,9 +21,6 @@ public class ExtraFields {
     m_fields.add("<org.trifort.rootbeer.runtimegpu.GpuException: int m_arrayLength>");
     m_fields.add("<org.trifort.rootbeer.runtimegpu.GpuException: int m_arrayIndex>");
     m_fields.add("<org.trifort.rootbeer.runtimegpu.GpuException: int m_array>");
-    m_fields.add("<java.lang.String: char[] value>");
-    m_fields.add("<java.lang.String: int count>");
-    m_fields.add("<java.lang.String: int offset>");
     m_fields.add("<java.lang.StringBuilder: char[] value>");
     m_fields.add("<java.lang.StringBuilder: int count>");
     m_fields.add("<org.trifort.rootbeer.runtime.GpuStopwatch: long m_start>");

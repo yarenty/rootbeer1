@@ -19,6 +19,7 @@ import org.trifort.rootbeer.generate.opencl.fields.OpenCLField;
 import org.trifort.rootbeer.util.Stack;
 
 import soot.*;
+import soot.coffi.constant_element_value;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 import soot.jimple.NullConstant;
@@ -380,8 +381,22 @@ public class VisitorReadGen extends AbstractVisitorGen {
     
     //m_bcl.top().println("searching null creators for:");
     //m_bcl.top().println(type_id);
+
+    Set<Type> visisted = new HashSet<Type>();
+    
+    //create for String and char[]
+    SootClass string_class = Scene.v().getSootClass("java.lang.String");
+    makeReadForNullForType(string_class.getType(), type_id);
+    visisted.add(string_class.getType());
+    ArrayType char_array_type = ArrayType.v(CharType.v(), 1);
+    makeReadForNullForType(char_array_type, type_id);
+    visisted.add(char_array_type);
         
     for(Type type : m_OrderedHistory){
+      if(visisted.contains(type)){
+        continue;
+      }
+      visisted.add(type);
       makeReadForNullForType(type, type_id);
     }
   }
@@ -395,8 +410,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     BytecodeLanguage bcl = m_bcl.top();
     bcl.ifStmt(type_id, "!=", IntConstant.v(id), label_after);
         
-    //mBcl.println("reading null value");
-    //mBcl.println(type_id);
+    //m_bcl.top().println("reading null value");
+    //m_bcl.top().println(type_id);
     
     Local ret_obj = null;
     Local new_object = null;

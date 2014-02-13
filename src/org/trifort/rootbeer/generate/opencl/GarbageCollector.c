@@ -23,6 +23,92 @@ $$__device__$$ long long java_lang_System_nanoTime($$__global$$ char * gc_info, 
 #define TO_SPACE_OFFSET               0
 #define TO_SPACE_FREE_POINTER_OFFSET  8
 
+$$__device__$$ char org_trifort_getchar($$__global$$ char * buffer, int pos){
+  return buffer[pos];
+}
+
+$$__device__$$ void org_trifort_setchar($$__global$$ char * buffer, int pos, char value){
+  buffer[pos] = value;
+}
+
+$$__device__$$ short org_trifort_getshort($$__global$$ char * buffer, int pos){
+  return *(($$__global$$ short *) &buffer[pos]);
+}
+
+$$__device__$$ void org_trifort_setshort($$__global$$ char * buffer, int pos, short value){
+  *(($$__global$$ short *) &buffer[pos]) = value;
+}
+
+$$__device__$$ int org_trifort_getint($$__global$$ char * buffer, int pos){
+  return *(($$__global$$ int *) &buffer[pos]);
+}
+
+$$__device__$$ void org_trifort_setint($$__global$$ char * buffer, int pos, int value){
+  *(($$__global$$ int *) &buffer[pos]) = value;
+}
+
+$$__device__$$ long long org_trifort_getlong($$__global$$ char * buffer, int pos){
+  return *(($$__global$$ long *) &buffer[pos]);
+}
+
+$$__device__$$ void org_trifort_setlong($$__global$$ char * buffer, int pos, long long value){
+  *(($$__global$$ long long *) &buffer[pos]) = value;
+}
+
+$$__device__$$ size_t org_trifort_getsize_t($$__global$$ char * buffer, int pos){
+  return *(($$__global$$ size_t *) &buffer[pos]);
+}
+
+$$__device__$$ void org_trifort_setsize_t($$__global$$ char * buffer, int pos, size_t value){
+  *(($$__global$$ size_t *) &buffer[pos]) = value;
+}
+
+$$__device__$$
+int org_trifort_rootbeer_get_string_char_array($$__global$$ char * gc_info,
+  int thisref, int * exception)
+{
+  char * thisref_deref;
+  if(thisref == -1){
+    *exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    return -1;
+  }
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  return *(( int *) &thisref_deref[32]);
+}
+
+$$__device__$$
+void org_trifort_rootbeer_set_string_char_array($$__global$$ char * gc_info,
+  int thisref, int value, int * exception)
+{
+  char * thisref_deref;
+  if(thisref == -1){
+    *exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    return;
+  }
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  *(( int *) &thisref_deref[32]) = value;
+}
+
+
+$$__device__$$ int
+org_trifort_strlen(char * str_constant){
+  int ret = 0;
+  while(1){
+    if(str_constant[ret] != '\0'){
+      ret++;
+    } else {
+      return ret;
+    }
+  }
+}
+
+$$__device__$$ int
+org_trifort_array_length($$__global$$ char * gc_info, int thisref){
+  $$__global$$ char * thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  int ret = org_trifort_getint(thisref_deref, 12);
+  return ret;
+}
+
 $$__device__$$
 void org_trifort_exitMonitorRef($$__global$$ char * gc_info, int thisref, int old){
   char * mem = org_trifort_gc_deref(gc_info, thisref); 
@@ -417,20 +503,17 @@ void java_io_PrintStream_println0_9_($$__global$$ char * gc_info, int thisref, i
 
   char * valueref_deref;
 
-  valueref = instance_getter_java_lang_String_value(gc_info, str_ret, exception);  
+  valueref = org_trifort_rootbeer_get_string_char_array(gc_info, str_ret, exception);  
   if(*exception != 0){
     return; 
   } 
-  count = instance_getter_java_lang_String_count(gc_info, str_ret, exception);
-  if(*exception != 0){
-    return; 
-  } 
-  offset = instance_getter_java_lang_String_offset(gc_info, str_ret, exception);
+  
+  count = org_trifort_array_length(gc_info, valueref, exception);
   if(*exception != 0){
     return; 
   } 
   valueref_deref = (char *) org_trifort_gc_deref(gc_info, valueref);
-  for(i = offset; i < count; ++i){
+  for(i = 0; i < count; ++i){
     curr_offset = 32 + (i * 4);
     printf("%c", valueref_deref[curr_offset]);
   }
@@ -488,24 +571,20 @@ void java_io_PrintStream_print0_9_($$__global$$ char * gc_info, int thisref, int
   int count;
   int offset;
   int i;
-  int curr_offset;
 
   char * valueref_deref;
 
-  valueref = instance_getter_java_lang_String_value(gc_info, str_ret, exception);  
+  valueref = org_trifort_rootbeer_get_string_char_array(gc_info, str_ret, exception);  
   if(*exception != 0){
     return; 
   } 
-  count = instance_getter_java_lang_String_count(gc_info, str_ret, exception);
-  if(*exception != 0){
-    return; 
-  } 
-  offset = instance_getter_java_lang_String_offset(gc_info, str_ret, exception);
+  
+  count = org_trifort_array_length(gc_info, valueref, exception);
   if(*exception != 0){
     return; 
   } 
   valueref_deref = (char *) org_trifort_gc_deref(gc_info, valueref);
-  for(i = offset; i < count; ++i){
+  for(i = 0; i < count; ++i){
     curr_offset = 32 + (i * 4);
     printf("%c", valueref_deref[curr_offset]);
   }
@@ -706,46 +785,6 @@ org_trifort_gc_get_size($$__global$$ char * mem_loc){
   return *(($$__global$$ GC_OBJ_TYPE_SIZE *) &mem_loc[0]);
 }
 
-$$__device__$$ char org_trifort_getchar($$__global$$ char * buffer, int pos){
-  return buffer[pos];
-}
-
-$$__device__$$ void org_trifort_setchar($$__global$$ char * buffer, int pos, char value){
-  buffer[pos] = value;
-}
-
-$$__device__$$ short org_trifort_getshort($$__global$$ char * buffer, int pos){
-  return *(($$__global$$ short *) &buffer[pos]);
-}
-
-$$__device__$$ void org_trifort_setshort($$__global$$ char * buffer, int pos, short value){
-  *(($$__global$$ short *) &buffer[pos]) = value;
-}
-
-$$__device__$$ int org_trifort_getint($$__global$$ char * buffer, int pos){
-  return *(($$__global$$ int *) &buffer[pos]);
-}
-
-$$__device__$$ void org_trifort_setint($$__global$$ char * buffer, int pos, int value){
-  *(($$__global$$ int *) &buffer[pos]) = value;
-}
-
-$$__device__$$ long long org_trifort_getlong($$__global$$ char * buffer, int pos){
-  return *(($$__global$$ long *) &buffer[pos]);
-}
-
-$$__device__$$ void org_trifort_setlong($$__global$$ char * buffer, int pos, long long value){
-  *(($$__global$$ long long *) &buffer[pos]) = value;
-}
-
-$$__device__$$ size_t org_trifort_getsize_t($$__global$$ char * buffer, int pos){
-  return *(($$__global$$ size_t *) &buffer[pos]);
-}
-
-$$__device__$$ void org_trifort_setsize_t($$__global$$ char * buffer, int pos, size_t value){
-  *(($$__global$$ size_t *) &buffer[pos]) = value;
-}
-
 $$__device__$$ void
 org_trifort_gc_set_to_space_address($$__global$$ char * gc_info, $$__global$$ char * value){
   org_trifort_setlong(gc_info, TO_SPACE_OFFSET, (long long) value);
@@ -772,29 +811,16 @@ org_trifort_gc_get_space_size($$__global$$ char * gc_info){
   return org_trifort_getint(gc_info, SPACE_SIZE_OFFSET);
 }
 
-$$__device__$$ int
-org_trifort_strlen(char * str_constant){
-  int ret = 0;
-  while(1){
-    if(str_constant[ret] != '\0'){
-      ret++;
-    } else {
-      return ret;
-    }
+$$__device__$$ 
+int org_trifort_string_get_array(char * gc_infop, int thisref, int * exception)
+{
+  char * thisref_deref;
+  if(thisref == -1){
+    *exception = ;
+    return;
   }
-}
-
-$$__device__$$ int
-org_trifort_array_length($$__global$$ char * gc_info, int thisref){
-  //if(thisref & 0x1000000000000000L){
-  //  thisref &= 0x0fffffffffffffffL;
-  //  thisref += 8;
-  //  return org_trifort_cache_get_int(thisref);
-  //} else {
-    $$__global$$ char * thisref_deref = org_trifort_gc_deref(gc_info, thisref);
-    int ret = org_trifort_getint(thisref_deref, 12);
-    return ret;
-  //}
+thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+*(( int *) &thisref_deref[36]) = parameter0;
 }
 
 $$__device__$$
@@ -830,9 +856,7 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a66(char * gc_info, int pa
     ch = char__array_get(gc_info, parameter0, i, exception);
     char__array_set(gc_info, characters_copy, i, ch, exception);
   }
-  instance_setter_java_lang_String_value(gc_info, thisref, characters_copy, exception); 
-  instance_setter_java_lang_String_count(gc_info, thisref, len, exception); 
-  instance_setter_java_lang_String_offset(gc_info, thisref, 0, exception); 
+  org_trifort_rootbeer_set_string_char_array(gc_info, thisref, characters_copy, exception);
   return thisref; 
 } 
 
@@ -1051,8 +1075,8 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(char * gc_
   org_trifort_gc_set_size ( thisref_deref , 44 ) ; 
   org_trifort_gc_init_monitor ( thisref_deref ) ; 
 
-  str_value = instance_getter_java_lang_String_value(gc_info, str, exception);
-  str_count = instance_getter_java_lang_String_count(gc_info, str, exception);
+  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, str, exception);
+  str_count = org_trifort_array_length(gc_info, str_value, exception);
 
   instance_setter_java_lang_AbstractStringBuilder_value(gc_info, thisref, str_value, exception); 
   instance_setter_java_lang_AbstractStringBuilder_count(gc_info, thisref, str_count, exception); 
@@ -1082,11 +1106,10 @@ int java_lang_StringBuilder_append10_9_(char * gc_info, int thisref,
     exception);
 
   //get string value and count
-  str_value = instance_getter_java_lang_String_value(gc_info, parameter0,
+  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, parameters0, 
     exception);
-
-  str_count = instance_getter_java_lang_String_count(gc_info, parameter0,
-    exception);
+    
+  str_count = org_trifort_array_length(gc_info, str_value, exception);
 
   new_count = sb_count + str_count;
   new_sb_value = char__array_new(gc_info, new_count, exception);
@@ -1566,8 +1589,8 @@ int java_lang_String_substring(char * gc_info, int str_obj_ref, int begin_index,
   int str_value = 0;
   int str_count = 0;
   
-  str_value = instance_getter_java_lang_String_value(gc_info, str_obj_ref, exception);
-  str_count = instance_getter_java_lang_String_count(gc_info, str_obj_ref, exception);
+  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, str_obj_ref, exception);
+  str_count = org_trifort_array_length(gc_info, str_value, exception);
   
   return at_illecker_substring(gc_info, str_value, str_count, begin_index, -1, exception);
 }
@@ -1579,8 +1602,8 @@ int java_lang_String_substring(char * gc_info, int str_obj_ref, int begin_index,
   int str_value = 0;
   int str_count = 0;
   
-  str_value = instance_getter_java_lang_String_value(gc_info, str_obj_ref, exception);
-  str_count = instance_getter_java_lang_String_count(gc_info, str_obj_ref, exception);
+  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, str_obj_ref, exception);
+  str_count = org_trifort_array_length(gc_info, str_value, exception);
   
   return at_illecker_substring(gc_info, str_value, str_count, begin_index, end_index, exception);
 }
@@ -1630,11 +1653,11 @@ int at_illecker_split(char * gc_info, int str_obj_ref, int delim_str_obj_ref,
   int delim_str_count = 0;
   int delim_occurrences = 0;
   
-  str_value = instance_getter_java_lang_String_value(gc_info, str_obj_ref, exception);
-  str_count = instance_getter_java_lang_String_count(gc_info, str_obj_ref, exception);
+  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, str_obj_ref, exception);
+  str_count = org_trifort_array_length(gc_info, str_value, exception);
   
-  delim_str_value = instance_getter_java_lang_String_value(gc_info, delim_str_obj_ref, exception);
-  delim_str_count = instance_getter_java_lang_String_count(gc_info, delim_str_obj_ref, exception);
+  delim_str_value = org_trifort_rootbeer_get_string_char_array(gc_info, delim_str_obj_ref, exception);
+  delim_str_count = org_trifort_array_length(gc_info, delim_str_value, exception);
   
   // count delimiters, needed for array size
   delim_occurrences = at_illecker_strcnt(gc_info, str_value, str_count,

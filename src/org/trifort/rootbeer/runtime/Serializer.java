@@ -112,14 +112,14 @@ public abstract class Serializer {
     if(result.m_NeedToWrite == false){
       return result.m_Ref;
     }
-    if(o == null){
-      System.out.println("writeToHeap: null at addr: "+result.m_Ref);
-    } else {
-      System.out.println("writeToHeap: "+o.toString()+" at addr: "+result.m_Ref);
-    }
+    //if(o == null){
+    //  System.out.println("writeToHeap: null at addr: "+result.m_Ref);
+    //} else {
+    //  System.out.println("writeToHeap: "+o.toString()+" at addr: "+result.m_Ref);
+    //}
     doWriteToHeap(o, write_data, result.m_Ref, read_only);
-    BufferPrinter printer = new BufferPrinter();
-    printer.print(mMem, result.m_Ref, 128);
+    //BufferPrinter printer = new BufferPrinter();
+    //printer.print(mMem, result.m_Ref, 128);
     return result.m_Ref;
   }
   
@@ -145,13 +145,13 @@ public abstract class Serializer {
     if(null_ptr_check == -1){
       return null;
     }
-    if(o == null){
-      System.out.println("readFromHeap: null. addr: "+address);
-    } else {
-      System.out.println("readFromHeap: "+o.toString()+". addr: "+address);
-    }
-    BufferPrinter printer = new BufferPrinter();
-    printer.print(mMem, address, 128);
+    //if(o == null){
+    //  System.out.println("readFromHeap: null. addr: "+address);
+    //} else {
+    //  System.out.println("readFromHeap: "+o.toString()+". addr: "+address);
+    //}
+    //BufferPrinter printer = new BufferPrinter();
+    //printer.print(mMem, address, 128);
     return doReadFromHeap(o, read_data, address);
   }
 
