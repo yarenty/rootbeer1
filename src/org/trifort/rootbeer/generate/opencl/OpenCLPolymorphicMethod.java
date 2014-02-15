@@ -117,7 +117,7 @@ public class OpenCLPolymorphicMethod {
       ret.append(address_qual+" char * thisref_deref;\n");
       ret.append("GC_OBJ_TYPE_TYPE derived_type;\n");
       ret.append("if(thisref == -1){\n");
-      ret.append("  *exception = -2;\n");
+      ret.append("  *exception = %%java_lang_NullPointerException_TypeNumber%%;\n");
       ret.append("return ");
       if(m_sootMethod.getReturnType() instanceof VoidType == false)
         ret.append("-1");
@@ -227,5 +227,9 @@ public class OpenCLPolymorphicMethod {
       Integer rhs_number = RootbeerClassLoader.v().getClassNumber(rhs_class);
       return lhs_number.compareTo(rhs_number);
     }
+  }
+
+  public String getSignature() {
+    return m_sootMethod.getSignature();
   }
 }

@@ -336,7 +336,8 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
     Value op = arg0.getOp();
     m_output.append("org_trifort_array_length(gc_info, ");
     op.apply(this);
-    m_output.append(")");
+    m_output.append(", exception)");
+    setCheckException();
   }
 
   public void caseNegExpr(NegExpr arg0) {

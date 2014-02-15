@@ -103,8 +103,14 @@ org_trifort_strlen(char * str_constant){
 }
 
 $$__device__$$ int
-org_trifort_array_length($$__global$$ char * gc_info, int thisref){
-  $$__global$$ char * thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+org_trifort_array_length($$__global$$ char * gc_info, int thisref, int * exception){
+  $$__global$$ char * thisref_deref;
+  
+  if(thisref == -1){
+    *exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    return 0;
+  }
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
   int ret = org_trifort_getint(thisref_deref, 12);
   return ret;
 }
@@ -850,7 +856,10 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a66(char * gc_info, int pa
   org_trifort_gc_set_size(thisref_deref, 48); 
   org_trifort_gc_init_monitor(thisref_deref); 
 
-  len = org_trifort_array_length(gc_info, parameter0);
+  len = org_trifort_array_length(gc_info, parameter0, exception);
+  if(*exception != 0){
+    return 0;
+  }
   characters_copy = char__array_new(gc_info, len, exception);
   for(i = 0; i < len; ++i){
     ch = char__array_get(gc_info, parameter0, i, exception);
@@ -1106,7 +1115,7 @@ int java_lang_StringBuilder_append10_9_(char * gc_info, int thisref,
     exception);
 
   //get string value and count
-  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, parameters0, 
+  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, parameter0, 
     exception);
     
   str_count = org_trifort_array_length(gc_info, str_value, exception);
