@@ -51,7 +51,6 @@ public class OpenCLScene {
   private static int m_curentIdent;
   private Map<String, OpenCLClass> m_classes;
   private Set<OpenCLArrayType> m_arrayTypes;
-  private CodeSegment m_codeSegment;
   private MethodHierarchies m_methodHierarchies;
   private boolean m_usesGarbageCollector;
   private SootClass m_rootSootClass;
@@ -70,7 +69,6 @@ public class OpenCLScene {
   }
   
   public void init(){
-    m_codeSegment = null;
     m_classes = new LinkedHashMap<String, OpenCLClass>();
     m_arrayTypes = new LinkedHashSet<OpenCLArrayType>();
     m_methodHierarchies = new MethodHierarchies();
@@ -474,7 +472,7 @@ public class OpenCLScene {
       for(String body : poly_bodies){
         System.out.println("body: "+body);
       }
-      bodies.addAll(bodies);
+      bodies.addAll(poly_bodies);
     }
     FieldTypeSwitch type_switch = new FieldTypeSwitch();
     FieldCodeGeneration gen = new FieldCodeGeneration();
@@ -505,7 +503,6 @@ public class OpenCLScene {
   }
 
   public void addCodeSegment(CodeSegment codeSegment){
-    this.m_codeSegment = codeSegment;
     m_rootSootClass = codeSegment.getRootSootClass();    
     m_readOnlyTypes = new ReadOnlyTypes(codeSegment.getRootMethod());
     getOpenCLClass(m_rootSootClass);
