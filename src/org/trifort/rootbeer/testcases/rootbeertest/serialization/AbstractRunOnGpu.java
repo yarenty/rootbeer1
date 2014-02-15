@@ -21,8 +21,6 @@ public class AbstractRunOnGpu implements Kernel {
   public boolean compare(AbstractRunOnGpu rhs) {
     if(m_result != rhs.m_result){
       System.out.println("m_result");
-      System.out.println("lhs: "+m_result);
-      System.out.println("rhs: "+rhs.m_result);
       return false;
     }
     return true;
