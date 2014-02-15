@@ -331,7 +331,7 @@ public class CUDAContext implements Context, Runnable {
   
   private void runBlocks(ThreadConfig thread_config, byte[] cubin_file){    
     m_runOnGpuStopwatch.start();
-        
+    
     KernelLaunch item = new KernelLaunch(m_device.getDeviceId(), cubin_file, 
       cubin_file.length, thread_config.getBlockShapeX(), 
       thread_config.getGridShapeX(), thread_config.getNumThreads(), 

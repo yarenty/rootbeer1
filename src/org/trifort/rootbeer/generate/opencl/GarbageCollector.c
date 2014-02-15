@@ -8,6 +8,13 @@
 #define COLOR_BLACK 1
 #define COLOR_WHITE 2
 
+#define OBJECT_HEADER_POSITION_GC_COUNT         0
+#define OBJECT_HEADER_POSITION_GC_COLOR         1
+#define OBJECT_HEADER_POSITION_CTOR_USED        3
+#define OBJECT_HEADER_POSITION_CLASS_NUMBER     4
+#define OBJECT_HEADER_POSITION_OBJECT_SIZE      8
+#define OBJECT_HEADER_POSITION_MONITOR          16
+
 $$__device__$$ void org_trifort_gc_collect($$__global$$ char * gc_info);
 $$__device__$$ void org_trifort_gc_assign($$__global$$ char * gc_info, int * lhs, int rhs);
 $$__device__$$ $$__global$$ char * org_trifort_gc_deref($$__global$$ char * gc_info, int handle);
@@ -697,7 +704,6 @@ org_trifort_cmpg(double lhs, double rhs){
     return 0;
   return 1;
 }
-
 
 $$__device__$$ void
 org_trifort_gc_memcpy($$__global$$ char * dest, $$__global$$ char * src, int len) {
@@ -1722,4 +1728,30 @@ int java_lang_String_split(char * gc_info, int str_obj_ref, int delim_str_obj_re
 $$__device__$$
 int java_lang_String_split(char * gc_info, int str_obj_ref, int delim_str_obj_ref, int * exception) {
   return at_illecker_split(gc_info, str_obj_ref, delim_str_obj_ref, 0, exception);
+}
+
+$$__device__$$ int 
+java_lang_Object_clone(char * gc_info, int thisref, int * exception){
+  char * src_deref;
+  char * dest_deref;
+  int dest;
+  int size;
+  
+  if(thisref == -1){
+    *exception = %%java_lang_NullPointerException_TypeNumber%%;
+    return 0;
+  }
+  
+  src_deref = org_trifort_gc_deref(gc_info, thisref);
+  size = org_trifort_getint(src_deref, OBJECT_HEADER_POSITION_OBJECT_SIZE);
+  dest = org_trifort_gc_malloc(gc_info, size);
+  if(dest == -1){
+    //TODO: make this an OutOfMemoryException
+    *exception = %%java_lang_NullPointerException_TypeNumber%%;
+    return 0;
+  }
+  dest_deref = org_trifort_gc_deref(gc_info, dest);
+  org_trifort_gc_memcpy(dest_deref, src_deref, size);
+  org_trifort_gc_set_ctor_used(dest_deref, 1);
+  return dest;
 }

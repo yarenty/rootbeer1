@@ -1,6 +1,7 @@
 package org.trifort.rootbeer.testcases.rootbeertest.serialization;
 
 import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.RootbeerGpu;
 
 public class ArrayCloneRunOnGpu implements Kernel {
 
@@ -53,12 +54,13 @@ public class ArrayCloneRunOnGpu implements Kernel {
       }
       for(int j = 0; j < lhs_inner.length; ++j){
         if(lhs_inner[j] != rhs_inner[j]){
-          System.out.println("m_array4[i][j]");
+          System.out.println("m_array4["+i+"]["+j+"]");
+          System.out.println("lhs: "+lhs_inner[j]);
+          System.out.println("rhs: "+rhs_inner[j]);
           return false;
         }
       }
     }
-    
     return true;
   }
 }

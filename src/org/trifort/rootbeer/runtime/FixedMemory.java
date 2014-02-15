@@ -458,15 +458,13 @@ public class FixedMemory implements Memory {
     }
     
     public void align16() {
-      long mod = m_pointer % 16;
+      long mod = m_heapEnd % 16;
       if(mod != 16){
-        m_pointer += (16 - mod);
+        m_heapEnd += (16 - mod);
       }
-      if(m_pointer > m_heapEnd){
-        m_heapEnd = m_pointer;
-      }
-      if(m_pointer > m_endPointer){
-        m_endPointer = m_pointer;
+      mod = m_endPointer % 16;
+      if(mod != 16){
+        m_endPointer += (16 - mod);
       }
     }
   }
