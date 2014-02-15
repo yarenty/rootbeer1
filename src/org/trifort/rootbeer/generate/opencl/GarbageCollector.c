@@ -1545,10 +1545,11 @@ int java_lang_String_indexOf(char * gc_info, int str_obj_ref,
   int search_str_value = 0;
   int search_str_count = 0;
   
-  str_value = instance_getter_java_lang_String_value(gc_info, str_obj_ref, exception);
-  str_count = instance_getter_java_lang_String_count(gc_info, str_obj_ref, exception);
-  search_str_value = instance_getter_java_lang_String_value(gc_info, search_str_obj_ref, exception);
-  search_str_count = instance_getter_java_lang_String_count(gc_info, search_str_obj_ref, exception);
+  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, str_obj_ref, exception);
+  str_count = org_trifort_array_length(gc_info, str_value, exception);
+  
+  search_str_value = org_trifort_rootbeer_get_string_char_array(gc_info, search_str_obj_ref, exception);
+  search_str_count = org_trifort_array_length(gc_info, search_str_value, exception);
   
   return at_illecker_strpos(gc_info, str_value, str_count, search_str_value, search_str_count, 0, exception);
 }
@@ -1562,10 +1563,11 @@ int java_lang_String_indexOf(char * gc_info, int str_obj_ref,
   int search_str_value = 0;
   int search_str_count = 0;
   
-  str_value = instance_getter_java_lang_String_value(gc_info, str_obj_ref, exception);
-  str_count = instance_getter_java_lang_String_count(gc_info, str_obj_ref, exception);
-  search_str_value = instance_getter_java_lang_String_value(gc_info, search_str_obj_ref, exception);
-  search_str_count = instance_getter_java_lang_String_count(gc_info, search_str_obj_ref, exception);
+  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, str_obj_ref, exception);
+  str_count = org_trifort_array_length(gc_info, str_value, exception);
+  
+  search_str_value = org_trifort_rootbeer_get_string_char_array(gc_info, search_str_obj_ref, exception);
+  search_str_count = org_trifort_array_length(gc_info, search_str_value, exception);
   
   return at_illecker_strpos(gc_info, str_value, str_count, search_str_value, search_str_count, from_index, exception);
 }
