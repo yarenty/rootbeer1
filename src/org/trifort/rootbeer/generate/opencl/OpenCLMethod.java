@@ -26,6 +26,7 @@ import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
 import soot.options.Options;
+import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.util.Chain;
@@ -35,15 +36,35 @@ import soot.util.Chain;
  * @author pcpratts
  */
 public class OpenCLMethod {
-  private final SootMethod m_sootMethod;
+  private SootMethod m_sootMethod;
   private SootClass m_sootClass;
   private Set<String> m_dontMangleMethods;
   private Set<String> m_dontEmitMethods;
   private Set<String> m_emitUnmangled;
   
   public OpenCLMethod(SootMethod soot_method, SootClass soot_class){
-    m_sootMethod = soot_method;
-    m_sootClass = soot_class;
+    if(soot_method.isConcrete()){
+      //if the method is concrete, use it.
+      m_sootMethod = soot_method;
+      m_sootClass = soot_class;
+    } else {
+      //otherwise, if we have gotten to here, there is only one concrete
+      //method in the hierarchy and this is not it. find it.
+      MethodSignatureUtil util = new MethodSignatureUtil();
+      ClassHierarchy hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+      List<String> virtual_signatures = hierarchy.getVirtualMethods(soot_method.getSignature());
+      for(String virtual_signature : virtual_signatures){
+        util.parse(virtual_signature);
+        SootMethod virtual_method = util.getSootMethod();
+        if(virtual_method.isConcrete()){
+          m_sootMethod = virtual_method;
+          m_sootClass = virtual_method.getDeclaringClass();
+        }
+      }
+      if(m_sootMethod == null){
+        throw new RuntimeException("error compiling CUDA code");
+      }
+    }
     createDontMangleMethods();
   }
     

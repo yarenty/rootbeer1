@@ -7,6 +7,7 @@
 
 package org.trifort.rootbeer.generate.opencl;
 
+import java.util.ArrayList;
 import java.util.List;
 import soot.SootClass;
 import soot.SootMethod;
@@ -39,11 +40,20 @@ public class IsPolymorphic {
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
     List<String> virtual_methods = class_hierarchy.getVirtualMethods(signature);
     
+    List<String> concrete_methods = new ArrayList<String>();
+    for(String virtual_method : virtual_methods){
+      m_util.parse(virtual_method);
+      SootMethod method = m_util.getSootMethod();
+      if(method.isConcrete()){
+        concrete_methods.add(virtual_method);
+      }
+    }
+    
     String base_sig = virtual_methods.get(0);
     m_util.parse(base_sig);
     m_baseMethod = m_util.getSootMethod();
-    
-    if(virtual_methods.size() == 1 || m_baseMethod.isConstructor() || special_invoke){
+   
+    if(concrete_methods.size() == 1 || m_baseMethod.isConstructor() || special_invoke){
       return false;
     } else {
       return true;
