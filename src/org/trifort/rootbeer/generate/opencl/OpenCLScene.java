@@ -467,12 +467,7 @@ public class OpenCLScene {
     }
     List<OpenCLPolymorphicMethod> poly_methods = m_methodHierarchies.getPolyMorphicMethods();
     for(OpenCLPolymorphicMethod poly_method : poly_methods){
-      System.out.println("poly_method: "+poly_method.getSignature());
-      Set<String> poly_bodies = poly_method.getMethodBodies();
-      for(String body : poly_bodies){
-        System.out.println("body: "+body);
-      }
-      bodies.addAll(poly_bodies);
+      bodies.addAll(poly_method.getMethodBodies());
     }
     FieldTypeSwitch type_switch = new FieldTypeSwitch();
     FieldCodeGeneration gen = new FieldCodeGeneration();
