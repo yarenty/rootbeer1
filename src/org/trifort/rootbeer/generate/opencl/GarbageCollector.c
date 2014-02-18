@@ -1757,3 +1757,439 @@ java_lang_Object_clone(char * gc_info, int thisref, int * exception){
   org_trifort_gc_set_ctor_used(dest_deref, 1);
   return dest;
 }
+
+$$__device__$$
+bool at_illecker_is_digit(unsigned char c) {
+  return ((c)>='0' && (c)<='9');
+}
+
+$$__device__$$
+bool at_illecker_is_space(unsigned char c) {
+  return ((c)==' ' || (c)=='\f' || (c)=='\n' || (c)=='\r' || (c)=='\t' || (c)=='\v');
+}
+
+// local string to unsigned long method
+// http://www.opensource.apple.com/source/tcl/tcl-14/tcl/compat/strtoul.c
+// Argument1: String of ASCII digits, possibly preceded by white space.
+// Argument2: Where to store address of terminating character, or NULL.
+// Argument3: Base for conversion.  Must be less than 37.
+// If 0, then the base is chosen from the leading characters of string:
+// "0x" means hex, "0" means octal, anything else means decimal.
+$$__device__$$
+unsigned long long at_illecker_strtoul(const char *string, char **end_ptr, int base) {
+  register const char *p;
+  register unsigned long long result = 0;
+  register unsigned digit;
+  int anyDigits = 0;
+  int negative=0;
+  int overflow=0;
+  
+  char cvtIn[] = {
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,		/* '0' - '9' */
+    100, 100, 100, 100, 100, 100, 100,		/* punctuation */
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,	/* 'A' - 'Z' */
+    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+    30, 31, 32, 33, 34, 35,
+    100, 100, 100, 100, 100, 100,		/* punctuation */
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,	/* 'a' - 'z' */
+    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+    30, 31, 32, 33, 34, 35
+  };
+  
+  // Skip any leading blanks.
+  p = string;
+  while (at_illecker_is_space((unsigned char) (*p))) {
+    p += 1;
+  }
+  // Check for a sign.
+  if (*p == '-') {
+    negative = 1;
+    p += 1;
+  } else {
+    if (*p == '+') {
+      p += 1;
+    }
+  }
+  
+  // If no base was provided, pick one from the leading characters
+  // of the string.
+  if (base == 0) {
+    if (*p == '0') {
+      p += 1;
+      if ((*p == 'x') || (*p == 'X')) {
+        p += 1;
+        base = 16;
+      } else {
+        // Must set anyDigits here, otherwise "0" produces a
+        // "no digits" error.
+        anyDigits = 1;
+        base = 8;
+      }
+    } else {
+      base = 10;
+    }
+  } else if (base == 16) {
+    // Skip a leading "0x" from hex numbers.
+    if ((p[0] == '0') && ((p[1] == 'x') || (p[1] == 'X'))) {
+      p += 2;
+    }
+  }
+  
+  // Sorry this code is so messy, but speed seems important. Do
+  // different things for base 8, 10, 16, and other.
+  if (base == 8) {
+    unsigned long long maxres = 0xFFFFFFFFUL >> 3; // ULONG_MAX = 0xFFFFFFFFUL
+    for ( ; ; p += 1) {
+      digit = *p - '0';
+      if (digit > 7) {
+        break;
+      }
+      if (result > maxres) {
+        overflow = 1;
+      }
+      result = (result << 3);
+      if (digit > (0xFFFFFFFFUL - result)) {
+        overflow = 1;
+      }
+      result += digit;
+      anyDigits = 1;
+    }
+  } else if (base == 10) {
+    unsigned long long maxres = 0xFFFFFFFFUL / 10; // ULONG_MAX = 0xFFFFFFFFUL
+    for ( ; ; p += 1) {
+      digit = *p - '0';
+      if (digit > 9) {
+        break;
+      }
+      if (result > maxres) {
+        overflow = 1;
+      }
+      result *= 10;
+      if (digit > (0xFFFFFFFFUL - result)) {
+        overflow = 1;
+      }
+      result += digit;
+      anyDigits = 1;
+    }
+  } else if (base == 16) {
+    unsigned long long maxres = 0xFFFFFFFFUL >> 4;
+    for ( ; ; p += 1) {
+      digit = *p - '0';
+      if (digit > ('z' - '0')) {
+        break;
+      }
+      digit = cvtIn[digit];
+      if (digit > 15) {
+        break;
+      }
+      if (result > maxres) {
+        overflow = 1;
+      }
+      result = (result << 4);
+      if (digit > (0xFFFFFFFFUL - result)) {
+        overflow = 1;
+      }
+      result += digit;
+      anyDigits = 1;
+    }
+  } else if ( base >= 2 && base <= 36 ) {
+    unsigned long long maxres = 0xFFFFFFFFUL / base;
+    for ( ; ; p += 1) {
+      digit = *p - '0';
+      if (digit > ('z' - '0')) {
+        break;
+      }
+      digit = cvtIn[digit];
+      if (digit >= ( (unsigned) base )) {
+        break;
+      }
+      if (result > maxres) {
+        overflow = 1;
+      }
+      result *= base;
+      if (digit > (0xFFFFFFFFUL - result)) {
+        overflow = 1;
+      }
+      result += digit;
+      anyDigits = 1;
+    }
+  }
+  
+  // See if there were any digits at all.
+  if (!anyDigits) {
+    p = string;
+  }
+  
+  if (end_ptr != 0) {
+    /* unsafe, but required by the strtoul prototype */
+    *end_ptr = (char *) p;
+  }
+  
+  if (overflow) {
+    return 0xFFFFFFFFUL;
+  }
+  
+  if (negative) {
+    return -result;
+  }
+  return result;
+}
+
+// local string to long method
+// http://www.opensource.apple.com/source/tcl/tcl-14/tcl/compat/strtol.c
+// Argument1: String of ASCII digits, possibly preceded by white space.
+// Argument2: Where to store address of terminating character, or NULL.
+// Argument3: Base for conversion.  Must be less than 37.
+// If 0, then the base is chosen from the leading characters of string:
+// "0x" means hex, "0" means octal, anything else means decimal.
+$$__device__$$
+long long at_illecker_strtol(const char *string, char **end_ptr, int base) {
+  register const char *p;
+  long long result;
+  
+  // Skip any leading blanks.
+  p = string;
+  while (at_illecker_is_space((unsigned char) (*p))) {
+    p += 1;
+  }
+  // Check for a sign.
+  if (*p == '-') {
+    p += 1;
+    result = -(at_illecker_strtoul(p, end_ptr, base));
+  } else {
+    if (*p == '+') {
+      p += 1;
+    }
+    result = at_illecker_strtoul(p, end_ptr, base);
+  }
+  if ((result == 0) && (end_ptr != 0) && (*end_ptr == p)) {
+    *end_ptr = (char *) string;
+  }
+  return result;
+}
+
+// local string to double method
+// http://www.opensource.apple.com/source/tcl/tcl-14/tcl/compat/strtod.c
+$$__device__$$
+double at_illecker_strtod(const char *string) {
+  int sign = 0; // FALSE
+  int expSign = 0; // FALSE
+  double fraction, dblExp, *d;
+  register const char *p;
+  register int c;
+  int exp = 0;
+  int fracExp = 0;
+  int mantSize;
+  int decPt;
+  const char *pExp;
+  
+  int maxExponent = 511;
+  double powersOf10[] = {
+    10.,
+    100.,
+    1.0e4,
+    1.0e8,
+    1.0e16,
+    1.0e32,
+    1.0e64,
+    1.0e128,
+    1.0e256
+  };
+  
+  // Strip off leading blanks and check for a sign.
+  p = string;
+  while (at_illecker_is_space((unsigned char) (*p))) {
+    p += 1;
+  }
+  
+  if (*p == '-') {
+    sign = 1; // TRUE
+    p += 1;
+  } else {
+    if (*p == '+') {
+      p += 1;
+    }
+    sign = 0; // FALSE
+  }
+  
+  // Count the number of digits in the mantissa (including the decimal
+  // point), and also locate the decimal point.
+  decPt = -1;
+  for (mantSize = 0; ; mantSize += 1) {
+    c = *p;
+    if (!at_illecker_is_digit(c)) {
+      if ((c != '.') || (decPt >= 0)) {
+        break;
+      }
+      decPt = mantSize;
+    }
+    p += 1;
+  }
+  
+  // Now suck up the digits in the mantissa.  Use two integers to
+  // collect 9 digits each (this is faster than using floating-point).
+  // If the mantissa has more than 18 digits, ignore the extras, since
+  // they can't affect the value anyway.
+  pExp  = p;
+  p -= mantSize;
+  if (decPt < 0) {
+    decPt = mantSize;
+  } else {
+    mantSize -= 1;
+  }
+  if (mantSize > 18) {
+    fracExp = decPt - 18;
+    mantSize = 18;
+  } else {
+    fracExp = decPt - mantSize;
+  }
+  if (mantSize == 0) {
+    fraction = 0.0;
+    p = string;
+    goto done;
+  } else {
+    int frac1, frac2;
+    frac1 = 0;
+    for ( ; mantSize > 9; mantSize -= 1) {
+      c = *p;
+      p += 1;
+      if (c == '.') {
+        c = *p;
+        p += 1;
+      }
+      frac1 = 10*frac1 + (c - '0');
+    }
+    frac2 = 0;
+    for (; mantSize > 0; mantSize -= 1) {
+      c = *p;
+      p += 1;
+      if (c == '.') {
+        c = *p;
+        p += 1;
+      }
+      frac2 = 10*frac2 + (c - '0');
+    }
+    fraction = (1.0e9 * frac1) + frac2;
+  }
+  
+  // Skim off the exponent.
+  p = pExp;
+  if ((*p == 'E') || (*p == 'e')) {
+    p += 1;
+    if (*p == '-') {
+      expSign = 1; // TRUE
+      p += 1;
+    } else {
+      if (*p == '+') {
+        p += 1;
+      }
+      expSign = 0; // FALSE
+    }
+    if (!at_illecker_is_digit((unsigned char) (*p))) {
+      p = pExp;
+      goto done;
+    }
+    while (at_illecker_is_digit((unsigned char) (*p))) {
+      exp = exp * 10 + (*p - '0');
+      p += 1;
+    }
+  }
+  if (expSign) {
+    exp = fracExp - exp;
+  } else {
+    exp = fracExp + exp;
+  }
+  
+  // Generate a floating-point number that represents the exponent.
+  // Do this by processing the exponent one bit at a time to combine
+  // many powers of 2 of 10. Then combine the exponent with the
+  // fraction.
+  if (exp < 0) {
+    expSign = 1; // TRUE
+    exp = -exp;
+  } else {
+    expSign = 0; // FALSE
+  }
+  if (exp > maxExponent) {
+    exp = maxExponent;
+    // errno = ERANGE;
+  }
+  dblExp = 1.0;
+  for (d = powersOf10; exp != 0; exp >>= 1, d += 1) {
+    if (exp & 01) {
+      dblExp *= *d;
+    }
+  }
+  if (expSign) {
+    fraction /= dblExp;
+  } else {
+    fraction *= dblExp;
+  }
+  
+done:
+  if (sign) {
+    return -fraction;
+  }
+  return fraction;
+}
+
+//<java.lang.Long: long parseLong(java.lang.String)>
+$$__device__$$
+long long java_lang_Long_parseLong(char * gc_info, int str_obj_ref, int * exception) {
+  int str_value = 0;
+  int str_count = 0;
+  char str_val[255]; // max len of 255
+  
+  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, str_obj_ref, exception);
+  str_count = org_trifort_array_length(gc_info, str_value, exception);
+  
+  // Check if str_count > 255, then truncate
+  if (str_count > 255) {
+    str_count = 255;
+  }
+  
+  // Convert string to char[]
+  for(int i = 0; i < str_count; i++){
+    str_val[i] = char__array_get(gc_info, str_value, i, exception);
+  }
+  str_val[str_count] = '\0';
+  
+  return at_illecker_strtol(str_val, 0, 0);
+}
+
+//<java.lang.Integer: int parseInt(java.lang.String)>
+$$__device__$$
+int java_lang_Integer_parseInt(char * gc_info, int str_obj_ref, int * exception) {
+  return java_lang_Long_parseLong(gc_info, str_obj_ref, exception);
+}
+
+//<java.lang.Double: double parseDouble(java.lang.String)>
+$$__device__$$
+double java_lang_Double_parseDouble(char * gc_info, int str_obj_ref, int * exception) {
+  int str_value = 0;
+  int str_count = 0;
+  char str_val[255]; // max len of 255
+  
+  str_value = org_trifort_rootbeer_get_string_char_array(gc_info, str_obj_ref, exception);
+  str_count = org_trifort_array_length(gc_info, str_value, exception);
+  
+  // Check if str_count > 255, then truncate
+  if (str_count > 255) {
+    str_count = 255;
+  }
+  
+  // Convert string to char[]
+  for(int i = 0; i < str_count; i++){
+    str_val[i] = char__array_get(gc_info, str_value, i, exception);
+  }
+  str_val[str_count] = '\0';
+  
+  return at_illecker_strtod(str_val);
+}
+
+//<java.lang.Float: float parseFloat(java.lang.String)>
+$$__device__$$
+float java_lang_Float_parseFloat(char * gc_info, int str_obj_ref, int * exception) {
+  return java_lang_Double_parseDouble(gc_info, str_obj_ref, exception);
+}
+
