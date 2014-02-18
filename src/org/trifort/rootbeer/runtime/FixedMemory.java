@@ -410,17 +410,26 @@ public class FixedMemory implements Memory {
 
     public long mallocWithSize(int size){
       int mod = size % 16;
-      if(mod != 0)
+      if(mod != 0){
         size += (16 - mod);
-
+      }
+        
+      long mod2 = m_endPointer % 16;
+      if(mod2 != 0){
+        m_endPointer += (16 - mod2);
+      }
+      
       long ret = m_endPointer;
       m_endPointer += size;              
+      
       if(ret + size > m_size){
         throw new OutOfMemoryError();
-      }        
+      }
+      
       m_pointer = ret;
-      if(ret > m_heapEnd)
+      if(ret > m_heapEnd){
         m_heapEnd = ret;
+      }
       
       return ret;
     }
