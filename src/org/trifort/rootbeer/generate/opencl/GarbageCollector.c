@@ -1210,9 +1210,9 @@ int java_lang_StringBuilder_toString9_(char * gc_info, int thisref,
     exception);
 }
 
-//<java.lang.Integer: java.lang.Integer init(int)>
+//<java.lang.Integer: java.lang.Integer <init>(int)>
 $$__device__$$
-int java_lang_Integer_initab850b60f96d11de8a390800200c9a660_5_(char * gc_info, 
+int java_lang_Integer_initab850b60f96d11de8a390800200c9a66(char * gc_info,
   int int_value, int * exception){
   int thisref;
   char * thisref_deref;
@@ -1231,7 +1231,6 @@ int java_lang_Integer_initab850b60f96d11de8a390800200c9a660_5_(char * gc_info,
   org_trifort_gc_set_size(thisref_deref, 48);
   org_trifort_gc_init_monitor(thisref_deref);
 
-  // instance_setter_java_lang_Integer_value(gc_info, thisref, 0, exception);
   instance_setter_java_lang_Integer_value(gc_info, thisref, int_value, exception);
   return thisref;
 }
@@ -1242,7 +1241,7 @@ int java_lang_Integer_valueOf(char * gc_info, int int_value, int * exception) {
   int return_obj = -1;
   
   org_trifort_gc_assign(gc_info, 
-    &return_obj, java_lang_Integer_initab850b60f96d11de8a390800200c9a660_5_(gc_info,
+    &return_obj, java_lang_Integer_initab850b60f96d11de8a390800200c9a66(gc_info,
     int_value, exception));
   
   if(*exception != 0) {
