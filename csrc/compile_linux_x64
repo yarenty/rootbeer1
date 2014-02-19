@@ -9,6 +9,3 @@ gcc -shared -Wl,-soname,rootbeer_cuda -o rootbeer_cuda_x64.so.1 CUDARuntime.o CU
 
 gcc -fPIC -g -c -I/usr/lib/jvm/default-java/include/ -I/usr/lib/jvm/default-java/include/linux -I/usr/local/cuda/targets/x86_64-linux/include/ org/trifort/rootbeer/runtime/OpenCLRuntime.c -o OpenCLRuntime.o
 gcc -shared -Wl,-soname,rootbeer_opencl -o rootbeer_opencl_x64.so.1 OpenCLRuntime.o -lc -lOpenCL
-
-mkdir ../build/classes/org/trifort/rootbeer/runtime/binaries/
-cp *.so.1 ../build/classes/org/trifort/rootbeer/runtime/binaries/

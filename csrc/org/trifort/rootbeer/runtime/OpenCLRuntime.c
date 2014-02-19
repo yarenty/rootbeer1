@@ -2,7 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef __APPLE__
+#include <OpenCL/cl.h>
+#else
 #include <CL/cl.h>
+#endif
 
 JNIEXPORT jobject JNICALL Java_org_trifort_rootbeer_runtime_OpenCLRuntime_loadGpuDevices
   (JNIEnv * env, jobject this_ref)
