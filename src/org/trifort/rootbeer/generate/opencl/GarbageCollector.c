@@ -896,7 +896,7 @@ thisref_deref = org_trifort_gc_deref(gc_info, thisref);
 }
 
 $$__device__$$
-int java_lang_String_initab850b60f96d11de8a390800200c9a66(char * gc_info, int parameter0, int * exception) { 
+int org_trifort_rootbeer_string_from_chars(char * gc_info, int parameter0, int * exception) {
   int r0 = -1; 
   int r1 = -1; 
   int i0; 
@@ -922,17 +922,29 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a66(char * gc_info, int pa
   org_trifort_gc_set_size(thisref_deref, 48); 
   org_trifort_gc_init_monitor(thisref_deref); 
 
+  org_trifort_rootbeer_set_string_char_array(gc_info, thisref, parameter0, exception);
+  return thisref; 
+}
+
+$$__device__$$
+int java_lang_String_initab850b60f96d11de8a390800200c9a660_9_(char * gc_info, int parameter0, int * exception) { 
+  int i;
+  int len;
+  int characters_copy;
+  char ch;
+  
   len = org_trifort_array_length(gc_info, parameter0, exception);
   if(*exception != 0){
     return 0;
   }
+
   characters_copy = char__array_new(gc_info, len, exception);
   for(i = 0; i < len; ++i){
     ch = char__array_get(gc_info, parameter0, i, exception);
     char__array_set(gc_info, characters_copy, i, ch, exception);
   }
-  org_trifort_rootbeer_set_string_char_array(gc_info, thisref, characters_copy, exception);
-  return thisref; 
+
+  return org_trifort_rootbeer_string_from_chars(gc_info, characters_copy, exception);
 } 
 
 $$__device__$$ int 
@@ -950,7 +962,7 @@ org_trifort_string_constant($$__global$$ char * gc_info, char * str_constant, in
     char__array_set(gc_info, characters, i, str_constant[i], exception);
   }
   
-  return java_lang_String_initab850b60f96d11de8a390800200c9a66(gc_info, characters, exception);
+  return characters;
 }
 
 $$__device__$$ void
@@ -1267,8 +1279,7 @@ int java_lang_StringBuilder_toString9_(char * gc_info, int thisref,
  
   int value = instance_getter_java_lang_AbstractStringBuilder_value(gc_info, thisref,
     exception);
-  return java_lang_String_initab850b60f96d11de8a390800200c9a66(gc_info, value, 
-    exception);
+  return org_trifort_rootbeer_string_from_chars(gc_info, value, exception);
 }
 
 //<java.lang.Integer: java.lang.Integer <init>(int)>
@@ -1408,52 +1419,6 @@ bool at_illecker_typeof_String(char * gc_info, int thisref){
   return false;
 }
 
-//<java.lang.String: java.lang.String valueOf(java.lang.Object)>
-$$__device__$$
-int java_lang_String_valueOf(char * gc_info, int obj_ref, int * exception) {
-  int return_str = -1;
-  char bool_val;
-
-  if (obj_ref != -1) {
-    
-    // check type
-    if (at_illecker_typeof_Boolean(gc_info, obj_ref)) {
-      bool_val = instance_getter_java_lang_Boolean_value(gc_info, obj_ref, exception);
-      if (bool_val == 0) {
-        return_str = org_trifort_string_constant(gc_info, (char *) "false", exception);
-      } else {
-        return_str = org_trifort_string_constant(gc_info, (char *) "true", exception);
-      }
-      
-    } else if (at_illecker_typeof_Integer(gc_info, obj_ref)) {
-      return_str = java_lang_Integer_toString9_5_(gc_info,
-        instance_getter_java_lang_Integer_value(gc_info, obj_ref, exception), exception);
-      
-    } else if (at_illecker_typeof_Long(gc_info, obj_ref)) {
-      return_str = java_lang_Long_toString9_6_(gc_info,
-        instance_getter_java_lang_Long_value(gc_info, obj_ref, exception), exception);
-      
-    } else if (at_illecker_typeof_Float(gc_info, obj_ref)) {
-      return_str = java_lang_Float_toString9_7_(gc_info,
-        instance_getter_java_lang_Float_value(gc_info, obj_ref, exception), exception);
-      
-    } else if (at_illecker_typeof_Double(gc_info, obj_ref)) {
-      return_str = java_lang_Double_toString9_8_(gc_info,
-        instance_getter_java_lang_Double_value(gc_info, obj_ref, exception), exception);
-            
-    } else if (at_illecker_typeof_String(gc_info, obj_ref)) {
-      return_str = obj_ref;
-      
-    } else {
-      return_str = java_lang_Object_toString9_(gc_info, obj_ref, exception);
-    }
-  } else {
-    return_str = org_trifort_string_constant(gc_info, (char *) "null", exception);
-  }
-  
-  return return_str;
-}
-
 //<java.lang.Object: java.lang.String toString()>
 $$__device__$$
 int java_lang_Object_toString9_(char * gc_info, int this_ref, int * exception){
@@ -1513,6 +1478,54 @@ int java_lang_Object_toString9_(char * gc_info, int this_ref, int * exception){
   }
   
   return ret_str;
+}
+
+//<java.lang.String: java.lang.String valueOf(java.lang.Object)>
+$$__device__$$
+int java_lang_String_valueOf(char * gc_info, int obj_ref, int * exception) {
+  int return_str = -1;
+  char bool_val;
+
+  if (obj_ref != -1) {
+    
+    // check type
+    if (at_illecker_typeof_Boolean(gc_info, obj_ref)) {
+      bool_val = instance_getter_java_lang_Boolean_value(gc_info, obj_ref, exception);
+      if (bool_val == 0) {
+        return_str = org_trifort_string_constant(gc_info, (char *) "false", exception);
+      } else {
+        return_str = org_trifort_string_constant(gc_info, (char *) "true", exception);
+      }
+      
+    } else if (at_illecker_typeof_Integer(gc_info, obj_ref)) {
+      return_str = java_lang_Integer_toString9_5_(gc_info,
+        instance_getter_java_lang_Integer_value(gc_info, obj_ref, exception), exception);
+      
+    } else if (at_illecker_typeof_Long(gc_info, obj_ref)) {
+      return_str = java_lang_Long_toString9_6_(gc_info,
+        instance_getter_java_lang_Long_value(gc_info, obj_ref, exception), exception);
+      
+    } else if (at_illecker_typeof_Float(gc_info, obj_ref)) {
+      return_str = java_lang_Float_toString9_7_(gc_info,
+        instance_getter_java_lang_Float_value(gc_info, obj_ref, exception), exception);
+      
+    } else if (at_illecker_typeof_Double(gc_info, obj_ref)) {
+      return_str = java_lang_Double_toString9_8_(gc_info,
+        instance_getter_java_lang_Double_value(gc_info, obj_ref, exception), exception);
+            
+    } else if (at_illecker_typeof_String(gc_info, obj_ref)) {
+      printf("typeof string\n");
+      return_str = obj_ref;
+    } else {
+      printf("typeof unknown\n");
+      return_str = java_lang_Object_toString9_(gc_info, obj_ref, exception);
+    }
+  } else {
+    printf("typeof null\n");
+    return_str = org_trifort_string_constant(gc_info, (char *) "null", exception);
+  }
+  
+  return return_str;
 }
 
 $$__device__$$
@@ -1859,7 +1872,7 @@ int at_illecker_substring(char * gc_info, int str_value, int str_count,
     begin_index++;
   }
   
-  return java_lang_String_initab850b60f96d11de8a390800200c9a66(gc_info, new_string, exception);
+  return org_trifort_rootbeer_string_from_chars(gc_info, new_string, exception);
 }
 
 //<java.lang.String: java.lang.String substring(int)>

@@ -8,6 +8,7 @@
 package org.trifort.rootbeer.testcases.rootbeertest.serialization;
 
 import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.RootbeerGpu;
 
 public class ObjectToStringRunOnGpu implements Kernel {
 

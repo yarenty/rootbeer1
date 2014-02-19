@@ -152,7 +152,18 @@ public abstract class Serializer {
     //}
     //BufferPrinter printer = new BufferPrinter();
     //printer.print(mMem, address, 128);
-    return doReadFromHeap(o, read_data, address);
+    Object ret = doReadFromHeap(o, read_data, address);
+    //if(ret == null){
+    //  System.out.println("doReadFromHeap: null. addr: "+address);
+    //} else {
+    //  if(ret instanceof char[]){
+    //    String str = new String((char[]) ret);
+    //    System.out.println("doReadFromHeap char[]: "+str+". addr: "+address);
+    //  } else {
+    //    System.out.println("doReadFromHeap: "+ret.toString()+". addr: "+address);
+    //  }
+    //}
+    return ret;
   }
 
   public void readStaticsFromHeap(){

@@ -7,6 +7,7 @@
 
 package org.trifort.rootbeer.generate.opencl.fields;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +26,11 @@ import soot.rbclassload.FieldSignatureUtil;
 public class FieldCodeGeneration {
   
   private FieldTypeSwitch m_TypeSwitch;
+  private List<String> m_fieldsToForce;
+  
+  public FieldCodeGeneration(){
+    m_fieldsToForce = new ArrayList<String>();
+  }
  
   public String prototypes(Map<String, OpenCLClass> classes) {
     Set<String> set = new HashSet<String>();
@@ -34,18 +40,15 @@ public class FieldCodeGeneration {
     }
     // Force fields to be generated
     FieldSignatureUtil util = new FieldSignatureUtil();
-    Iterator<String> it = ForcedFields.getInstance().get().iterator();
-    while (it.hasNext()){
-      util.parse(it.next());
+    ForcedFields forced_fields = new ForcedFields();
+    for(String field_sig : forced_fields.get()){
+      util.parse(field_sig);
       OpenCLClass field_class = classes.get(util.getDeclaringClass());
       OpenCLField field = field_class.getField(util.getName());
       String prototype = field.getGetterSetterPrototypes();
       if (!set.contains(prototype)) {
         set.add(prototype);
-      } else {
-        // remove item from m_ForcedFields, because it was already added
-        // this will skip generating duplicate bodies
-        it.remove();
+        m_fieldsToForce.add(field_sig);
       }
     }
     return setToString(set);
@@ -60,7 +63,7 @@ public class FieldCodeGeneration {
     }
     // Force fields to be generated
     FieldSignatureUtil util = new FieldSignatureUtil();
-    for(String field_sig : ForcedFields.getInstance().get()){
+    for(String field_sig : m_fieldsToForce){
       util.parse(field_sig);
       OpenCLClass field_class = classes.get(util.getDeclaringClass());
       OpenCLField field = field_class.getField(util.getName());

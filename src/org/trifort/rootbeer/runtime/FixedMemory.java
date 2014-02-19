@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.omg.CORBA._IDLTypeStub;
+import org.trifort.rootbeer.generate.bytecode.Constants;
 
 public class FixedMemory implements Memory {
 
@@ -409,14 +410,14 @@ public class FixedMemory implements Memory {
     }
 
     public long mallocWithSize(int size){
-      int mod = size % 16;
+      int mod = size % Constants.MallocAlignBytes;
       if(mod != 0){
-        size += (16 - mod);
+        size += (Constants.MallocAlignBytes - mod);
       }
         
-      long mod2 = m_endPointer % 16;
+      long mod2 = m_endPointer % Constants.MallocAlignBytes;
       if(mod2 != 0){
-        m_endPointer += (16 - mod2);
+        m_endPointer += (Constants.MallocAlignBytes - mod2);
       }
       
       long ret = m_endPointer;
@@ -467,13 +468,13 @@ public class FixedMemory implements Memory {
     }
     
     public void align16() {
-      long mod = m_heapEnd % 16;
-      if(mod != 16){
-        m_heapEnd += (16 - mod);
+      long mod = m_heapEnd % Constants.MallocAlignBytes;
+      if(mod != 0){
+        m_heapEnd += (Constants.MallocAlignBytes - mod);
       }
-      mod = m_endPointer % 16;
-      if(mod != 16){
-        m_endPointer += (16 - mod);
+      mod = m_endPointer % Constants.MallocAlignBytes;
+      if(mod != 0){
+        m_endPointer += (Constants.MallocAlignBytes - mod);
       }
     }
   }

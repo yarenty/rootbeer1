@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.configuration.RootbeerPaths;
-import org.trifort.rootbeer.entry.ExtraFields;
+import org.trifort.rootbeer.entry.ForcedFields;
 import org.trifort.rootbeer.generate.bytecode.ReadOnlyTypes;
 import org.trifort.rootbeer.generate.codesegment.CodeSegment;
 import org.trifort.rootbeer.generate.opencl.fields.CompositeField;
@@ -60,6 +60,7 @@ public class OpenCLScene {
   private List<CompositeField> m_compositeFields;
   private List<SootMethod> m_methods;
   private ClassConstantNumbers m_constantNumbers;
+  private FieldCodeGeneration m_fieldCodeGeneration;
   
   static {
     m_curentIdent = 0;
@@ -75,6 +76,7 @@ public class OpenCLScene {
     m_instanceOfs = new HashSet<OpenCLInstanceof>();
     m_methods = new ArrayList<SootMethod>();
     m_constantNumbers = new ClassConstantNumbers();
+    m_fieldCodeGeneration = new FieldCodeGeneration();
     loadTypes(); 
   }
 
@@ -228,11 +230,12 @@ public class OpenCLScene {
     for(SootField field : fields){
       addField(field);
     }
-    FieldSignatureUtil futil = new FieldSignatureUtil();
-    ExtraFields extra_fields = new ExtraFields();
-    for(String extra_field : extra_fields.get()){
-      futil.parse(extra_field);
-      addField(futil.getSootField());
+
+    FieldSignatureUtil field_util = new FieldSignatureUtil();
+    ForcedFields forced_fields = new ForcedFields();
+    for(String field_sig : forced_fields.get()){
+      field_util.parse(field_sig);
+      addField(field_util.getSootField());
     }
     
     Set<ArrayType> array_types = RootbeerClassLoader.v().getDfsInfo().getArrayTypes();
@@ -446,8 +449,7 @@ public class OpenCLScene {
     for(OpenCLPolymorphicMethod poly_method : poly_methods){
       protos.add(poly_method.getMethodPrototypes());
     }
-    FieldCodeGeneration gen = new FieldCodeGeneration();
-    protos.add(gen.prototypes(m_classes));
+    protos.add(m_fieldCodeGeneration.prototypes(m_classes));
     for(OpenCLArrayType array_type : m_arrayTypes){
       protos.add(array_type.getPrototypes());
     }
@@ -483,8 +485,7 @@ public class OpenCLScene {
       bodies.addAll(poly_method.getMethodBodies());
     }
     FieldTypeSwitch type_switch = new FieldTypeSwitch();
-    FieldCodeGeneration gen = new FieldCodeGeneration();
-    String field_bodies = gen.bodies(m_classes, type_switch);
+    String field_bodies = m_fieldCodeGeneration.bodies(m_classes, type_switch);
     bodies.add(field_bodies);
     for(OpenCLArrayType array_type : m_arrayTypes){
       bodies.add(array_type.getBodies());

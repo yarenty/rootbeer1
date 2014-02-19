@@ -12,4 +12,5 @@ public class Constants {
   //if SiceGcInfo is 16, the synch tests fail
   public final static int SizeGcInfo = 32;
   public final static int ArrayOffsetSize = 32;
+  public final static int MallocAlignBytes = 16;
 }

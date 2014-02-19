@@ -200,9 +200,9 @@ public class OpenCLArrayType {
     ret.append("int thisref;\n");
     ret.append(address_qual+" char * thisref_deref;\n");
     ret.append("total_size = (size * "+element_size+")+ "+offset_size+";\n");
-    ret.append("mod = total_size % 8;\n");
+    ret.append("mod = total_size % "+Constants.MallocAlignBytes+";\n");
     ret.append("if(mod != 0)\n");
-    ret.append("  total_size += (8 - mod);\n");
+    ret.append("  total_size += ("+Constants.MallocAlignBytes+" - mod);\n");
     ret.append("thisref = org_trifort_gc_malloc(gc_info, total_size);\n");
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("if(thisref == -1){\n");
@@ -236,9 +236,9 @@ public class OpenCLArrayType {
     ret.append("int mod;\n");
     ret.append("int thisref;\n");
     ret.append(address_qual+" char * thisref_deref;\n");
-    ret.append("mod = total_size % 8;\n");
+    ret.append("mod = total_size % "+Constants.MallocAlignBytes+";\n");
     ret.append("if(mod != 0)\n");
-    ret.append("  total_size += (8 - mod);\n");
+    ret.append("  total_size += ("+Constants.MallocAlignBytes+" - mod);\n");
     ret.append("thisref = org_trifort_gc_malloc(gc_info, total_size);\n");
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("if(thisref == -1){\n");
