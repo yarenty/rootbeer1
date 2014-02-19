@@ -161,6 +161,3 @@ Syracuse University and God is Most High.
 Phil Pratt-Szeliga  
 http://trifort.org/
 
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/pcpratts/rootbeer1/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
