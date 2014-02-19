@@ -22,4 +22,9 @@ public class RootbeerAtomicInt {
       return ret;
     }
   }
+
+  @Override
+  public String toString() {
+    return Integer.toString(m_value);
+  }
 }
