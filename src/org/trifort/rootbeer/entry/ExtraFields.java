@@ -25,7 +25,11 @@ public class ExtraFields {
     m_fields.add("<java.lang.StringBuilder: int count>");
     m_fields.add("<org.trifort.rootbeer.runtime.GpuStopwatch: long m_start>");
     m_fields.add("<org.trifort.rootbeer.runtime.GpuStopwatch: long m_stop>");
+    m_fields.add("<java.lang.Boolean: boolean value>");
     m_fields.add("<java.lang.Integer: int value>");
+    m_fields.add("<java.lang.Long: long value>");
+    m_fields.add("<java.lang.Float: float value>");
+    m_fields.add("<java.lang.Double: double value>");
   }
   
   public List<String> get(){

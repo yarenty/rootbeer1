@@ -527,6 +527,7 @@ public class OpenCLMethod {
     m_dontEmitMethods.add("<java.lang.Float: java.lang.String toString(float)>");
     m_dontEmitMethods.add("<java.lang.Integer: java.lang.String toString(int)>");
     m_dontEmitMethods.add("<java.lang.Long: java.lang.String toString(long)>");
+    m_dontEmitMethods.add("<java.lang.Object: java.lang.String toString()>");
     
     m_emitUnmangled.add("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
   }
