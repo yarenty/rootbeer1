@@ -13,6 +13,3 @@ llvm-gcc $LDFLAGS -F/Library/Frameworks -framework CUDA -o rootbeer_cuda.dylib C
 llvm-gcc $CFLAGS -g -c -I/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/include -I/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/include/darwin/ -I/usr/local/cuda/include/ org/trifort/rootbeer/runtime/OpenCLRuntime.c -o OpenCLRuntime.o
 llvm-gcc $CFLAGS -g -c -I/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/include -I/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/include/darwin/ -I/usr/local/cuda/include/ org/trifort/rootbeer/runtime/OpenCLContext.c -o OpenCLContext.o
 llvm-gcc $LDFLAGS -F/Library/Frameworks -framework CUDA -o rootbeer_opencl.dylib OpenCLRuntime.o OpenCLContext.o -lc -lcuda -L/usr/local/cuda/lib
-
-mkdir ../build/classes/org/trifort/rootbeer/runtime/binaries/
-cp *.dylib ../build/classes/org/trifort/rootbeer/runtime/binaries/
