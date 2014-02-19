@@ -533,6 +533,37 @@ void java_io_PrintStream_println0_9_($$__global$$ char * gc_info, int thisref, i
 }
 
 $$__device__$$
+void java_io_PrintStream_println0_11_($$__global$$ char * gc_info, int thisref, int obj_ref, int * exception){
+  int str_ref;
+  int valueref;
+  int count;
+  int i;
+  int curr_offset;
+  char * valueref_deref;
+
+  str_ref = java_lang_String_valueOf(gc_info, obj_ref, exception);
+  if(*exception != 0){
+    return; 
+  }
+  
+  valueref = org_trifort_rootbeer_get_string_char_array(gc_info, str_ref, exception);  
+  if(*exception != 0){
+    return; 
+  } 
+  
+  count = org_trifort_array_length(gc_info, valueref, exception);
+  if(*exception != 0){
+    return; 
+  } 
+  valueref_deref = (char *) org_trifort_gc_deref(gc_info, valueref);
+  for(i = 0; i < count; ++i){
+    curr_offset = 32 + (i * 4);
+    printf("%c", valueref_deref[curr_offset]);
+  }
+  printf("\n");
+}
+
+$$__device__$$
 void java_io_PrintStream_println0_($$__global$$ char * gc_info, int thisref, int * exception){
   printf("\n");
 }
@@ -587,6 +618,36 @@ void java_io_PrintStream_print0_9_($$__global$$ char * gc_info, int thisref, int
   char * valueref_deref;
 
   valueref = org_trifort_rootbeer_get_string_char_array(gc_info, str_ret, exception);  
+  if(*exception != 0){
+    return; 
+  } 
+  
+  count = org_trifort_array_length(gc_info, valueref, exception);
+  if(*exception != 0){
+    return; 
+  } 
+  valueref_deref = (char *) org_trifort_gc_deref(gc_info, valueref);
+  for(i = 0; i < count; ++i){
+    curr_offset = 32 + (i * 4);
+    printf("%c", valueref_deref[curr_offset]);
+  }
+}
+
+$$__device__$$
+void java_io_PrintStream_print0_11_($$__global$$ char * gc_info, int thisref, int obj_ref, int * exception){
+  int str_ref;
+  int valueref;
+  int count;
+  int i;
+  int curr_offset;
+  char * valueref_deref;
+
+  str_ref = java_lang_String_valueOf(gc_info, obj_ref, exception);
+  if(*exception != 0){
+    return; 
+  }
+  
+  valueref = org_trifort_rootbeer_get_string_char_array(gc_info, str_ref, exception);  
   if(*exception != 0){
     return; 
   } 
@@ -1249,6 +1310,209 @@ int java_lang_Integer_valueOf(char * gc_info, int int_value, int * exception) {
   }
 
   return return_obj;
+}
+
+// typeof_Boolean
+$$__device__$$
+bool at_illecker_typeof_Boolean(char * gc_info, int thisref){
+  char * thisref_deref;
+  GC_OBJ_TYPE_TYPE type;
+  if(thisref == -1){
+    return false;
+  }
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  type = org_trifort_gc_get_type(thisref_deref);
+  if(type==%%java_lang_Boolean_TypeNumber%%) {
+    return true;
+  }
+  return false;
+}
+
+// typeof_Integer
+$$__device__$$
+bool at_illecker_typeof_Integer(char * gc_info, int thisref){
+  char * thisref_deref;
+  GC_OBJ_TYPE_TYPE type;
+  if(thisref == -1){
+    return false;
+  }
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  type = org_trifort_gc_get_type(thisref_deref);
+  if(type==%%java_lang_Integer_TypeNumber%%) {
+    return true;
+  }
+  return false;
+}
+
+// typeof_Long
+$$__device__$$
+bool at_illecker_typeof_Long(char * gc_info, int thisref){
+  char * thisref_deref;
+  GC_OBJ_TYPE_TYPE type;
+  if(thisref == -1){
+    return false;
+  }
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  type = org_trifort_gc_get_type(thisref_deref);
+  if(type==%%java_lang_Long_TypeNumber%%) {
+    return true;
+  }
+  return false;
+}
+
+// typeof_Float
+$$__device__$$
+bool at_illecker_typeof_Float(char * gc_info, int thisref){
+  char * thisref_deref;
+  GC_OBJ_TYPE_TYPE type;
+  if(thisref == -1){
+    return false;
+  }
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  type = org_trifort_gc_get_type(thisref_deref);
+  if(type==%%java_lang_Float_TypeNumber%%) {
+    return true;
+  }
+  return false;
+}
+
+// typeof_Double
+$$__device__$$
+bool at_illecker_typeof_Double(char * gc_info, int thisref){
+  char * thisref_deref;
+  GC_OBJ_TYPE_TYPE type;
+  if(thisref == -1){
+    return false;
+  }
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  type = org_trifort_gc_get_type(thisref_deref);
+  if(type==%%java_lang_Double_TypeNumber%%) {
+    return true;
+  }
+  return false;
+}
+
+// typeof_String
+$$__device__$$
+bool at_illecker_typeof_String(char * gc_info, int thisref){
+  char * thisref_deref;
+  GC_OBJ_TYPE_TYPE type;
+  if(thisref == -1){
+    return false;
+  }
+  thisref_deref = org_trifort_gc_deref(gc_info, thisref);
+  type = org_trifort_gc_get_type(thisref_deref);
+  if(type==%%java_lang_String_TypeNumber%%) {
+    return true;
+  }
+  return false;
+}
+
+//<java.lang.String: java.lang.String valueOf(java.lang.Object)>
+$$__device__$$
+int java_lang_String_valueOf(char * gc_info, int obj_ref, int * exception) {
+  int return_str = -1;
+  char bool_val;
+
+  if (obj_ref != -1) {
+    
+    // check type
+    if (at_illecker_typeof_Boolean(gc_info, obj_ref)) {
+      bool_val = instance_getter_java_lang_Boolean_value(gc_info, obj_ref, exception);
+      if (bool_val == 0) {
+        return_str = org_trifort_string_constant(gc_info, (char *) "false", exception);
+      } else {
+        return_str = org_trifort_string_constant(gc_info, (char *) "true", exception);
+      }
+      
+    } else if (at_illecker_typeof_Integer(gc_info, obj_ref)) {
+      return_str = java_lang_Integer_toString9_5_(gc_info,
+        instance_getter_java_lang_Integer_value(gc_info, obj_ref, exception), exception);
+      
+    } else if (at_illecker_typeof_Long(gc_info, obj_ref)) {
+      return_str = java_lang_Long_toString9_6_(gc_info,
+        instance_getter_java_lang_Long_value(gc_info, obj_ref, exception), exception);
+      
+    } else if (at_illecker_typeof_Float(gc_info, obj_ref)) {
+      return_str = java_lang_Float_toString9_7_(gc_info,
+        instance_getter_java_lang_Float_value(gc_info, obj_ref, exception), exception);
+      
+    } else if (at_illecker_typeof_Double(gc_info, obj_ref)) {
+      return_str = java_lang_Double_toString9_8_(gc_info,
+        instance_getter_java_lang_Double_value(gc_info, obj_ref, exception), exception);
+            
+    } else if (at_illecker_typeof_String(gc_info, obj_ref)) {
+      return_str = obj_ref;
+      
+    } else {
+      return_str = java_lang_Object_toString9_(gc_info, obj_ref, exception);
+    }
+  } else {
+    return_str = org_trifort_string_constant(gc_info, (char *) "null", exception);
+  }
+  
+  return return_str;
+}
+
+//<java.lang.Object: java.lang.String toString()>
+$$__device__$$
+int java_lang_Object_toString9_(char * gc_info, int this_ref, int * exception){
+  int sb_ref = -1;
+  int class_ref = -1;
+  int class_name = -1;
+  int hash_code = -1;
+  int hex_string = -1;
+  int ret_str = -1;
+  
+  org_trifort_gc_assign(gc_info, 
+    &sb_ref, java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a660_(gc_info, exception));  
+  if(*exception != 0) {
+    return 0;
+  }
+  
+  class_ref = java_lang_Object_getClass(gc_info, this_ref, exception);
+  if(*exception != 0) {
+    return 0;
+  }
+  
+  class_name  = java_lang_Class_getName(gc_info, class_ref, exception);
+  if(*exception != 0) {
+    return 0;
+  }
+  
+  sb_ref = java_lang_StringBuilder_append10_9_(gc_info, sb_ref,  class_name, exception);
+  if(*exception != 0) {
+    return 0;
+  }
+  
+  sb_ref = java_lang_StringBuilder_append10_9_(gc_info, sb_ref,
+    org_trifort_string_constant(gc_info, (char *) "@", exception), exception);
+  if(*exception != 0) {
+    return 0;
+  }
+  
+  // TODO
+  //hash_code = invoke_java_lang_Object_hashCode(gc_info, this_ref, exception);
+  //if(*exception != 0) {
+  //  return 0;
+  //}
+  
+  //hex_string = java_lang_Integer_toHexString9_5_(gc_info,  hash_code, exception);
+  //if(*exception != 0) {
+  //  return 0;
+  //}
+  
+  //sb_ref = java_lang_StringBuilder_append10_9_(gc_info, sb_ref,  hex_string, exception);
+  //if(*exception != 0) {
+  //  return 0;
+  //}
+  
+  ret_str = java_lang_StringBuilder_toString9_(gc_info, sb_ref, exception);
+  if(*exception != 0) {
+    return 0;
+  }
+  
+  return ret_str;
 }
 
 $$__device__$$

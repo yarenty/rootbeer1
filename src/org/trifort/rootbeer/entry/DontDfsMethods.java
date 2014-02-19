@@ -93,6 +93,7 @@ public class DontDfsMethods {
     m_methods.add("<java.lang.String: int indexOf(java.lang.String,int)>");  
     m_methods.add("<java.lang.String: java.lang.String[] split(java.lang.String)>");
     m_methods.add("<java.lang.String: java.lang.String[] split(java.lang.String,int)>");
+    m_methods.add("<java.lang.String: java.lang.String valueOf(java.lang.Object)>");
     m_methods.add("<java.lang.Integer: int parseInt(java.lang.String)>");
     m_methods.add("<java.lang.Long: long parseLong(java.lang.String)>");
     m_methods.add("<java.lang.Float: float parseFloat(java.lang.String)>");
