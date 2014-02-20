@@ -954,7 +954,7 @@ $$__device__$$ void
 char__array_set($$__global$$ char * gc_info, int thisref, int parameter0, char parameter1, int * exception);
 
 $$__device__$$ int
-org_trifort_string_constant($$__global$$ char * gc_info, char * str_constant, int * exception){
+org_trifort_char_constant($$__global$$ char * gc_info, char * str_constant, int * exception){
   int i;
   int len = org_trifort_strlen(str_constant);
   int characters = char__array_new(gc_info, len, exception);
@@ -963,6 +963,14 @@ org_trifort_string_constant($$__global$$ char * gc_info, char * str_constant, in
   }
   
   return characters;
+}
+
+$$__device__$$ int
+org_trifort_string_constant($$__global$$ char * gc_info, char * str_constant, int * exception){
+  int characters;
+
+  characters = org_trifort_char_constant(gc_info, str_constant, exception);
+  return org_trifort_rootbeer_string_from_chars(gc_info, characters, exception);
 }
 
 $$__device__$$ void
@@ -1496,32 +1504,24 @@ int java_lang_String_valueOf(char * gc_info, int obj_ref, int * exception) {
       } else {
         return_str = org_trifort_string_constant(gc_info, (char *) "true", exception);
       }
-      
     } else if (at_illecker_typeof_Integer(gc_info, obj_ref)) {
       return_str = java_lang_Integer_toString9_5_(gc_info,
         instance_getter_java_lang_Integer_value(gc_info, obj_ref, exception), exception);
-      
     } else if (at_illecker_typeof_Long(gc_info, obj_ref)) {
       return_str = java_lang_Long_toString9_6_(gc_info,
         instance_getter_java_lang_Long_value(gc_info, obj_ref, exception), exception);
-      
     } else if (at_illecker_typeof_Float(gc_info, obj_ref)) {
       return_str = java_lang_Float_toString9_7_(gc_info,
         instance_getter_java_lang_Float_value(gc_info, obj_ref, exception), exception);
-      
     } else if (at_illecker_typeof_Double(gc_info, obj_ref)) {
       return_str = java_lang_Double_toString9_8_(gc_info,
         instance_getter_java_lang_Double_value(gc_info, obj_ref, exception), exception);
-            
     } else if (at_illecker_typeof_String(gc_info, obj_ref)) {
-      printf("typeof string\n");
       return_str = obj_ref;
     } else {
-      printf("typeof unknown\n");
       return_str = java_lang_Object_toString9_(gc_info, obj_ref, exception);
     }
   } else {
-    printf("typeof null\n");
     return_str = org_trifort_string_constant(gc_info, (char *) "null", exception);
   }
   
