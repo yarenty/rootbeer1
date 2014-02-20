@@ -734,6 +734,11 @@ void org_trifort_rootbeer_runtime_RootbeerGpu_threadfenceBlock($$__global$$ char
   org_trifort_threadfence_block();
 }
 
+$$__device__$$
+void org_trifort_rootbeer_runtime_RootbeerGpu_threadfenceSystem($$__global$$ char * gc_info, int * exception){
+  org_trifort_threadfence_system();
+}
+
 $$__device__$$ char
 org_trifort_cmp(long long lhs, long long rhs){
   if(lhs > rhs)
