@@ -82,6 +82,9 @@ public class RootbeerGpu {
   public static void threadfenceBlock(){ 
   }
   
+  public static void threadfenceSystem(){
+  }
+  
   public static long getRef(Object obj) {
     return 0;
   }

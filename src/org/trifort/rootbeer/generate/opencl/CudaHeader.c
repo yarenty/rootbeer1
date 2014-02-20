@@ -53,4 +53,9 @@ void org_trifort_threadfence_block(){
   __threadfence_block();
 }
 
+__device__
+void org_trifort_threadfence_system(){
+  __threadfence_system();
+}
+
 __device__ clock_t global_now;
