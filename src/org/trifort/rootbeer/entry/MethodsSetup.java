@@ -49,6 +49,7 @@ public class MethodsSetup {
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void syncthreads()>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void threadfence()>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void threadfenceBlock()>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void threadfenceSystem()>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: java.lang.Object getSharedObject(int)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void setSharedObject(int,java.lang.Object)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: byte getSharedByte(int)>");
