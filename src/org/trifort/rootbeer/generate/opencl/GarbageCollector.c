@@ -888,18 +888,6 @@ org_trifort_gc_get_space_size($$__global$$ char * gc_info){
   return org_trifort_getint(gc_info, SPACE_SIZE_OFFSET);
 }
 
-$$__device__$$ 
-int org_trifort_string_get_array(char * gc_infop, int thisref, int * exception)
-{
-  char * thisref_deref;
-  if(thisref == -1){
-    *exception = ;
-    return;
-  }
-thisref_deref = org_trifort_gc_deref(gc_info, thisref);
-*(( int *) &thisref_deref[36]) = parameter0;
-}
-
 $$__device__$$
 int org_trifort_rootbeer_string_from_chars(char * gc_info, int parameter0, int * exception) {
   int r0 = -1; 
@@ -933,22 +921,25 @@ int org_trifort_rootbeer_string_from_chars(char * gc_info, int parameter0, int *
 
 $$__device__$$
 int java_lang_String_initab850b60f96d11de8a390800200c9a660_9_(char * gc_info, int parameter0, int * exception) { 
+
   int i;
   int len;
+  int characters_src;
   int characters_copy;
   char ch;
   
-  len = org_trifort_array_length(gc_info, parameter0, exception);
+  characters_src = org_trifort_rootbeer_get_string_char_array(gc_info, parameter0, exception);
   if(*exception != 0){
     return 0;
   }
 
+  len = org_trifort_array_length(gc_info, characters_src, exception);
+
   characters_copy = char__array_new(gc_info, len, exception);
   for(i = 0; i < len; ++i){
-    ch = char__array_get(gc_info, parameter0, i, exception);
+    ch = char__array_get(gc_info, characters_src, i, exception);
     char__array_set(gc_info, characters_copy, i, ch, exception);
   }
-
   return org_trifort_rootbeer_string_from_chars(gc_info, characters_copy, exception);
 } 
 

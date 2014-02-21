@@ -386,7 +386,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
   
   public void caseStringConstant(StringConstant arg0) {
-    m_output.append(" org_trifort_char_constant(gc_info, (char *) "+arg0.toString()+", exception) ");
+    m_output.append(" org_trifort_string_constant(gc_info, (char *) "+arg0.toString()+", exception) ");
   }
 
   public void caseClassConstant(ClassConstant arg0) {
