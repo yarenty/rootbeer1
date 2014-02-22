@@ -13,29 +13,30 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.trifort.rootbeer.runtime.Kernel;
 
 public class AtomicLongRunOnGpu implements Kernel {
-  private AtomicLong m_ALong;
-  private float m_Random;
-  private double m_Random2;
+  private AtomicLong m_along;
+  private AtomicLong m_along2;
+  private float m_random;
+  private double m_random2;
   private Random random;
-  private long m_Num1;
-  private long m_Num2;
+  private long m_num1;
+  private long m_num2;
   
   public AtomicLongRunOnGpu(AtomicLong along, Random random){
-    m_ALong = along;
-    m_Random = -100;
-    m_Random2 = -100;
+    m_along = along;
+    m_random = -100;
+    m_random2 = -100;
     this.random = random;
   }
 
   @Override
   public void gpuMethod() {
-    m_Num1 = m_ALong.addAndGet(10);
-    m_Random = (float) random.nextDouble();
-    m_Random2 = Math.random();
-    AtomicLong newlong = new AtomicLong(30);
-    m_Num1 = newlong.get();
-    m_Num2 = newlong.get();
-    m_Random2 = 10;
+    m_num1 = m_along.addAndGet(10);
+    m_random = (float) random.nextDouble();
+    m_random2 = Math.random();
+    m_along2 = new AtomicLong(30);
+    m_num1 = m_along2.addAndGet(5);
+    m_num2 = m_along2.addAndGet(5);
+    m_random2 = 10;
   }
   
   boolean compare(AtomicLongRunOnGpu grhs) {
@@ -43,34 +44,38 @@ public class AtomicLongRunOnGpu implements Kernel {
       System.out.println("grhs == null");
       return false;
     }
-    if(m_ALong.get() != grhs.m_ALong.get()){
-      System.out.println("value");
-      System.out.println("lhs: "+m_ALong.get());
-      System.out.println("rhs: "+grhs.m_ALong.get());
-      return false;
-    }
-    if(grhs.m_Random == -100){
-      System.out.println("random");
-      return false;
-    }
-    if(grhs.m_Random2 == -100){
-      System.out.println("random2");
-      return false;
-    }
-    if(m_Num1 != grhs.m_Num1){
-      System.out.println("num1");
-      System.out.println("lhs: "+m_Num1);
-      System.out.println("rhs: "+grhs.m_Num1);
+    if(m_num1 != grhs.m_num1){
+      System.out.println("m_num1");
+      System.out.println("lhs: "+m_num1);
+      System.out.println("rhs: "+grhs.m_num1);
       return false;
     } 
-    /*
-    if(m_Num2 != grhs.m_Num2){
-      System.out.println("num2");
-      System.out.println("lhs: "+m_Num2);
-      System.out.println("rhs: "+grhs.m_Num2);
+    if(m_num2 != grhs.m_num2){
+      System.out.println("m_num2");
+      System.out.println("lhs: "+m_num2);
+      System.out.println("rhs: "+grhs.m_num2);
       return false;
     }
-    */
+    if(m_along2.get() != grhs.m_along2.get()){
+      System.out.println("m_along2");
+      System.out.println("lhs: "+m_along2.get());
+      System.out.println("rhs: "+grhs.m_along2.get());
+      return false;
+    }
+    if(m_along.get() != grhs.m_along.get()){
+      System.out.println("m_along");
+      System.out.println("lhs: "+m_along.get());
+      System.out.println("rhs: "+grhs.m_along.get());
+      return false;
+    }
+    if(grhs.m_random == -100){
+      System.out.println("m_random");
+      return false;
+    }
+    if(grhs.m_random2 == -100){
+      System.out.println("m_random2");
+      return false;
+    }
     return true;
   }
 }

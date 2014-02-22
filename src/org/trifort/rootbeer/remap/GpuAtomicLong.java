@@ -11,37 +11,38 @@ import java.io.Serializable;
 
 public class GpuAtomicLong extends Number implements Serializable {
 
-  private volatile long m_Value;
+  private static final long serialVersionUID = 1L;
+  private volatile long value;
   
-  public GpuAtomicLong(long value){
-    m_Value = value;
+  public GpuAtomicLong(long start_value){
+    value = start_value;
   }
   
   public GpuAtomicLong(){
-    m_Value = 0;
+    value = 0;
   }
   
   public synchronized long get(){
-    return m_Value;
+    return value;
   }
   
-  public synchronized void set(long value){
-    m_Value = value;
+  public synchronized void set(long set_value){
+    value = set_value;
   }
   
-  public synchronized void lazySet(long value){
-    m_Value = value;
+  public synchronized void lazySet(long set_value){
+    value = set_value;
   }
   
-  public synchronized long getAndSet(long value){
-    long ret = m_Value;
-    m_Value = value;
+  public synchronized long getAndSet(long set_value){
+    long ret = value;
+    value = set_value;
     return ret;
   }
   
   public synchronized boolean compareAndSet(long expect, long update){
-    if(m_Value == expect){
-      m_Value = update;
+    if(value == expect){
+      value = update;
       return true;
     } else {
       return false;
@@ -49,8 +50,8 @@ public class GpuAtomicLong extends Number implements Serializable {
   }
   
   public synchronized boolean weakCompareAndSet(long expect, long update){
-    if(m_Value == expect){
-      m_Value = update;
+    if(value == expect){
+      value = update;
       return true;
     } else {
       return false;
@@ -58,36 +59,36 @@ public class GpuAtomicLong extends Number implements Serializable {
   }
   
   public synchronized long getAndIncrement(){
-    long ret = m_Value;
-    m_Value++;
+    long ret = value;
+    value++;
     return ret;
   }
   
   public synchronized long getAndDecrement(){
-    long ret = m_Value;
-    m_Value--;
+    long ret = value;
+    value--;
     return ret;
   }
   
-  public synchronized long getAndAdd(long value){
-    long ret = m_Value;
-    m_Value += value;
+  public synchronized long getAndAdd(long add_value){
+    long ret = value;
+    value += add_value;
     return ret;
   }  
   
   public synchronized long incrementAndGet(){
-    m_Value++;
-    return m_Value;
+    value++;
+    return value;
   }
   
   public synchronized long decrementAndGet(){
-    m_Value--;
-    return m_Value;
+    value--;
+    return value;
   }
     
-  public synchronized long addAndGet(long value){
-    m_Value += value;
-    return m_Value;
+  public synchronized long addAndGet(long add_value){
+    value += add_value;
+    return value;
   }  
   
   @Override
@@ -99,28 +100,28 @@ public class GpuAtomicLong extends Number implements Serializable {
   @Override
   public int intValue() {
     synchronized(this){
-      return (int) m_Value;
+      return (int) value;
     }
   }
 
   @Override
   public long longValue() {
     synchronized(this){
-      return m_Value;
+      return value;
     }
   }
 
   @Override
   public float floatValue() {
     synchronized(this){
-      return (float) m_Value;
+      return (float) value;
     }
   }
 
   @Override
   public double doubleValue() {    
     synchronized(this){
-      return (double) m_Value;
+      return (double) value;
     }
   }  
 }

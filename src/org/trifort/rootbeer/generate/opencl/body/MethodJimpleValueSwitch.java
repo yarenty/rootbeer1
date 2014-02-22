@@ -278,18 +278,14 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   public void caseSpecialInvokeExpr(SpecialInvokeExpr arg0) {
     SootMethod soot_method = arg0.getMethod();
     SootClass soot_class = soot_method.getDeclaringClass();
-    if(soot_class.getName().equals("java.lang.Object"))
-      return;
     OpenCLMethod ocl_method = new OpenCLMethod(soot_method, soot_class);
     m_output.append(ocl_method.getInstanceInvokeString(arg0));
     setCheckException();
   }
 
-  public void caseStaticInvokeExpr(StaticInvokeExpr arg0) {    
+  public void caseStaticInvokeExpr(StaticInvokeExpr arg0) {
     SootMethod soot_method = arg0.getMethod();
-    SootClass soot_class = soot_method.getDeclaringClass();
-    if(soot_class.getName().equals("java.lang.Object"))
-      return;
+    SootClass soot_class = soot_method.getDeclaringClass();    
     OpenCLMethod ocl_method = new OpenCLMethod(soot_method, soot_class);
     m_output.append(ocl_method.getStaticInvokeString(arg0));
     setCheckException();

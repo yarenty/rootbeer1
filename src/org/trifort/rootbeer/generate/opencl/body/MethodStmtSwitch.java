@@ -208,7 +208,7 @@ public class MethodStmtSwitch implements StmtSwitch {
     m_output.append("switch(");
     arg0.getKey().apply(m_valueSwitch);
     m_output.append("){\n");
-    List<Value> values = arg0.getLookupValues();
+    List<IntConstant> values = arg0.getLookupValues();
     List<Unit> units = arg0.getTargets();
     Unit default_target = arg0.getDefaultTarget();
     

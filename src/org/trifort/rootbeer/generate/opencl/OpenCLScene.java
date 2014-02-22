@@ -465,8 +465,10 @@ public class OpenCLScene {
 
   private String methodBodiesString() throws IOException{
     StringBuilder ret = new StringBuilder();
-    if(m_usesGarbageCollector)
+    if(m_usesGarbageCollector){
       ret.append("#define USING_GARBAGE_COLLECTOR\n");
+    }
+    
     //a set is used so duplicates get filtered out
     Set<String> bodies = new HashSet<String>();
     

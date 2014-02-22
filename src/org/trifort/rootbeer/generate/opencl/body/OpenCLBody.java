@@ -32,19 +32,18 @@ import soot.shimple.ShimpleBody;
 import soot.util.Chain;
 
 public class OpenCLBody {
-  private Body m_Body;
-  private List<Unit> m_Labels;
-  private boolean m_IsConstructor;
-  private boolean m_IsConstructorBodyWithoutHeader;
-  private String m_ClassName;
-  private int m_RefFieldsSize;
-  private MethodStmtSwitch m_StmtSwitch;
-  private int m_DerivedType;
-  private int m_AllocSize;
-  private SootClass m_SootClass;
-  private SootMethod m_SootMethod;
-  private Map<Unit, List<TrapItem>> m_TrapMap;
-  private List<TrapItem> m_AllTraps;
+  private Body m_body;
+  private List<Unit> m_labels;
+  private boolean m_isConstructor;
+  private boolean m_isConstructorBodyWithoutHeader;
+  private int m_refFieldsSize;
+  private MethodStmtSwitch m_stmtSwitch;
+  private int m_derivedType;
+  private int m_allocSize;
+  private SootClass m_sootClass;
+  private SootMethod m_sootMethod;
+  private Map<Unit, List<TrapItem>> m_trapMap;
+  private List<TrapItem> m_allTraps;
 
   /**
    * Use this for either a constructor with header or a normal body
@@ -52,16 +51,16 @@ public class OpenCLBody {
    * @param is_constructor 
    */
   public OpenCLBody(SootMethod method, boolean is_constructor){
-    m_Labels = new ArrayList<Unit>();
-    m_TrapMap = new HashMap<Unit, List<TrapItem>>();
-    m_AllTraps = new ArrayList<TrapItem>();
-    m_IsConstructor = is_constructor;
-    m_IsConstructorBodyWithoutHeader = false;
-    m_SootMethod = method;
+    m_labels = new ArrayList<Unit>();
+    m_trapMap = new HashMap<Unit, List<TrapItem>>();
+    m_allTraps = new ArrayList<TrapItem>();
+    m_isConstructor = is_constructor;
+    m_isConstructorBodyWithoutHeader = false;
+    m_sootMethod = method;
 
-    m_SootClass = method.getDeclaringClass();
+    m_sootClass = method.getDeclaringClass();
     Body body = method.retrieveActiveBody();
-    m_Body = body;  
+    m_body = body;  
   }
   
   /**
@@ -69,16 +68,17 @@ public class OpenCLBody {
    * @param body 
    */
   public OpenCLBody(Body body){
-    m_Labels = new ArrayList<Unit>();
-    m_TrapMap = new HashMap<Unit, List<TrapItem>>();
-    m_AllTraps = new ArrayList<TrapItem>();
-    m_IsConstructor = false;
-    m_IsConstructorBodyWithoutHeader = true;
-    m_Body = body;  
+    m_labels = new ArrayList<Unit>();
+    m_trapMap = new HashMap<Unit, List<TrapItem>>();
+    m_allTraps = new ArrayList<TrapItem>();
+    m_isConstructor = false;
+    m_isConstructorBodyWithoutHeader = true;
+    m_body = body;  
+    m_sootMethod = body.getMethod();
   }
   
   private Iterator<Unit> bodyIterator(){
-    PatchingChain<Unit> chain_units = m_Body.getUnits();
+    PatchingChain<Unit> chain_units = m_body.getUnits();
     return chain_units.iterator();
   }
 
@@ -104,18 +104,18 @@ public class OpenCLBody {
   }
   
   private void addTrapItem(Unit unit, TrapItem item){
-    if(m_TrapMap.containsKey(unit)){
-      List<TrapItem> traps = m_TrapMap.get(unit);
+    if(m_trapMap.containsKey(unit)){
+      List<TrapItem> traps = m_trapMap.get(unit);
       traps.add(item);
     } else {
       List<TrapItem> traps = new ArrayList<TrapItem>();
       traps.add(item);
-      m_TrapMap.put(unit, traps);
+      m_trapMap.put(unit, traps);
     }
   }
 
   private String writeMethodBody(){
-    Iterator<Trap> traps = m_Body.getTraps().iterator();
+    Iterator<Trap> traps = m_body.getTraps().iterator();
     int trap_num = 0;
     while(traps.hasNext()){
       Trap t = traps.next();
@@ -125,15 +125,15 @@ public class OpenCLBody {
         addTrapItem(u, item);
       }
       trap_num++;
-      m_AllTraps.add(item);
+      m_allTraps.add(item);
     }
 
     MonitorGroups monitor_groups = new MonitorGroups();
-    List<MonitorGroupItem> root_items = monitor_groups.getItems(m_Body);
+    List<MonitorGroupItem> root_items = monitor_groups.getItems(m_body);
     for(MonitorGroupItem item : root_items){
       handleMonitorGroupItem(item);
     }
-    return m_StmtSwitch.toString();
+    return m_stmtSwitch.toString();
   }
   
   private void handleMonitorGroupItem(MonitorGroupItem item){
@@ -150,43 +150,42 @@ public class OpenCLBody {
       handleMonitorGroupItem(sub_item);
     }
     if(enter != null){     
-      m_StmtSwitch.append("  }\n");
-      m_StmtSwitch.append("}\n");
-      m_StmtSwitch.popMonitor(); 
+      m_stmtSwitch.append("  }\n");
+      m_stmtSwitch.append("}\n");
+      m_stmtSwitch.popMonitor(); 
     }
   }
   
   private void handleUnit(Unit next){
     int label_num = labelNum(next);
     if(label_num != -1){
-      m_StmtSwitch.append("label" + Integer.toString(label_num) + ":\n");
+      m_stmtSwitch.append("label" + Integer.toString(label_num) + ":\n");
     }
     int trap_num2 = trapNum(next);
     if(trap_num2 != -1){
-      m_StmtSwitch.append("trap" + Integer.toString(trap_num2) + ":\n");
+      m_stmtSwitch.append("trap" + Integer.toString(trap_num2) + ":\n");
     }
-    m_StmtSwitch.append("//"+next.toString()+"\n");
+    m_stmtSwitch.append("//"+next.toString()+"\n");
     List<TrapItem> trap_items = null;
-    if(m_TrapMap.containsKey(next)){
-      trap_items = m_TrapMap.get(next);
+    if(m_trapMap.containsKey(next)){
+      trap_items = m_trapMap.get(next);
     }
-    m_StmtSwitch.reset();
-    m_StmtSwitch.setTrapItems(trap_items);
-    next.apply(m_StmtSwitch);
-    if(m_StmtSwitch.hasCaughtExceptionRef()){
-      m_StmtSwitch.append("*exception = 0;\n");
+    m_stmtSwitch.reset();
+    m_stmtSwitch.setTrapItems(trap_items);
+    next.apply(m_stmtSwitch);
+    if(m_stmtSwitch.hasCaughtExceptionRef()){
+      m_stmtSwitch.append("*exception = 0;\n");
     } 
   }
   
   private void determineConstructorInfo(){
-    SootMethod soot_method = m_Body.getMethod();
+    SootMethod soot_method = m_body.getMethod();
     SootClass soot_class = soot_method.getDeclaringClass();
     OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(soot_class);
 
-    m_ClassName = ocl_class.getName();
-    m_AllocSize = ocl_class.getSize();
-    m_RefFieldsSize = ocl_class.getRefFieldsSize();
-    m_DerivedType = OpenCLScene.v().getClassType(soot_class);
+    m_allocSize = ocl_class.getSize();
+    m_refFieldsSize = ocl_class.getRefFieldsSize();
+    m_derivedType = OpenCLScene.v().getClassType(soot_class);
   }
   
   private String writeConstructorBody(){
@@ -197,8 +196,8 @@ public class OpenCLBody {
     ret.append("int thisref;\n");
     ret.append(pointer_namespace_qual+" char * thisref_deref;\n");
     ret.append("thisref = -1;\n");
-    int alloc_size = m_AllocSize;
-    int mod = m_AllocSize % 8;
+    int alloc_size = m_allocSize;
+    int mod = m_allocSize % 8;
     if(mod != 0)
       alloc_size += (8 - mod);
     ret.append("org_trifort_gc_assign(gc_info, &thisref, org_trifort_gc_malloc(gc_info, "+Integer.toString(alloc_size)+"));\n");
@@ -210,27 +209,27 @@ public class OpenCLBody {
     }
     ret.append("thisref_deref = org_trifort_gc_deref(gc_info, thisref);\n");
     ret.append("\n//class info\n");
-    ret.append("org_trifort_gc_set_count(thisref_deref, "+Integer.toString(m_RefFieldsSize)+");\n");
+    ret.append("org_trifort_gc_set_count(thisref_deref, "+Integer.toString(m_refFieldsSize)+");\n");
     ret.append("org_trifort_gc_set_color(thisref_deref, COLOR_GREY);\n");
-    ret.append("org_trifort_gc_set_type(thisref_deref, "+Integer.toString(m_DerivedType)+");\n");
+    ret.append("org_trifort_gc_set_type(thisref_deref, "+Integer.toString(m_derivedType)+");\n");
     ret.append("org_trifort_gc_set_ctor_used(thisref_deref, 1);\n");
     ret.append("org_trifort_gc_set_size(thisref_deref, "+Integer.toString(alloc_size)+");\n");
     ret.append("org_trifort_gc_init_monitor(thisref_deref);\n");
     
-    if(m_SootClass != null){
+    if(m_sootClass != null){
       ret.append(initFields());
     }
     
-    m_StmtSwitch = new ConstructorStmtSwitch(this, m_Body.getMethod(), false);
+    m_stmtSwitch = new ConstructorStmtSwitch(this, m_body.getMethod(), false);
     ret.append(writeMethodBody());
 
-    ret.append("return "+m_StmtSwitch.getThisRef()+";\n");
+    ret.append("return "+m_stmtSwitch.getThisRef()+";\n");
     return ret.toString();
   }
   
   private String initFields(){
     StringBuilder ret = new StringBuilder();
-    SootClass soot_class = m_SootClass;
+    SootClass soot_class = m_sootClass;
     while(true){
       initFieldsForClass(soot_class, ret);      
       if(soot_class.getName().equals("java.lang.Object"))
@@ -262,23 +261,23 @@ public class OpenCLBody {
   }
   
   private String writeBody(){
-    if(m_IsConstructorBodyWithoutHeader == false){
-      if(m_IsConstructor)
+    if(m_isConstructorBodyWithoutHeader == false){
+      if(m_isConstructor)
         return writeConstructorBody();
       else {
-        m_StmtSwitch = new MethodStmtSwitch(this, m_Body.getMethod());
+        m_stmtSwitch = new MethodStmtSwitch(this, m_body.getMethod());
         return writeMethodBody();
       }
     } else {
       StringBuilder ret = new StringBuilder();
-      m_StmtSwitch = new ConstructorStmtSwitch(this, m_Body.getMethod(), true);
+      m_stmtSwitch = new ConstructorStmtSwitch(this, m_body.getMethod(), true);
       ret.append(writeMethodBody());
       return ret.toString();
     }
   }
   
   private String writeLocals() {
-    Chain<Local> locals = m_Body.getLocals();
+    Chain<Local> locals = m_body.getLocals();
     String ret = "";
     for(Local local : locals){
       OpenCLType type = new OpenCLType(local.getType());
@@ -296,14 +295,14 @@ public class OpenCLBody {
       Unit curr = iter.next();
       if(curr instanceof IfStmt){
         IfStmt ifstmt = (IfStmt) curr;
-        m_Labels.add(ifstmt.getTarget());
+        m_labels.add(ifstmt.getTarget());
       } else if(curr instanceof GotoStmt){
         GotoStmt gotostmt = (GotoStmt) curr;
-        m_Labels.add(gotostmt.getTarget());
+        m_labels.add(gotostmt.getTarget());
       } else if(curr instanceof LookupSwitchStmt){
         LookupSwitchStmt lookup = (LookupSwitchStmt) curr;
         addTargets(lookup.getTargets());
-        m_Labels.add(lookup.getDefaultTarget());
+        m_labels.add(lookup.getDefaultTarget());
       } else if(curr instanceof TableSwitchStmt){
         TableSwitchStmt table = (TableSwitchStmt) curr;
         addTargets(table.getTargets());
@@ -313,20 +312,20 @@ public class OpenCLBody {
   
   private void addTargets(List<Unit> units){
     for(Unit unit : units){
-      m_Labels.add(unit);
+      m_labels.add(unit);
     }
   }
 
   int labelNum(Unit unit){
-    for(int i = 0; i < m_Labels.size(); ++i){
-      if(m_Labels.get(i).equals(unit))
+    for(int i = 0; i < m_labels.size(); ++i){
+      if(m_labels.get(i).equals(unit))
         return i;
     }
     return -1;
   }
 
   private int trapNum(Unit next) {
-    for(TrapItem trap : m_AllTraps){
+    for(TrapItem trap : m_allTraps){
       if(trap.unitIsHandler(next)){
         return trap.getTrapNum();
       }

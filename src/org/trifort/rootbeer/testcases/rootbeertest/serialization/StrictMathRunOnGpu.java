@@ -30,21 +30,26 @@ public class StrictMathRunOnGpu implements Kernel {
   }
 
   public boolean compare(StrictMathRunOnGpu rhs){
-    //System.out.println("floor: "+m_floor+" "+rhs.m_floor);
-    //System.out.println("abs: "+m_abs+" "+rhs.m_abs);
-    //System.out.println("sqrt: "+m_sqrt+" "+rhs.m_sqrt);
-    //System.out.println("round: "+m_round+" "+rhs.m_round);
-    //System.out.println("pow: "+m_pow+" "+rhs.m_pow);
-    if(m_floor != rhs.m_floor)
+    if(m_floor != rhs.m_floor){
+      System.out.println("floor: "+m_floor+" "+rhs.m_floor);
       return false;
-    if(m_abs != rhs.m_abs)
+    }
+    if(m_abs != rhs.m_abs){
+      System.out.println("abs: "+m_abs+" "+rhs.m_abs);
       return false;
-    if(m_sqrt != rhs.m_sqrt)
+    }
+    if(m_sqrt != rhs.m_sqrt){
+      System.out.println("sqrt: "+m_sqrt+" "+rhs.m_sqrt);
       return false;
-    if(m_round != rhs.m_round)
+    }
+    if(m_round != rhs.m_round){
+      System.out.println("round: "+m_round+" "+rhs.m_round);
       return false;
-    if(m_pow != rhs.m_pow)
+    }
+    if(m_pow != rhs.m_pow){
+      System.out.println("pow: "+m_pow+" "+rhs.m_pow);
       return false;
+    }
     return true;
   }
 }
