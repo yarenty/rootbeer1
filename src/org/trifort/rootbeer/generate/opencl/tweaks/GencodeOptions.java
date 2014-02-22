@@ -53,7 +53,9 @@ public class GencodeOptions {
       sm_12 = "";
     }
     
-    if(version.equals("Cuda compilation tools, release 5.5, V5.5.0")){
+    if(version.equals("Cuda compilation tools, release 6.0, V6.0.1")){
+      return sm_35 + sm_30 + sm_21 + sm_20 + sm_12;
+    } else if(version.equals("Cuda compilation tools, release 5.5, V5.5.0")){
       return sm_35 + sm_30 + sm_21 + sm_20 + sm_12;
     } else if(version.equals("Cuda compilation tools, release 5.0, V0.2.1221")){
       return sm_35 + sm_30 + sm_21 + sm_20 + sm_12;
