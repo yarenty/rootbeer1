@@ -2463,3 +2463,17 @@ $$__device__$$
 float java_lang_Float_parseFloat(char * gc_info, int str_obj_ref, int * exception) {
   return java_lang_Double_parseDouble(gc_info, str_obj_ref, exception);
 }
+
+$$__device__$$ 
+int org_trifort_rootbeer_testcases_rootbeertest_serialization_ForceArrayNewRunOnGpu_getStringArray9_( char * gc_info, int thisref, int * exception){
+  int r0 = -1;
+  int r1 = -1;
+  r0  =  thisref ;
+  r1  = java_lang_String__array_new(gc_info,  1 , exception);
+
+  java_lang_String__array_set(gc_info, r1, 0,  org_trifort_string_constant(gc_info, (char *) "testForceArrayNew", exception) , exception);
+  if(*exception != 0) {
+    return 0; 
+  }
+  return java_lang_String__array_get(gc_info, r1, 0, exception);
+}

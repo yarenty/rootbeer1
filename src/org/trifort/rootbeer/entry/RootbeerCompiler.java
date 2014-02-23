@@ -173,7 +173,7 @@ public class RootbeerCompiler {
 
     ListMethodTester dont_dfs_tester = new ListMethodTester();
 
-    MethodsSetup setup = new MethodsSetup();
+    CompilerSetup setup = new CompilerSetup();
     for(String no_dfs : setup.getDontDfs()){
       dont_dfs_tester.addSignature(no_dfs);
     }
