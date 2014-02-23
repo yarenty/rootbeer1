@@ -23,6 +23,7 @@ import soot.jimple.ExitMonitorStmt;
 public class MonitorGroups {
  
   public List<MonitorGroupItem> getItems(Body body){
+    System.out.println("get_items: "+body.getMethod().getSignature());
     List<MonitorGroupItem> ret = new ArrayList<MonitorGroupItem>();
     Stack<MonitorGroupItem> stack = new Stack<MonitorGroupItem>();
     MonitorGroupItem curr_monitor = new MonitorGroupItem();
@@ -32,6 +33,7 @@ public class MonitorGroups {
     for(int i = 0; i < units.size(); ++i){
       Unit curr = units.get(i);
       if(curr instanceof EnterMonitorStmt){
+        System.out.println("enter: "+i+" "+curr);
         MonitorGroupItem item = new MonitorGroupItem();
         item.addEnterMonitor(curr);
         stack.top().addGroup(item);
@@ -40,7 +42,9 @@ public class MonitorGroups {
         stack.top().addGroup(item2);
         stack.push(item2);
       } else if(curr instanceof ExitMonitorStmt){
-        if(isLastExit((ExitMonitorStmt) curr, i, units)){          
+        System.out.println("exit: "+i+" "+curr);
+        if(isLastExit((ExitMonitorStmt) curr, i, units)){
+          System.out.println("  last");
           stack.top().addUnit(curr); 
           stack.pop();
           stack.pop();
@@ -61,17 +65,13 @@ public class MonitorGroups {
         stack.top().addUnit(curr); 
       }
     }
-    //if(body.getMethod().getName().equals("gpuMethod")){
-    //  System.out.println("gpuMethod");
-    //  print(ret);
-    //}
     return ret;
   }
   
   private boolean isLastExit(ExitMonitorStmt exit, int index, List<Unit> units){
     Value op = exit.getOp();
     Local op_local = (Local) op;
-    for(int j = index +1; j < units.size(); ++j){
+    for(int j = index + 1; j < units.size(); ++j){
       Unit curr = units.get(j);
       if(curr instanceof EnterMonitorStmt){
         return true;
