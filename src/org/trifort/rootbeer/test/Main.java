@@ -120,6 +120,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new ObjectToStringTest());
     ret.add(new StringBuilderTest3());
     ret.add(new StaticInitTest());
+    ret.add(new PolymorphicNewTest());
             
     if(m_hardTests){
       ret.add(new SimpleSynchronizedTest());
