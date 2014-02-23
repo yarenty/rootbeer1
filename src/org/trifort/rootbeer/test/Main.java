@@ -128,7 +128,8 @@ public class Main implements TestSerializationFactory {
     ret.add(new SynchronizedMethod3Test());
     ret.add(new SynchronizedStaticMethodTest());
     ret.add(new SynchronizedObjectTest());
-    
+    ret.add(new ForceArrayNewTest());
+            
     if(org.trifort.rootbeer.entry.Main.largeMemTests()){
       ret.add(new LargeMemTest());
     }

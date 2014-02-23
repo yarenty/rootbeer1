@@ -42,7 +42,7 @@ public class RootbeerDfs {
     queue.add(new HierarchySignature("<org.trifort.rootbeer.runtimegpu.GpuException: void <init>()>"));
     queue.add(new HierarchySignature("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>"));
 
-    MethodsSetup setup = new MethodsSetup();
+    CompilerSetup setup = new CompilerSetup();
     for(String method : setup.getDontDfs()){
       visited.add(new HierarchySignature(method));
     }

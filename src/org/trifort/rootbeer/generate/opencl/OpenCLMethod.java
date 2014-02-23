@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.trifort.rootbeer.configuration.Configuration;
-import org.trifort.rootbeer.entry.MethodsSetup;
+import org.trifort.rootbeer.entry.CompilerSetup;
 import org.trifort.rootbeer.generate.bytecode.StaticOffsets;
 import org.trifort.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
 import org.trifort.rootbeer.generate.opencl.body.OpenCLBody;
@@ -502,7 +502,7 @@ public class OpenCLMethod {
   }
   
   private void createDontMangleMethods() {
-    MethodsSetup setup = new MethodsSetup();
+    CompilerSetup setup = new CompilerSetup();
     m_dontMangleMethods = setup.getDontMangle();
     m_dontEmitMethods = setup.getDontEmit();
     m_emitUnmangled = setup.getEmitUnmanged();   

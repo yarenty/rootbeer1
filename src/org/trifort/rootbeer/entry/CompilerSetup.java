@@ -3,9 +3,14 @@ package org.trifort.rootbeer.entry;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.trifort.rootbeer.generate.opencl.OpenCLArrayType;
+
+import soot.ArrayType;
+import soot.CharType;
+import soot.RefType;
 import soot.rbclassload.HierarchySignature;
 
-public class MethodsSetup {
+public class CompilerSetup {
 
   public Set<String> getDontDfs(){
     Set<String> ret = new HashSet<String>();
@@ -69,6 +74,7 @@ public class MethodsSetup {
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: double getSharedDouble(int)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void setSharedDouble(int,double)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: double sin(double)>");
+    ret.add("<org.trifort.rootbeer.testcases.rootbeertest.serialization.ForceArrayNewRunOnGpu: java.lang.String getStringArray()>");
     ret.add("<java.lang.System: long nanoTime()>");
     ret.add("<java.lang.Class: java.lang.String getName()>");
     ret.add("<java.lang.Object: java.lang.Class getClass()>");
@@ -241,6 +247,13 @@ public class MethodsSetup {
   public Set<String> getEmitUnmanged() {
     Set<String> ret = new HashSet<String>();
     ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
+    return ret;
+  }
+
+  public Set<ArrayType> getExtraArrayTypes() {
+    Set<ArrayType> ret = new HashSet<ArrayType>();
+    ret.add(ArrayType.v(CharType.v(), 1));
+    ret.add(ArrayType.v(RefType.v("java.lang.String"), 1));
     return ret;
   }
 }

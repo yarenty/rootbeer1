@@ -208,6 +208,5 @@ public class RootbeerGpu {
   
   public static double sin(double value){
     return 0;
-  }
-  
+  }  
 }
