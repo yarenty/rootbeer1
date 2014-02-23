@@ -348,14 +348,15 @@ public class VisitorReadGen extends AbstractVisitorGen {
     BytecodeLanguage bcl = m_bcl.top();
     SootClass soot_class = type.getSootClass();
     
-    Local object_to_write_to = bcl.local(type);
     BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top()); 
     
     String name = soot_class.getName();
     if(soot_class.isApplicationClass() == false){    
       if(soot_class.declaresMethod("void <init>()")){
+        Local object_to_write_to = bcl.local(type);
         Local new_object = bcl.newInstance(name);
         bcl.assign(object_to_write_to, new_object); 
+        return object_to_write_to;
       } else { 
         JavaNumberTypes number_types = new JavaNumberTypes();
         String type_string = type.toString();
@@ -383,9 +384,10 @@ public class VisitorReadGen extends AbstractVisitorGen {
           } else if(type_string.equals("java.lang.Double")){
             value = bcl_mem.readDouble();
           } else {
-            throw new UnsupportedOperationException("cannot create type");
+            throw new UnsupportedOperationException("cannot create type: "+type_string);
           }
-          
+
+          Local object_to_write_to = bcl.local(type);
           Local new_object = bcl.newInstance(name, value);
           bcl.assign(object_to_write_to, new_object);
 
@@ -393,23 +395,19 @@ public class VisitorReadGen extends AbstractVisitorGen {
           
           bcl.returnValue(object_to_write_to);
           return object_to_write_to;
-        }
-        if(type.toString().equals("java.lang.Integer")){
-            
-          
-          Local int_value = bcl_mem.readInt();
-
         } else {
-          throw new UnsupportedOperationException("cannot create type");
+          Local object_to_write_to = bcl.local(type);
+          bcl.assign(object_to_write_to, NullConstant.v());
+          return object_to_write_to;
         }
       }
     } else {
+      Local object_to_write_to = bcl.local(type);
       Local sentinal = bcl.newInstance("org.trifort.rootbeer.runtime.Sentinal");
       Local new_object = bcl.newInstance(name, sentinal);
       bcl.assign(object_to_write_to, new_object);
+      return object_to_write_to;
     }
-    
-    return object_to_write_to;
   }
   
   private Local makeReadFromHeapBodyForSootClass(RefType type){
