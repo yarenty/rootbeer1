@@ -22,7 +22,7 @@ public class RegisterNamer {
   }
 
   public String getName(){
-    String ret = "philreg" + Integer.toString(count);
+    String ret = "rbreg" + Integer.toString(count);
     count++;
     return ret;
   }

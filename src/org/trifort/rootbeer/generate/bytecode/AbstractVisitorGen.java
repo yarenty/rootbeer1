@@ -24,7 +24,7 @@ public class AbstractVisitorGen {
   
   protected Local m_thisRef;
   protected Stack<Local> m_currThisRef;
-  private int m_labelI;
+  private int m_labelIndex;
   protected Stack<BytecodeLanguage> m_bcl;
   protected Stack<Local> m_gcObjVisitor;
   protected Stack<Local> m_currMem;
@@ -32,7 +32,7 @@ public class AbstractVisitorGen {
   protected List<String> m_classesToIgnore;
   
   public AbstractVisitorGen(){
-    m_labelI = 0; 
+    m_labelIndex = 0; 
     m_bcl = new Stack<BytecodeLanguage>();
     m_gcObjVisitor = new Stack<Local>();
     m_currMem = new Stack<Local>();
@@ -89,8 +89,8 @@ public class AbstractVisitorGen {
   }
 
   protected String getNextLabel(){
-    String ret = "phillabel"+Integer.toString(m_labelI);
-    m_labelI++;
+    String ret = "rblabel"+Integer.toString(m_labelIndex);
+    m_labelIndex++;
     return ret;
   }
   

@@ -16,11 +16,15 @@ public class Autoboxing2RunOnGpu implements Kernel {
   }
   
   private int returnInteger1() {
-    return 0; 
+    return 1; 
   }
   
-  public double getInteger0(){
+  public int getInteger0(){
     return m_int0;
+  }
+
+  public int getInteger1(){
+    return m_int1;
   }
   
   public boolean compare(Autoboxing2RunOnGpu rhs) {
@@ -28,6 +32,12 @@ public class Autoboxing2RunOnGpu implements Kernel {
       System.out.println("m_int0");
       System.out.println("lhs: "+getInteger0());
       System.out.println("rhs: "+rhs.getInteger0());
+      return false;
+    }    
+    if(getInteger1() != rhs.getInteger1()){
+      System.out.println("m_int1");
+      System.out.println("lhs: "+getInteger1());
+      System.out.println("rhs: "+rhs.getInteger1());
       return false;
     }
     return true;

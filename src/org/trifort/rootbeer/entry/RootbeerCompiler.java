@@ -32,7 +32,6 @@ import pack.Pack;
 import soot.*;
 import soot.options.Options;
 import soot.rbclassload.DfsInfo;
-import soot.rbclassload.HierarchySignature;
 import soot.rbclassload.ListClassTester;
 import soot.rbclassload.ListMethodTester;
 import soot.rbclassload.MethodTester;
@@ -271,8 +270,8 @@ public class RootbeerCompiler {
         }
       }
       if(write){
-        writeClassFile(class_name);
         writeJimpleFile(class_name);
+        writeClassFile(class_name);
       }
     }
     

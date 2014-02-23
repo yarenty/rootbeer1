@@ -22,20 +22,20 @@ import soot.rbclassload.TypeToString;
 
 public class BytecodeLanguage {
 
-  private Jimple jimple;
-  private SootClass mCurrClass;
+  private Jimple m_jimple;
+  private SootClass m_currClass;
 
   //method fields
-  private SootMethod mCurrMethod;
-  private JimpleBody mCurrBody;
-  private List<Type> mParameterTypes;
-  private UnitAssembler mAssembler;
+  private SootMethod m_currMethod;
+  private JimpleBody m_currBody;
+  private List<Type> m_parameterTypes;
+  private UnitAssembler m_assembler;
 
-  private Stack<SootMethod> mMethodStack;
+  private Stack<SootMethod> m_methodStack;
 
   public BytecodeLanguage(){
-    jimple = Jimple.v();
-    mMethodStack = new Stack<SootMethod>();
+    m_jimple = Jimple.v();
+    m_methodStack = new Stack<SootMethod>();
   }
 
   public SootClass makeClass(String name){
@@ -46,7 +46,7 @@ public class BytecodeLanguage {
     Scene.v().addClass(ret);
     ret.setApplicationClass();
 
-    mCurrClass = ret;
+    m_currClass = ret;
     return ret;
   }
 
@@ -60,27 +60,27 @@ public class BytecodeLanguage {
     Scene.v().addClass(ret);
     ret.setApplicationClass();
 
-    mCurrClass = ret;
+    m_currClass = ret;
     return ret;
   }
 
   public void addFieldToClass(Local local){
     SootField field = new SootField(local.getName(), local.getType(), Modifier.PUBLIC);
-    mCurrClass.addField(field);
+    m_currClass.addField(field);
   }
   
   public void addFieldToClass(Local local, String name){
     SootField field = new SootField(name, local.getType(), Modifier.PUBLIC);
-    mCurrClass.addField(field);
+    m_currClass.addField(field);
   }
 
 
   public void openClass(String name){
-    mCurrClass = Scene.v().getSootClass(name);
+    m_currClass = Scene.v().getSootClass(name);
   }
 
   public void openClass(SootClass soot_class){
-    mCurrClass = soot_class;
+    m_currClass = soot_class;
   }
 
   public void startMethod(String method_name, Type return_type, Type... arg_types){
@@ -88,17 +88,17 @@ public class BytecodeLanguage {
   }
   
   private void doStartMethod(String method_name, Type return_type, int modifiers, Type... arg_types){
-    mAssembler = new UnitAssembler();
+    m_assembler = new UnitAssembler();
 
-    mParameterTypes = convertTypeArrayToList(arg_types);
-    mCurrMethod = new SootMethod(method_name, mParameterTypes, return_type, modifiers);
-    mCurrMethod.setDeclaringClass(mCurrClass);
+    m_parameterTypes = convertTypeArrayToList(arg_types);
+    m_currMethod = new SootMethod(method_name, m_parameterTypes, return_type, modifiers);
+    m_currMethod.setDeclaringClass(m_currClass);
 
-    mCurrBody = jimple.newBody(mCurrMethod);
-    mCurrMethod.setActiveBody(mCurrBody);
-    mCurrClass.addMethod(mCurrMethod);
+    m_currBody = m_jimple.newBody(m_currMethod);
+    m_currMethod.setActiveBody(m_currBody);
+    m_currClass.addMethod(m_currMethod);
     
-    RootbeerClassLoader.v().addGeneratedMethod(mCurrMethod.getSignature());
+    RootbeerClassLoader.v().addGeneratedMethod(m_currMethod.getSignature());
   }
   
   public void startStaticMethod(String method_name, Type return_type, Type... arg_types){
@@ -106,47 +106,47 @@ public class BytecodeLanguage {
   }
 
   public void continueMethod(UnitAssembler assembler){
-    mAssembler = assembler;
+    m_assembler = assembler;
   }
 
   public Local refThis(){
     String name = "this0";
-    RefType type = mCurrClass.getType();
-    Local thislocal = jimple.newLocal(name, type);
-    Unit u = jimple.newIdentityStmt(thislocal, jimple.newThisRef(type));
-    mAssembler.add(u);
+    RefType type = m_currClass.getType();
+    Local thislocal = m_jimple.newLocal(name, type);
+    Unit u = m_jimple.newIdentityStmt(thislocal, m_jimple.newThisRef(type));
+    m_assembler.add(u);
     return thislocal;
   }
 
   public Local refParameter(int index){
-    Type type = mParameterTypes.get(index);
+    Type type = m_parameterTypes.get(index);
     String name = "parameter"+Integer.toString(index);
-    Local parameterI = jimple.newLocal(name, type);
-    Unit u = jimple.newIdentityStmt(parameterI, jimple.newParameterRef(type, index));
-    mAssembler.add(u);
+    Local parameterI = m_jimple.newLocal(name, type);
+    Unit u = m_jimple.newIdentityStmt(parameterI, m_jimple.newParameterRef(type, index));
+    m_assembler.add(u);
     return parameterI;
   }
 
   public Local binOp(Value lhs, String op, Value rhs){
     Value binop = null;
     if(op.equals("*")){
-      binop = jimple.newMulExpr(lhs, rhs);
+      binop = m_jimple.newMulExpr(lhs, rhs);
     }
 
-    Local ret = jimple.newLocal(getLocalName(), lhs.getType());
-    Unit u = jimple.newAssignStmt(ret, binop);
-    mAssembler.add(u);
+    Local ret = m_jimple.newLocal(getLocalName(), lhs.getType());
+    Unit u = m_jimple.newAssignStmt(ret, binop);
+    m_assembler.add(u);
     return ret;
   }
 
   public void setInstanceField(SootField field, Local field_instance, Value value){
     Value lhs;
     if(field.isStatic() == false)
-      lhs = jimple.newInstanceFieldRef(field_instance, field.makeRef());
+      lhs = m_jimple.newInstanceFieldRef(field_instance, field.makeRef());
     else
-      lhs = jimple.newStaticFieldRef(field.makeRef());
-    Unit u = jimple.newAssignStmt(lhs, value);
-    mAssembler.add(u);
+      lhs = m_jimple.newStaticFieldRef(field.makeRef());
+    Unit u = m_jimple.newAssignStmt(lhs, value);
+    m_assembler.add(u);
   }
 
   public void setInstanceField(String field_name, Local field_instance, Value value){
@@ -161,15 +161,15 @@ public class BytecodeLanguage {
 
   public void setStaticField(SootField field, Value value) {
     Value lhs;
-    lhs = jimple.newStaticFieldRef(field.makeRef());
-    Unit u = jimple.newAssignStmt(lhs, value);
-    mAssembler.add(u);
+    lhs = m_jimple.newStaticFieldRef(field.makeRef());
+    Unit u = m_jimple.newAssignStmt(lhs, value);
+    m_assembler.add(u);
   }
 
   public void endMethod(){
-    //System.out.println("Ending method: "+mCurrMethod.getName());
-    mAssembler.assemble(mCurrBody);
-    //System.out.println(mAssembler.toString());
+    //System.out.println("Ending method: "+m_currMethod.getName());
+    m_assembler.assemble(m_currBody);
+    //System.out.println(m_assembler.toString());
   }
 
   private List<Type> convertTypeArrayToList(Type[] type_array){
@@ -205,7 +205,7 @@ public class BytecodeLanguage {
     }
     util.setParameterTypes(parameter_types);
     SootMethod soot_method = util.getSootMethod();
-    mMethodStack.push(soot_method);
+    m_methodStack.push(soot_method);
   }
 
   private List<Value> convertValueArrayToList(Value[] local_array){
@@ -218,66 +218,66 @@ public class BytecodeLanguage {
   }
 
   public void invokeMethodNoRet(Local base, Value... args){
-    SootMethod method = mMethodStack.pop();
+    SootMethod method = m_methodStack.pop();
     List<Value> args_list = convertValueArrayToList(args);
     Value invoke_expr;
     if(method.getName().equals("<init>")){
-      invoke_expr = jimple.newSpecialInvokeExpr(base, method.makeRef(), args_list);
+      invoke_expr = m_jimple.newSpecialInvokeExpr(base, method.makeRef(), args_list);
     } else {
       //I can't find any way to distinguish between an interface and non-interface
       //method.  let's just try both and use whatever works.
       try {
-        invoke_expr = jimple.newVirtualInvokeExpr(base, method.makeRef(), args_list);
+        invoke_expr = m_jimple.newVirtualInvokeExpr(base, method.makeRef(), args_list);
       } catch(RuntimeException ex){
-        invoke_expr = jimple.newInterfaceInvokeExpr(base, method.makeRef(), args_list);
+        invoke_expr = m_jimple.newInterfaceInvokeExpr(base, method.makeRef(), args_list);
       }
     }
 
-    Unit u = jimple.newInvokeStmt(invoke_expr);
-    mAssembler.add(u);
+    Unit u = m_jimple.newInvokeStmt(invoke_expr);
+    m_assembler.add(u);
   }
   
   public void invokeStaticMethodNoRet(Value... args){
-    SootMethod method = mMethodStack.pop();
+    SootMethod method = m_methodStack.pop();
     List<Value> args_list = convertValueArrayToList(args);
     Value invoke_expr;
     
-    invoke_expr = jimple.newStaticInvokeExpr(method.makeRef(), args_list);
+    invoke_expr = m_jimple.newStaticInvokeExpr(method.makeRef(), args_list);
     
-    Unit u = jimple.newInvokeStmt(invoke_expr);
-    mAssembler.add(u);
+    Unit u = m_jimple.newInvokeStmt(invoke_expr);
+    m_assembler.add(u);
   }
   
   public void invokeSpecialNoRet(Local base, Value... args){
-    SootMethod method = mMethodStack.pop();
+    SootMethod method = m_methodStack.pop();
     List<Value> args_list = convertValueArrayToList(args);
     Value invoke_expr;
-    invoke_expr = jimple.newSpecialInvokeExpr(base, method.makeRef(), args_list);
+    invoke_expr = m_jimple.newSpecialInvokeExpr(base, method.makeRef(), args_list);
 
-    Unit u = jimple.newInvokeStmt(invoke_expr);
-    mAssembler.add(u);
+    Unit u = m_jimple.newInvokeStmt(invoke_expr);
+    m_assembler.add(u);
   }
 
   public Local invokeMethodRet(Local base, Value... args){
-    SootMethod method = mMethodStack.pop();
+    SootMethod method = m_methodStack.pop();
     List<Value> args_list = convertValueArrayToList(args);
     Value invoke_expr;
     if(method.getName().equals("<init>")){
-      invoke_expr = jimple.newSpecialInvokeExpr(base, method.makeRef(), args_list);
+      invoke_expr = m_jimple.newSpecialInvokeExpr(base, method.makeRef(), args_list);
     } else {
       //I can't find any way to distinguish between an interface and non-interface
       //method.  let's just try both and use whatever works.
       try {
-        invoke_expr = jimple.newVirtualInvokeExpr(base, method.makeRef(), args_list);
+        invoke_expr = m_jimple.newVirtualInvokeExpr(base, method.makeRef(), args_list);
       } catch(RuntimeException ex){
-        invoke_expr = jimple.newInterfaceInvokeExpr(base, method.makeRef(), args_list);
+        invoke_expr = m_jimple.newInterfaceInvokeExpr(base, method.makeRef(), args_list);
       }
     }
 
     String name = getLocalName();
-    Local ret = jimple.newLocal(name, method.getReturnType());
-    Unit u = jimple.newAssignStmt(ret, invoke_expr);
-    mAssembler.add(u);
+    Local ret = m_jimple.newLocal(name, method.getReturnType());
+    Unit u = m_jimple.newAssignStmt(ret, invoke_expr);
+    m_assembler.add(u);
     return ret;
   }
 
@@ -286,58 +286,58 @@ public class BytecodeLanguage {
   }
 
   public Local local(Type type){
-    Local ret = jimple.newLocal(getLocalName(), type);
+    Local ret = m_jimple.newLocal(getLocalName(), type);
     return ret;
   }
 
   public void ifStmt(Value lhs, String op, Value rhs, String target_label){
     Value condition;
     if(op.equals("==")){
-      condition = jimple.newEqExpr(lhs, rhs);
+      condition = m_jimple.newEqExpr(lhs, rhs);
     } else if(op.equals("!=")){
-      condition = jimple.newNeExpr(lhs, rhs);
+      condition = m_jimple.newNeExpr(lhs, rhs);
     } else if(op.equals(">=")){
-      condition = jimple.newGeExpr(lhs, rhs);    
+      condition = m_jimple.newGeExpr(lhs, rhs);    
     } else {
       throw new UnsupportedOperationException();
     }
-    mAssembler.addIf(condition, target_label);
+    m_assembler.addIf(condition, target_label);
   }
 
   public void ifInstanceOfStmt(Value lhs, Type rhs, String target){
     //Local lhs_instanceof_rhs_local = lhs instanceof rhs;
     Value lhs_instanceof_rhs;
-    lhs_instanceof_rhs = jimple.newInstanceOfExpr(lhs, rhs);
-    Local lhs_instance_of_rhs_local = jimple.newLocal(getLocalName(), BooleanType.v());
-    Unit u1 = jimple.newAssignStmt(lhs_instance_of_rhs_local, lhs_instanceof_rhs);
-    mAssembler.add(u1);
+    lhs_instanceof_rhs = m_jimple.newInstanceOfExpr(lhs, rhs);
+    Local lhs_instance_of_rhs_local = m_jimple.newLocal(getLocalName(), BooleanType.v());
+    Unit u1 = m_jimple.newAssignStmt(lhs_instance_of_rhs_local, lhs_instanceof_rhs);
+    m_assembler.add(u1);
 
-    Value eq = jimple.newEqExpr(lhs_instance_of_rhs_local, IntConstant.v(0));
-    mAssembler.addIf(eq, target);
+    Value eq = m_jimple.newEqExpr(lhs_instance_of_rhs_local, IntConstant.v(0));
+    m_assembler.addIf(eq, target);
   }
 
   public void label(String label_string){
-    mAssembler.addLabel(label_string);
+    m_assembler.addLabel(label_string);
   }
 
   public void returnVoid() {
-    mAssembler.add(jimple.newReturnVoidStmt());
+    m_assembler.add(m_jimple.newReturnVoidStmt());
   }
 
   public void returnValue(Value value){
-    Unit u = jimple.newReturnStmt(value);
-    mAssembler.add(u);
+    Unit u = m_jimple.newReturnStmt(value);
+    m_assembler.add(u);
   }
 
   public Local refInstanceField(Local base, String field_name){
     Type base_type = base.getType();
     SootClass base_class = Scene.v().getSootClass(base_type.toString());
     SootField field = getFieldByName(base_class, field_name);
-    Local ret = jimple.newLocal(getLocalName(), field.getType());
+    Local ret = m_jimple.newLocal(getLocalName(), field.getType());
 
-    Value rhs = jimple.newInstanceFieldRef(base, field.makeRef());
-    Unit u = jimple.newAssignStmt(ret, rhs);
-    mAssembler.add(u);
+    Value rhs = m_jimple.newInstanceFieldRef(base, field.makeRef());
+    Unit u = m_jimple.newAssignStmt(ret, rhs);
+    m_assembler.add(u);
     return ret;
   }
 
@@ -349,11 +349,11 @@ public class BytecodeLanguage {
   Local refStaticField(Type base_type, String field_name) {
     SootClass base_class = Scene.v().getSootClass(base_type.toString());
     SootField field = getFieldByName(base_class, field_name);
-    Local ret = jimple.newLocal(getLocalName(), field.getType());
+    Local ret = m_jimple.newLocal(getLocalName(), field.getType());
 
-    Value rhs = jimple.newStaticFieldRef(field.makeRef());
-    Unit u = jimple.newAssignStmt(ret, rhs);
-    mAssembler.add(u);
+    Value rhs = m_jimple.newStaticFieldRef(field.makeRef());
+    Unit u = m_jimple.newAssignStmt(ret, rhs);
+    m_assembler.add(u);
     return ret;
   }
 
@@ -362,9 +362,9 @@ public class BytecodeLanguage {
     SootClass base_class = Scene.v().getSootClass(base_type.toString());
     SootField field = getFieldByName(base_class, field_name);
 
-    Value rhs = jimple.newInstanceFieldRef(base, field.makeRef());
-    Unit u = jimple.newAssignStmt(input, rhs);
-    mAssembler.add(u);
+    Value rhs = m_jimple.newInstanceFieldRef(base, field.makeRef());
+    Unit u = m_jimple.newAssignStmt(input, rhs);
+    m_assembler.add(u);
   }
   
   public void refInstanceFieldFromInput(Local base, String field_name, Local input){
@@ -372,9 +372,9 @@ public class BytecodeLanguage {
     SootClass base_class = Scene.v().getSootClass(base_type.toString());
     SootField field = getFieldByName(base_class, field_name);
 
-    Value rhs = jimple.newInstanceFieldRef(base, field.makeRef());
-    Unit u = jimple.newAssignStmt(rhs, input);
-    mAssembler.add(u);
+    Value rhs = m_jimple.newInstanceFieldRef(base, field.makeRef());
+    Unit u = m_jimple.newAssignStmt(rhs, input);
+    m_assembler.add(u);
   }
 
   public String getTypeString(Local local){
@@ -383,19 +383,19 @@ public class BytecodeLanguage {
   }
 
   public Local cast(Type type, Local rhs){
-    Local ret = jimple.newLocal(getLocalName(), type);
-    Value rhs_value = jimple.newCastExpr(rhs, type);
-    Unit u = jimple.newAssignStmt(ret, rhs_value);
-    mAssembler.add(u);
+    Local ret = m_jimple.newLocal(getLocalName(), type);
+    Value rhs_value = m_jimple.newCastExpr(rhs, type);
+    Unit u = m_jimple.newAssignStmt(ret, rhs_value);
+    m_assembler.add(u);
     return ret;
   }
 
   public Local newInstance(String mClassName, Value... params) {
     SootClass soot_class = Scene.v().getSootClass(mClassName);
-    Local u1_lhs = jimple.newLocal(getLocalName(), soot_class.getType());
-    Value u1_rhs = jimple.newNewExpr(soot_class.getType());
-    Unit u1 = jimple.newAssignStmt(u1_lhs, u1_rhs);
-    mAssembler.add(u1);
+    Local u1_lhs = m_jimple.newLocal(getLocalName(), soot_class.getType());
+    Value u1_rhs = m_jimple.newNewExpr(soot_class.getType());
+    Unit u1 = m_jimple.newAssignStmt(u1_lhs, u1_rhs);
+    m_assembler.add(u1);
 
     Type[] arg_types = new Type[params.length];
     for(int i = 0; i < params.length; ++i){
@@ -404,49 +404,49 @@ public class BytecodeLanguage {
     pushMethod(u1_lhs, "<init>", VoidType.v(), arg_types);
     invokeMethodNoRet(u1_lhs, params);
 
-    Local u2_lhs = jimple.newLocal(getLocalName(), soot_class.getType());
-    Unit u2 = jimple.newAssignStmt(u2_lhs, u1_lhs);
-    mAssembler.add(u2);
+    Local u2_lhs = m_jimple.newLocal(getLocalName(), soot_class.getType());
+    Unit u2 = m_jimple.newAssignStmt(u2_lhs, u1_lhs);
+    m_assembler.add(u2);
     return u2_lhs;
   }
 
   public Local newInstanceValueOf(String mClassName, Value param) {
     // Generate mClassName.valueOf(param)
     SootClass soot_class = Scene.v().getSootClass(mClassName);
-    Local l_res = jimple.newLocal(getLocalName(), soot_class.getType());
+    Local l_res = m_jimple.newLocal(getLocalName(), soot_class.getType());
     SootMethodRef classForNameRef = soot.Scene.v().makeMethodRef(soot_class,
         "valueOf", Arrays.asList(param.getType()), soot_class.getType(), true);
-    Unit u1 = jimple.newAssignStmt(l_res, jimple.newStaticInvokeExpr(classForNameRef, Arrays.asList(new Value[]{param})));
-    mAssembler.add(u1);
+    Unit u1 = m_jimple.newAssignStmt(l_res, m_jimple.newStaticInvokeExpr(classForNameRef, Arrays.asList(new Value[]{param})));
+    m_assembler.add(u1);
     return l_res;
   }
 
   public Value newArray(Type type, Value size) {
     ArrayType atype = (ArrayType) type;
     if(atype.numDimensions == 1)
-      return jimple.newNewArrayExpr(atype.baseType, size);
+      return m_jimple.newNewArrayExpr(atype.baseType, size);
     else {
       ArrayType to_create = ArrayType.v(atype.baseType, atype.numDimensions-1);
-      return jimple.newNewArrayExpr(to_create, size);
+      return m_jimple.newNewArrayExpr(to_create, size);
     }
   }
 
   public void assign(Value lhs, Value rhs) {
-    Unit u = jimple.newAssignStmt(lhs, rhs);
-    mAssembler.add(u);
+    Unit u = m_jimple.newAssignStmt(lhs, rhs);
+    m_assembler.add(u);
   }
 
   public Unit getLastUnitCreated(){
-    return mAssembler.getLastUnitCreated();
+    return m_assembler.getLastUnitCreated();
   }
 
   public void gotoLabel(String label2) {
-    mAssembler.addGoto(label2);
+    m_assembler.addGoto(label2);
   }
 
   public void makeVoidCtor() {
     startMethod("<init>", VoidType.v());
-    SootClass super_soot_class = mCurrClass.getSuperclass();
+    SootClass super_soot_class = m_currClass.getSuperclass();
     Local thisref = refThis();
     pushMethod(super_soot_class.getName(), "<init>", VoidType.v());
     invokeMethodNoRet(thisref);
@@ -455,19 +455,19 @@ public class BytecodeLanguage {
   }
 
   public UnitAssembler getAssembler() {
-    return mAssembler;
+    return m_assembler;
   }
 
   Local lengthof(Local object_to_write_from) {
-    Value rhs = jimple.newLengthExpr(object_to_write_from);
-    Local lhs = jimple.newLocal(getLocalName(), IntType.v());
-    Unit u = jimple.newAssignStmt(lhs, rhs);
-    mAssembler.add(u);
+    Value rhs = m_jimple.newLengthExpr(object_to_write_from);
+    Local lhs = m_jimple.newLocal(getLocalName(), IntType.v());
+    Unit u = m_jimple.newAssignStmt(lhs, rhs);
+    m_assembler.add(u);
     return lhs;
   }
 
   Local indexArray(Local base, Value i) {
-    Value rhs = jimple.newArrayRef(base, i);
+    Value rhs = m_jimple.newArrayRef(base, i);
     Type type = base.getType();
     if(type instanceof ArrayType == false)
       throw new RuntimeException("How do we handle this case?");
@@ -475,49 +475,49 @@ public class BytecodeLanguage {
 
     Local lhs;
     if(atype.numDimensions == 1){
-      lhs = jimple.newLocal(getLocalName(), atype.baseType);
+      lhs = m_jimple.newLocal(getLocalName(), atype.baseType);
     } else {
       Type lhs_type = ArrayType.v(atype.baseType, atype.numDimensions-1);
-      lhs = jimple.newLocal(getLocalName(), lhs_type);
+      lhs = m_jimple.newLocal(getLocalName(), lhs_type);
     }
-    Unit u = jimple.newAssignStmt(lhs, rhs);
-    mAssembler.add(u);
+    Unit u = m_jimple.newAssignStmt(lhs, rhs);
+    m_assembler.add(u);
     return lhs;
   }
   
   public void assignArray(Local base, Value i, Local value){
-    Value lhs = jimple.newArrayRef(base, i);
-    Unit u = jimple.newAssignStmt(lhs, value);
-    mAssembler.add(u);
+    Value lhs = m_jimple.newArrayRef(base, i);
+    Unit u = m_jimple.newAssignStmt(lhs, value);
+    m_assembler.add(u);
   }
 
   void plus(Local i, int add_value) {
-    Value rhs = jimple.newAddExpr(i, IntConstant.v(add_value));
-    Unit u = jimple.newAssignStmt(i, rhs);
-    mAssembler.add(u);
+    Value rhs = m_jimple.newAddExpr(i, IntConstant.v(add_value));
+    Unit u = m_jimple.newAssignStmt(i, rhs);
+    m_assembler.add(u);
   }
 
   void plus(Local i, Value add_value) {
-    Value rhs = jimple.newAddExpr(i, add_value);
-    Unit u = jimple.newAssignStmt(i, rhs);
-    mAssembler.add(u);
+    Value rhs = m_jimple.newAddExpr(i, add_value);
+    Unit u = m_jimple.newAssignStmt(i, rhs);
+    m_assembler.add(u);
   }
 
   void mult(Local lhs, Value mult_value){
-    Value rhs = jimple.newMulExpr(lhs, mult_value);
-    Unit u = jimple.newAssignStmt(lhs, rhs);
-    mAssembler.add(u);
+    Value rhs = m_jimple.newMulExpr(lhs, mult_value);
+    Unit u = m_jimple.newAssignStmt(lhs, rhs);
+    m_assembler.add(u);
   }
 
   void noOp() {
-    Unit u = jimple.newNopStmt();
-    mAssembler.add(u);
+    Unit u = m_jimple.newNopStmt();
+    m_assembler.add(u);
   }
   
   void assignElementToArray(Local base, Value rhs, Value i) {
-    Value lhs = jimple.newArrayRef(base, i);
-    Unit u = jimple.newAssignStmt(lhs, rhs);
-    mAssembler.add(u);
+    Value lhs = m_jimple.newArrayRef(base, i);
+    Unit u = m_jimple.newAssignStmt(lhs, rhs);
+    m_assembler.add(u);
   }
 
   public void println(String message){
@@ -543,15 +543,15 @@ public class BytecodeLanguage {
   }
 
   SootClass getSootClass() {
-    return mCurrClass;
+    return m_currClass;
   }
 
   Local classConstant(Type type) {
     String class_name = convertToConstant(type);
     Value curr = ClassConstant.v(class_name);
-    Local ret = jimple.newLocal(getLocalName(), curr.getType());
-    Unit u = jimple.newAssignStmt(ret, curr);
-    mAssembler.add(u);
+    Local ret = m_jimple.newLocal(getLocalName(), curr.getType());
+    Unit u = m_jimple.newAssignStmt(ret, curr);
+    m_assembler.add(u);
     return ret;
   }
 

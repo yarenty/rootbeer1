@@ -214,13 +214,7 @@ public class RootbeerTestAgent {
       }
     } catch(Throwable ex){
       ex.printStackTrace(System.out);
-      m_message = "Exception thrown at index: "+i+"\n";
-      ByteArrayOutputStream os = new ByteArrayOutputStream();
-      PrintWriter writer = new PrintWriter(os);
-      ex.printStackTrace(writer);
-      writer.flush();
-      writer.close();
-      m_message += os.toString();
+      m_message = "Exception thrown at index: "+i;
       m_passed = false;
     }
   }
@@ -262,13 +256,7 @@ public class RootbeerTestAgent {
       }
     } catch(Throwable ex){
       ex.printStackTrace(System.out);
-      m_message = "Exception thrown at index: "+i+"\n";
-      ByteArrayOutputStream os = new ByteArrayOutputStream();
-      PrintWriter writer = new PrintWriter(os);
-      ex.printStackTrace(writer);
-      writer.flush();
-      writer.close();
-      m_message += os.toString();
+      m_message = "Exception thrown at index: "+i;
       m_passed = false;
     }
   }
@@ -341,13 +329,7 @@ public class RootbeerTestAgent {
         }
       } catch(Throwable ex){
         ex.printStackTrace(System.out);
-        m_message = "Exception thrown at index: "+i+"\n";
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        PrintWriter writer = new PrintWriter(os);
-        ex.printStackTrace(writer);
-        writer.flush();
-        writer.close();
-        m_message += os.toString();
+        m_message = "Exception thrown at index: "+i;
         m_passed = false;
       }
     }

@@ -50,15 +50,15 @@ public class AutoboxingRunOnGpu implements Kernel {
     return m_double0;
   }
   
-  public double getInteger0(){
+  public int getInteger0(){
     return m_int0;
   }
   
-  public double getInteger1(){
+  public int getInteger1(){
     return m_int1;
   }
 
-  public double getInteger2(){
+  public int getInteger2(){
     return m_int2;
   }
   
