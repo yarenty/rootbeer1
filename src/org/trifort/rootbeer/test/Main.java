@@ -70,9 +70,9 @@ public class Main implements TestSerializationFactory {
     ret.add(new ArraySumTest());
     ret.add(new RemapTest());
     ret.add(new InstanceofTest());
-    //ret.add(new DotClassTest());
+    ret.add(new DotClassTest());
     ret.add(new PrintTest());
-    //ret.add(new BarrierTest());
+    ret.add(new BarrierTest());
     ret.add(new SharedMemSimpleTest());
     ret.add(new StringConstantTest());
     ret.add(new AbstractTest());
@@ -119,6 +119,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new ShortToStringTest());
     ret.add(new ObjectToStringTest());
     ret.add(new StringBuilderTest3());
+    ret.add(new StaticInitTest());
             
     if(m_hardTests){
       ret.add(new SimpleSynchronizedTest());
