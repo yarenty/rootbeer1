@@ -23,13 +23,13 @@ public class DotClassRunOnGpu implements Kernel {
   }
  
   public void gpuMethod() {
-    m_name = DotClassRunOnGpu.class.getName();
-    m_name2 = int[][].class.getName();
-    m_child.exec();
+    //m_name = DotClassRunOnGpu.class.getName();
+    //m_name2 = int[][].class.getName();
+    //m_child.exec();
   }
   
   public boolean compare(DotClassRunOnGpu rhs){ 
-    
+    /*
     if(m_name == null || rhs.m_name == null){
       System.out.println("m_name: "+m_name);
       System.out.println("rhs.m_name: "+rhs.m_name);
@@ -65,7 +65,8 @@ public class DotClassRunOnGpu implements Kernel {
       System.out.println("rhs.child.name: "+rhs.m_child.getName());
       return false;
     }
-    
     return true;
+    */
+    return false;
   }
 }

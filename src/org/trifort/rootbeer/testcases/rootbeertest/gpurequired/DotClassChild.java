@@ -12,7 +12,7 @@ public class DotClassChild {
   private String m_name;
   
   public void exec(){
-    m_name = DotClassChild.class.getName();
+    //m_name = DotClassChild.class.getName();
   }
   
   public String getName(){

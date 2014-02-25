@@ -21,4 +21,13 @@ public class CheckedFixedMemory extends FixedMemory {
     }
     super.setAddress(address);
   }
+  
+  @Override
+  protected long currPointer(){
+    long ret = super.currPointer();
+    if(ret >= m_size){
+      throw new RuntimeException("address out of range: "+ret);
+    }
+    return ret;
+  }
 }
