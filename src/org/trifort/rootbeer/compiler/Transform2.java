@@ -9,7 +9,7 @@ package org.trifort.rootbeer.compiler;
 
 import java.util.List;
 
-import org.trifort.rootbeer.generate.bytecode.GenerateRuntimeBasicBlock;
+import org.trifort.rootbeer.generate.bytecode.GenerateForKernel;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 
 import soot.*;
@@ -32,11 +32,10 @@ public class Transform2 {
     SootClass soot_class1 = Scene.v().getSootClass(cls);
     SootMethod method = soot_class1.getMethod("void gpuMethod()");
     
-    //generate RuntimeBasicBlock and Serializer
     String uuid = getUuid();
-    GenerateRuntimeBasicBlock generate = new GenerateRuntimeBasicBlock(method, uuid);
+    GenerateForKernel generator = new GenerateForKernel(method, uuid);
     try {
-      generate.makeClass();
+      generator.makeClass();
     } catch(Exception ex){
       ex.printStackTrace();
       OpenCLScene.releaseV();

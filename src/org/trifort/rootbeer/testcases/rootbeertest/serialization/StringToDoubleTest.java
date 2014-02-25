@@ -17,7 +17,7 @@ public class StringToDoubleTest implements TestSerialization {
 
   public List<Kernel> create() {
     List<Kernel> ret = new ArrayList<Kernel>();
-    for(int i = 0; i < 10; ++i) {
+    for(int i = 0; i < 1; ++i) {
       ret.add(new StringToDoubleRunOnGpu(Double.toString(Math.pow(0.125, i))));
     }
     return ret;

@@ -113,7 +113,7 @@ public abstract class Serializer {
       return result.m_Ref;
     }
     //if(o == null){
-    //  System.out.println("writeToHeap: null at addr: "+result.m_Ref);
+    // System.out.println("writeToHeap: null at addr: "+result.m_Ref);
     //} else {
     //  System.out.println("writeToHeap: "+o.toString()+" at addr: "+result.m_Ref);
     //}
@@ -148,17 +148,18 @@ public abstract class Serializer {
     //if(o == null){
     //  System.out.println("readFromHeap: null. addr: "+address);
     //} else {
-    //  System.out.println("readFromHeap: "+o.toString()+". addr: "+address);
+    //  System.out.println("readFromHeap: "+o.toString()+". addr: "+address+" class: "+o.getClass());
     //}
     //BufferPrinter printer = new BufferPrinter();
-    //printer.print(mMem, address, 128);
+    //printer.print(mMem, address-128, 256);
     Object ret = doReadFromHeap(o, read_data, address);
     //if(ret == null){
     //  System.out.println("doReadFromHeap: null. addr: "+address);
     //} else {
     //  if(ret instanceof char[]){
-    //    String str = new String((char[]) ret);
-    //    System.out.println("doReadFromHeap char[]: "+str+". addr: "+address);
+    //    char[] char_array = (char[]) ret;
+    //    String str = new String(char_array);
+    //    System.out.println("doReadFromHeap char[]: "+str+".["+char_array.length+"] addr: "+address);
     //  } else {
     //    System.out.println("doReadFromHeap: "+ret.toString()+". addr: "+address);
     //  }

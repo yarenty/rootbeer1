@@ -458,8 +458,8 @@ public class BytecodeLanguage {
     return m_assembler;
   }
 
-  Local lengthof(Local object_to_write_from) {
-    Value rhs = m_jimple.newLengthExpr(object_to_write_from);
+  Local lengthof(Value array) {
+    Value rhs = m_jimple.newLengthExpr(array);
     Local lhs = m_jimple.newLocal(getLocalName(), IntType.v());
     Unit u = m_jimple.newAssignStmt(lhs, rhs);
     m_assembler.add(u);
@@ -528,14 +528,14 @@ public class BytecodeLanguage {
     invokeMethodNoRet(out, StringConstant.v(message));
   }
 
-  void println(Local number) {
+  void println(Value number) {
     Type system = RefType.v("java.lang.System");
     Local out = refStaticField(system, "out");
     pushMethod(out, "println", VoidType.v(), IntType.v());
     invokeMethodNoRet(out, number);
   }
   
-  void printlnLong(Local number) {
+  void printlnLong(Value number) {
     Type system = RefType.v("java.lang.System");
     Local out = refStaticField(system, "out");
     pushMethod(out, "println", VoidType.v(), LongType.v());

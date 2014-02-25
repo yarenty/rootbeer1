@@ -17,8 +17,6 @@ import java.util.List;
 import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.configuration.RootbeerPaths;
 import org.trifort.rootbeer.deadmethods.DeadMethods;
-import org.trifort.rootbeer.generate.codesegment.CodeSegment;
-import org.trifort.rootbeer.generate.codesegment.MethodCodeSegment;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 import org.trifort.rootbeer.generate.opencl.tweaks.CompileResult;
 
@@ -30,15 +28,15 @@ import soot.jimple.StringConstant;
 import soot.options.Options;
 import soot.rbclassload.RootbeerClassLoader;
 
-public class GenerateRuntimeBasicBlock {
-  private CodeSegment m_codeSegment;
+public class GenerateForKernel {
+  private MethodCodeSegment m_codeSegment;
   private SootClass m_sootClass;
   private List<Local> m_firstIterationLocals;
   private Jimple m_jimple;
   private String m_runtimeBasicBlockClassName;
   private String m_serializerClassName;
 
-  public GenerateRuntimeBasicBlock(SootMethod method, String uuid){
+  public GenerateForKernel(SootMethod method, String uuid){
     m_jimple = Jimple.v();
     m_firstIterationLocals = new ArrayList<Local>();
     m_sootClass = method.getDeclaringClass();
@@ -63,7 +61,7 @@ public class GenerateRuntimeBasicBlock {
   }
 
   private void makeCpuBody() {
-    m_codeSegment.makeCpuBodyForRuntimeBasicBlock(m_sootClass);
+    m_codeSegment.makeCpuBody(m_sootClass);
   }  
   
   private void makeGetCodeMethodThatReturnsBytes(boolean m32, String filename) {

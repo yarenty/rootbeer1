@@ -5,7 +5,7 @@
  * See the file LICENSE for copying permission.
  */
 
-package org.trifort.rootbeer.generate.codesegment;
+package org.trifort.rootbeer.generate.bytecode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,18 +20,18 @@ import soot.Type;
 import soot.Value;
 import soot.jimple.internal.JimpleLocal;
 
-public class MethodCodeSegment implements CodeSegment {
-  private SootMethod existingMethod;
-  private SootMethod clonedMethod;
-  private SootClass mClonedClass;
+public class MethodCodeSegment {
+  private SootMethod m_existingMethod;
+  private SootMethod m_clonedMethod;
+  private SootClass m_clonedClass;
 
   public MethodCodeSegment(SootMethod method){
-    this.existingMethod = method;
+    this.m_existingMethod = method;
   }
 
   public List<Local> getInputArguments() {
     List<Local> ret = new ArrayList<Local>();
-    Type t = existingMethod.getDeclaringClass().getType();
+    Type t = m_existingMethod.getDeclaringClass().getType();
     Local l = new JimpleLocal("r0", t);
     ret.add(l);
     return ret;
@@ -42,7 +42,7 @@ public class MethodCodeSegment implements CodeSegment {
   }
 
   public SootClass getSootClass() {
-    return existingMethod.getDeclaringClass();
+    return m_existingMethod.getDeclaringClass();
   }
 
   public List<Value> getInputValues() {
@@ -51,21 +51,21 @@ public class MethodCodeSegment implements CodeSegment {
 
   public List<Type> getParameterTypes() {
     List<Type> ret = new ArrayList<Type>();
-    Type t = existingMethod.getDeclaringClass().getType();
+    Type t = m_existingMethod.getDeclaringClass().getType();
     ret.add(t);
     return ret;
   }
 
-  public void makeCpuBodyForRuntimeBasicBlock(SootClass mClass) {
-    mClonedClass = mClass;
+  public void makeCpuBody(SootClass soot_class) {
+    m_clonedClass = soot_class;
   }
 
   public SootMethod getRootMethod() {
-    return existingMethod;
+    return m_existingMethod;
   }
 
   public SootClass getRootSootClass() {
-    return existingMethod.getDeclaringClass();
+    return m_existingMethod.getDeclaringClass();
   }
 
 }

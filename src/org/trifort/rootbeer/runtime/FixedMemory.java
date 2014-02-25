@@ -375,10 +375,11 @@ public class FixedMemory implements Memory {
   }
   
   public void finishReading(){
-    long ptr = m_currentPointer.m_pointer / 8;
-    ptr *= 8;
-    if(ptr != m_currentPointer.m_pointer){
-      ptr += 8;
+    long ptr = m_currentPointer.m_pointer;
+
+    int mod = (int) (ptr % Constants.MallocAlignBytes);
+    if(mod != 0){
+      ptr += (Constants.MallocAlignBytes - mod);
     }
     setPointer(ptr);
   }
@@ -392,13 +393,11 @@ public class FixedMemory implements Memory {
   private class MemPointer {
    
     private PointerStack m_stack; 
-    private long m_endPointer;
     private long m_pointer;
     private long m_heapEnd;
     
     public MemPointer(){
       m_stack = new PointerStack();
-      m_endPointer = 0;
     }
 
     public void popAddress() {
@@ -415,22 +414,19 @@ public class FixedMemory implements Memory {
         size += (Constants.MallocAlignBytes - mod);
       }
         
-      long mod2 = m_endPointer % Constants.MallocAlignBytes;
+      long mod2 = m_heapEnd % Constants.MallocAlignBytes;
       if(mod2 != 0){
-        m_endPointer += (Constants.MallocAlignBytes - mod2);
+        m_heapEnd += (Constants.MallocAlignBytes - mod2);
       }
       
-      long ret = m_endPointer;
-      m_endPointer += size;              
+      long ret = m_heapEnd;
+      m_heapEnd += size;              
       
       if(ret + size > m_size){
         throw new OutOfMemoryError();
       }
       
       m_pointer = ret;
-      if(ret > m_heapEnd){
-        m_heapEnd = ret;
-      }
       
       return ret;
     }
@@ -438,7 +434,6 @@ public class FixedMemory implements Memory {
     private void clearHeapEndPtr() {      
       m_heapEnd = 0;
       m_pointer = 0;
-      m_endPointer = 0;
     }
 
     private void setAddress(long address) {
@@ -462,19 +457,12 @@ public class FixedMemory implements Memory {
       if(m_pointer > m_heapEnd){
         m_heapEnd = m_pointer;
       }
-      if(m_pointer > m_endPointer){
-        m_endPointer = m_pointer;
-      }
     }
     
     public void align16() {
       long mod = m_heapEnd % Constants.MallocAlignBytes;
       if(mod != 0){
         m_heapEnd += (Constants.MallocAlignBytes - mod);
-      }
-      mod = m_endPointer % Constants.MallocAlignBytes;
-      if(mod != 0){
-        m_endPointer += (Constants.MallocAlignBytes - mod);
       }
     }
   }

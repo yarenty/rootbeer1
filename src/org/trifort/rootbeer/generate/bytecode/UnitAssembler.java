@@ -233,9 +233,6 @@ public class UnitAssembler {
   }
 
   public void addLabel(String label){
-    if(label.equals("phillabel2")){
-      label = "phillabel2";
-    }
     while(m_inputUnits.size() >= m_labels.size())
       m_labels.add(new ArrayList<String>());
 

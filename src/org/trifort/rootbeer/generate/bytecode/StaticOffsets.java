@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.trifort.rootbeer.generate.opencl.OpenCLClass;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 import org.trifort.rootbeer.generate.opencl.fields.CompositeField;
 import org.trifort.rootbeer.generate.opencl.fields.OpenCLField;
@@ -137,8 +138,9 @@ public class StaticOffsets {
   private List<OpenCLField> staticFilter(List<OpenCLField> fields){
     List<OpenCLField> ret = new ArrayList<OpenCLField>();
     for(OpenCLField field : fields){
-      if(field.isInstance() == false)
+      if(field.isInstance() == false){
         ret.add(field);
+      }
     }
     return ret;
   }

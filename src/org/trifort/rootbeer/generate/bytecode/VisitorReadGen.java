@@ -19,13 +19,9 @@ import org.trifort.rootbeer.generate.opencl.fields.OpenCLField;
 import org.trifort.rootbeer.util.Stack;
 
 import soot.*;
-import soot.coffi.constant_element_value;
 import soot.jimple.IntConstant;
-import soot.jimple.Jimple;
 import soot.jimple.LongConstant;
 import soot.jimple.NullConstant;
-import soot.jimple.StringConstant;
-import soot.options.Options;
 import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -91,39 +87,42 @@ public class VisitorReadGen extends AbstractVisitorGen {
     Local class_number = bcl_mem.readInt();
     
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
+    long string_number = class_hierarchy.getNumberForType("java.lang.String");
     
     //create readers for String and char[]
     Local ret;
-    SootClass string_class = Scene.v().getSootClass("java.lang.String");
-    RefType string_type = string_class.getType();
-    String label = getNextLabel();
-    long string_number = class_hierarchy.getNumberForType(string_type.toString());
-    bcl.ifStmt(class_number, "!=", IntConstant.v((int) string_number), label);
+
+    String after_ctors_label = getNextLabel();
+    String ctors_label = getNextLabel();
+    String string_label = getNextLabel();
+    String increment_addr_label = getNextLabel();
+    bcl.ifStmt(class_number, "==", IntConstant.v((int) string_number), string_label);
+    bcl.ifStmt(ctor_used, "==", IntConstant.v(1), ctors_label);
+    bcl.ifStmt(m_param0, "==", NullConstant.v(), ctors_label);
+    
+    bcl.gotoLabel(increment_addr_label);
+    
+    bcl.label(string_label);
+    
+    RefType string_type = RefType.v("java.lang.String");
     ret = makeReadFromHeapBodyForString(string_type);
     m_readFromHeapMethodsMade.put(string_type, ret);
     bcl.returnValue(ret);
-    bcl.label(label);
     
-    ArrayType array_type = ArrayType.v(CharType.v(), 1);
-    label = getNextLabel();
-    long array_number = class_hierarchy.getNumberForType(array_type.toString());
-    bcl.ifStmt(class_number, "!=", IntConstant.v((int) array_number), label);
-    ret = makeReadFromHeapBodyForArrayType(array_type, ctor_used);
-    m_readFromHeapMethodsMade.put(array_type, ret);
-    bcl.returnValue(ret);
-    bcl.label(label);
+    bcl.label(ctors_label);
     
-    String after_ctors_label = getNextLabel();
-    bcl.ifStmt(ctor_used, "==", IntConstant.v(0), after_ctors_label);
-
     for(Type type : m_orderedHistory){
       makeCtorReadFromHeapMethodForType(type, false, class_number, ctor_used, after_ctors_label);
     }
 
     RefType obj = RefType.v("java.lang.Object");
     makeCtorReadFromHeapMethodForType(obj, true, class_number, ctor_used, after_ctors_label);
+
+    bcl.label(increment_addr_label);
+    bcl_mem.incrementAddress(8);
     
     bcl.label(after_ctors_label);
+    bcl_mem.incrementAddress(16);
 
     for(Type type : m_orderedHistory){
       makeReadFromHeapMethodForType(type, false, ctor_used);
@@ -174,7 +173,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     
     Local ret;
     if(type instanceof ArrayType){
-      ret = makeReadFromHeapBodyForArrayType((ArrayType) type, ctor_used);
+      ret = makeReadFromHeapBodyForArrayType((ArrayType) type);
     }
     else {
       ret = makeReadFromHeapBodyForSootClass((RefType) type);
@@ -221,7 +220,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     
     Local ret;
     if(type instanceof ArrayType){
-      ret = makeReadFromHeapBodyForArrayType((ArrayType) type, ctor_used);
+      ret = makeCtorReadFromHeapBodyForArrayType((ArrayType) type, ctor_used);
       m_ctorReadFromHeapMethodsMade.put(type, ret);
       bcl.returnValue(ret);
     }
@@ -234,43 +233,31 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl.label(label);
   }
 
-  private Local makeReadFromHeapBodyForArrayType(ArrayType type, Local ctor_used) {
+  private Local makeCtorReadFromHeapBodyForArrayType(ArrayType type,
+      Local ctor_used) {
+
+    BytecodeLanguage bcl = m_bcl.top();
+    BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top());   
+    bcl_mem.incrementAddress(4);
+    
+    Local array_length = bcl_mem.readInt();
+    //bcl.println("reading size: ");
+    //bcl.println(size);
+    Local ret = bcl.local(type);
+    
+    bcl.assign(ret, bcl.newArray(type, array_length));
+
+    return ret;
+  }
+
+  private Local makeReadFromHeapBodyForArrayType(ArrayType type) {
     BytecodeLanguage bcl = m_bcl.top();
 
     BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top());   
     
-    bcl_mem.incrementAddress(4);
-    
-    Local size = bcl_mem.readInt();
-    //bcl.println("reading size: ");
-    //bcl.println(size);
     Local ret = bcl.local(type);
-
-    //pad for 16 bytes
-    bcl_mem.incrementAddress(16);
-    
-    String label_new_array = getNextLabel();
-    String label_after_new_array = getNextLabel();
-    
-    bcl.ifStmt(ctor_used, "==", IntConstant.v(1), label_new_array);
-
-    Local object_to_read_from = bcl.cast(type, m_param0);
-    Local previous_size = bcl.lengthof(object_to_read_from);
-    
-    bcl.ifStmt(size, "!=", previous_size, label_new_array);
-    
-    bcl.assign(ret, object_to_read_from);
-    bcl.gotoLabel(label_after_new_array);
-    
-    bcl.label(label_new_array);
-    bcl.assign(ret, bcl.newArray(type, size));
-    
-    bcl.label(label_after_new_array);
-    
-    SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
-    bcl.pushMethod(m_thisRef, "checkCache",obj_class.getType(), LongType.v(), obj_class.getType());
-    ret = bcl.invokeMethodRet(m_thisRef, m_refParam, ret);
-    ret = bcl.cast(type, ret);
+    ret = bcl.cast(type, m_param0);
+    Local size = bcl.lengthof(ret);
     
     //optimization for single-dimensional arrays of primitive types.
     //doesn't work for chars yet because they are still stored as ints on the gpu
@@ -299,9 +286,9 @@ public class VisitorReadGen extends AbstractVisitorGen {
     Local new_curr;
 
     if(type.numDimensions != 1){
-      new_curr = readFromHeapArray(object_to_read_from, i, previous_size);
+      new_curr = readFromHeapArray(ret, i, size);
     } else if(type.baseType instanceof RefType){
-      Local temp = readFromHeapArray(object_to_read_from, i, previous_size);
+      Local temp = readFromHeapArray(ret, i, size);
       new_curr = bcl.cast(type.baseType, temp);
     } else {
       new_curr = bcl_mem.readVar(type.baseType);
@@ -317,27 +304,47 @@ public class VisitorReadGen extends AbstractVisitorGen {
 
     return ret;
   }
-  
+
   private Local makeReadFromHeapBodyForString(RefType type){
-    SootClass object_class = Scene.v().getSootClass("java.lang.Object"); 
-    SootClass string_class = Scene.v().getSootClass("java.lang.String");
-    ArrayType char_array_type = ArrayType.v(CharType.v(), 1);
-    
     BytecodeLanguage bcl = m_bcl.top();
     BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top());
-
-    int size_read = 8;
-    bcl_mem.incrementAddress(Constants.SizeGcInfo - size_read);   
+  
+    bcl_mem.incrementAddress(4+4+16);
     Local ref = bcl_mem.readRef();
     
-    bcl.pushMethod(m_gcObjVisitor.top(), "readFromHeap", object_class.getType(), 
-        object_class.getType(), BooleanType.v(), LongType.v());
-    Local new_char_array_obj = bcl.invokeMethodRet(m_gcObjVisitor.top(), NullConstant.v(),
-        IntConstant.v(1), ref);
+    bcl_mem.setAddress(ref);
+    bcl_mem.incrementAddress(12);
     
-    Local new_char_array = bcl.cast(char_array_type, new_char_array_obj);
-    Local new_string = bcl.newInstance(string_class.getName(), new_char_array);
+    Local array_length = bcl_mem.readInt();
+    
+    bcl_mem.incrementAddress(16);
+    
+    ArrayType array_type = ArrayType.v(CharType.v(), 1);
+    
+    Local ret = bcl.local(array_type);
+    bcl.assign(ret, bcl.newArray(array_type, array_length));
+    
+    Local i = bcl.local(IntType.v());
+    bcl.assign(i, IntConstant.v(0));
+
+    String end_for_label = getNextLabel();
+    String before_if_label = getNextLabel();
+    bcl.label(before_if_label);
+    bcl.ifStmt(i, "==", array_length, end_for_label);
+
+    Local new_curr = bcl_mem.readChar();
+    bcl.assignElementToArray(ret, new_curr, i);
+
+    bcl.plus(i, 1);
+    bcl.gotoLabel(before_if_label);
+    bcl.label(end_for_label);
+
+    SootClass string_class = Scene.v().getSootClass("java.lang.String");
+    Local new_string = bcl.newInstance(string_class.getName(), ret);
     bcl_mem.finishReading();
+    
+    m_ctorReadFromHeapMethodsMade.put(type, new_string);
+    m_readFromHeapMethodsMade.put(type, new_string);
     
     return new_string;
   }
@@ -346,9 +353,10 @@ public class VisitorReadGen extends AbstractVisitorGen {
       Local ctor_used, Local class_number) {
 
     BytecodeLanguage bcl = m_bcl.top();
-    SootClass soot_class = type.getSootClass();
+    BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top());   
+    bcl_mem.incrementAddress(8);
     
-    BclMemory bcl_mem = new BclMemory(bcl, m_currMem.top()); 
+    SootClass soot_class = type.getSootClass();
     
     String name = soot_class.getName();
     if(soot_class.isApplicationClass() == false){    
@@ -362,8 +370,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
         String type_string = type.toString();
         if(number_types.get().contains(type_string)){
 
-          int size_read = 8;
-          bcl_mem.incrementAddress(Constants.SizeGcInfo - size_read);  
+          bcl_mem.incrementAddress(Constants.MallocAlignBytes);  
           
           Local value;
           
@@ -422,9 +429,6 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl.pushMethod(m_thisRef, "checkCache",obj_class.getType(), LongType.v(), obj_class.getType());
     object_to_write_to = bcl.invokeMethodRet(m_thisRef, m_refParam, object_to_write_to);
     object_to_write_to = bcl.cast(type, object_to_write_to);
-
-    int size_read = 8;
-    bcl_mem.incrementAddress(Constants.SizeGcInfo - size_read);    
     
     m_currObj.push(object_to_write_to);
     m_objSerializing.push(object_to_write_to);

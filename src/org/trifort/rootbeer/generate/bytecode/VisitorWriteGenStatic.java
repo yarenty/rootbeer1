@@ -180,7 +180,11 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     } 
     
     for(SootClass child : children){
-      attachAndCallWriter(child, new ArrayList<SootClass>());
+      if(soot_class.isApplicationClass()){
+        attachAndCallWriter(child, new ArrayList<SootClass>());
+      } else {
+        doWriter(child, new ArrayList<SootClass>());
+      }
     }
   }
 

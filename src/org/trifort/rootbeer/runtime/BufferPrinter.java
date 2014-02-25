@@ -41,6 +41,9 @@ public class BufferPrinter {
   }
   
   public void print(Memory mem, long start_ptr, int length){
+    if(start_ptr < 0){
+      start_ptr = 0;
+    }
     long previous = mem.getPointer();
     mem.setAddress(start_ptr);
 

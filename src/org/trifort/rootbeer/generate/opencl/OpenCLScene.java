@@ -28,8 +28,8 @@ import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.configuration.RootbeerPaths;
 import org.trifort.rootbeer.entry.ForcedFields;
 import org.trifort.rootbeer.entry.CompilerSetup;
+import org.trifort.rootbeer.generate.bytecode.MethodCodeSegment;
 import org.trifort.rootbeer.generate.bytecode.ReadOnlyTypes;
-import org.trifort.rootbeer.generate.codesegment.CodeSegment;
 import org.trifort.rootbeer.generate.opencl.fields.CompositeField;
 import org.trifort.rootbeer.generate.opencl.fields.CompositeFieldFactory;
 import org.trifort.rootbeer.generate.opencl.fields.FieldCodeGeneration;
@@ -517,7 +517,7 @@ public class OpenCLScene {
     throw new RuntimeException("Cannot find composite field for soot_class");
   }
 
-  public void addCodeSegment(CodeSegment codeSegment){
+  public void addCodeSegment(MethodCodeSegment codeSegment){
     m_rootSootClass = codeSegment.getRootSootClass();    
     m_readOnlyTypes = new ReadOnlyTypes(codeSegment.getRootMethod());
     getOpenCLClass(m_rootSootClass);

@@ -183,7 +183,6 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     bcl_mem.writeInt(0);              //reserved                    [20]
     bcl_mem.writeInt(0);              //reserved                    [24]
     bcl_mem.writeInt(0);              //reserved                    [28]
-    
 
     //optimization for single-dimensional arrays of primitive types.
     //doesn't work for chars yet because they are still stored as ints on the gpu
@@ -247,10 +246,9 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     
     Local object_to_write_from = bcl.cast(type, m_Param0);
     
-    OpenCLClass ocl_class = OpenCLScene.v().getOpenCLClass(soot_class);
-    int size = ocl_class.getSize();
-    int gc_count = ocl_class.getRefFieldsSize();
-    
+    int size = Constants.SizeGcInfo + 16;
+    int gc_count = 1;
+        
     bcl_mem.writeByte((byte) gc_count);      //ref_type count [0]
     bcl_mem.writeByte((byte) 0);             //garabage collector color [1]
     bcl_mem.writeByte((byte) 0);             //reserved [2]
@@ -263,7 +261,6 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     int written_size = 1+1+1+1+4+4+4+4;
     
     bcl_mem.incrementAddress(Constants.SizeGcInfo - written_size);
-    
     bcl_mem.pushAddress();
     
     int size_minus_gc_info = size - Constants.SizeGcInfo;
@@ -282,7 +279,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     Local char_array_address = bcl.invokeMethodRet(m_gcObjVisitor.top(), char_array, 
         IntConstant.v(1));
     m_ValuesWritten.add(char_array_address);
-    
+        
     Local after_array_write_address = bcl_mem.getPointer();
     bcl_mem.popAddress();
     

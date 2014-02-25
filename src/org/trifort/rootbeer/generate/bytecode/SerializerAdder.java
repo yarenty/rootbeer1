@@ -7,16 +7,8 @@
 
 package org.trifort.rootbeer.generate.bytecode;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.trifort.rootbeer.generate.codesegment.CodeSegment;
-import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 
 import soot.*;
-import soot.jimple.FieldRef;
-import soot.jimple.InvokeExpr;
 
 public class SerializerAdder {
 
@@ -25,7 +17,7 @@ public class SerializerAdder {
   public SerializerAdder(){
   }
 
-  public void add(CodeSegment block){
+  public void add(MethodCodeSegment block){
     System.out.println("generating serialization bytecode...");
     SootClass block_class = block.getRootSootClass();
 
@@ -34,7 +26,7 @@ public class SerializerAdder {
     m_serializerClassName = generate_visitor.getClassName();
   }
 
-  String getGcObjectVisitorClassName() {
+  public String getSerializerClassName() {
     return m_serializerClassName;
   }
 }

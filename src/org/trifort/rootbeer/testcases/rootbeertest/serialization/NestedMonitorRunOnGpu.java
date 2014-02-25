@@ -12,6 +12,7 @@ public class NestedMonitorRunOnGpu implements Kernel {
   
   @Override
   public void gpuMethod() {
+    /*
     Object object1 = new Object();
     synchronized (object1) {
       if(object1.toString().equals("")){
@@ -29,9 +30,11 @@ public class NestedMonitorRunOnGpu implements Kernel {
         }
       }
     }
+    */
   }
 
   public boolean compare(NestedMonitorRunOnGpu rhs) {
+    /*
     if(m_value != rhs.m_value){
       System.out.println("m_value");
       System.out.println("lhs: "+m_value);
@@ -39,5 +42,7 @@ public class NestedMonitorRunOnGpu implements Kernel {
       return false;
     }
     return true;
+    */
+    return false;
   }
 }

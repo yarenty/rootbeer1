@@ -919,6 +919,7 @@ int org_trifort_rootbeer_string_from_chars(char * gc_info, int parameter0, int *
   return thisref; 
 }
 
+//<java.lang.String: void <init>(java.lang.String)>
 $$__device__$$
 int java_lang_String_initab850b60f96d11de8a390800200c9a660_9_(char * gc_info, int parameter0, int * exception) { 
 
@@ -942,6 +943,28 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a660_9_(char * gc_info, in
   }
   return org_trifort_rootbeer_string_from_chars(gc_info, characters_copy, exception);
 } 
+
+//<java.lang.String: void <init>(char[])>
+$$__device__$$
+int java_lang_String_initab850b60f96d11de8a390800200c9a660_a12_(char * gc_info, int parameter0, int * exception){
+
+  int i;
+  int len;
+  int characters_src;
+  int characters_copy;
+  char ch;
+
+  len = org_trifort_array_length(gc_info, parameter0, exception);
+
+  characters_copy = char__array_new(gc_info, len, exception);
+  for(i = 0; i < len; ++i){
+    ch = char__array_get(gc_info, parameter0, i, exception);
+    char__array_set(gc_info, characters_copy, i, ch, exception);
+  }
+  return org_trifort_rootbeer_string_from_chars(gc_info, characters_copy, exception);
+}
+
+__device__ void java_lang_String_initab850b60f96d11de8a390800200c9a66_body0_a12_( char * gc_info, int thisref, int parameter0, int * exception);
 
 $$__device__$$ int 
 char__array_new($$__global$$ char * gc_info, int size, int * exception);
