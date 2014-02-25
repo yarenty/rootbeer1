@@ -222,7 +222,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     if(type instanceof ArrayType){
       ret = makeCtorReadFromHeapBodyForArrayType((ArrayType) type, ctor_used);
       m_ctorReadFromHeapMethodsMade.put(type, ret);
-      bcl.returnValue(ret);
+      bcl.assign(m_param0, ret);
+      bcl.gotoLabel(after_ctors_label);
     }
     else {
       ret = makeCtorReadFromHeapBodyForSootClass((RefType) type, ctor_used, class_number);
@@ -258,7 +259,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     Local ret = bcl.local(type);
     ret = bcl.cast(type, m_param0);
     Local size = bcl.lengthof(ret);
-    
+        
     //optimization for single-dimensional arrays of primitive types.
     //doesn't work for chars yet because they are still stored as ints on the gpu
     if(type.baseType instanceof PrimType && type.numDimensions == 1 && 
