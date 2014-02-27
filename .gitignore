@@ -57,3 +57,5 @@ KeepMainTest-GPU.jar
 MultiGpuApp-GPU.jar
 MultiGpuApp.jar
 examples/MultiGpu/csrc/
+MatrixApp-GPU.jar
+MatrixApp.jar

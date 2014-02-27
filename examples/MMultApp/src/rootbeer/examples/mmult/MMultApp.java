@@ -3,9 +3,9 @@ package rootbeer.examples.mmult;
 
 import java.util.List;
 import java.util.ArrayList;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
-import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
+import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Rootbeer;
+import org.trifort.rootbeer.runtime.util.Stopwatch;
 
 public class MMultApp {
 
@@ -16,7 +16,7 @@ public class MMultApp {
     }
 
     Rootbeer rootbeer = new Rootbeer();
-    rootbeer.runAll(jobs);
+    rootbeer.run(jobs);
   }
 
   public void cpuMultMatrices(int[] a, int[] b, int[] c, int size){

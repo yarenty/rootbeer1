@@ -4,5 +4,5 @@ cd ../../
 ant jar
 ./pack-rootbeer
 
-cd gtc2013/Matrix/
+cd examples/MatrixShared/
 ant jar

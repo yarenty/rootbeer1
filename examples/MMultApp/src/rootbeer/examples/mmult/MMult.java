@@ -7,7 +7,7 @@
 
 package rootbeer.examples.mmult;
 
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Kernel;
 
 public class MMult implements Kernel {
 

@@ -1,8 +1,8 @@
 package rootbeer.examples.gtc2013;
 
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-import edu.syr.pcpratts.rootbeer.runtime.RootbeerGpu;
-import edu.syr.pcpratts.rootbeer.runtimegpu.GpuException;
+import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.RootbeerGpu;
+import org.trifort.rootbeer.runtimegpu.GpuException;
 
 import java.util.List;
 import java.util.ArrayList;
