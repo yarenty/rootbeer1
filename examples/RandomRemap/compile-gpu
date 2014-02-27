@@ -6,4 +6,4 @@ ant jar
 
 cd examples/RandomRemap/
 ant jar
-java -jar ../../Rootbeer.jar RandomRemapApp.jar RandomRemapApp-GPU.jar
+java -jar ../../Rootbeer.jar RandomRemapApp.jar RandomRemapApp-GPU.jar -64bit

@@ -117,7 +117,7 @@ See the [example](https://github.com/pcpratts/rootbeer1/tree/master/examples/Mul
     }
 
 ### Shared Memory Example
-See the [example](https://github.com/pcpratts/rootbeer1/tree/master/gtc2013/Matrix)
+See the [example](https://github.com/pcpratts/rootbeer1/tree/master/examples/MatrixShared)
 
 ### Compiling Rootbeer Enabled Projects
 1. Download the latest Rootbeer.jar from the releases

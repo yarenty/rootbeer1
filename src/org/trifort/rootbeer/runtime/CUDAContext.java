@@ -64,7 +64,7 @@ public class CUDAContext implements Context, Runnable {
   }
 
   @Override
-  public void init(int memory_size) {
+  public void init(long memory_size) {
     m_objectMemory = new CheckedFixedMemory(memory_size);
   }
 
@@ -88,6 +88,10 @@ public class CUDAContext implements Context, Runnable {
     m_handlesMemory.close();
     m_exceptionsMemory.close();
     m_classMemory.close();
+  }
+  
+  public long size(){
+    return m_objectMemory.getSize();
   }
   
   public List<StatsRow> getStats(){

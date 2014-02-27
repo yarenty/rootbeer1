@@ -4,8 +4,8 @@ package rootbeer.examples.randomremap;
 import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
+import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Rootbeer;
 
 public class RandomRemapApp {
 
@@ -18,7 +18,7 @@ public class RandomRemapApp {
     }
 
     Rootbeer rootbeer = new Rootbeer();
-    rootbeer.runAll(jobs);
+    rootbeer.run(jobs);
 
     for(int i = 0; i < jobs.size(); ++i){
       RandomRemap curr = (RandomRemap) jobs.get(i);

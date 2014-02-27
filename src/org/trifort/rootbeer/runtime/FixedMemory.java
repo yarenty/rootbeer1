@@ -10,15 +10,12 @@ public class FixedMemory implements Memory {
 
   protected long m_address;
   protected long m_size;
-  protected long m_reserve;
   protected MemPointer m_staticPointer;
   protected MemPointer m_instancePointer;
   protected MemPointer m_currentPointer;  
   protected List<List<Long>> m_integerList;
     
   public FixedMemory(long size){
-    m_reserve = 1024;
-    size += m_reserve;
     m_address = malloc(size);    
     m_size = size;
     m_instancePointer = new MemPointer();

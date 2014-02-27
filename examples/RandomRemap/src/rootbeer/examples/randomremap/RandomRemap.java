@@ -4,7 +4,7 @@ package rootbeer.examples.randomremap;
 import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Kernel;
 
 public class RandomRemap implements Kernel {
   
