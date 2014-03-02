@@ -43,6 +43,8 @@ public class TestCaseEntryPointDetector implements MethodTester {
     m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.apps.fastmatrixdebug.");
     m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.arraysum.");
     m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.baseconversion.");
+    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.canonical.");
+    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.canonical2.");
     m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.exception.");
     m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.gpurequired.");
     m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.");

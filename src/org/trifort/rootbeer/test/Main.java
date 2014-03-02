@@ -17,6 +17,7 @@ import org.trifort.rootbeer.test.TestSerialization;
 import org.trifort.rootbeer.test.TestSerializationFactory;
 import org.trifort.rootbeer.testcases.rootbeertest.SuperClass;
 import org.trifort.rootbeer.testcases.rootbeertest.arraysum.ArraySumTest;
+import org.trifort.rootbeer.testcases.rootbeertest.canonical.CanonicalTest;
 import org.trifort.rootbeer.testcases.rootbeertest.exception.NullPointer4Test;
 import org.trifort.rootbeer.testcases.rootbeertest.gpurequired.*;
 import org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.FastMatrixTest;
@@ -129,6 +130,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new SynchronizedStaticMethodTest());
     ret.add(new SynchronizedObjectTest());
     ret.add(new ForceArrayNewTest());
+    ret.add(new CanonicalTest());
             
     if(org.trifort.rootbeer.entry.Main.largeMemTests()){
       ret.add(new LargeMemTest());
