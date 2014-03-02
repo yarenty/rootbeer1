@@ -20,10 +20,11 @@ public class CanonicalObject {
       object.sumContents();
       sum += object.getResult();
     }
+    arrays.sum();
     sum += arrays.getResult();
   }
   
-  public float getResult(){
+  public synchronized float getResult(){
     return sum;
   }
 }

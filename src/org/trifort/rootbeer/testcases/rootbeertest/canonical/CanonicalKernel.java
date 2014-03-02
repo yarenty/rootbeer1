@@ -24,6 +24,8 @@ public class CanonicalKernel implements Kernel {
   }
 
   public boolean compare(CanonicalKernel rhs) {
+    //TODO: this is failing because the static serialization has trouble
+    //with complex objects
     if(result != rhs.result){
       System.out.println("result");
       System.out.println("lhs: "+result);

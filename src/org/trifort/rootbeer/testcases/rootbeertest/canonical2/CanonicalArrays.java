@@ -25,6 +25,8 @@ class CanonicalArrays {
   }
   
   public float getResult(){
-    return arraySum;
+    synchronized(this){
+      return arraySum;
+    }
   }
 }
