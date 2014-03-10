@@ -131,6 +131,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new SynchronizedObjectTest());
     ret.add(new ForceArrayNewTest());
     ret.add(new CanonicalTest());
+    ret.add(new GpuVectorMapTest());
             
     if(org.trifort.rootbeer.entry.Main.largeMemTests()){
       ret.add(new LargeMemTest());
