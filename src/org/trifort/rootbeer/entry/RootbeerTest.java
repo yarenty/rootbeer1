@@ -10,6 +10,7 @@ package org.trifort.rootbeer.entry;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 
+import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.util.CurrJarName;
 import org.trifort.rootbeer.util.ForceGC;
 
@@ -23,6 +24,7 @@ public class RootbeerTest {
   
   public void runTests(String test_case, boolean run_hard_tests) {
     RootbeerCompiler compiler = new RootbeerCompiler();
+    Configuration.compilerInstance().setExceptions(false);
     String dest_jar = "output.jar";   
     CurrJarName jar_name = new CurrJarName();
     String rootbeer_jar = jar_name.get();
