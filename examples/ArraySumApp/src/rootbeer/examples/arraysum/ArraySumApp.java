@@ -3,8 +3,8 @@ package rootbeer.examples.arraysum;
 
 import java.util.List;
 import java.util.ArrayList;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
+import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Rootbeer;
 
 public class ArraySumApp {
 
@@ -17,7 +17,7 @@ public class ArraySumApp {
      }
 
      Rootbeer rootbeer = new Rootbeer();
-     rootbeer.runAll(jobs);
+     rootbeer.run(jobs);
      return ret;
   }
   

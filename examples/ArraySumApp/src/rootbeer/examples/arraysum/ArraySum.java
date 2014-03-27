@@ -3,7 +3,7 @@ package rootbeer.examples.arraysum;
 
 import java.util.List;
 import java.util.ArrayList;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Kernel;
 
 public class ArraySum implements Kernel {
   
