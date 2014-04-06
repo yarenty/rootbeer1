@@ -260,7 +260,7 @@ public class CUDAContext implements Context, Runnable {
           throw new OutOfMemoryError();
         }
         
-        m_objectMemory.setAddress(ref);           
+        m_objectMemory.setAddress(ref);          
         Object except = serializer.readFromHeap(null, true, ref);
         if(except instanceof Error){
           Error except_th = (Error) except;

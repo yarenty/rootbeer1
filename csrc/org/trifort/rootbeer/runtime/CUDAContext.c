@@ -221,6 +221,9 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   status = cuMemcpyHtoD(gpu_buffer_size, &cpu_object_mem_size, sizeof(jlong));
   CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_buffer_size", status, device)
 
+  status = cuMemcpyHtoD(gpu_exceptions_mem, cpu_exceptions_mem, cpu_exceptions_mem_size);
+  CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_exceptions_mem", status, device)
+
   //----------------------------------------------------------------------------
   //launch
   //----------------------------------------------------------------------------
@@ -247,7 +250,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_object_mem", status, device)
 
   status = cuMemcpyDtoH(cpu_exceptions_mem, gpu_exceptions_mem, cpu_exceptions_mem_size);
-  CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_object_mem", status, device)
+  CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_exceptions_mem", status, device)
 
   //----------------------------------------------------------------------------
   //free resources
