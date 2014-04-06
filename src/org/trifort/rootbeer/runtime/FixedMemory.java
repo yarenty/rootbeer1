@@ -17,6 +17,9 @@ public class FixedMemory implements Memory {
     
   public FixedMemory(long size){
     m_address = malloc(size);    
+    if(m_address == 0){
+      throw new RuntimeException("cannot allocate memory of size: "+size);
+    }
     m_size = size;
     m_instancePointer = new MemPointer();
     m_staticPointer = new MemPointer();

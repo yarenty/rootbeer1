@@ -70,7 +70,9 @@ public class CUDAContext implements Context, Runnable {
 
   @Override
   public void init() {
-    long free_mem_size = m_device.getFreeGlobalMemoryBytes();
+    long free_mem_size_gpu = m_device.getFreeGlobalMemoryBytes();
+    long free_mem_size_cpu = Runtime.getRuntime().freeMemory();
+    long free_mem_size = Math.min(free_mem_size_gpu, free_mem_size_cpu);
     free_mem_size -= 64 * 1024 * 1024;
     free_mem_size -= m_handlesMemory.getSize();
     free_mem_size -= m_exceptionsMemory.getSize();
