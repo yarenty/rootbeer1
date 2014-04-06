@@ -132,6 +132,9 @@ public class Main implements TestSerializationFactory {
     ret.add(new ForceArrayNewTest());
     ret.add(new CanonicalTest());
     ret.add(new GpuVectorMapTest());
+    
+    //fails with OOM with 16G on my machine
+    //ret.add(new StringBuilderTest4());
             
     if(org.trifort.rootbeer.entry.Main.largeMemTests()){
       ret.add(new LargeMemTest());
