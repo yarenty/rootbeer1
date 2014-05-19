@@ -150,8 +150,8 @@ public class OpenCLMethod {
     String ret = "";
     ret += "int id;\n";
     ret += "char * mem;\n";
-    ret += "char * trash;\n";
-    ret += "char * mystery;\n";
+    //ret += "char * trash;\n";
+    //ret += "char * mystery;\n";
     ret += "int count;\n";
     ret += "int old;\n";
     ret += "char * thisref_synch_deref;\n";
@@ -175,25 +175,26 @@ public class OpenCLMethod {
     if(m_sootMethod.isStatic()){
       int offset = static_offsets.getIndex(m_sootClass);
       ret += "mem = org_trifort_gc_deref(gc_info, 0);\n";
-      ret += "trash = mem + "+junk_index+";\n";
-      ret += "mystery = mem + "+mystery_index+";\n";
+      //ret += "trash = mem + "+junk_index+";\n";
+      //ret += "mystery = mem + "+mystery_index+";\n";
       ret += "mem += "+offset+";\n";
     } else {
       ret += "mem = org_trifort_gc_deref(gc_info, thisref);\n";
-      ret += "trash = org_trifort_gc_deref(gc_info, 0) + "+junk_index+";\n";
-      ret += "mystery = trash - 8;\n";
+      //ret += "trash = org_trifort_gc_deref(gc_info, 0) + "+junk_index+";\n";
+      //ret += "mystery = trash - 8;\n";
       ret += "mem += 16;\n";
     }
     ret += "count = 0;\n";
     ret += "while(count < 100){\n";
     ret += "  old = atomicCAS((int *) mem, -1 , id);\n";
-    ret += "  *((int *) trash) = old;\n";
+    //ret += "  *((int *) trash) = old;\n";
     if(isLinux()){
       ret += "  if(old == -1 || old == id){\n";
     } else {
       ret += "  if(old != -1 && old != id){\n";
       ret += "    count++;\n";
-      ret += "    if(count > 50 || (*((int *) mystery)) == 0){\n";
+      //ret += "    if(count > 50 || (*((int *) mystery)) == 0){\n";
+      ret += "    if(count > 50){\n";
       ret += "      count = 0;\n";
       ret += "    }\n";
       ret += "  } else {\n"; 
@@ -217,8 +218,8 @@ public class OpenCLMethod {
         ret += "  }\n";
       }
 
-      ret += "  thisref_synch_deref = org_trifort_gc_deref ( gc_info , thisref );\n";
-      ret += "  * ( ( int * ) & thisref_synch_deref [ 20 ] ) = 20 ;\n";
+      //ret += "  thisref_synch_deref = org_trifort_gc_deref ( gc_info , thisref );\n";
+      //ret += "  * ( ( int * ) & thisref_synch_deref [ 20 ] ) = 20 ;\n";
     }
     return ret;
   }
@@ -247,7 +248,8 @@ public class OpenCLMethod {
             if(isLinux()){
               ret.append("  } else {");
               ret.append("    count++;\n");
-              ret.append("    if(count > 50 || (*((int *) mystery)) == 0){\n");
+              //ret.append("    if(count > 50 || (*((int *) mystery)) == 0){\n");
+              ret.append("    if(count > 50){\n");
               ret.append("      count = 0;\n");
               ret.append("    }\n");
               ret.append("  }\n"); 

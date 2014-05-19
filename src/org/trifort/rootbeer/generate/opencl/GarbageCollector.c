@@ -114,11 +114,13 @@ org_trifort_array_length($$__global$$ char * gc_info, int thisref, int * excepti
   $$__global$$ char * thisref_deref;
   
   if(thisref == -1){
+    //printf("array_length: null pointer exception\n");
     *exception = %%java_lang_NullPointerException_TypeNumber%%; 
     return 0;
   }
   thisref_deref = org_trifort_gc_deref(gc_info, thisref);
   int ret = org_trifort_getint(thisref_deref, 12);
+  //printf("array_length: %d\n", ret);
   return ret;
 }
 
@@ -127,7 +129,7 @@ void org_trifort_exitMonitorRef($$__global$$ char * gc_info, int thisref, int ol
   char * mem = org_trifort_gc_deref(gc_info, thisref); 
   mem += 16;
   if(old == -1){    
-    org_trifort_threadfence();  
+    //org_trifort_threadfence();  
     atomicExch((int *) mem, -1); 
   }
 }
@@ -135,7 +137,7 @@ void org_trifort_exitMonitorRef($$__global$$ char * gc_info, int thisref, int ol
 $$__device__$$
 void org_trifort_exitMonitorMem($$__global$$ char * gc_info, char * mem, int old){
   if(old == -1){   
-    org_trifort_threadfence(); 
+    //org_trifort_threadfence(); 
     atomicExch((int *) mem, -1);
   }
 }

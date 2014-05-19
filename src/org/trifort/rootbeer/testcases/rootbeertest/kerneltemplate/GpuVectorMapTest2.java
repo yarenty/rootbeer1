@@ -8,7 +8,8 @@ import org.trifort.rootbeer.test.TestKernelTemplate;
 
 public class GpuVectorMapTest2 implements TestKernelTemplate {
   public static final int blockSize = 1;
-  public static final int gridSize = 2;
+  //public static final int gridSize = 2;
+  public static final int gridSize = 1;
   public static final boolean isDebugging = true;
 
   @Override
