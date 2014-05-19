@@ -12,7 +12,7 @@ package org.trifort.rootbeer.runtime;
  * 
  * @author Daniel Brown
  */
-public class CudaErrorException extends RuntimeException{
+public class CudaErrorException extends RuntimeException {
     /** Enum value of error */
     private int cudaError_enum;
     
