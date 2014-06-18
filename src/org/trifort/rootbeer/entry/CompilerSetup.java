@@ -1,6 +1,8 @@
 package org.trifort.rootbeer.entry;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.trifort.rootbeer.generate.opencl.OpenCLArrayType;
@@ -254,6 +256,21 @@ public class CompilerSetup {
     Set<ArrayType> ret = new HashSet<ArrayType>();
     ret.add(ArrayType.v(CharType.v(), 1));
     ret.add(ArrayType.v(RefType.v("java.lang.String"), 1));
+    return ret;
+  }
+
+  public Set<String> getExtraMethods() {
+    Set<String> ret = new HashSet<String>();
+    ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
+    ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: void <init>()>");
+    ret.add("<java.lang.String: void <init>(char[])>");
+    ret.add("<java.lang.Object: int hashCode()>");
+    ret.add("<java.lang.Boolean: java.lang.String toString(boolean)>");
+    ret.add("<java.lang.Character: java.lang.String toString(char)>");
+    ret.add("<java.lang.Double: java.lang.String toString(double)>");
+    ret.add("<java.lang.Float: java.lang.String toString(float)>");
+    ret.add("<java.lang.Integer: java.lang.String toString(int)>");
+    ret.add("<java.lang.Long: java.lang.String toString(long)>");
     return ret;
   }
 }

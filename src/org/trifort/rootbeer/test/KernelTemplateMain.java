@@ -14,6 +14,7 @@ import org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.DoubleToString
 import org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.DoubleToStringKernelTemplateTest;
 import org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.FastMatrixTest;
 import org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.GpuParametersTest;
+import org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.GpuVectorMapTest2;
 
 public class KernelTemplateMain implements TestKernelTemplateFactory {
 
@@ -23,6 +24,7 @@ public class KernelTemplateMain implements TestKernelTemplateFactory {
     ret.add(new DoubleToStringKernelTemplateTest());
     ret.add(new DoubleToStringKernelTemplateBuilderTest());
     ret.add(new GpuParametersTest());
+    ret.add(new GpuVectorMapTest2());
     return ret;
   }
 

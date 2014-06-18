@@ -4,7 +4,7 @@ cd ../../
 ant jar
 ./pack-rootbeer
 
-cd gtc2013/MegaMandel2/mandellib
+cd examples/MegaMandel2/mandellib
 ant jar
 cd ../MegaMandel2/
 ant jar

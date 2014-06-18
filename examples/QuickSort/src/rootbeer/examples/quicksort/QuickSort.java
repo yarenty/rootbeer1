@@ -9,9 +9,9 @@ package rootbeer.examples.quicksort;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
-import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
+import org.trifort.rootbeer.runtime.Rootbeer;
+import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.util.Stopwatch;
 
 public class QuickSort {
 
@@ -42,7 +42,7 @@ public class QuickSort {
       jobs.add(kernel);
     }
     Rootbeer rootbeer = new Rootbeer();
-    rootbeer.runAll(jobs);
+    rootbeer.run(jobs);
 
     QuickSortKernel job0 = (QuickSortKernel) jobs.get(0);
     int[] result = job0.getValues();

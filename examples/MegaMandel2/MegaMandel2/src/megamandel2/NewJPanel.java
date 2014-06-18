@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import mandellib.MandelGenerator;
 
-import edu.syr.pcpratts.rootbeer.runtime.util.Stopwatch;
+import org.trifort.rootbeer.runtime.util.Stopwatch;
 
 import java.util.List;
 import java.util.ArrayList;

@@ -7,18 +7,14 @@ import org.trifort.rootbeer.runtime.Rootbeer;
 import org.trifort.rootbeer.runtime.GpuDevice;
 import org.trifort.rootbeer.runtime.Context;
 import org.trifort.rootbeer.runtime.util.Stopwatch;
+import org.trifort.rootbeer.runtime.StatsRow;
+import org.trifort.rootbeer.runtime.ThreadConfig;
 
 public class MultiGpuApp {
 
   public void multArray(int[] array1, int[] array2){
-    List<Kernel> work0 = new ArrayList<Kernel>();
-    for(int i = 0; i < array1.length; ++i){
-      work0.add(new ArrayMult(array1, i));
-    }
-    List<Kernel> work1 = new ArrayList<Kernel>();
-    for(int i = 0; i < array2.length; ++i){
-      work1.add(new ArrayMult(array2, i));
-    }
+    Kernel work0 = new ArrayMult(array1);
+    Kernel work1 = new ArrayMult(array2);
 
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
@@ -34,8 +30,20 @@ public class MultiGpuApp {
       Context context0 = device0.createContext(4096);
       Context context1 = device1.createContext(4096);
 
-      rootbeer.run(work0, context0);
-      rootbeer.run(work1, context1);
+      ThreadConfig config0 = new ThreadConfig(1, array1.length, array1.length);
+      ThreadConfig config1 = new ThreadConfig(1, array2.length, array2.length);
+
+      try {
+        rootbeer.run(work0, config0, context0);
+      } catch(Exception ex){
+        ex.printStackTrace();
+      }
+      try {
+        rootbeer.run(work1, config1, context1);
+      } catch(Exception ex){
+        ex.printStackTrace();
+      }
+
       watch.stop();
       System.out.println("time: "+watch.elapsedTimeMillis());
     } else {
@@ -44,8 +52,7 @@ public class MultiGpuApp {
       for(GpuDevice device : devices){
         System.out.println("  name: "+device.getDeviceName());
       }
-    }
-    
+    } 
   }
   
   public static void main(String[] args){
@@ -53,8 +60,8 @@ public class MultiGpuApp {
     int[] array1 = new int[5];
     int[] array2 = new int[5];
     for(int i = 0; i < array1.length; ++i){
-      array1[i] = i;
-      array2[i] = i;
+      array1[i] = i+1;
+      array2[i] = i+1;
     }
     for(int i = 0; i < array1.length; ++i){
       System.out.println("start arrays["+i+"]: "+array1[i]+" "+array2[i]);

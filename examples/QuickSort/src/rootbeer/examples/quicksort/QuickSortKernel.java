@@ -6,7 +6,7 @@
  */
 package rootbeer.examples.quicksort;
 
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Kernel;
 
 public class QuickSortKernel implements Kernel {
 

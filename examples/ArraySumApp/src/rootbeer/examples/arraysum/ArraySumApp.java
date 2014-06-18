@@ -3,8 +3,9 @@ package rootbeer.examples.arraysum;
 
 import java.util.List;
 import java.util.ArrayList;
-import edu.syr.pcpratts.rootbeer.runtime.Kernel;
-import edu.syr.pcpratts.rootbeer.runtime.Rootbeer;
+import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Rootbeer;
+import org.trifort.rootbeer.runtime.Context;
 
 public class ArraySumApp {
 
@@ -17,7 +18,9 @@ public class ArraySumApp {
      }
 
      Rootbeer rootbeer = new Rootbeer();
-     rootbeer.runAll(jobs);
+     Context context = rootbeer.createDefaultContext();
+     context.init(1024*1024*4);
+     rootbeer.run(jobs, context);
      return ret;
   }
   

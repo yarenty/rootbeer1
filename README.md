@@ -151,6 +151,11 @@ now.
 See [here](https://github.com/pcpratts/rootbeer1/tree/master/examples) for a variety of
 examples.
 
+
+### Consulting
+
+GPU Consulting available for Rootbeer and CUDA. Please email pcpratts@trifort.org  
+
 ### Credit
 
 Rootbeer was partially supported by both the National Science Foundation and

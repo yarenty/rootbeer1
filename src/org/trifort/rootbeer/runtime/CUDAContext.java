@@ -70,7 +70,9 @@ public class CUDAContext implements Context, Runnable {
 
   @Override
   public void init() {
-    long free_mem_size = m_device.getFreeGlobalMemoryBytes();
+    long free_mem_size_gpu = m_device.getFreeGlobalMemoryBytes();
+    long free_mem_size_cpu = Runtime.getRuntime().freeMemory();
+    long free_mem_size = Math.min(free_mem_size_gpu, free_mem_size_cpu);
     free_mem_size -= 64 * 1024 * 1024;
     free_mem_size -= m_handlesMemory.getSize();
     free_mem_size -= m_exceptionsMemory.getSize();
@@ -178,7 +180,7 @@ public class CUDAContext implements Context, Runnable {
     if(m_objectMemory == null){
       init();
     }
-    
+
     writeBlocks(work);
     runBlocks(thread_config, cubin_file);
     readBlocks(work);
@@ -260,7 +262,7 @@ public class CUDAContext implements Context, Runnable {
           throw new OutOfMemoryError();
         }
         
-        m_objectMemory.setAddress(ref);           
+        m_objectMemory.setAddress(ref);          
         Object except = serializer.readFromHeap(null, true, ref);
         if(except instanceof Error){
           Error except_th = (Error) except;
@@ -342,10 +344,20 @@ public class CUDAContext implements Context, Runnable {
       m_objectMemory, m_handlesMemory, m_exceptionsMemory, m_classMemory);
     
     m_toThread.put(item);
-    m_fromThread.take();
+    item = m_fromThread.take();
     
     m_runOnGpuStopwatch.stop();
     m_executionTime = m_runOnGpuStopwatch.elapsedTimeMillis();
+    
+    if(item.getException() != null){
+      Exception exception = item.getException();
+      if(exception instanceof RuntimeException){
+        RuntimeException run_except = (RuntimeException) exception;
+        throw run_except;
+      } else {
+        throw new RuntimeException(item.getException());
+      }
+    }
   }  
 
   private byte[] readCubinFile(String filename) {
@@ -369,13 +381,14 @@ public class CUDAContext implements Context, Runnable {
   
   @Override
   public void run() {
-    while(true){
+    while(true){        
+      
+      //here we are changing to our own thread before launching.
+      //cuda assigns the context to the calling thread, so each
+      //launch will be on its own thread and have it's own context
+      KernelLaunch item = m_toThread.take();
+      
       try {
-        //here we are changing to our own thread before launching.
-        //cuda assigns the context to the calling thread, so each
-        //launch will be on its own thread and have it's own context
-        KernelLaunch item = m_toThread.take();
-        
         if(item.quit()){
           m_fromThread.put(item);
           return;
@@ -388,7 +401,8 @@ public class CUDAContext implements Context, Runnable {
         
         m_fromThread.put(item);
       } catch(Exception ex){
-        //ignore
+        item.setException(ex);
+        m_fromThread.put(item);
       }
     }
   }

@@ -13,6 +13,7 @@ public class KernelLaunch {
   private Memory m_exceptionsMem;
   private Memory m_classMem;
   private boolean m_quit;
+  private Exception m_exception;
   
   public KernelLaunch(int device_index, byte[] cubin_file, int cubin_file_length, 
     int block_shape_x, int grid_shape_x, int num_threads, Memory object_mem, 
@@ -77,5 +78,13 @@ public class KernelLaunch {
 
   public Memory getClassMem() {
     return m_classMem;
+  }
+  
+  public void setException(Exception exception){
+    m_exception = exception;
+  }
+  
+  public Exception getException(){
+    return m_exception;
   }
 }

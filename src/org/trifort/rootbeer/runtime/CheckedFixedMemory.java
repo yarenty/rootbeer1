@@ -25,7 +25,7 @@ public class CheckedFixedMemory extends FixedMemory {
   @Override
   protected long currPointer(){
     long ret = super.currPointer();
-    if(ret >= m_size){
+    if(ret >= m_size || ret < 0){
       throw new RuntimeException("address out of range: "+ret);
     }
     return ret;
