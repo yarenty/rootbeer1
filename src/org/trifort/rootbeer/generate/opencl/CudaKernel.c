@@ -25,15 +25,17 @@ org_trifort_gc_malloc(char * gc_info, int size){
   return (int) (ret >> 4);
 }
 
+//TODO: don't pass gc_info everywhere because free pointer is __device__
+__device__ unsigned long long * free_pointer; 
+
 __device__ unsigned long long
 org_trifort_gc_malloc_no_fail(char * gc_info, int size){
-  unsigned long long * addr = (unsigned long long *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
   if(size % 16 != 0){
     size += (16 - (size %16));
   }
 
   unsigned long long ret;
-  ret = atomicAdd(addr, size);
+  ret = atomicAdd(free_pointer, size);
   return ret;
 }
 
@@ -46,8 +48,8 @@ org_trifort_gc_init(char * gc_info, char * to_space, size_t space_size, int * ja
     m_Local[1] = (size_t) space_size;
     m_Local[2] = (size_t) java_lang_class_refs;
     
-    unsigned long long * global_free_ptr = (unsigned long long *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
-    *global_free_ptr = free_ptr;
+    free_pointer = (unsigned long long *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
+    *free_pointer = free_ptr;
   }
 }
 

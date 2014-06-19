@@ -10,6 +10,7 @@ package org.trifort.rootbeer.generate.opencl;
 import soot.RefLikeType;
 import soot.RefType;
 import soot.Type;
+import soot.ArrayType;
 
 public class OpenCLType {
   private final Type m_sootType;
@@ -19,8 +20,11 @@ public class OpenCLType {
   }
 
   public String getRefString(){
-    if(m_sootType instanceof RefLikeType)
+    if(m_sootType instanceof RefType){
       return "int";
+    } else if(m_sootType instanceof ArrayType){
+      return "int";
+    }
     String ret = getDerefString();
     if(ret.equals("long"))
       return "long long";
@@ -46,32 +50,39 @@ public class OpenCLType {
   }
 
   public boolean isRefType(){
-    if(m_sootType instanceof RefLikeType)
+    if(m_sootType instanceof RefType){
       return true;
+    } else if(m_sootType instanceof ArrayType){
+      return true;
+    }
     return false;
   }
   
   public int getSize(){
-    if(m_sootType instanceof RefLikeType)
+    if(m_sootType instanceof RefType){
       return 4;
+    } else if(m_sootType instanceof ArrayType){
+      return 4;
+    }
     String type = m_sootType.toString();
-    if(type.equals("byte"))
+    if(type.equals("byte")){
       return 1;
-    if(type.equals("boolean"))
+    } else if(type.equals("boolean")){
       return 1;
-    if(type.equals("char"))
+    } else if(type.equals("char")){
       return 4;
-    if(type.equals("short"))
+    } else if(type.equals("short")){
       return 2;
-    if(type.equals("int"))
+    } else if(type.equals("int")){
       return 4;
-    if(type.equals("long"))
+    } else if(type.equals("long")){
       return 8;
-    if(type.equals("float"))
+    } else if(type.equals("float")){
       return 4;
-    if(type.equals("double"))
+    } else if(type.equals("double")){
       return 8;
-    throw new RuntimeException("Unknown type");
+    }
+    throw new RuntimeException("Unknown type: "+type);
   }
 
   public Type getSootType() {
@@ -79,8 +90,11 @@ public class OpenCLType {
   }
 
   public Type getCapitalType() {
-    if(m_sootType instanceof RefLikeType)
+    if(m_sootType instanceof RefType){
       return m_sootType;
+    } else if(m_sootType instanceof ArrayType){
+      return m_sootType;
+    }
     String type = m_sootType.toString();
     if(type.equals("byte"))
       return RefType.v("java.lang.Byte");

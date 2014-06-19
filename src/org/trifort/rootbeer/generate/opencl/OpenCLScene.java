@@ -330,6 +330,10 @@ public class OpenCLScene {
     int null_pointer_number = RootbeerClassLoader.v().getClassNumber("java.lang.NullPointerException");
     String np_str = "" + null_pointer_number;
     cuda_code = cuda_code.replaceAll("%%java_lang_NullPointerException_TypeNumber%%", np_str);
+
+    int out_of_memory_number = RootbeerClassLoader.v().getClassNumber("java.lang.OutOfMemoryError");
+    String out_of_memory_str = "" + out_of_memory_number;
+    cuda_code = cuda_code.replaceAll("%%java_lang_OutOfMemoryError_TypeNumber%%", out_of_memory_str);
     
     int size = Configuration.compilerInstance().getSharedMemSize();
     String size_str = ""+size;

@@ -833,6 +833,7 @@ $$__device__$$ GC_OBJ_TYPE_TYPE
 org_trifort_gc_get_type($$__global$$ char * mem_loc){
   mem_loc += sizeof(GC_OBJ_TYPE_COUNT) + sizeof(GC_OBJ_TYPE_COLOR) + sizeof(char) +
     sizeof(GC_OBJ_TYPE_CTOR_USED);
+  
   return *(($$__global$$ GC_OBJ_TYPE_TYPE *) &mem_loc[0]);
 }
 
@@ -904,7 +905,7 @@ int org_trifort_rootbeer_string_from_chars(char * gc_info, int parameter0, int *
   thisref = -1; 
   org_trifort_gc_assign(gc_info, &thisref, org_trifort_gc_malloc(gc_info, 48)); 
   if(thisref == -1) { 
-    *exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    *exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
     return -1; 
   } 
   thisref_deref = org_trifort_gc_deref(gc_info, thisref); 
@@ -1147,7 +1148,7 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a660_(char * gc_inf
 
   thisref = org_trifort_gc_malloc(gc_info , 48);
   if(thisref == -1){
-    *exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    *exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
     return -1; 
   }
 
@@ -1167,7 +1168,7 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a660_(char * gc_inf
 
 //<java.lang.StringBuilder: java.lang.StringBuilder void(java.lang.String)>
 $$__device__$$ 
-int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(char * gc_info, 
+int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a660_9_(char * gc_info, 
   int str ,int * exception){
  
   int thisref; 
@@ -1178,7 +1179,7 @@ int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a6610_9_(char * gc_
   thisref = -1;
   org_trifort_gc_assign ( gc_info , & thisref , org_trifort_gc_malloc ( gc_info , 48 ) ) ; 
   if ( thisref ==-1 ) { 
-    * exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    * exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
     return-1 ; 
   } 
   thisref_deref = org_trifort_gc_deref ( gc_info , thisref ) ; 
@@ -1303,10 +1304,24 @@ int java_lang_StringBuilder_append10_6_(char * gc_info, int thisref,
 $$__device__$$ 
 int java_lang_StringBuilder_toString9_(char * gc_info, int thisref,
   int * exception){
- 
-  int value = instance_getter_java_lang_AbstractStringBuilder_value(gc_info, thisref,
+
+  int value;
+  int count;
+  int new_chars; 
+  int i;
+  char c;
+
+  value = instance_getter_java_lang_AbstractStringBuilder_value(gc_info, thisref,
     exception);
-  return org_trifort_rootbeer_string_from_chars(gc_info, value, exception);
+  count = org_trifort_array_length(gc_info, value, exception);
+  new_chars = char__array_new(gc_info, count, exception);
+
+  for(i = 0; i < count; ++i){
+    c = char__array_get(gc_info, value, i, exception);
+    char__array_set(gc_info, new_chars, i, c, exception);
+  }
+
+  return org_trifort_rootbeer_string_from_chars(gc_info, new_chars, exception);
 }
 
 //<java.lang.Integer: java.lang.Integer <init>(int)>
@@ -1319,7 +1334,7 @@ int java_lang_Integer_initab850b60f96d11de8a390800200c9a66(char * gc_info,
   thisref = -1;
   thisref = org_trifort_gc_malloc(gc_info , 48);
   if ( thisref ==-1 ) { 
-    * exception = %%java_lang_NullPointerException_TypeNumber%%; 
+    * exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
     return-1 ; 
   }
   thisref_deref = org_trifort_gc_deref(gc_info, thisref);
@@ -2042,8 +2057,7 @@ java_lang_Object_clone(char * gc_info, int thisref, int * exception){
   size = org_trifort_getint(src_deref, OBJECT_HEADER_POSITION_OBJECT_SIZE);
   dest = org_trifort_gc_malloc(gc_info, size);
   if(dest == -1){
-    //TODO: make this an OutOfMemoryException
-    *exception = %%java_lang_NullPointerException_TypeNumber%%;
+    *exception = %%java_lang_OutOfMemoryError_TypeNumber%%;
     return 0;
   }
   dest_deref = org_trifort_gc_deref(gc_info, dest);

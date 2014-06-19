@@ -5,33 +5,30 @@
  * See the file LICENSE for copying permission.
  */
 
-package org.trifort.rootbeer.testcases.rootbeertest.exception;
+package org.trifort.rootbeer.testcases.rootbeertest.serialization;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.trifort.rootbeer.runtime.Kernel;
-import org.trifort.rootbeer.test.TestException;
 import org.trifort.rootbeer.test.TestSerialization;
 
-public class NullPointer4Test implements TestSerialization {
+public class String2Test implements TestSerialization {
 
   @Override
   public List<Kernel> create() {
     List<Kernel> jobs = new ArrayList<Kernel>();
     for(int i = 0; i < 1; ++i){
-      NullPointer4RunOnGpu curr = new NullPointer4RunOnGpu();
+      String2RunOnGpu curr = new String2RunOnGpu();
       jobs.add(curr);
     }
     return jobs;
   }
 
   @Override
-  public boolean compare(Kernel rog, Kernel rog1) {
-    NullPointer4RunOnGpu lhs = (NullPointer4RunOnGpu) rog;
-    NullPointer4RunOnGpu rhs = (NullPointer4RunOnGpu) rog1;
-    return lhs.compare(rhs);
+  public boolean compare(Kernel lhs, Kernel rhs) {
+    String2RunOnGpu blhs = (String2RunOnGpu) lhs;
+    String2RunOnGpu brhs = (String2RunOnGpu) rhs;
+    return blhs.compare(brhs);
   }
-
-  
 }
