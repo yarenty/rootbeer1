@@ -276,7 +276,7 @@ public class OpenCLField {
     if(base instanceof Local == false)
       throw new UnsupportedOperationException("how do we handle when a base is not a loca?");
     Local local = (Local) base;
-    return "instance_setter_"+getFullName()+"("+local.getName();
+    return "instance_setter_"+getFullName()+"("+local.getName()+", ";
   }
   
   public String getInstanceSetterInvokeWithoutThisref(){

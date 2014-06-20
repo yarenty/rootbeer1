@@ -103,7 +103,6 @@ public class MethodStmtSwitch implements StmtSwitch {
     if(left_op instanceof FieldRef || left_op instanceof ArrayRef){
       m_valueSwitch.setLhs();
       left_op.apply(m_valueSwitch);
-      m_output.append(", ");
       m_valueSwitch.setRhs();
       right_op.apply(m_valueSwitch);
       m_output.append(", exception);\n");

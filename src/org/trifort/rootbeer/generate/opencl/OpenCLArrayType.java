@@ -50,7 +50,7 @@ public class OpenCLArrayType {
       throw new UnsupportedOperationException("what do I do if base is not a local?");
     Local local = (Local) base;
 
-    return getDerefTypeString()+"_set("+local.getName()+", "+index.toString();
+    return getDerefTypeString()+"_set("+local.getName()+", "+index.toString()+", ";
   }
   
   public String getDerefTypeString(){
@@ -99,7 +99,8 @@ public class OpenCLArrayType {
     ret.append(getDerefTypeString()+"_new(");
     MethodJimpleValueSwitch quick_value_switch = new MethodJimpleValueSwitch(ret);
     arg0.getSize().apply(quick_value_switch);
-    ret.append(", exception)");
+    ret.append(", ");
+    ret.append("exception)");
     return ret.toString();
   }
   
@@ -336,13 +337,5 @@ public class OpenCLArrayType {
     if(str.equals("char"))
       return true;
     return false;
-  }
-
-  private String getCacheName() {
-    String ret = getAssignType();
-    if(ret.equals("long long")){
-      return "long";
-    } 
-    return ret;
   }
 }
