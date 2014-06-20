@@ -134,7 +134,7 @@ public class OpenCLPolymorphicMethod {
         ret.append("-1");
       ret.append(";\n");
       ret.append("}\n");
-      ret.append("thisref_deref = org_trifort_gc_deref(gc_info, thisref);\n");
+      ret.append("thisref_deref = org_trifort_gc_deref(thisref);\n");
       if(virtual_methods.size() == 1){
         SootClass sclass = virtual_methods.get(0).getDeclaringClass();
         String invoke_string = getInvokeString(sclass);
@@ -190,18 +190,14 @@ public class OpenCLPolymorphicMethod {
     OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, soot_class);
     String ret = ocl_method.getPolymorphicName() + "(";
 
-    //write the gc_info and thisref
-    ret += "gc_info, thisref";
+    //write the thisref
+    ret += "thisref, ";
     List args = m_sootMethod.getParameterTypes();
-    if(args.size() != 0)
-      ret += ", ";
-
     for(int i = 0; i < args.size(); ++i){
       ret += "parameter" + Integer.toString(i);
-      if(i < args.size() - 1)
-        ret += ", ";
+      ret += ", ";
     }
-    ret += ", exception);";
+    ret += "exception);";
     return ret;
   }
 
@@ -211,18 +207,12 @@ public class OpenCLPolymorphicMethod {
     OpenCLMethod ocl_method = new OpenCLMethod(m_sootMethod, soot_class);
     String ret = ocl_method.getPolymorphicName() + "(";
 
-    //write the gc_info and thisref
-    ret += "gc_info";
     List args = m_sootMethod.getParameterTypes();
-    if(args.size() != 0)
-      ret += ", ";
-
     for(int i = 0; i < args.size(); ++i){
       ret += "parameter" + Integer.toString(i);
-      if(i < args.size() - 1)
-        ret += ", ";
+      ret += ", ";
     }
-    ret += ", exception);";
+    ret += "exception);";
     return ret;
   }
 

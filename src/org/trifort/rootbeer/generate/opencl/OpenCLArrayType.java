@@ -39,7 +39,7 @@ public class OpenCLArrayType {
     if(base instanceof Local == false)
       throw new UnsupportedOperationException("what do I do if base is not a local?");
     Local local = (Local) base;
-    return getDerefTypeString()+"_get(gc_info, "+local.getName()+", "+index.toString()+", exception)";
+    return getDerefTypeString()+"_get("+local.getName()+", "+index.toString()+", exception)";
   }
   
   
@@ -50,7 +50,7 @@ public class OpenCLArrayType {
       throw new UnsupportedOperationException("what do I do if base is not a local?");
     Local local = (Local) base;
 
-    return getDerefTypeString()+"_set(gc_info, "+local.getName()+", "+index.toString();
+    return getDerefTypeString()+"_set("+local.getName()+", "+index.toString();
   }
   
   public String getDerefTypeString(){
@@ -69,15 +69,14 @@ public class OpenCLArrayType {
 
   private List<String> getDecls(){
     List<String> ret = new ArrayList<String>();
-    String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     String function_qual = Tweaks.v().getDeviceFunctionQualifier();
-    ret.add(function_qual+" "+getAssignType()+" "+getDerefTypeString()+"_get("+address_qual+" char * gc_info, int thisref, int parameter0, int * exception)");
-    ret.add(function_qual+" void "+getDerefTypeString()+"_set("+address_qual+" char * gc_info, int thisref, int parameter0, "+getAssignType()+" parameter1, int * exception)");
-    ret.add(function_qual+" int "+getDerefTypeString()+"_new("+address_qual+" char * gc_info, int size, int * exception)");
+    ret.add(function_qual+" "+getAssignType()+" "+getDerefTypeString()+"_get(int thisref, int parameter0, int * exception)");
+    ret.add(function_qual+" void "+getDerefTypeString()+"_set(int thisref, int parameter0, "+getAssignType()+" parameter1, int * exception)");
+    ret.add(function_qual+" int "+getDerefTypeString()+"_new(int size, int * exception)");
     
     String multi_dim_decl = "";
     multi_dim_decl += function_qual+" int "+getDerefTypeString()+"_new_multi_array";
-    multi_dim_decl += "("+address_qual+" char * gc_info, ";
+    multi_dim_decl += "(";
     for(int i = 0; i < m_arrayType.numDimensions; ++i){
       multi_dim_decl += "int dim"+i+", ";
     }
@@ -97,7 +96,7 @@ public class OpenCLArrayType {
 
   public String invokeNewArrayExpr(NewArrayExpr arg0){
     StringBuilder ret = new StringBuilder();
-    ret.append(getDerefTypeString()+"_new(gc_info, ");
+    ret.append(getDerefTypeString()+"_new(");
     MethodJimpleValueSwitch quick_value_switch = new MethodJimpleValueSwitch(ret);
     arg0.getSize().apply(quick_value_switch);
     ret.append(", exception)");
@@ -106,7 +105,7 @@ public class OpenCLArrayType {
   
   public String invokeNewMultiArrayExpr(NewMultiArrayExpr arg0){
     StringBuilder ret = new StringBuilder();
-    ret.append(getDerefTypeString()+"_new_multi_array(gc_info, ");
+    ret.append(getDerefTypeString()+"_new_multi_array(");
     MethodJimpleValueSwitch quick_value_switch = new MethodJimpleValueSwitch(ret);
     for(int i = 0; i < arg0.getSizeCount(); ++i){
       arg0.getSize(i).apply(quick_value_switch);
@@ -154,12 +153,12 @@ public class OpenCLArrayType {
       ret.append("  return 0;\n");
       ret.append("}\n");
     }
-    ret.append("thisref_deref = org_trifort_gc_deref(gc_info, thisref);\n");
+    ret.append("thisref_deref = org_trifort_gc_deref(thisref);\n");
     if(Configuration.compilerInstance().getArrayChecks() && 
        Configuration.compilerInstance().getExceptions()){
       ret.append("length = org_trifort_getint(thisref_deref, 12);\n");
       ret.append("if(parameter0 < 0 || parameter0 >= length){\n");
-      ret.append("  *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, parameter0, thisref, length, exception);");
+      ret.append("  *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(parameter0, thisref, length, exception);");
       ret.append("  return 0;\n");
       ret.append("}\n");
     }
@@ -176,12 +175,12 @@ public class OpenCLArrayType {
       ret.append("    return;\n");
       ret.append("  }\n");
     }
-    ret.append("thisref_deref = org_trifort_gc_deref(gc_info, thisref);\n");
+    ret.append("thisref_deref = org_trifort_gc_deref(thisref);\n");
      if(Configuration.compilerInstance().getArrayChecks() && 
        Configuration.compilerInstance().getExceptions()){
       ret.append("length = org_trifort_getint(thisref_deref, 12);\n");
       ret.append("if(parameter0 < 0 || parameter0 >= length){\n");
-      ret.append("  *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(gc_info, parameter0, thisref, length, exception);");
+      ret.append("  *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(parameter0, thisref, length, exception);");
       ret.append("  return;\n");
       ret.append("}\n");
     }
@@ -203,14 +202,14 @@ public class OpenCLArrayType {
     ret.append("mod = total_size % "+Constants.MallocAlignBytes+";\n");
     ret.append("if(mod != 0)\n");
     ret.append("  total_size += ("+Constants.MallocAlignBytes+" - mod);\n");
-    ret.append("thisref = org_trifort_gc_malloc(gc_info, total_size);\n");
+    ret.append("thisref = org_trifort_gc_malloc(total_size);\n");
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("if(thisref == -1){\n");
       ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
       ret.append("  return -1;\n");
       ret.append("}\n");
     }
-    ret.append("thisref_deref = org_trifort_gc_deref(gc_info, thisref);\n");
+    ret.append("thisref_deref = org_trifort_gc_deref(thisref);\n");
     ret.append("\n//class info\n");
     ret.append("org_trifort_gc_set_count(thisref_deref, 0);\n");
     ret.append("org_trifort_gc_set_color(thisref_deref, COLOR_GREY);\n");
@@ -219,7 +218,7 @@ public class OpenCLArrayType {
     ret.append("org_trifort_gc_set_size(thisref_deref, total_size);\n");
     ret.append("org_trifort_setint(thisref_deref, 12, size);\n");
     ret.append("for(i = 0; i < size; ++i){\n");
-    ret.append("  "+getDerefTypeString()+"_set(gc_info, thisref, i, "+initValue()+", exception);\n");
+    ret.append("  "+getDerefTypeString()+"_set(thisref, i, "+initValue()+", exception);\n");
     ret.append("}\n");
     ret.append("return thisref;\n");
     ret.append("}\n");   
@@ -239,14 +238,14 @@ public class OpenCLArrayType {
     ret.append("mod = total_size % "+Constants.MallocAlignBytes+";\n");
     ret.append("if(mod != 0)\n");
     ret.append("  total_size += ("+Constants.MallocAlignBytes+" - mod);\n");
-    ret.append("thisref = org_trifort_gc_malloc(gc_info, total_size);\n");
+    ret.append("thisref = org_trifort_gc_malloc(total_size);\n");
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("if(thisref == -1){\n");
       ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
       ret.append("  return -1;\n");
       ret.append("}\n");
     }
-    ret.append("thisref_deref = org_trifort_gc_deref(gc_info, thisref);\n");
+    ret.append("thisref_deref = org_trifort_gc_deref(thisref);\n");
     ret.append("\n//class info\n");
     ret.append("org_trifort_gc_set_count(thisref_deref, 0);\n");
     ret.append("org_trifort_gc_set_color(thisref_deref, COLOR_GREY);\n");
@@ -263,7 +262,6 @@ public class OpenCLArrayType {
 
   private String multiInitString(int dim){
     String ret = "";
-    String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     
     for(int i = 0; i < dim; ++i){      
       ret += "for(index"+i+" = 0; index"+i+" < dim"+i+"; ++index"+i+"){\n";
@@ -271,9 +269,9 @@ public class OpenCLArrayType {
       if(i > 0){
         thisref = "aref"+(i-1);
       }
-      String set_str = getMultiDeref(dim-i)+"_set("+address_qual+"gc_info, "+thisref;
+      String set_str = getMultiDeref(dim-i)+"_set("+thisref;
       if(i < dim - 1){
-        String new_str = getMultiDeref(dim-1-i)+"_new("+address_qual+"gc_info, dim"+(i+1)+", exception)";
+        String new_str = getMultiDeref(dim-1-i)+"_new(dim"+(i+1)+", exception)";
         ret += "  aref"+i+" = "+new_str+";\n";
         ret += "  "+set_str+", index"+i+", aref"+i+", exception);\n";
       } else {

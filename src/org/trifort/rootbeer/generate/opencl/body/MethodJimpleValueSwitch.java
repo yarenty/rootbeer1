@@ -330,7 +330,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
 
   public void caseLengthExpr(LengthExpr arg0) {
     Value op = arg0.getOp();
-    m_output.append("org_trifort_array_length(gc_info, ");
+    m_output.append("org_trifort_array_length(");
     op.apply(this);
     m_output.append(", exception)");
     setCheckException();
@@ -382,7 +382,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
   
   public void caseStringConstant(StringConstant arg0) {
-    m_output.append(" org_trifort_string_constant(gc_info, (char *) "+arg0.toString()+", exception) ");
+    m_output.append(" org_trifort_string_constant((char *) "+arg0.toString()+", exception) ");
   }
 
   public void caseClassConstant(ClassConstant arg0) {

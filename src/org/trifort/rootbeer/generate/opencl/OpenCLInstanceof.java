@@ -46,7 +46,7 @@ public class OpenCLInstanceof {
     String global = Tweaks.v().getGlobalAddressSpaceQualifier();
     
     String ret = device+" char "+getMethodName();
-    ret += "("+global+" char * gc_info, int thisref, int * exception)";
+    ret += "(int thisref, int * exception)";
     return ret;
   }
   
@@ -68,7 +68,7 @@ public class OpenCLInstanceof {
     ret += "  if(thisref == -1){\n";
     ret += "    return 0;\n";
     ret += "  }\n";
-    ret += "  thisref_deref = org_trifort_gc_deref(gc_info, thisref);\n";
+    ret += "  thisref_deref = org_trifort_gc_deref(thisref);\n";
     ret += "  type = org_trifort_gc_get_type(thisref_deref);\n";
     ret += "  switch(type){\n";
     for(NumberedType ntype : type_list){
@@ -83,7 +83,7 @@ public class OpenCLInstanceof {
   
   public String invokeExpr(InstanceOfExpr arg0){
     String ret = getMethodName();
-    ret += "(gc_info, "+arg0.getOp().toString()+", exception)";
+    ret += "("+arg0.getOp().toString()+", exception)";
     return ret;
   }
   

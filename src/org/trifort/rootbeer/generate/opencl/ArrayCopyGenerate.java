@@ -26,8 +26,8 @@ public class ArrayCopyGenerate {
     ret.append("  int i;\n");
     ret.append("  int src_index;\n");
     ret.append("  int dest_index;\n");
-    ret.append("  "+address_qual+" char * src_deref = org_trifort_gc_deref(gc_info, src_handle);\n");
-    ret.append("  "+address_qual+" char * dest_deref = org_trifort_gc_deref(gc_info, dest_handle);\n");
+    ret.append("  "+address_qual+" char * src_deref = org_trifort_gc_deref(src_handle);\n");
+    ret.append("  "+address_qual+" char * dest_deref = org_trifort_gc_deref(dest_handle);\n");
     ret.append("  \n");
     ret.append("  GC_OBJ_TYPE_TYPE src_type = org_trifort_gc_get_type(src_deref);\n");
     ret.append("  GC_OBJ_TYPE_TYPE dest_type = org_trifort_gc_get_type(dest_deref);\n");
@@ -53,8 +53,8 @@ public class ArrayCopyGenerate {
         ret.append("        for(i = length - 1; i >= 0; --i){\n");
         ret.append("          src_index = srcPos + i;\n");
         ret.append("          dest_index = destPos + i;\n");
-        ret.append("        "+dest.getDerefTypeString()+"_set(gc_info, dest_handle, dest_index, ");
-        ret.append(src.getDerefTypeString()+"_get(gc_info, src_handle, src_index, exception), exception);\n");
+        ret.append("        "+dest.getDerefTypeString()+"_set(dest_handle, dest_index, ");
+        ret.append(src.getDerefTypeString()+"_get(src_handle, src_index, exception), exception);\n");
         ret.append("        }\n");
         ret.append("      }\n");
       }
@@ -72,10 +72,9 @@ public class ArrayCopyGenerate {
   
   private String getDecl(){
     String device_function_qual = Tweaks.v().getDeviceFunctionQualifier();
-    String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     StringBuilder ret = new StringBuilder();
     ret.append(device_function_qual+" void \n");
-    ret.append("java_lang_System_arraycopy("+address_qual+" char * gc_info, ");
+    ret.append("java_lang_System_arraycopy(");
     ret.append("int src_handle, int srcPos, int dest_handle, int destPos, int length, int * exception)"); 
     return ret.toString();
   }

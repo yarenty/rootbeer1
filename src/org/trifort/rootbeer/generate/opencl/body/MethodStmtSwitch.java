@@ -160,10 +160,10 @@ public class MethodStmtSwitch implements StmtSwitch {
     OpenCLMethod ocl_method = ocl_class.getMethod(m_sootMethod.getSignature());
     
     m_output.append("int "+id+" = getThreadId();\n");
-    m_output.append("char * "+mem+" = org_trifort_gc_deref(gc_info, ");
+    m_output.append("char * "+mem+" = org_trifort_gc_deref(");
     arg0.getOp().apply(m_valueSwitch);
     m_output.append(");\n");
-    m_output.append("char * "+synch+" = org_trifort_gc_deref(gc_info, ");
+    m_output.append("char * "+synch+" = org_trifort_gc_deref(");
     arg0.getOp().apply(m_valueSwitch);
     m_output.append(");\n");
     m_output.append(mem+" += 16;\n");
@@ -183,7 +183,7 @@ public class MethodStmtSwitch implements StmtSwitch {
   }
 
   public void caseExitMonitorStmt(ExitMonitorStmt arg0) {
-    m_output.append("org_trifort_exitMonitorRef(gc_info, ");
+    m_output.append("org_trifort_exitMonitorRef(");
     arg0.getOp().apply(m_valueSwitch);
     m_output.append(", "+m_oldValueFromMonitorStack.top()+");\n");
   }
@@ -235,7 +235,7 @@ public class MethodStmtSwitch implements StmtSwitch {
 
   public void caseReturnStmt(ReturnStmt arg0) {
     if(m_sootMethod.isSynchronized()){
-      m_output.append("org_trifort_exitMonitorMem(gc_info, mem, old);\n");
+      m_output.append("org_trifort_exitMonitorMem(mem, old);\n");
     }
     m_output.append("return ");
     arg0.getOp().apply(m_valueSwitch);
@@ -244,7 +244,7 @@ public class MethodStmtSwitch implements StmtSwitch {
   
   public void caseReturnVoidStmt(ReturnVoidStmt arg0) {
     if(m_sootMethod.isSynchronized()){ 
-      m_output.append("org_trifort_exitMonitorMem(gc_info, mem, old);\n");
+      m_output.append("org_trifort_exitMonitorMem(mem, old);\n");
     }
     m_output.append("return;\n");
   }
@@ -280,7 +280,7 @@ public class MethodStmtSwitch implements StmtSwitch {
     op.apply(m_valueSwitch);
     m_output.append(";\n");
     if(m_sootMethod.isSynchronized()){
-      m_output.append("org_trifort_exitMonitorMem(gc_info, mem, old);\n");
+      m_output.append("org_trifort_exitMonitorMem(mem, old);\n");
     }
     m_output.append("return");
     if(methodReturnsAValue())
@@ -338,7 +338,7 @@ public class MethodStmtSwitch implements StmtSwitch {
       m_output.append("  if(*exception == "+oom_num+" || *exception == "+null_num+"){\n");
       m_output.append("    ex_type = *exception;\n");
       m_output.append("  } else {\n");
-      m_output.append("    char * ex_deref = org_trifort_gc_deref(gc_info, *exception);\n");
+      m_output.append("    char * ex_deref = org_trifort_gc_deref(*exception);\n");
       m_output.append("    ex_type = org_trifort_gc_get_type(ex_deref);\n");
       m_output.append("  }\n");
       m_output.append("if(0){}\n");
@@ -356,9 +356,9 @@ public class MethodStmtSwitch implements StmtSwitch {
         m_output.append("}\n");
       }
     }
-    //mOutput.append("org_trifort_fillInStackTrace(gc_info, *exception, \""+class_name+"\", \""+method_name+"\");\n");
+    //mOutput.append("org_trifort_fillInStackTrace(*exception, \""+class_name+"\", \""+method_name+"\");\n");
     if(m_sootMethod.isSynchronized()){
-      m_output.append("org_trifort_exitMonitorMem(gc_info, mem, old);\n");
+      m_output.append("org_trifort_exitMonitorMem(mem, old);\n");
     }
     m_output.append("return ");
     if(methodReturnsAValue())

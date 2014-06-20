@@ -93,14 +93,14 @@ public class OpenCLField {
     String address_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     if(m_sootField.isStatic() == false){
       //instance getter
-      ret.add(device_function_qual+" "+type_string+" instance_getter_"+getFullName()+"("+address_qual+" char * gc_info, int thisref, int * exception)");
+      ret.add(device_function_qual+" "+type_string+" instance_getter_"+getFullName()+"(int thisref, int * exception)");
       //instance setter
-      ret.add(device_function_qual+" void instance_setter_"+getFullName()+"("+address_qual+" char * gc_info, int thisref, "+type_string+" parameter0, int * exception)");
+      ret.add(device_function_qual+" void instance_setter_"+getFullName()+"(int thisref, "+type_string+" parameter0, int * exception)");
     } else {
       //static getter
-      ret.add(device_function_qual+" "+type_string+" static_getter_"+getFullName()+"("+address_qual+" char * gc_info, int * exception)");
+      ret.add(device_function_qual+" "+type_string+" static_getter_"+getFullName()+"(int * exception)");
       //static setter
-      ret.add(device_function_qual+" void static_setter_"+getFullName()+"("+address_qual+" char * gc_info, "+type_string+" parameter0, int * expcetion)");
+      ret.add(device_function_qual+" void static_setter_"+getFullName()+"("+type_string+" parameter0, int * expcetion)");
     }
     return ret;
   }
@@ -180,7 +180,7 @@ public class OpenCLField {
       ret.append("  return 0;\n");
       ret.append("}\n");
     }
-    ret.append("thisref_deref = org_trifort_gc_deref(gc_info, thisref);\n");
+    ret.append("thisref_deref = org_trifort_gc_deref(thisref);\n");
     if(composite.getClasses().size() == 1){
       SootClass sclass = composite.getClasses().get(0);
       ret.append("return *(("+address_qual+" "+cast_string+" *) &thisref_deref["+Integer.toString(field_offset)+"]);\n");
@@ -204,7 +204,7 @@ public class OpenCLField {
       ret.append("  return;\n");
       ret.append("}\n");
     }
-    ret.append("thisref_deref = org_trifort_gc_deref(gc_info, thisref);\n");    
+    ret.append("thisref_deref = org_trifort_gc_deref(thisref);\n");    
     if(composite.getClasses().size() == 1){
       ret.append("*(("+address_qual+" "+cast_string+" *) &thisref_deref["+Integer.toString(field_offset)+"]) = parameter0;\n");
     } else {
@@ -227,12 +227,12 @@ public class OpenCLField {
     String cast_string = getCastString();
     
     ret.append(decls.get(0)+"{\n");
-    ret.append(address_qual+" char * thisref_deref = org_trifort_gc_deref(gc_info, 0);\n");
+    ret.append(address_qual+" char * thisref_deref = org_trifort_gc_deref(0);\n");
     ret.append("return *(("+address_qual+" "+cast_string+" *) &thisref_deref["+offset+"]);\n");
     ret.append("}\n");
     
     ret.append(decls.get(1)+"{\n");    
-    ret.append(address_qual+" char * thisref_deref = org_trifort_gc_deref(gc_info, 0);\n");
+    ret.append(address_qual+" char * thisref_deref = org_trifort_gc_deref(0);\n");
     ret.append("*(("+address_qual+" "+cast_string+" *) &thisref_deref["+offset+"]) = parameter0;\n");
     ret.append("}\n");
     return ret.toString();
@@ -258,29 +258,29 @@ public class OpenCLField {
   }
   
   public String getStaticGetterInvoke(){
-    return "static_getter_"+getFullName()+"(gc_info, exception)";
+    return "static_getter_"+getFullName()+"(exception)";
   }
 
   public String getStaticSetterInvoke(){
-    return "static_setter_"+getFullName()+"(gc_info";
+    return "static_setter_"+getFullName()+"(";
   }
 
   public String getInstanceGetterInvoke(Value base){
     if(base instanceof Local == false)
       throw new UnsupportedOperationException("how do we handle when a base is not a loca?");
     Local local = (Local) base;
-    return "instance_getter_"+getFullName()+"(gc_info, "+local.getName()+", exception)";
+    return "instance_getter_"+getFullName()+"("+local.getName()+", exception)";
   }
 
   public String getInstanceSetterInvoke(Value base){
     if(base instanceof Local == false)
       throw new UnsupportedOperationException("how do we handle when a base is not a loca?");
     Local local = (Local) base;
-    return "instance_setter_"+getFullName()+"(gc_info, "+local.getName();
+    return "instance_setter_"+getFullName()+"("+local.getName();
   }
   
   public String getInstanceSetterInvokeWithoutThisref(){
-    return "instance_setter_"+getFullName()+"(gc_info, ";
+    return "instance_setter_"+getFullName()+"(";
   }
 
   @Override

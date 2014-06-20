@@ -62,19 +62,15 @@ public class OpenCLMethod {
   private String getRestOfArgumentListStringInternal(){
     StringBuilder ret = new StringBuilder();
     List args = m_sootMethod.getParameterTypes();
-    
-    if(args.size() != 0)
-      ret.append(", ");
-    
+        
     for(int i = 0; i < args.size(); ++i){
       Type curr_arg = (Type) args.get(i);
       OpenCLType parameter_type = new OpenCLType(curr_arg);
       ret.append(parameter_type.getCudaTypeString());
       ret.append(" parameter" + Integer.toString(i));
-      if(i < args.size()-1)
-        ret.append(", ");
+      ret.append(", ");
     }
-    ret.append(", int * exception");
+    ret.append("int * exception");
     ret.append(")");
     return ret.toString();
   }
@@ -83,13 +79,10 @@ public class OpenCLMethod {
     StringBuilder ret = new StringBuilder();
     ret.append("(");
 
-    String address_space_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
     if(isConstructor() == true){
-      ret.append(address_space_qual+" char * gc_info");
+      //do nothing
     } else if((isConstructor() == false || override_ctor == true) && m_sootMethod.isStatic() == false){
-      ret.append(address_space_qual+" char * gc_info, int thisref");
-    } else {
-      ret.append(address_space_qual+" char * gc_info");
+      ret.append("int thisref, ");
     }
     
     ret.append(getRestOfArgumentListStringInternal());
@@ -98,8 +91,7 @@ public class OpenCLMethod {
 
   public String getArgumentListString(boolean ctor_body){
     if(ctor_body){
-      String address_space_qual = Tweaks.v().getGlobalAddressSpaceQualifier();
-      String ret = "("+address_space_qual+" char * gc_info, int thisref";
+      String ret = "(int thisref, ";
       ret += getRestOfArgumentListStringInternal();
       return ret;
     } else {
@@ -174,13 +166,13 @@ public class OpenCLMethod {
     int mystery_index = junk_index - 4;
     if(m_sootMethod.isStatic()){
       int offset = static_offsets.getIndex(m_sootClass);
-      ret += "mem = org_trifort_gc_deref(gc_info, 0);\n";
+      ret += "mem = org_trifort_gc_deref(0);\n";
       ret += "trash = mem + "+junk_index+";\n";
       ret += "mystery = mem + "+mystery_index+";\n";
       ret += "mem += "+offset+";\n";
     } else {
-      ret += "mem = org_trifort_gc_deref(gc_info, thisref);\n";
-      ret += "trash = org_trifort_gc_deref(gc_info, 0) + "+junk_index+";\n";
+      ret += "mem = org_trifort_gc_deref(thisref);\n";
+      ret += "trash = org_trifort_gc_deref(0) + "+junk_index+";\n";
       ret += "mystery = trash - 8;\n";
       ret += "mem += 16;\n";
     }
@@ -208,7 +200,7 @@ public class OpenCLMethod {
         ret += "  }\n";
 
         ret += "  if ( * exception != 0 ) {\n";
-        ret += "    org_trifort_exitMonitorMem ( gc_info , mem , old ) ;\n";
+        ret += "    org_trifort_exitMonitorMem (mem , old ) ;\n";
         if(returnsAValue()){
           ret += "    return 0;\n";
         } else {
@@ -217,7 +209,7 @@ public class OpenCLMethod {
         ret += "  }\n";
       }
 
-      ret += "  thisref_synch_deref = org_trifort_gc_deref ( gc_info , thisref );\n";
+      ret += "  thisref_synch_deref = org_trifort_gc_deref (thisref );\n";
       ret += "  * ( ( int * ) & thisref_synch_deref [ 20 ] ) = 20 ;\n";
     }
     return ret;
@@ -305,29 +297,16 @@ public class OpenCLMethod {
     StringBuilder ret = new StringBuilder();
 
     ret.append(getPolymorphicNameInternal(true) +"(");
+    ret.append("thisref, ");
+    
     List args = arg0.getArgs();
-    List<String> args_list = new ArrayList<String>();
-    args_list.add("gc_info");
-    args_list.add("thisref");
-    
-    for(int i = 0; i < args_list.size() - 1; ++i){
-      ret.append(args_list.get(i));
-      ret.append(",\n ");
-    }
-    if(args_list.size() > 0){
-      ret.append(args_list.get(args_list.size()-1));
-      if(args.size() > 0)
-        ret.append(",\n ");
-    }
-    
     MethodJimpleValueSwitch quick_value_switch = new MethodJimpleValueSwitch(ret);
     for(int i = 0; i < args.size(); ++i){
       Value arg = (Value) args.get(i);
       arg.apply(quick_value_switch);
-      if(i < args.size() - 1)
-        ret.append(",\n ");
+      ret.append(",\n ");
     }
-    ret.append(", exception");
+    ret.append("exception");
     ret.append(")");
     
     return ret.toString();
@@ -347,26 +326,13 @@ public class OpenCLMethod {
 
     ret.append(getPolymorphicName()+"(");
     List args = expr.getArgs();
-    List<String> args_list = new ArrayList<String>();
-    args_list.add("gc_info");
-
-    for(int i = 0; i < args_list.size() - 1; ++i){
-      ret.append(args_list.get(i));
-      ret.append(", ");
-    }
-    if(args_list.size() > 0){
-      ret.append(args_list.get(args_list.size()-1));
-      if(args.size() > 0)
-        ret.append(", ");
-    }
     MethodJimpleValueSwitch quick_value_switch = new MethodJimpleValueSwitch(ret);
     for(int i = 0; i < args.size(); ++i){
       Value arg = (Value) args.get(i);
       arg.apply(quick_value_switch);
-      if(i < args.size() - 1)
-        ret.append(", ");
+      ret.append(", ");
     }
-    ret.append(", exception");
+    ret.append("exception");
     ret.append(")");
     return ret.toString();
   }
@@ -383,37 +349,30 @@ public class OpenCLMethod {
       throw new UnsupportedOperationException("How do we handle an invoke on a non loca?");
     Local local = (Local) base;
     if(isConstructor()){
-      ret.append("org_trifort_gc_assign (gc_info, \n&"+local.getName()+", ");
+      ret.append("org_trifort_gc_assign (\n&"+local.getName()+", ");
     }
 
     String function_name = method_prefix+corrected_this.getPolymorphicName();
     ret.append(function_name+"(");
     List args = arg0.getArgs();
     List<String> args_list = new ArrayList<String>();
-    args_list.add("gc_info");
     
     //write the thisref
     if(isConstructor() == false)
       args_list.add(local.getName());
 
-    for(int i = 0; i < args_list.size() - 1; ++i){
+    for(int i = 0; i < args_list.size(); ++i){
       ret.append(args_list.get(i));
       ret.append(",\n ");
-    }
-    if(args_list.size() > 0){
-      ret.append(args_list.get(args_list.size()-1));
-      if(args.size() > 0)
-        ret.append(",\n ");
     }
     
     MethodJimpleValueSwitch quick_value_switch = new MethodJimpleValueSwitch(ret);
     for(int i = 0; i < args.size(); ++i){
       Value arg = (Value) args.get(i);
       arg.apply(quick_value_switch);
-      if(i < args.size() - 1)
-        ret.append(",\n ");
+      ret.append(",\n ");
     }
-    ret.append(", exception");
+    ret.append("exception");
     ret.append(")");
     
     if(isConstructor()){

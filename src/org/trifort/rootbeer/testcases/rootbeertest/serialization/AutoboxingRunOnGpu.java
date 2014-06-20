@@ -25,11 +25,11 @@ public class AutoboxingRunOnGpu implements Kernel {
   // static_getter_java_lang_Integer$IntegerCache_cache
   /*
      if ( i0  <  -128   ) goto label0;
-     $i1  = static_getter_java_lang_Integer$IntegerCache_high(gc_info, exception);
+     $i1  = static_getter_java_lang_Integer$IntegerCache_high(exception);
      if ( i0  >  $i1   ) goto label0;
-     $r0  = static_getter_java_lang_Integer$IntegerCache_cache(gc_info, exception);
+     $r0  = static_getter_java_lang_Integer$IntegerCache_cache(exception);
      $i2  =  i0  +  128  ;
-     $r1  = java_lang_Integer__array_get(gc_info, $r0, $i2, exception);
+     $r1  = java_lang_Integer__array_get($r0, $i2, exception);
      if(*exception != 0) {
      return 0; }
      return  $r1 ;
