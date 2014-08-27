@@ -77,7 +77,13 @@ public class Configuration {
     try {
       List<byte[]> data = ResourceReader.getResourceArray("org/trifort/rootbeer/runtime/config.txt");
       int mode = data.get(0)[0];
+      int exceptions = data.get(0)[1];
       m_mode = mode;
+      if(exceptions == 1){
+        m_exceptions = true;
+      } else {
+        m_exceptions = false;
+      }
     } catch(Exception ex){
       m_mode = MODE_GPU;
     }

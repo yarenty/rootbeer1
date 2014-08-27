@@ -31,6 +31,7 @@ public class CUDAContext implements Context, Runnable {
   private Memory m_handlesMemory;
   private Memory m_exceptionsMemory;
   private Memory m_classMemory;
+  private boolean m_usingKernelTemplates;
   
   private Map<Kernel, Long> m_handles;
   
@@ -38,7 +39,10 @@ public class CUDAContext implements Context, Runnable {
   private BlockingQueue<KernelLaunch> m_toThread;
   private BlockingQueue<KernelLaunch> m_fromThread;
   
+  private boolean m_usingUncheckedMemory;
+  
   public CUDAContext(GpuDevice device){
+    m_usingUncheckedMemory = true;
     m_device = device;    
        
     String arch = System.getProperty("os.arch");
@@ -53,7 +57,6 @@ public class CUDAContext implements Context, Runnable {
     m_readBlocksStopwatch = new Stopwatch();
     
     m_handles = new HashMap<Kernel, Long>();
-
     m_textureMemory = new CheckedFixedMemory(64);
     
     m_toThread = new BlockingQueue<KernelLaunch>();
@@ -65,7 +68,11 @@ public class CUDAContext implements Context, Runnable {
 
   @Override
   public void init(long memory_size) {
-    m_objectMemory = new CheckedFixedMemory(memory_size);
+    if(m_usingUncheckedMemory){
+      m_objectMemory = new FixedMemory(memory_size);
+    } else {
+      m_objectMemory = new CheckedFixedMemory(memory_size);
+    }
   }
 
   @Override
@@ -73,14 +80,18 @@ public class CUDAContext implements Context, Runnable {
     long free_mem_size_gpu = m_device.getFreeGlobalMemoryBytes();
     long free_mem_size_cpu = Runtime.getRuntime().freeMemory();
     long free_mem_size = Math.min(free_mem_size_gpu, free_mem_size_cpu);
+    
+    //space for instructions
     free_mem_size -= 64 * 1024 * 1024;
+    
     free_mem_size -= m_handlesMemory.getSize();
     free_mem_size -= m_exceptionsMemory.getSize();
     free_mem_size -= m_classMemory.getSize();
+    
     if(free_mem_size <= 0){
       StringBuilder error = new StringBuilder();
       error.append("OutOfMemory while allocating Java CPU and GPU memory.\n");
-      error.append("  Try increasing the the max Java Heap Size using -Xmx.\n");
+      error.append("  Try increasing the the initial Java Heap Size using -Xms.\n");
       error.append("  Try reducing the number of threads you are using.\n");
       error.append("  Try using kernel templates.\n");
       error.append("  Debugging Output:\n");
@@ -121,6 +132,7 @@ public class CUDAContext implements Context, Runnable {
 
   @Override
   public void run(Kernel template, ThreadConfig thread_config) {
+    m_usingKernelTemplates = true;
     m_runStopwatch.start();
     CompiledKernel compiled_kernel = (CompiledKernel) template;
     
@@ -143,10 +155,15 @@ public class CUDAContext implements Context, Runnable {
       cubin_file = readCubinFile(filename);
       m_cubinFiles.put(filename, cubin_file);
     }
-    
-    m_handlesMemory = new CheckedFixedMemory(4*thread_config.getNumThreads());
-    m_exceptionsMemory = new CheckedFixedMemory(4*thread_config.getNumThreads());
-    m_classMemory = new CheckedFixedMemory(1024);
+    if(m_usingUncheckedMemory){
+      m_handlesMemory = new FixedMemory(4);
+      m_classMemory = new FixedMemory(1024);
+      m_exceptionsMemory = new FixedMemory(getExceptionsMemSize(thread_config));
+    } else {
+      m_handlesMemory = new CheckedFixedMemory(4);
+      m_exceptionsMemory = new CheckedFixedMemory(getExceptionsMemSize(thread_config));
+      m_classMemory = new CheckedFixedMemory(1024);
+    }
     if(m_objectMemory == null){
       init();
     }
@@ -163,8 +180,17 @@ public class CUDAContext implements Context, Runnable {
         thread_config.getGridShapeX(), thread_config.getBlockShapeX()));
   }
 
+  private long getExceptionsMemSize(ThreadConfig thread_config) {
+    if(Configuration.runtimeInstance().getExceptions()){
+      return 4L*thread_config.getNumThreads();
+    } else {
+      return 4;
+    }
+  }
+
   @Override
   public void run(List<Kernel> work, ThreadConfig thread_config) {
+    m_usingKernelTemplates = false;
     m_runStopwatch.start();
     CompiledKernel compiled_kernel = (CompiledKernel) work.get(0);
     
@@ -188,9 +214,15 @@ public class CUDAContext implements Context, Runnable {
       m_cubinFiles.put(filename, cubin_file);
     }
     
-    m_handlesMemory = new CheckedFixedMemory(4*work.size());
-    m_exceptionsMemory = new CheckedFixedMemory(4*work.size());
-    m_classMemory = new CheckedFixedMemory(1024);
+    if(m_usingUncheckedMemory){
+      m_handlesMemory = new FixedMemory(4);
+      m_exceptionsMemory = new FixedMemory(getExceptionsMemSize(thread_config));
+      m_classMemory = new FixedMemory(1024);
+    } else {
+      m_handlesMemory = new CheckedFixedMemory(4);
+      m_exceptionsMemory = new CheckedFixedMemory(getExceptionsMemSize(thread_config));
+      m_classMemory = new CheckedFixedMemory(1024);
+    }
     if(m_objectMemory == null){
       init();
     }
@@ -243,9 +275,7 @@ public class CUDAContext implements Context, Runnable {
     serializer.writeStaticsToHeap();
     
     long handle = serializer.writeToHeap(compiled_kernel);
-    for(int i = 0; i < thread_config.getNumThreads(); ++i){
-      m_handlesMemory.writeRef(handle);
-    }
+    m_handlesMemory.writeRef(handle);
     m_objectMemory.align16();
    
     
@@ -265,28 +295,30 @@ public class CUDAContext implements Context, Runnable {
     
     CompiledKernel compiled_kernel = (CompiledKernel) work.get(0);
     Serializer serializer = compiled_kernel.getSerializer(m_objectMemory, m_textureMemory);
-    
-    for(int i = 0; i < work.size(); ++i){
-      long ref = m_exceptionsMemory.readRef();
-      if(ref != 0){
-        long ref_num = ref >> 4;
-        if(ref_num == compiled_kernel.getNullPointerNumber()){
-          throw new NullPointerException(); 
-        } else if(ref_num == compiled_kernel.getOutOfMemoryNumber()){
-          throw new OutOfMemoryError();
-        }
-        
-        m_objectMemory.setAddress(ref);          
-        Object except = serializer.readFromHeap(null, true, ref);
-        if(except instanceof Error){
-          Error except_th = (Error) except;
-          throw except_th;
-        } else if(except instanceof GpuException){
-          GpuException gpu_except = (GpuException) except;
-          throw new ArrayIndexOutOfBoundsException("array_index: "+gpu_except.m_arrayIndex+
-            " array_length: "+gpu_except.m_arrayLength+" array: "+gpu_except.m_array);
-        } else {
-          throw new RuntimeException((Throwable) except);
+
+    if(Configuration.runtimeInstance().getExceptions()){
+      for(int i = 0; i < work.size(); ++i){
+        long ref = m_exceptionsMemory.readRef();
+        if(ref != 0){
+          long ref_num = ref >> 4;
+          if(ref_num == compiled_kernel.getNullPointerNumber()){
+            throw new NullPointerException(); 
+          } else if(ref_num == compiled_kernel.getOutOfMemoryNumber()){
+            throw new OutOfMemoryError();
+          }
+          
+          m_objectMemory.setAddress(ref);          
+          Object except = serializer.readFromHeap(null, true, ref);
+          if(except instanceof Error){
+            Error except_th = (Error) except;
+            throw except_th;
+          } else if(except instanceof GpuException){
+            GpuException gpu_except = (GpuException) except;
+            throw new ArrayIndexOutOfBoundsException("array_index: "+gpu_except.m_arrayIndex+
+              " array_length: "+gpu_except.m_arrayLength+" array: "+gpu_except.m_array);
+          } else {
+            throw new RuntimeException((Throwable) except);
+          }
         }
       }
     }
@@ -313,30 +345,32 @@ public class CUDAContext implements Context, Runnable {
     
     Serializer serializer = compiled_kernel.getSerializer(m_objectMemory, m_textureMemory);
     
-    for(int i = 0; i < thread_config.getNumThreads(); ++i){
-      long ref = m_exceptionsMemory.readRef();
-      if(ref != 0){
-        long ref_num = ref >> 4;
-        if(ref_num == compiled_kernel.getNullPointerNumber()){
-          throw new NullPointerException(); 
-        } else if(ref_num == compiled_kernel.getOutOfMemoryNumber()){
-          throw new OutOfMemoryError();
+    if(Configuration.runtimeInstance().getExceptions()){
+      for(long i = 0; i < thread_config.getNumThreads(); ++i){
+        long ref = m_exceptionsMemory.readRef();
+        if(ref != 0){
+          long ref_num = ref >> 4;
+          if(ref_num == compiled_kernel.getNullPointerNumber()){
+            throw new NullPointerException(); 
+          } else if(ref_num == compiled_kernel.getOutOfMemoryNumber()){
+            throw new OutOfMemoryError();
+          }
+          
+          m_objectMemory.setAddress(ref);           
+          Object except = serializer.readFromHeap(null, true, ref);
+          if(except instanceof Error){
+            Error except_th = (Error) except;
+            throw except_th;
+          } else if(except instanceof GpuException){
+            GpuException gpu_except = (GpuException) except;
+            throw new ArrayIndexOutOfBoundsException("array_index: "+gpu_except.m_arrayIndex+
+                " array_length: "+gpu_except.m_arrayLength+" array: "+gpu_except.m_array);
+          } else {
+            throw new RuntimeException((Throwable) except);
+          }
         }
-        
-        m_objectMemory.setAddress(ref);           
-        Object except = serializer.readFromHeap(null, true, ref);
-        if(except instanceof Error){
-          Error except_th = (Error) except;
-          throw except_th;
-        } else if(except instanceof GpuException){
-          GpuException gpu_except = (GpuException) except;
-          throw new ArrayIndexOutOfBoundsException("array_index: "+gpu_except.m_arrayIndex+
-              " array_length: "+gpu_except.m_arrayLength+" array: "+gpu_except.m_array);
-        } else {
-          throw new RuntimeException((Throwable) except);
-        }
-      }
-    }    
+      }    
+    }
     
     serializer.readStaticsFromHeap();
     serializer.readFromHeap(compiled_kernel, true, m_handlesMemory.readRef());
@@ -355,7 +389,8 @@ public class CUDAContext implements Context, Runnable {
     KernelLaunch item = new KernelLaunch(m_device.getDeviceId(), cubin_file, 
       cubin_file.length, thread_config.getBlockShapeX(), 
       thread_config.getGridShapeX(), thread_config.getNumThreads(), 
-      m_objectMemory, m_handlesMemory, m_exceptionsMemory, m_classMemory);
+      m_objectMemory, m_handlesMemory, m_exceptionsMemory, m_classMemory,
+      m_usingKernelTemplates);
     
     m_toThread.put(item);
     item = m_fromThread.take();
@@ -411,7 +446,8 @@ public class CUDAContext implements Context, Runnable {
         cudaRun(item.getDeviceIndex(), item.getCubinFile(), item.getCubinLength(),
           item.getBlockShapeX(), item.getGridShapeX(), item.getNumThreads(), 
           item.getObjectMem(), item.getHandlesMem(), item.getExceptionsMem(),
-          item.getClassMem());
+          item.getClassMem(), b2i(item.getUsingKernelTemplates()),
+          b2i(Configuration.runtimeInstance().getExceptions()));
         
         m_fromThread.put(item);
       } catch(Exception ex){
@@ -421,7 +457,16 @@ public class CUDAContext implements Context, Runnable {
     }
   }
   
+  private int b2i(boolean value){
+    if(value){
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+  
   private native void cudaRun(int device_index, byte[] cubin_file, int cubin_length,
     int block_shape_x, int grid_shape_x, int num_threads, Memory object_mem,
-    Memory handles_mem, Memory exceptions_mem, Memory class_mem);
+    Memory handles_mem, Memory exceptions_mem, Memory class_mem, 
+    int usingKernelTemplates, int usingExceptions);
 }

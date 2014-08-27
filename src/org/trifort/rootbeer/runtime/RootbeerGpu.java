@@ -14,7 +14,7 @@ public class RootbeerGpu {
   private static int m_blockIdxx;
   private static int m_threadIdxx;
   private static int m_threadId;
-  private static int m_gridDimx;
+  private static long m_gridDimx;
   private static int m_blockDimx;
   
   static {
@@ -49,7 +49,7 @@ public class RootbeerGpu {
     return m_blockDimx;
   }
   
-  public static int getGridDimx(){
+  public static long getGridDimx(){
     return m_gridDimx;
   }
   
@@ -69,7 +69,7 @@ public class RootbeerGpu {
     m_blockDimx = block_dimx;
   }
   
-  public static void setGridDimx(int grid_dimx){
+  public static void setGridDimx(long grid_dimx){
     m_gridDimx = grid_dimx;
   }
   

@@ -60,19 +60,26 @@ long long java_lang_System_nanoTime(int * exception){
 
 __global__ void entry(char * gc_info, char * to_space, int * handles, 
   int * free_pointer, long long * space_size, int * exceptions,
-  int * java_lang_class_refs, int num_blocks){
+  int * java_lang_class_refs, int num_blocks, int using_kernel_templates){
 
   org_trifort_gc_init(free_pointer, to_space, *space_size, java_lang_class_refs);
   __syncthreads();
-
+      
   int loop_control = blockIdx.x * blockDim.x + threadIdx.x;
   if(loop_control >= num_blocks){
     return;
   } else {
-    int handle = handles[loop_control];
-    int exception = 0;   
-    %%invoke_run%%(handle, &exception);
-    exceptions[loop_control] = exception;
+    int handle;
+    if(using_kernel_templates){
+      handle = handles[0];
+    } else {
+      handle = handles[loop_control];
+    }
+    int exception = 0; 
+    %%invoke_run%%(handle, &exception);  
+    if(%%using_exceptions%%){
+      exceptions[loop_control] = exception;
+    }
 
     int * result_free_pointer = (int *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
     *result_free_pointer = *global_free_pointer;

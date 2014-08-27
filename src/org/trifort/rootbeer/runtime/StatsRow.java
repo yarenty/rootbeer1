@@ -14,12 +14,12 @@ public class StatsRow {
   private long m_deserializationTime;
   private long m_overallTime;
   
-  private int m_gridShape;
+  private long m_gridShape;
   private int m_blockShape;
   
   public StatsRow(long serialization_time, long execution_time, 
                   long deserialization_time, long overall_time,
-                  int grid_shape, int block_shape) {
+                  long grid_shape, int block_shape) {
     m_serializationTime = serialization_time;
     m_executionTime = execution_time;
     m_deserializationTime = deserialization_time;
@@ -64,7 +64,7 @@ public class StatsRow {
    * Number of blocks
    * @return 
    */
-  public int getNumBlocks(){
+  public long getNumBlocks(){
     return m_gridShape;
   }
   

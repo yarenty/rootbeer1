@@ -7,17 +7,19 @@ public class KernelLaunch {
   private int m_cubinFileLength;
   private int m_blockShapeX;
   private int m_gridShapeX;
-  private int m_numThreads;
+  private long m_numThreads;
   private Memory m_objectMem;
   private Memory m_handlesMem;
   private Memory m_exceptionsMem;
   private Memory m_classMem;
+  private boolean m_usingKernelTemplates;
   private boolean m_quit;
   private Exception m_exception;
   
   public KernelLaunch(int device_index, byte[] cubin_file, int cubin_file_length, 
-    int block_shape_x, int grid_shape_x, int num_threads, Memory object_mem, 
-    Memory handles_mem, Memory exceptions_mem, Memory class_mem){
+    int block_shape_x, int grid_shape_x, long num_threads, Memory object_mem, 
+    Memory handles_mem, Memory exceptions_mem, Memory class_mem, 
+    boolean usingKernelTemplates){
     
     m_deviceIndex = device_index;
     m_cubinFile = cubin_file;
@@ -29,6 +31,7 @@ public class KernelLaunch {
     m_handlesMem = handles_mem;
     m_exceptionsMem = exceptions_mem;
     m_classMem = class_mem;
+    m_usingKernelTemplates = usingKernelTemplates;
     m_quit = false;
   }
   
@@ -61,7 +64,7 @@ public class KernelLaunch {
   }
 
   public int getNumThreads() {
-    return m_numThreads;
+    return (int) m_numThreads;
   }
 
   public Memory getObjectMem() {
@@ -78,6 +81,10 @@ public class KernelLaunch {
 
   public Memory getClassMem() {
     return m_classMem;
+  }
+  
+  public boolean getUsingKernelTemplates(){
+    return m_usingKernelTemplates;
   }
   
   public void setException(Exception exception){

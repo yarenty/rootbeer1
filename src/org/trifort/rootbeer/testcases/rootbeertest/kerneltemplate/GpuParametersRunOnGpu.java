@@ -9,14 +9,14 @@ public class GpuParametersRunOnGpu implements Kernel {
   private int[] m_threadIdxxs;
   private int[] m_blockIdxxs;
   private int[] m_blockDims;
-  private int[] m_gridDims;
+  private long[] m_gridDims;
   
   public GpuParametersRunOnGpu(int thread_count){
     m_threadIds = new int[thread_count];
     m_threadIdxxs = new int[thread_count];
     m_blockIdxxs = new int[thread_count];
     m_blockDims = new int[thread_count];
-    m_gridDims = new int[thread_count];
+    m_gridDims = new long[thread_count];
   }
   
   @Override
@@ -74,8 +74,8 @@ public class GpuParametersRunOnGpu implements Kernel {
       }
     }
     for(int i = 0; i < m_gridDims.length; ++i){
-      int lhs_value = m_gridDims[i];
-      int rhs_value = rhs.m_gridDims[i];
+      long lhs_value = m_gridDims[i];
+      long rhs_value = rhs.m_gridDims[i];
       if(lhs_value != rhs_value){
         return false;
       }

@@ -363,8 +363,13 @@ public class RootbeerCompiler {
     String name = folder_name + "config.txt";
     ZipEntry entry = new ZipEntry(name);
     entry.setSize(1);
-    byte[] contents = new byte[1];
+    byte[] contents = new byte[2];
     contents[0] = (byte) Configuration.compilerInstance().getMode();
+    if(Configuration.compilerInstance().getExceptions()){
+      contents[1] = (byte) 1;
+    } else {
+      contents[1] = (byte) 0;
+    }
     
     entry.setCrc(calcCrc32(contents));
     zos.putNextEntry(entry);

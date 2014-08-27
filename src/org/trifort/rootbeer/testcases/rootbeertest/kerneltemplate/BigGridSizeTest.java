@@ -18,7 +18,7 @@ public class BigGridSizeTest implements TestKernelTemplate {
   private int m_gridSize;
   public BigGridSizeTest(){ 
     m_blockSize = 1024;
-    m_gridSize = 4096 * 4096;
+    m_gridSize = 2096128;
   }
 
   public Kernel create() {
@@ -27,13 +27,13 @@ public class BigGridSizeTest implements TestKernelTemplate {
   }
 
   public ThreadConfig getThreadConfig() {
-    ThreadConfig ret = new ThreadConfig(m_blockSize, m_gridSize, m_blockSize * m_gridSize);
+    ThreadConfig ret = new ThreadConfig(m_blockSize, m_gridSize, (long) m_blockSize * (long) m_gridSize);
     return ret;
   }
 
   public boolean compare(Kernel original, Kernel from_heap) {
-    MatrixKernel lhs = (MatrixKernel) original;
-    MatrixKernel rhs = (MatrixKernel) from_heap;
+    EmptyKernel lhs = (EmptyKernel) original;
+    EmptyKernel rhs = (EmptyKernel) from_heap;
     return lhs.compare(rhs);
   }
 
