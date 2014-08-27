@@ -144,8 +144,8 @@ public class CUDAContext implements Context, Runnable {
       m_cubinFiles.put(filename, cubin_file);
     }
     
-    m_handlesMemory = new CheckedFixedMemory(8*thread_config.getNumThreads());
-    m_exceptionsMemory = new CheckedFixedMemory(8*thread_config.getNumThreads());
+    m_handlesMemory = new CheckedFixedMemory(4*thread_config.getNumThreads());
+    m_exceptionsMemory = new CheckedFixedMemory(4*thread_config.getNumThreads());
     m_classMemory = new CheckedFixedMemory(1024);
     if(m_objectMemory == null){
       init();
@@ -188,8 +188,8 @@ public class CUDAContext implements Context, Runnable {
       m_cubinFiles.put(filename, cubin_file);
     }
     
-    m_handlesMemory = new CheckedFixedMemory(8*work.size());
-    m_exceptionsMemory = new CheckedFixedMemory(8*work.size());
+    m_handlesMemory = new CheckedFixedMemory(4*work.size());
+    m_exceptionsMemory = new CheckedFixedMemory(4*work.size());
     m_classMemory = new CheckedFixedMemory(1024);
     if(m_objectMemory == null){
       init();
