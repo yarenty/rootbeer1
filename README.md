@@ -6,9 +6,13 @@ The Rootbeer GPU Compiler lets you use GPUs from within Java. It allows you to u
   2. Static and instance methods and fields
   3. Arrays of primitive and reference types of any dimension.
 
+ROOTBEER IS PRE-PRODUCTION BETA. IF ROOTBEER WORKS FOR YOU, PLEASE LET ME KNOW AT PCPRATTS@TRIFORT.ORG
+
 Be aware that you should not expect to get a speedup using a GPU by doing something simple
 like multiplying each element in an array by a scalar. Serialization time is a large bottleneck
-and usually you need an algorithm that is O(n^2) to O(n^3).
+and usually you need an algorithm that is O(n^2) to O(n^3) per O(n) elements of data.
+
+GPU PROGRAMMING IS NOT FOR THE FAINT OF HEART, EVEN WITH ROOTBEER. EXPECT TO SPEND A MONTH OPTIMIZING TRIVIAL EXAMPLES. FEEL FREE TO EMAIL ME FOR DISCUSSIONS BEFORE ATTEMPTING TO USE ROOTBEER.
 
 An experienced GPU developer will look at existing code and find places where control can 
 be transfered to the GPU. Optimal performance in an application will have places with serial
