@@ -8,6 +8,7 @@
 package org.trifort.rootbeer.generate.opencl.tweaks;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -65,8 +66,11 @@ public class ParallelCompile implements Runnable {
     if(single_result){
       ParallelCompileJob job = m_fromCores.take();
       CompileResult result = job.getResult();
-      CompileResult[] ret = new CompileResult[1];
+      CompileResult[] ret = new CompileResult[2];
       ret[0] = result;
+      CompileResult voidResult = new CompileResult(!result.is32Bit(), 
+          new ArrayList<byte[]>(), new ArrayList<String>());
+      ret[1] = voidResult;
       return ret;
     } else {
       ParallelCompileJob ret1 = m_fromCores.take();

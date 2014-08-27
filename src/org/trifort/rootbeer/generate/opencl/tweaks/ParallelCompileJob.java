@@ -46,7 +46,7 @@ public class ParallelCompileJob {
       String command;
       if (File.separator.equals("/")) {
         command = m_cudaPath.get() + "/nvcc " + model_string + " " +
-          m_gencodeOptions + " -fatbin " + m_generated.getAbsolutePath() +
+          m_gencodeOptions + "-I/usr/local/cuda/include -fatbin " + m_generated.getAbsolutePath() +
           " -o " + code_file.getAbsolutePath();
         CompilerRunner runner = new CompilerRunner();
         List<String> errors = runner.run(command);
