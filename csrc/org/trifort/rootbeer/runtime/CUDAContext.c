@@ -191,11 +191,11 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   offset += sizeof(CUdeviceptr);
 
   status = cuParamSeti(function, offset, num_threads);
-  CHECK_STATUS(env, "Error in cuParamSetv: num_threads", status, device)
+  CHECK_STATUS(env, "Error in cuParamSeti: num_threads", status, device)
   offset += sizeof(int);
 
   status = cuParamSeti(function, offset, using_kernel_templates);
-  CHECK_STATUS(env, "Error in cuParamSetv: num_threads", status, device)
+  CHECK_STATUS(env, "Error in cuParamSeti: using_kernel_templates", status, device)
   offset += sizeof(int);
 
   //----------------------------------------------------------------------------
