@@ -48,14 +48,12 @@ public class GencodeOptions {
     
     //sm_12 doesn't support recursion
     if(Configuration.compilerInstance().getRecursion()){
-      System.out.println("warning: sm_12 and sm_11 not supported with recursion. use -norecursion to enable.");
       sm_12 = "";
       sm_11 = "";
     }
     
     //sm_12 doesn't support doubles
     if(Configuration.compilerInstance().getDoubles()){
-      System.out.println("warning: sm_12 and sm_11 not supported with doubles. use -nodoubles to enable.");
       sm_12 = "";
       sm_11 = "";
     }

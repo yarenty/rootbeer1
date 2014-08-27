@@ -134,6 +134,14 @@ public class Main {
       }
     }
     
+    if(Configuration.compilerInstance().getRecursion() && m_printDeviceInfo == false){
+      System.out.println("warning: sm_12 and sm_11 not supported with recursion. use -norecursion to enable.");
+    }
+    
+    if(Configuration.compilerInstance().getDoubles() && m_printDeviceInfo == false){
+      System.out.println("warning: sm_12 and sm_11 not supported with doubles. use -nodoubles to enable.");
+    }
+
     if(arch32bit && !arch64bit) {
       Configuration.compilerInstance().setCompileArchitecture(CompileArchitecture.Arch32bit);
     } else if(!arch32bit && arch64bit) {
