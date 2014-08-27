@@ -156,6 +156,7 @@ See the [example](https://github.com/pcpratts/rootbeer1/tree/master/examples/Mat
 * `-shared-mem-size` = specify the shared memory size
 * `-32bit` = compile with 32bit
 * `-64bit` = compile with 64bit (if you are on a 64bit machine you will want to use just this)
+* `-computecapability` = specify the Compute Capability {sm_11,sm_12,sm_20,sm_21,sm_30,sm_35} (default ALL)
 
 Once you get started, you will find you want to use a combination of -maxregcount, -shared-mem-size and the thread count sent to the GPU to control occupancy.
 
