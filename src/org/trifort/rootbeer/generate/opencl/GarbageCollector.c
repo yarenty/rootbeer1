@@ -19,7 +19,7 @@ $$__device__$$ void org_trifort_gc_collect();
 $$__device__$$ void org_trifort_gc_assign(int * lhs, int rhs);
 $$__device__$$ $$__global$$ char * org_trifort_gc_deref(int handle);
 $$__device__$$ int org_trifort_gc_malloc(int size);
-$$__device__$$ unsigned long long org_trifort_gc_malloc_no_fail(int size);
+$$__device__$$ int org_trifort_gc_malloc_no_fail(int size);
 $$__device__$$ int org_trifort_classConstant(int type_num);
 $$__device__$$ long long java_lang_System_nanoTime(int * exception);
 

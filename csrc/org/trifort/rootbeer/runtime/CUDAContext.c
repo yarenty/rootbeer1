@@ -32,7 +32,7 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error,
     case CUDA_ERROR_NO_BINARY_FOR_GPU:
       cuDeviceGetName(name,1024,device);
       cuDeviceComputeCapability(&a, &b, device);
-      sprintf(msg, "No binary for gpu. Selected %s (%d.%d). 2.0 compatibility required.", name, a, b);
+      sprintf(msg, "No binary for gpu. %s Selected %s (%d.%d). 2.0 compatibility required.", message, name, a, b);
       break;
     default:
       sprintf(msg, "ERROR STATUS:%i : %.900s", error, message);
@@ -100,7 +100,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   CHECK_STATUS(env, "Error in cuModuleLoad", status, device)
   free(fatcubin);
 
-  status = cuModuleGetFunction(&function, module, "_Z5entryPcS_PiPxS1_S0_S0_i"); 
+  status = cuModuleGetFunction(&function, module, "_Z5entryPcS_PiS0_PxS0_S0_i"); 
   CHECK_STATUS(env, "Error in cuModuleGetFunction", status, device)
 
   //----------------------------------------------------------------------------
@@ -114,6 +114,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
   cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
   cpu_heap_end = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
+  cpu_heap_end >>= 4;
 
   cpu_handles_mem = (void *) (*env)->CallLongMethod(env, handles_mem, get_address_method);
   cpu_handles_mem_size = (*env)->CallLongMethod(env, handles_mem, get_size_method);
@@ -234,6 +235,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_info_space", status, device)
 
   cpu_heap_end = info_space[1];
+  cpu_heap_end <<= 4;
 
   status = cuMemcpyDtoH(cpu_object_mem, gpu_object_mem, cpu_heap_end);
   CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_object_mem", status, device)

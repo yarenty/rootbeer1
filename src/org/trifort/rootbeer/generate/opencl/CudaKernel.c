@@ -17,37 +17,39 @@ org_trifort_gc_deref(int handle){
 __device__ int
 org_trifort_gc_malloc(int size){
   unsigned long long space_size = m_Local[1];
-  unsigned long long ret = org_trifort_gc_malloc_no_fail(size);
-  unsigned long long end = ret + size + 8L;
+  int ret = org_trifort_gc_malloc_no_fail(size);
+  unsigned long long long_ret = ret << 4;
+  unsigned long long end = long_ret + size + 8L;
   if(end >= space_size){
     return -1;
   }
-  return (int) (ret >> 4);
+  return ret;
 }
 
 //TODO: don't pass gc_info everywhere because free pointer is __device__
-__device__ unsigned long long * global_free_pointer; 
+__device__ int * global_free_pointer; 
 
-__device__ unsigned long long
+__device__ int
 org_trifort_gc_malloc_no_fail(int size){
   if(size % 16 != 0){
     size += (16 - (size %16));
   }
+  size >>= 4;
 
-  unsigned long long ret;
+  int ret;
   ret = atomicAdd(global_free_pointer, size);
   return ret;
 }
 
 __device__  void
-org_trifort_gc_init(long long * free_pointer, char * to_space, size_t space_size, int * java_lang_class_refs){
+org_trifort_gc_init(int * free_pointer, char * to_space, size_t space_size, int * java_lang_class_refs){
   
   if(threadIdx.x == 0){
     m_Local[0] = (size_t) to_space;
     m_Local[1] = (size_t) space_size;
     m_Local[2] = (size_t) java_lang_class_refs;
     
-    global_free_pointer = (unsigned long long *) free_pointer;
+    global_free_pointer = free_pointer;
   }
 }
 
@@ -57,7 +59,7 @@ long long java_lang_System_nanoTime(int * exception){
 }
 
 __global__ void entry(char * gc_info, char * to_space, int * handles, 
-  long long * free_pointer, long long * space_size, int * exceptions,
+  int * free_pointer, long long * space_size, int * exceptions,
   int * java_lang_class_refs, int num_blocks){
 
   org_trifort_gc_init(free_pointer, to_space, *space_size, java_lang_class_refs);
@@ -72,11 +74,7 @@ __global__ void entry(char * gc_info, char * to_space, int * handles,
     %%invoke_run%%(handle, &exception);
     exceptions[loop_control] = exception;
 
-    __threadfence_system();
-
-    if(loop_control == 0){
-      unsigned long long * result_free_pointer = (unsigned long long *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
-      *result_free_pointer = *global_free_pointer;
-    }
+    int * result_free_pointer = (int *) (gc_info + TO_SPACE_FREE_POINTER_OFFSET);
+    *result_free_pointer = *global_free_pointer;
   }
 }
