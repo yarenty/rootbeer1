@@ -42,7 +42,7 @@ public class CUDAContext implements Context, Runnable {
   private boolean m_usingUncheckedMemory;
   
   public CUDAContext(GpuDevice device){
-    m_usingUncheckedMemory = true;
+    m_usingUncheckedMemory = false;
     m_device = device;    
        
     String arch = System.getProperty("os.arch");
@@ -215,11 +215,11 @@ public class CUDAContext implements Context, Runnable {
     }
     
     if(m_usingUncheckedMemory){
-      m_handlesMemory = new FixedMemory(4);
+      m_handlesMemory = new FixedMemory(4*thread_config.getNumThreads());
       m_exceptionsMemory = new FixedMemory(getExceptionsMemSize(thread_config));
       m_classMemory = new FixedMemory(1024);
     } else {
-      m_handlesMemory = new CheckedFixedMemory(4);
+      m_handlesMemory = new CheckedFixedMemory(4*thread_config.getNumThreads());
       m_exceptionsMemory = new CheckedFixedMemory(getExceptionsMemSize(thread_config));
       m_classMemory = new CheckedFixedMemory(1024);
     }

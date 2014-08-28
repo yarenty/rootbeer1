@@ -29,6 +29,5 @@ public class ThreadConfig {
   
   public long getNumThreads(){
     return m_numThreads;
-  }
-          
+  } 
 }

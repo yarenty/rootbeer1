@@ -84,7 +84,7 @@ public class Rootbeer {
     
     return new ThreadConfig(block_shaper.getMaxThreadsPerBlock(), 
                             block_shaper.getMaxBlocksPerProc(),
-                            kernels.size());
+                            (long) kernels.size());
   }
   
   public void run(Kernel template, ThreadConfig thread_config){

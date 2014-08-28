@@ -21,7 +21,7 @@ public class DoubleToStringKernelTemplateTest implements TestKernelTemplate {
   
   @Override
   public ThreadConfig getThreadConfig() {
-    return new ThreadConfig(m_blockSize, m_gridSize, m_blockSize * m_gridSize);
+    return new ThreadConfig(m_blockSize, m_gridSize, (long) m_blockSize * (long) m_gridSize);
   }
   
   @Override
