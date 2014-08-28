@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     org_trifort_rootbeer_runtime_CUDAContext
  * Method:    cudaRun
- * Signature: (I[BIIIILorg/trifort/rootbeer/runtime/Memory;Lorg/trifort/rootbeer/runtime/Memory;Lorg/trifort/rootbeer/runtime/Memory;Lorg/trifort/rootbeer/runtime/Memory;)V
+ * Signature: (I[BIIIILorg/trifort/rootbeer/runtime/Memory;Lorg/trifort/rootbeer/runtime/Memory;Lorg/trifort/rootbeer/runtime/Memory;Lorg/trifort/rootbeer/runtime/Memory;II)V
  */
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
-  (JNIEnv *, jobject, jint, jbyteArray, jint, jint, jint, jint, jobject, jobject, jobject, jobject);
+  (JNIEnv *, jobject, jint, jbyteArray, jint, jint, jint, jint, jobject, jobject, jobject, jobject, jint, jint);
 
 #ifdef __cplusplus
 }
