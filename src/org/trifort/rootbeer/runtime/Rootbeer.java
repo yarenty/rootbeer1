@@ -1,23 +1,13 @@
 package org.trifort.rootbeer.runtime;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
 public class Rootbeer {
 
-  private IRuntime m_openCLRuntime;
   private IRuntime m_cudaRuntime;
-  private IRuntime m_nativeRuntime;
-  
-  private List<StatsRow> m_stats;
-  private boolean m_ranGpu;
-  private ThreadConfig m_threadConfig;
-  
   private List<GpuDevice> m_cards;
   
   static {
@@ -26,7 +16,6 @@ public class Rootbeer {
   }
   
   public Rootbeer(){
-    m_stats = new ArrayList<StatsRow>();
   }
   
   public List<GpuDevice> getDevices(){
@@ -41,7 +30,7 @@ public class Rootbeer {
       m_cudaRuntime = ctor.newInstance();
       m_cards.addAll(m_cudaRuntime.getGpuDevices());
     } catch(Exception ex){
-	  ex.printStackTrace();
+      ex.printStackTrace();
       //ignore
     }
     

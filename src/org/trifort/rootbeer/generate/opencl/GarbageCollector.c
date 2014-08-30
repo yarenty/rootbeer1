@@ -289,7 +289,7 @@ int org_trifort_rootbeer_runtime_RootbeerGpu_getBlockDimx(int * exception){
 }
 
 $$__device__$$ 
-int org_trifort_rootbeer_runtime_RootbeerGpu_getGridDimx(int * exception){
+long long org_trifort_rootbeer_runtime_RootbeerGpu_getGridDimx(int * exception){
   return getGridDimx();
 }
 

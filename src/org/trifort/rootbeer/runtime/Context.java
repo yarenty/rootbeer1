@@ -10,7 +10,9 @@ public interface Context {
   public void close();
   public GpuDevice getDevice();
   public List<StatsRow> getStats();
+  public void setCacheConfig(CacheConfig config);
   
   public void run(Kernel template, ThreadConfig thread_config);
   public void run(List<Kernel> work, ThreadConfig thread_config);
+  
 }

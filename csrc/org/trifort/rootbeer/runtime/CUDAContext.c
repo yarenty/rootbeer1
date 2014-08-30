@@ -48,7 +48,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   (JNIEnv *env, jobject this_ref, jint device_index, jbyteArray cubin_file,
    jint cubin_length, jint block_shape_x, jint grid_shape_x, jint num_threads,
    jobject object_mem, jobject handles_mem, jobject exceptions_mem,
-   jobject class_mem, jint using_kernel_templates, jint using_exceptions)
+   jobject class_mem, jint using_kernel_templates, jint using_exceptions,
+   jint cache_config)
 {
   CUresult status;
   CUdevice device;
@@ -83,6 +84,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   jmethodID get_heap_end_method;
 
   jlong * info_space;
+  CUfunc_cache cache_config_enum;
 
   //----------------------------------------------------------------------------
   //init device and function
@@ -102,6 +104,22 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
 
   status = cuModuleGetFunction(&function, module, "_Z5entryPcS_PiS0_PxS0_S0_ii");
   CHECK_STATUS(env, "Error in cuModuleGetFunction", status, device)
+
+  if(cache_config != 0){
+    switch(cache_config){
+      case 1:
+        cache_config_enum = CU_FUNC_CACHE_PREFER_SHARED;
+        break;
+      case 2:
+        cache_config_enum = CU_FUNC_CACHE_PREFER_L1;
+        break;
+      case 3:
+        cache_config_enum = CU_FUNC_CACHE_PREFER_EQUAL;
+        break;
+    }
+    status = cuFuncSetCacheConfig(function, cache_config_enum);
+    CHECK_STATUS(env, "Error in cuFuncSetCacheConfig", status, device)
+  }
 
   //----------------------------------------------------------------------------
   //get handles from java
@@ -125,7 +143,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   cpu_class_mem = (void *) (*env)->CallLongMethod(env, class_mem, get_address_method);
   cpu_class_mem_size = (*env)->CallLongMethod(env, class_mem, get_size_method);
 
-  info_space_size = 1024;
+  info_space_size = 16;
   info_space = (jlong *) malloc(info_space_size);
   info_space[1] = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
 

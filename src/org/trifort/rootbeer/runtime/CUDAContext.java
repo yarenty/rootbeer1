@@ -40,9 +40,10 @@ public class CUDAContext implements Context, Runnable {
   private BlockingQueue<KernelLaunch> m_fromThread;
   
   private boolean m_usingUncheckedMemory;
+  private CacheConfig m_cacheConfig;
   
   public CUDAContext(GpuDevice device){
-    m_usingUncheckedMemory = false;
+    m_usingUncheckedMemory = true;
     m_device = device;    
        
     String arch = System.getProperty("os.arch");
@@ -58,6 +59,7 @@ public class CUDAContext implements Context, Runnable {
     
     m_handles = new HashMap<Kernel, Long>();
     m_textureMemory = new CheckedFixedMemory(64);
+    m_cacheConfig = CacheConfig.PREFER_NONE;
     
     m_toThread = new BlockingQueue<KernelLaunch>();
     m_fromThread = new BlockingQueue<KernelLaunch>();
@@ -91,7 +93,7 @@ public class CUDAContext implements Context, Runnable {
     if(free_mem_size <= 0){
       StringBuilder error = new StringBuilder();
       error.append("OutOfMemory while allocating Java CPU and GPU memory.\n");
-      error.append("  Try increasing the the initial Java Heap Size using -Xms.\n");
+      error.append("  Try increasing the max Java Heap Size using -Xmx and the initial Java Heap Size using -Xms.\n");
       error.append("  Try reducing the number of threads you are using.\n");
       error.append("  Try using kernel templates.\n");
       error.append("  Debugging Output:\n");
@@ -384,13 +386,14 @@ public class CUDAContext implements Context, Runnable {
   }
   
   private void runBlocks(ThreadConfig thread_config, byte[] cubin_file){    
+    
     m_runOnGpuStopwatch.start();
     
     KernelLaunch item = new KernelLaunch(m_device.getDeviceId(), cubin_file, 
       cubin_file.length, thread_config.getBlockShapeX(), 
       thread_config.getGridShapeX(), thread_config.getNumThreads(), 
       m_objectMemory, m_handlesMemory, m_exceptionsMemory, m_classMemory,
-      m_usingKernelTemplates);
+      m_usingKernelTemplates, m_cacheConfig);
     
     m_toThread.put(item);
     item = m_fromThread.take();
@@ -429,6 +432,11 @@ public class CUDAContext implements Context, Runnable {
   }
   
   @Override
+  public void setCacheConfig(CacheConfig config) {
+    m_cacheConfig = config;
+  }
+  
+  @Override
   public void run() {
     while(true){        
       
@@ -442,12 +450,28 @@ public class CUDAContext implements Context, Runnable {
           m_fromThread.put(item);
           return;
         }
+
+        int cache_config = 0;
+        switch(item.getCacheConfig()){
+        case PREFER_NONE:
+          cache_config = 0;
+          break;
+        case PREFER_SHARED:
+          cache_config = 1;
+          break;
+        case PREFER_L1:
+          cache_config = 2;
+          break;
+        case PREFER_EQUAL:
+          cache_config = 3;
+          break;
+        }
         
         cudaRun(item.getDeviceIndex(), item.getCubinFile(), item.getCubinLength(),
           item.getBlockShapeX(), item.getGridShapeX(), item.getNumThreads(), 
           item.getObjectMem(), item.getHandlesMem(), item.getExceptionsMem(),
           item.getClassMem(), b2i(item.getUsingKernelTemplates()),
-          b2i(Configuration.runtimeInstance().getExceptions()));
+          b2i(Configuration.runtimeInstance().getExceptions()), cache_config);
         
         m_fromThread.put(item);
       } catch(Exception ex){
@@ -468,5 +492,5 @@ public class CUDAContext implements Context, Runnable {
   private native void cudaRun(int device_index, byte[] cubin_file, int cubin_length,
     int block_shape_x, int grid_shape_x, int num_threads, Memory object_mem,
     Memory handles_mem, Memory exceptions_mem, Memory class_mem, 
-    int usingKernelTemplates, int usingExceptions);
+    int usingKernelTemplates, int usingExceptions, int cache_config);
 }

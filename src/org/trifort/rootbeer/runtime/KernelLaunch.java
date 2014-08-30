@@ -13,13 +13,14 @@ public class KernelLaunch {
   private Memory m_exceptionsMem;
   private Memory m_classMem;
   private boolean m_usingKernelTemplates;
+  private CacheConfig m_cacheConfig;
   private boolean m_quit;
   private Exception m_exception;
   
   public KernelLaunch(int device_index, byte[] cubin_file, int cubin_file_length, 
     int block_shape_x, int grid_shape_x, long num_threads, Memory object_mem, 
-    Memory handles_mem, Memory exceptions_mem, Memory class_mem, 
-    boolean usingKernelTemplates){
+    Memory handles_mem, Memory exceptions_mem, Memory class_mem,
+    boolean usingKernelTemplates, CacheConfig cache_config){
     
     m_deviceIndex = device_index;
     m_cubinFile = cubin_file;
@@ -32,6 +33,7 @@ public class KernelLaunch {
     m_exceptionsMem = exceptions_mem;
     m_classMem = class_mem;
     m_usingKernelTemplates = usingKernelTemplates;
+    m_cacheConfig = cache_config;
     m_quit = false;
   }
   
@@ -81,6 +83,10 @@ public class KernelLaunch {
 
   public Memory getClassMem() {
     return m_classMem;
+  }
+  
+  public CacheConfig getCacheConfig(){
+    return m_cacheConfig;
   }
   
   public boolean getUsingKernelTemplates(){
