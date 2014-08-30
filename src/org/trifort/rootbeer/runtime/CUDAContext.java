@@ -41,6 +41,7 @@ public class CUDAContext implements Context, Runnable {
   
   private boolean m_usingUncheckedMemory;
   private CacheConfig m_cacheConfig;
+  private long m_requiredMemorySize;
   
   public CUDAContext(GpuDevice device){
     m_usingUncheckedMemory = true;
@@ -435,6 +436,11 @@ public class CUDAContext implements Context, Runnable {
   public void setCacheConfig(CacheConfig config) {
     m_cacheConfig = config;
   }
+
+  @Override
+  public long getRequiredMemory() {
+    return m_requiredMemorySize;
+  }
   
   @Override
   public void run() {
@@ -473,6 +479,8 @@ public class CUDAContext implements Context, Runnable {
           item.getClassMem(), b2i(item.getUsingKernelTemplates()),
           b2i(Configuration.runtimeInstance().getExceptions()), cache_config);
         
+        m_requiredMemorySize = item.getObjectMem().getHeapEndPtr();
+        
         m_fromThread.put(item);
       } catch(Exception ex){
         item.setException(ex);
@@ -493,4 +501,5 @@ public class CUDAContext implements Context, Runnable {
     int block_shape_x, int grid_shape_x, int num_threads, Memory object_mem,
     Memory handles_mem, Memory exceptions_mem, Memory class_mem, 
     int usingKernelTemplates, int usingExceptions, int cache_config);
+
 }

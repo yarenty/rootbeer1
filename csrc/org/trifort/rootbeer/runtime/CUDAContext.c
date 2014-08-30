@@ -82,6 +82,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   jmethodID get_address_method;
   jmethodID get_size_method;
   jmethodID get_heap_end_method;
+  jmethodID set_heap_end_method;
 
   jlong * info_space;
   CUfunc_cache cache_config_enum;
@@ -128,6 +129,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   get_address_method = (*env)->GetMethodID(env, cuda_memory_class, "getAddress", "()J");
   get_size_method = (*env)->GetMethodID(env, cuda_memory_class, "getSize", "()J");
   get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEndPtr", "()J");
+  set_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "setHeapEndPtr", "(J)V");
 
   cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
   cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
@@ -270,6 +272,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
     status = cuMemcpyDtoH(cpu_exceptions_mem, gpu_exceptions_mem, cpu_exceptions_mem_size);
     CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_exceptions_mem", status, device)
   }
+
+  (*env)->CallVoidMethod(env, handles_mem, set_heap_end_method, cpu_heap_end);
 
   //----------------------------------------------------------------------------
   //free resources

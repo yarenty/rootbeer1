@@ -11,6 +11,7 @@ public interface Context {
   public GpuDevice getDevice();
   public List<StatsRow> getStats();
   public void setCacheConfig(CacheConfig config);
+  public long getRequiredMemory();
   
   public void run(Kernel template, ThreadConfig thread_config);
   public void run(List<Kernel> work, ThreadConfig thread_config);

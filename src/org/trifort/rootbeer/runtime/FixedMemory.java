@@ -262,6 +262,11 @@ public class FixedMemory implements Memory {
   public long getHeapEndPtr() {
     return m_currentPointer.m_heapEnd;
   }
+
+  @Override
+  public void setHeapEndPtr(long value) {
+    m_currentPointer.m_heapEnd = value;
+  }
   
   @Override
   public long getSize() {

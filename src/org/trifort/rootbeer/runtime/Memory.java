@@ -52,6 +52,7 @@ public interface Memory {
   public void useStaticPointer();
   public void align();
   public void clearHeapEndPtr();
+  public void setHeapEndPtr(long value);
   public long getHeapEndPtr();
   public long getPointer();
   public long getSize();
