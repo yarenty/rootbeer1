@@ -138,15 +138,22 @@ public class CUDAContext implements Context, Runnable {
     m_usingKernelTemplates = true;
     m_runStopwatch.start();
     CompiledKernel compiled_kernel = (CompiledKernel) template;
-    
+
     String filename;
+    int size = 0;
+    boolean error;
+    
     if(m_32bit){
       filename = compiled_kernel.getCubin32();
+      size = compiled_kernel.getCubin32Size();
+      error = compiled_kernel.getCubin32Error();
     } else {
       filename = compiled_kernel.getCubin64();
+      size = compiled_kernel.getCubin64Size();
+      error = compiled_kernel.getCubin32Error();
     }
     
-    if(filename.endsWith(".error")){
+    if(error){
       throw new RuntimeException("CUDA code compiled with error");
     }
     
@@ -155,9 +162,10 @@ public class CUDAContext implements Context, Runnable {
     if(m_cubinFiles.containsKey(filename)){
       cubin_file = m_cubinFiles.get(filename);
     } else {
-      cubin_file = readCubinFile(filename);
+      cubin_file = readCubinFile(filename, size);
       m_cubinFiles.put(filename, cubin_file);
     }
+    
     if(m_usingUncheckedMemory){
       m_handlesMemory = new FixedMemory(4);
       m_classMemory = new FixedMemory(1024);
@@ -198,13 +206,20 @@ public class CUDAContext implements Context, Runnable {
     CompiledKernel compiled_kernel = (CompiledKernel) work.get(0);
     
     String filename;
+    int size = 0;
+    boolean error;
+    
     if(m_32bit){
       filename = compiled_kernel.getCubin32();
+      size = compiled_kernel.getCubin32Size();
+      error = compiled_kernel.getCubin32Error();
     } else {
       filename = compiled_kernel.getCubin64();
+      size = compiled_kernel.getCubin64Size();
+      error = compiled_kernel.getCubin32Error();
     }
     
-    if(filename.endsWith(".error")){
+    if(error){
       throw new RuntimeException("CUDA code compiled with error");
     }
     
@@ -213,7 +228,7 @@ public class CUDAContext implements Context, Runnable {
     if(m_cubinFiles.containsKey(filename)){
       cubin_file = m_cubinFiles.get(filename);
     } else {
-      cubin_file = readCubinFile(filename);
+      cubin_file = readCubinFile(filename, size);
       m_cubinFiles.put(filename, cubin_file);
     }
     
@@ -413,20 +428,10 @@ public class CUDAContext implements Context, Runnable {
     }
   }  
 
-  private byte[] readCubinFile(String filename) {
+  private byte[] readCubinFile(String filename, int length) {
     try {
-      List<byte[]> buffer = ResourceReader.getResourceArray(filename);
-      int total_len = 0;
-      for(byte[] sub_buffer : buffer){
-        total_len += sub_buffer.length;
-      }
-      byte[] cubin_file = new byte[total_len];
-      int pos = 0;
-      for(byte[] small_buffer : buffer){
-        System.arraycopy(small_buffer, 0, cubin_file, pos, small_buffer.length);
-        pos += small_buffer.length;
-      }
-      return cubin_file;
+      byte[] buffer = ResourceReader.getResourceArray(filename, length);
+      return buffer;
     } catch(Exception ex){
       throw new RuntimeException(ex);
     }

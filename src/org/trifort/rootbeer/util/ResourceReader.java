@@ -35,6 +35,19 @@ public class ResourceReader {
     is.close();
     return ret.toString();
   }
+
+
+  public static byte[] getResourceArray(String jar_path, int length) throws IOException {
+    InputStream is = ResourceReader.class.getResourceAsStream(jar_path);
+    byte[] ret = new byte[length];
+    int offset = 0;
+    while(offset < length){
+      int thisLength = length - offset;
+      int read = is.read(ret, offset, thisLength);
+      offset += read;
+    }
+    return ret;
+  }
   
   public static List<byte[]> getResourceArray(String jar_path) throws IOException {
     InputStream is = ResourceReader.class.getResourceAsStream(jar_path);

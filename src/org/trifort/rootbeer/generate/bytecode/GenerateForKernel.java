@@ -74,6 +74,28 @@ public class GenerateForKernel {
     bcl.endMethod();
   }
   
+  private void makeGetCubinSizeMethod(boolean m32, int length){
+    BytecodeLanguage bcl = new BytecodeLanguage();
+    bcl.openClass(m_sootClass);
+    bcl.startMethod("getCubin"+(m32 ? "32" : "64")+"Size", IntType.v());
+    Local thisref = bcl.refThis();
+    bcl.returnValue(IntConstant.v(length));
+    bcl.endMethod();
+  }
+
+  private void makeGetCubinErrorMethod(boolean m32, boolean error){
+    BytecodeLanguage bcl = new BytecodeLanguage();
+    bcl.openClass(m_sootClass);
+    bcl.startMethod("getCubin"+(m32 ? "32" : "64")+"Error", BooleanType.v());
+    Local thisref = bcl.refThis();
+    int intError = 0;
+    if(error == true){
+      intError = 1;
+    }
+    bcl.returnValue(IntConstant.v(intError));
+    bcl.endMethod();
+  }
+  
   private void makeGetCodeMethodThatReturnsString(String gpu_code, boolean unix){    
     //make the getCode method with the results of the opencl code generation
     String name = "getCode";
@@ -153,10 +175,14 @@ public class GenerateForKernel {
         String suffix = res.is32Bit() ? "-32" : "-64";
         if (res.getBinary() == null) {
           makeGetCodeMethodThatReturnsBytes(res.is32Bit(), cubinFilename(false, suffix) + ".error");
+          makeGetCubinSizeMethod(res.is32Bit(), 0);
+          makeGetCubinErrorMethod(res.is32Bit(), true);
         } else {
-          List<byte[]> bytes = res.getBinary();
+          byte[] bytes = res.getBinary();
           writeBytesToFile(bytes, cubinFilename(true, suffix));
           makeGetCodeMethodThatReturnsBytes(res.is32Bit(), cubinFilename(false, suffix));
+          makeGetCubinSizeMethod(res.is32Bit(), bytes.length);
+          makeGetCubinErrorMethod(res.is32Bit(), false);
         }
       }
       makeGetCodeMethodThatReturnsString("", true);
@@ -203,15 +229,13 @@ public class GenerateForKernel {
       return class_name;
   }
   
-  private void writeBytesToFile(List<byte[]> bytes, String filename) {
+  private void writeBytesToFile(byte[] bytes, String filename) {
     try {
       File file = new File(filename);
       File parent = file.getParentFile();
       parent.mkdirs();
       OutputStream os = new FileOutputStream(filename);
-      for(byte[] buffer : bytes){
-        os.write(buffer);
-      }
+      os.write(bytes);
       os.flush();
       os.close();
     } catch(Exception ex){
