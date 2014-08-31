@@ -1,7 +1,5 @@
 package org.trifort.rootbeer.runtime;
 
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -286,6 +284,7 @@ public class CUDAContext implements Context {
     runOnGpuStopwatch.start();
     cudaRun(nativeContext, (int) (handle >> 4), objectMemory);
     runOnGpuStopwatch.stop();
+    requiredMemorySize = objectMemory.getHeapEndPtr();
     stats.setExecutionTime(runOnGpuStopwatch.elapsedTimeMillis());
   }
   

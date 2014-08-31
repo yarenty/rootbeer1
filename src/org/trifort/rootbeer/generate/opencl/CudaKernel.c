@@ -16,10 +16,9 @@ org_trifort_gc_deref(int handle){
 
 __device__ int
 org_trifort_gc_malloc(int size){
-  unsigned long long space_size = m_Local[1];
+  int space_size = (int) m_Local[1];
   int ret = org_trifort_gc_malloc_no_fail(size);
-  unsigned long long long_ret = ret << 4;
-  unsigned long long end = long_ret + size + 8L;
+  int end = ret + ((size + 16) >> 4);
   if(end >= space_size){
     return -1;
   }
@@ -32,7 +31,7 @@ __device__ int * global_free_pointer;
 __device__ int
 org_trifort_gc_malloc_no_fail(int size){
   if(size % 16 != 0){
-    size += (16 - (size %16));
+    size += (16 - (size % 16));
   }
   size >>= 4;
 
@@ -46,19 +45,19 @@ long long java_lang_System_nanoTime(int * exception){
   return (long long) clock64();
 }
 
-__global__ void entry(char * to_space, int * exceptions, 
-  int * java_lang_class_refs, int space_size, int num_blocks, int handle){
+__global__ void entry(char * objectMemory, int * exceptions, 
+  int * classRefs, int spaceSize, int numBlocks, int handle){
 
   int loop_control = blockIdx.x * blockDim.x + threadIdx.x;
   
   if(threadIdx.x == 0){
-    m_Local[0] = (size_t) to_space;
-    m_Local[1] = (size_t) space_size;
-    m_Local[2] = (size_t) java_lang_class_refs;
+    m_Local[0] = (size_t) objectMemory;
+    m_Local[1] = (size_t) spaceSize;
+    m_Local[2] = (size_t) classRefs;
   }
   __syncthreads();
       
-  if(loop_control >= num_blocks){
+  if(loop_control >= numBlocks){
     return;
   } else {
     int exception = 0; 

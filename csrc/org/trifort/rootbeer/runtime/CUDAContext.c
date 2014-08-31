@@ -12,7 +12,6 @@ struct ContextState {
   CUdeviceptr gpu_exceptions_mem;
   CUdeviceptr gpu_class_mem;
   CUdeviceptr gpu_heap_end;
-  CUdeviceptr gpu_buffer_size;
 
   void * cpu_object_mem;
   void * cpu_exceptions_mem;
@@ -105,7 +104,6 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_freeNativeC
   cuMemFree(stateObject->gpu_exceptions_mem);
   cuMemFree(stateObject->gpu_class_mem);
   cuMemFree(stateObject->gpu_heap_end);
-  cuMemFree(stateObject->gpu_buffer_size);
   cuCtxDestroy(stateObject->context);
 
   free(stateObject);
@@ -123,6 +121,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   void * fatcubin;
   int offset;
   CUfunc_cache cache_config_enum;
+  jint objectMemSizeShifted;
 
   struct ContextState * stateObject = (struct ContextState *) nativeContext;
 
@@ -194,15 +193,18 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   status = cuMemAlloc(&(stateObject->gpu_heap_end), 4);
   CHECK_STATUS(env, "Error in cuMemAlloc: gpu_heap_end", status, stateObject->device)
 
-  status = cuMemAlloc(&(stateObject->gpu_buffer_size), 8);
-  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_buffer_size", status, stateObject->device)
-
   //----------------------------------------------------------------------------
   //set function parameters
   //----------------------------------------------------------------------------
   status = cuParamSetSize(stateObject->function, (3 * sizeof(CUdeviceptr)) + (3 * sizeof(int)));
   CHECK_STATUS(env, "Error in cuParamSetSize", status, stateObject->device)
 
+/*
+
+__global__ void entry(char * objectMemory, int * exceptions,
+  int * classRefs, int spaceSize, int numBlocks, int handle){
+
+*/
   offset = 0;
   status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_object_mem), sizeof(CUdeviceptr));
   CHECK_STATUS(env, "Error in cuParamSetv: gpu_object_mem", status, stateObject->device)
@@ -216,7 +218,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   CHECK_STATUS(env, "Error in cuParamSetv: gpu_class_mem", status, stateObject->device)
   offset += sizeof(CUdeviceptr);
 
-  status = cuParamSeti(stateObject->function, offset, (int) stateObject->cpu_object_mem_size);
+  objectMemSizeShifted = (jint) (stateObject->cpu_object_mem_size >> 4);
+  status = cuParamSeti(stateObject->function, offset, objectMemSizeShifted);
   CHECK_STATUS(env, "Error in cuParamSeti: space_size", status, stateObject->device)
   offset += sizeof(int);
 
@@ -265,9 +268,6 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
 
   status = cuMemcpyHtoD(stateObject->gpu_heap_end, &(heap_end_int), sizeof(jint));
   CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_heap_end", status, stateObject->device)
-
-  status = cuMemcpyHtoD(stateObject->gpu_buffer_size, &(stateObject->cpu_object_mem_size), sizeof(jlong));
-  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_buffer_size", status, stateObject->device)
 
   if(stateObject->using_exceptions){
     status = cuMemcpyHtoD(stateObject->gpu_exceptions_mem, stateObject->cpu_exceptions_mem, stateObject->cpu_exceptions_mem_size);
