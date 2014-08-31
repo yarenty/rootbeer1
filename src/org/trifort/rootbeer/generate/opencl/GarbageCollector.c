@@ -27,9 +27,6 @@ $$__device__$$ long long java_lang_System_nanoTime(int * exception);
 #define CACHE_SIZE_INTS (CACHE_SIZE_BYTES / sizeof(int))
 #define CACHE_ENTRY_SIZE 4
 
-#define TO_SPACE_OFFSET               0
-#define TO_SPACE_FREE_POINTER_OFFSET  8
-
 $$__device__$$ char org_trifort_getchar($$__global$$ char * buffer, int pos){
   return buffer[pos];
 }

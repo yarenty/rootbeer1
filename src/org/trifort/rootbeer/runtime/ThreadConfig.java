@@ -11,9 +11,9 @@ public class ThreadConfig {
 
   private int m_blockShapeX;
   private int m_gridShapeX;
-  private long m_numThreads;
+  private int m_numThreads;
   
-  public ThreadConfig(int block_shape_x, int grid_shape_x, long numThreads){
+  public ThreadConfig(int block_shape_x, int grid_shape_x, int numThreads){
     m_blockShapeX = block_shape_x;
     m_gridShapeX = grid_shape_x;
     m_numThreads = numThreads;
@@ -27,7 +27,7 @@ public class ThreadConfig {
     return m_gridShapeX;
   }
   
-  public long getNumThreads(){
+  public int getNumThreads(){
     return m_numThreads;
   } 
 }

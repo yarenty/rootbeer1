@@ -81,7 +81,7 @@ public class GpuDevice {
   
   public Context createContext(){
     if(m_deviceType == DEVICE_TYPE_CUDA){
-      return new CUDAContext(this);
+      return new CUDAContext_old(this);
     } else {
       throw new UnsupportedOperationException();
     }
@@ -89,7 +89,7 @@ public class GpuDevice {
   
   public Context createContext(int memory_size){
     if(m_deviceType == DEVICE_TYPE_CUDA){
-      CUDAContext ret = new CUDAContext(this);
+      CUDAContext_old ret = new CUDAContext_old(this);
       ret.init(memory_size);
       return ret;
     } else {

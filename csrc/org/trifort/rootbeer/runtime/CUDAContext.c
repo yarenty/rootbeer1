@@ -1,6 +1,43 @@
 #include "CUDARuntime.h"
 #include <cuda.h>
 
+struct ContextState {
+  CUdevice device;
+  CUcontext context;
+  CUmodule module;
+  CUfunction function;
+
+  CUdeviceptr gpu_info_space;
+  CUdeviceptr gpu_object_mem;
+  CUdeviceptr gpu_exceptions_mem;
+  CUdeviceptr gpu_class_mem;
+  CUdeviceptr gpu_heap_end;
+  CUdeviceptr gpu_buffer_size;
+
+  void * cpu_object_mem;
+  void * cpu_exceptions_mem;
+  void * cpu_class_mem;
+
+  jlong cpu_object_mem_size;
+  jlong cpu_exceptions_mem_size;
+  jlong cpu_class_mem_size;
+
+  jint * info_space;
+  jint grid_shape_x;
+  jint handle_offset;
+  jint using_exceptions;
+
+  jobject object_mem;
+  jobject exceptions_mem;
+  jobject class_mem;
+};
+
+jclass cuda_memory_class;
+jmethodID get_address_method;
+jmethodID get_size_method;
+jmethodID get_heap_end_method;
+jmethodID set_heap_end_method;
+
 #define CHECK_STATUS(env,msg,status,device) \
 if (CUDA_SUCCESS != status) {\
   throw_cuda_errror_exception(env, msg, status, device);\
@@ -44,67 +81,79 @@ void throw_cuda_errror_exception(JNIEnv *env, const char *message, int error,
   return;
 }
 
-JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
-  (JNIEnv *env, jobject this_ref, jint device_index, jbyteArray cubin_file,
-   jint cubin_length, jint block_shape_x, jint grid_shape_x, jint num_threads,
-   jobject object_mem, jobject handles_mem, jobject exceptions_mem,
-   jobject class_mem, jint using_kernel_templates, jint using_exceptions,
-   jint cache_config)
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_initializeDriver
+  (JNIEnv *env, jobject this_ref)
+{
+  cuda_memory_class = (*env)->FindClass(env, "org/trifort/rootbeer/runtime/FixedMemory");
+  get_address_method = (*env)->GetMethodID(env, cuda_memory_class, "getAddress", "()J");
+  get_size_method = (*env)->GetMethodID(env, cuda_memory_class, "getSize", "()J");
+  get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEndPtr", "()J");
+  set_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "setHeapEndPtr", "(J)V");
+}
+
+JNIEXPORT jlong JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_allocateNativeContext
+  (JNIEnv *env, jobject this_ref)
+{
+  struct ContextState * ret = (struct ContextState *) malloc(sizeof(struct ContextState));
+  return (jlong) ret;
+}
+
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_freeNativeContext
+  (JNIEnv *env, jobject this_ref, jlong reference)
+{
+  struct ContextState * stateObject = (struct ContextState *) reference;
+
+  free(stateObject->info_space);
+  cuMemFree(stateObject->gpu_info_space);
+  cuMemFree(stateObject->gpu_object_mem);
+  cuMemFree(stateObject->gpu_exceptions_mem);
+  cuMemFree(stateObject->gpu_class_mem);
+  cuMemFree(stateObject->gpu_heap_end);
+  cuMemFree(stateObject->gpu_buffer_size);
+  cuCtxDestroy(stateObject->context);
+
+  free(stateObject);
+}
+
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuildState
+  (JNIEnv *env, jobject this_ref, jlong nativeContext, jint device_index,
+   jbyteArray cubin_file, jint cubin_length, jint block_shape_x,
+   jint grid_shape_x, jint num_threads, jobject object_mem,
+   jobject exceptions_mem, jobject class_mem,
+   jint using_exceptions, jint cache_config)
+
 {
   CUresult status;
-  CUdevice device;
-  CUcontext context;
-  CUmodule module;
-  CUfunction function;
   void * fatcubin;
   int offset;
-  int info_space_size;
-
-  CUdeviceptr gpu_info_space;
-  CUdeviceptr gpu_object_mem;
-  CUdeviceptr gpu_handles_mem;
-  CUdeviceptr gpu_exceptions_mem;
-  CUdeviceptr gpu_class_mem;
-  CUdeviceptr gpu_heap_end;
-  CUdeviceptr gpu_buffer_size;
-
-  void * cpu_object_mem;
-  void * cpu_handles_mem;
-  void * cpu_exceptions_mem;
-  void * cpu_class_mem;
-  jlong cpu_object_mem_size;
-  jlong cpu_handles_mem_size;
-  jlong cpu_exceptions_mem_size;
-  jlong cpu_class_mem_size;
-  jlong cpu_heap_end;
-
-  jclass cuda_memory_class;
-  jmethodID get_address_method;
-  jmethodID get_size_method;
-  jmethodID get_heap_end_method;
-  jmethodID set_heap_end_method;
-
-  jlong * info_space;
   CUfunc_cache cache_config_enum;
 
-  //----------------------------------------------------------------------------
-  //init device and function
-  //----------------------------------------------------------------------------
-  status = cuDeviceGet(&device, device_index);
-  CHECK_STATUS(env, "Error in cuDeviceGet", status, device)
+  struct ContextState * stateObject = (struct ContextState *) nativeContext;
 
-  status = cuCtxCreate(&context, CU_CTX_MAP_HOST, device);
-  CHECK_STATUS(env,"Error in cuCtxCreate", status, device)
+  stateObject->grid_shape_x = grid_shape_x;
+  stateObject->using_exceptions = using_exceptions;
+
+  stateObject->object_mem = object_mem;
+  stateObject->exceptions_mem = exceptions_mem;
+  stateObject->class_mem = class_mem;
+
+  status = cuDeviceGet(&(stateObject->device), device_index);
+  CHECK_STATUS(env, "Error in cuDeviceGet", status, stateObject->device)
+
+  status = cuCtxCreate(&(stateObject->context), CU_CTX_MAP_HOST,
+    stateObject->device);
+  CHECK_STATUS(env,"Error in cuCtxCreate", status, stateObject->device)
 
   fatcubin = malloc(cubin_length);
   (*env)->GetByteArrayRegion(env, cubin_file, 0, cubin_length, fatcubin);
 
-  status = cuModuleLoadFatBinary(&module, fatcubin);
-  CHECK_STATUS(env, "Error in cuModuleLoad", status, device)
+  status = cuModuleLoadFatBinary(&(stateObject->module), fatcubin);
+  CHECK_STATUS(env, "Error in cuModuleLoad", status, stateObject->device)
   free(fatcubin);
 
-  status = cuModuleGetFunction(&function, module, "_Z5entryPcS_PiS0_PxS0_S0_ii");
-  CHECK_STATUS(env, "Error in cuModuleGetFunction", status, device)
+  status = cuModuleGetFunction(&(stateObject->function), stateObject->module,
+    "_Z5entryPcS_PiS0_PxS0_S0_ii");
+  CHECK_STATUS(env, "Error in cuModuleGetFunction", status, stateObject->device)
 
   if(cache_config != 0){
     switch(cache_config){
@@ -118,175 +167,149 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
         cache_config_enum = CU_FUNC_CACHE_PREFER_EQUAL;
         break;
     }
-    status = cuFuncSetCacheConfig(function, cache_config_enum);
-    CHECK_STATUS(env, "Error in cuFuncSetCacheConfig", status, device)
+    status = cuFuncSetCacheConfig(stateObject->function, cache_config_enum);
+    CHECK_STATUS(env, "Error in cuFuncSetCacheConfig", status, stateObject->device)
   }
 
-  //----------------------------------------------------------------------------
-  //get handles from java
-  //----------------------------------------------------------------------------
-  cuda_memory_class = (*env)->FindClass(env, "org/trifort/rootbeer/runtime/FixedMemory");
-  get_address_method = (*env)->GetMethodID(env, cuda_memory_class, "getAddress", "()J");
-  get_size_method = (*env)->GetMethodID(env, cuda_memory_class, "getSize", "()J");
-  get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEndPtr", "()J");
-  set_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "setHeapEndPtr", "(J)V");
-
-  cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
-  cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
-  cpu_heap_end = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
-  cpu_heap_end >>= 4;
-
-  cpu_handles_mem = (void *) (*env)->CallLongMethod(env, handles_mem, get_address_method);
-  cpu_handles_mem_size = (*env)->CallLongMethod(env, handles_mem, get_size_method);
-
-  cpu_exceptions_mem = (void *) (*env)->CallLongMethod(env, exceptions_mem, get_address_method);
-  cpu_exceptions_mem_size = (*env)->CallLongMethod(env, exceptions_mem, get_size_method);
-
-  cpu_class_mem = (void *) (*env)->CallLongMethod(env, class_mem, get_address_method);
-  cpu_class_mem_size = (*env)->CallLongMethod(env, class_mem, get_size_method);
-
-  info_space_size = 16;
-  info_space = (jlong *) malloc(info_space_size);
-  info_space[1] = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
+  stateObject->cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
+  stateObject->cpu_exceptions_mem = (void *) (*env)->CallLongMethod(env, exceptions_mem, get_address_method);
+  stateObject->cpu_class_mem = (void *) (*env)->CallLongMethod(env, class_mem, get_address_method);
 
   //----------------------------------------------------------------------------
   //allocate mem
   //----------------------------------------------------------------------------
-  status = cuMemAlloc(&gpu_info_space, info_space_size);
-  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_info_mem", status, device)
 
-  status = cuMemAlloc(&gpu_object_mem, cpu_object_mem_size);
-  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_object_mem", status, device)
+  stateObject->info_space = (jint *) malloc(4);
 
-  status = cuMemAlloc(&gpu_handles_mem, cpu_handles_mem_size);
-  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_handles_mem", status, device)
+  status = cuMemAlloc(&(stateObject->gpu_info_space), 4);
+  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_info_mem", status, stateObject->device)
+
+  status = cuMemAlloc(&(stateObject->gpu_object_mem), stateObject->cpu_object_mem_size);
+  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_object_mem", status, stateObject->device)
 
   if(using_exceptions){
-    status = cuMemAlloc(&gpu_exceptions_mem, cpu_exceptions_mem_size);
-    CHECK_STATUS(env, "Error in cuMemAlloc: gpu_exceptions_mem", status, device)
+    status = cuMemAlloc(&(stateObject->gpu_exceptions_mem), stateObject->cpu_exceptions_mem_size);
+    CHECK_STATUS(env, "Error in cuMemAlloc: gpu_exceptions_mem", status, stateObject->device)
   }
 
-  status = cuMemAlloc(&gpu_class_mem, cpu_class_mem_size);
-  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_class_mem", status, device)
+  status = cuMemAlloc(&(stateObject->gpu_class_mem), stateObject->cpu_class_mem_size);
+  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_class_mem", status, stateObject->device)
 
-  status = cuMemAlloc(&gpu_heap_end, 8);
-  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_heap_end", status, device)
+  status = cuMemAlloc(&(stateObject->gpu_heap_end), 4);
+  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_heap_end", status, stateObject->device)
 
-  status = cuMemAlloc(&gpu_buffer_size, 8);
-  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_buffer_size", status, device)
+  status = cuMemAlloc(&(stateObject->gpu_buffer_size), 8);
+  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_buffer_size", status, stateObject->device)
 
   //----------------------------------------------------------------------------
   //set function parameters
   //----------------------------------------------------------------------------
-  status = cuParamSetSize(function, (7 * sizeof(CUdeviceptr)) + (2 * sizeof(int)));
-  CHECK_STATUS(env, "Error in cuParamSetSize", status, device)
+  status = cuParamSetSize(stateObject->function, (6 * sizeof(CUdeviceptr)) + (2 * sizeof(int)));
+  CHECK_STATUS(env, "Error in cuParamSetSize", status, stateObject->device)
 
   offset = 0;
-  status = cuParamSetv(function, offset, (void *) &gpu_info_space, sizeof(CUdeviceptr));
-  CHECK_STATUS(env, "Error in cuParamSetv gpu_info_space", status, device)
+  status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_info_space), sizeof(CUdeviceptr));
+  CHECK_STATUS(env, "Error in cuParamSetv gpu_info_space", status, stateObject->device)
   offset += sizeof(CUdeviceptr);
 
-  status = cuParamSetv(function, offset, (void *) &gpu_object_mem, sizeof(CUdeviceptr));
-  CHECK_STATUS(env, "Error in cuParamSetv: gpu_object_mem", status, device)
+  status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_object_mem), sizeof(CUdeviceptr));
+  CHECK_STATUS(env, "Error in cuParamSetv: gpu_object_mem", status, stateObject->device)
   offset += sizeof(CUdeviceptr);
 
-  status = cuParamSetv(function, offset, (void *) &gpu_handles_mem, sizeof(CUdeviceptr));
-  CHECK_STATUS(env, "Error in cuParamSetv: gpu_handles_mem %", status, device)
+  status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_heap_end), sizeof(CUdeviceptr));
+  CHECK_STATUS(env, "Error in cuParamSetv: gpu_heap_end", status, stateObject->device)
   offset += sizeof(CUdeviceptr);
 
-  status = cuParamSetv(function, offset, (void *) &gpu_heap_end, sizeof(CUdeviceptr));
-  CHECK_STATUS(env, "Error in cuParamSetv: gpu_heap_end", status, device)
+  status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_buffer_size), sizeof(CUdeviceptr));
+  CHECK_STATUS(env, "Error in cuParamSetv: gpu_buffer_size", status, stateObject->device)
   offset += sizeof(CUdeviceptr);
 
-  status = cuParamSetv(function, offset, (void *) &gpu_buffer_size, sizeof(CUdeviceptr));
-  CHECK_STATUS(env, "Error in cuParamSetv: gpu_buffer_size", status, device)
+  status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_exceptions_mem), sizeof(CUdeviceptr));
+  CHECK_STATUS(env, "Error in cuParamSetv: gpu_exceptions_mem", status, stateObject->device)
   offset += sizeof(CUdeviceptr);
 
-  status = cuParamSetv(function, offset, (void *) &gpu_exceptions_mem, sizeof(CUdeviceptr));
-  CHECK_STATUS(env, "Error in cuParamSetv: gpu_exceptions_mem", status, device)
+  status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_class_mem), sizeof(CUdeviceptr));
+  CHECK_STATUS(env, "Error in cuParamSetv: gpu_class_mem", status, stateObject->device)
   offset += sizeof(CUdeviceptr);
 
-  status = cuParamSetv(function, offset, (void *) &gpu_class_mem, sizeof(CUdeviceptr));
-  CHECK_STATUS(env, "Error in cuParamSetv: gpu_class_mem", status, device)
-  offset += sizeof(CUdeviceptr);
-
-  status = cuParamSeti(function, offset, num_threads);
-  CHECK_STATUS(env, "Error in cuParamSeti: num_threads", status, device)
+  status = cuParamSeti(stateObject->function, offset, num_threads);
+  CHECK_STATUS(env, "Error in cuParamSeti: num_threads", status, stateObject->device)
   offset += sizeof(int);
 
-  status = cuParamSeti(function, offset, using_kernel_templates);
-  CHECK_STATUS(env, "Error in cuParamSeti: using_kernel_templates", status, device)
+  stateObject->handle_offset = offset;
   offset += sizeof(int);
+
+  status = cuFuncSetBlockShape(stateObject->function, block_shape_x, 1, 1);
+  CHECK_STATUS(env, "Error in cuFuncSetBlockShape", status, stateObject->device);
+}
+
+
+JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
+  (JNIEnv *env, jobject this_ref, jlong nativeContext, jint handle)
+{
+  CUresult status;
+  jlong heap_end_long;
+  jint heap_end_int;
+  struct ContextState * stateObject = (struct ContextState *) nativeContext;
+
+  heap_end_long = (*env)->CallLongMethod(env, stateObject->object_mem, get_heap_end_method);
+  heap_end_long >>= 4;
+  heap_end_int = (jint) heap_end_long;
+
+  stateObject->cpu_exceptions_mem_size = (*env)->CallLongMethod(env, stateObject->exceptions_mem, get_size_method);
+  stateObject->cpu_class_mem_size = (*env)->CallLongMethod(env, stateObject->class_mem, get_size_method);
 
   //----------------------------------------------------------------------------
   //copy data
   //----------------------------------------------------------------------------
-  status = cuMemcpyHtoD(gpu_info_space, info_space, info_space_size);
-  CHECK_STATUS(env, "Error in cuMemcpyHtoD: info_space", status, device)
+  status = cuMemcpyHtoD(stateObject->gpu_info_space, stateObject->info_space, 4);
+  CHECK_STATUS(env, "Error in cuMemcpyHtoD: info_space", status, stateObject->device)
 
-  status = cuMemcpyHtoD(gpu_object_mem, cpu_object_mem, cpu_object_mem_size);
-  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_object_mem", status, device)
+  status = cuMemcpyHtoD(stateObject->gpu_object_mem, stateObject->cpu_object_mem, stateObject->cpu_object_mem_size);
+  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_object_mem", status, stateObject->device)
 
-  status = cuMemcpyHtoD(gpu_handles_mem, cpu_handles_mem, cpu_handles_mem_size);
-  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_handles_mem", status, device)
+  status = cuMemcpyHtoD(stateObject->gpu_class_mem, stateObject->cpu_class_mem, stateObject->cpu_class_mem_size);
+  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_class_mem", status, stateObject->device)
 
-  status = cuMemcpyHtoD(gpu_class_mem, cpu_class_mem, cpu_class_mem_size);
-  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_class_mem", status, device)
+  status = cuMemcpyHtoD(stateObject->gpu_heap_end, &(heap_end_int), sizeof(jint));
+  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_heap_end", status, stateObject->device)
 
-  status = cuMemcpyHtoD(gpu_heap_end, &cpu_heap_end, sizeof(jlong));
-  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_heap_end", status, device)
+  status = cuMemcpyHtoD(stateObject->gpu_buffer_size, &(stateObject->cpu_object_mem_size), sizeof(jlong));
+  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_buffer_size", status, stateObject->device)
 
-  status = cuMemcpyHtoD(gpu_buffer_size, &cpu_object_mem_size, sizeof(jlong));
-  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_buffer_size", status, device)
-
-  if(using_exceptions){
-    status = cuMemcpyHtoD(gpu_exceptions_mem, cpu_exceptions_mem, cpu_exceptions_mem_size);
-    CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_exceptions_mem", status, device)
+  if(stateObject->using_exceptions){
+    status = cuMemcpyHtoD(stateObject->gpu_exceptions_mem, stateObject->cpu_exceptions_mem, stateObject->cpu_exceptions_mem_size);
+    CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_exceptions_mem", status, stateObject->device)
   }
 
   //----------------------------------------------------------------------------
   //launch
   //----------------------------------------------------------------------------
-  status = cuFuncSetBlockShape(function, block_shape_x, 1, 1);
-  CHECK_STATUS(env, "Error in cuFuncSetBlockShape", status, device);
+  status = cuParamSeti(stateObject->function, stateObject->handle_offset, handle);
+  CHECK_STATUS(env, "Error in cuParamSeti: handle", status, stateObject->device)
 
-  status = cuLaunchGrid(function, grid_shape_x, 1);
-  CHECK_STATUS(env, "Error in cuLaunchGrid", status, device)
+  status = cuLaunchGrid(stateObject->function, stateObject->grid_shape_x, 1);
+  CHECK_STATUS(env, "Error in cuLaunchGrid", status, stateObject->device)
 
   status = cuCtxSynchronize();
-  CHECK_STATUS(env, "Error in cuCtxSynchronize", status, device)
+  CHECK_STATUS(env, "Error in cuCtxSynchronize", status, stateObject->device)
 
   //----------------------------------------------------------------------------
   //copy data back
   //----------------------------------------------------------------------------
-  status = cuMemcpyDtoH(info_space, gpu_info_space, info_space_size);
-  CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_info_space", status, device)
+  status = cuMemcpyDtoH(stateObject->info_space, stateObject->gpu_info_space, 4);
+  CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_info_space", status, stateObject->device)
 
-  cpu_heap_end = info_space[1];
-  cpu_heap_end <<= 4;
+  heap_end_long = stateObject->info_space[1];
+  heap_end_long <<= 4;
 
-  status = cuMemcpyDtoH(cpu_object_mem, gpu_object_mem, cpu_heap_end);
-  CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_object_mem", status, device)
+  status = cuMemcpyDtoH(stateObject->cpu_object_mem, stateObject->gpu_object_mem, heap_end_long);
+  CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_object_mem", status, stateObject->device)
 
-  if(using_exceptions){
-    status = cuMemcpyDtoH(cpu_exceptions_mem, gpu_exceptions_mem, cpu_exceptions_mem_size);
-    CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_exceptions_mem", status, device)
+  if(stateObject->using_exceptions){
+    status = cuMemcpyDtoH(stateObject->cpu_exceptions_mem, stateObject->gpu_exceptions_mem, stateObject->cpu_exceptions_mem_size);
+    CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_exceptions_mem", status, stateObject->device)
   }
 
-  (*env)->CallVoidMethod(env, handles_mem, set_heap_end_method, cpu_heap_end);
-
-  //----------------------------------------------------------------------------
-  //free resources
-  //----------------------------------------------------------------------------
-  free(info_space);
-
-  cuMemFree(gpu_info_space);
-  cuMemFree(gpu_object_mem);
-  cuMemFree(gpu_handles_mem);
-  cuMemFree(gpu_exceptions_mem);
-  cuMemFree(gpu_class_mem);
-  cuMemFree(gpu_heap_end);
-  cuMemFree(gpu_buffer_size);
-
-  cuCtxDestroy(context);
+  (*env)->CallVoidMethod(env, stateObject->object_mem, set_heap_end_method, heap_end_long);
 }
