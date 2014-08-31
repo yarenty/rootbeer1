@@ -82,6 +82,11 @@ public class CUDAContext implements Context {
     disruptor.shutdown();
     exec.shutdown();
     freeNativeContext(nativeContext);
+    
+    objectMemory.close();
+    exceptionsMemory.close();
+    classMemory.close();
+    textureMemory.close();
   }
 
   @Override
@@ -130,9 +135,11 @@ public class CUDAContext implements Context {
     if(usingUncheckedMemory){
       classMemory = new FixedMemory(1024);
       exceptionsMemory = new FixedMemory(getExceptionsMemSize(threadConfig));
+      textureMemory = new FixedMemory(8);
     } else {
       exceptionsMemory = new CheckedFixedMemory(getExceptionsMemSize(threadConfig));
       classMemory = new CheckedFixedMemory(1024);
+      textureMemory = new CheckedFixedMemory(8);
     }
     if(memorySize == -1){
       findMemorySize(cubinFile.length);
@@ -196,13 +203,18 @@ public class CUDAContext implements Context {
 
   @Override
   public long getRequiredMemory() {
-    // TODO Auto-generated method stub
-    return 0;
+    return requiredMemorySize;
   }
 
   @Override
   public void setThreadConfig(ThreadConfig threadConfig){
     this.threadConfig = threadConfig;
+  }
+  
+  @Override
+  public void setThreadConfig(int block_shape_x, int grid_shape_x,
+      int num_threads) {
+    this.threadConfig = new ThreadConfig(block_shape_x, grid_shape_x, num_threads);
   }
   
   @Override
@@ -213,7 +225,12 @@ public class CUDAContext implements Context {
   
   @Override
   public GpuFuture runAsync() {
-    return null;
+    long seq = ringBuffer.next();
+    GpuEvent gpuEvent = ringBuffer.get(seq);
+    gpuEvent.setValue(GpuEventCommand.NATIVE_RUN);
+    gpuEvent.getFuture().reset();
+    ringBuffer.publish(seq);
+    return gpuEvent.getFuture();
   }
 
   @Override
@@ -267,8 +284,7 @@ public class CUDAContext implements Context {
   
   private void runGpu(){
     runOnGpuStopwatch.start();
-    long shiftedHandle = handle >> 4;
-    cudaRun(nativeContext, (int) shiftedHandle);
+    cudaRun(nativeContext, (int) (handle >> 4), objectMemory);
     runOnGpuStopwatch.stop();
     stats.setExecutionTime(runOnGpuStopwatch.elapsedTimeMillis());
   }
@@ -335,5 +351,6 @@ public class CUDAContext implements Context {
       Memory objectMem, Memory exceptionsMem, Memory classMem, int usingExceptions, 
       int cacheConfig);
   
-  private native void cudaRun(long nativeContext, int handle);
+  private native void cudaRun(long nativeContext, int handle, Memory objectMem);
+
 }

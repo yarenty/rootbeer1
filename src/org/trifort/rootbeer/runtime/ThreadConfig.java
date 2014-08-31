@@ -13,10 +13,10 @@ public class ThreadConfig {
   private int m_gridShapeX;
   private int m_numThreads;
   
-  public ThreadConfig(int block_shape_x, int grid_shape_x, int numThreads){
+  public ThreadConfig(int block_shape_x, int grid_shape_x, int num_threads){
     m_blockShapeX = block_shape_x;
     m_gridShapeX = grid_shape_x;
-    m_numThreads = numThreads;
+    m_numThreads = num_threads;
   }
   
   public int getBlockShapeX(){

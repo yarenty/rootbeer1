@@ -41,31 +41,23 @@ org_trifort_gc_malloc_no_fail(int size){
   return ret;
 }
 
-__device__  void
-org_trifort_gc_init(int * free_pointer, char * to_space, size_t space_size, int * java_lang_class_refs){
-  
-  if(threadIdx.x == 0){
-    m_Local[0] = (size_t) to_space;
-    m_Local[1] = (size_t) space_size;
-    m_Local[2] = (size_t) java_lang_class_refs;
-    
-    global_free_pointer = free_pointer;
-  }
-}
-
 __device__
 long long java_lang_System_nanoTime(int * exception){
   return (long long) clock64();
 }
 
-__global__ void entry(int * result_free_pointer, char * to_space,
-  int * free_pointer, long long * space_size, int * exceptions,
-  int * java_lang_class_refs, int num_blocks, int handle){
+__global__ void entry(char * to_space, int * exceptions, 
+  int * java_lang_class_refs, int space_size, int num_blocks, int handle){
 
-  org_trifort_gc_init(free_pointer, to_space, *space_size, java_lang_class_refs);
+  int loop_control = blockIdx.x * blockDim.x + threadIdx.x;
+  
+  if(threadIdx.x == 0){
+    m_Local[0] = (size_t) to_space;
+    m_Local[1] = (size_t) space_size;
+    m_Local[2] = (size_t) java_lang_class_refs;
+  }
   __syncthreads();
       
-  int loop_control = blockIdx.x * blockDim.x + threadIdx.x;
   if(loop_control >= num_blocks){
     return;
   } else {
@@ -74,7 +66,5 @@ __global__ void entry(int * result_free_pointer, char * to_space,
     if(%%using_exceptions%%){
       exceptions[loop_control] = exception;
     }
-
-    *result_free_pointer = *global_free_pointer;
   }
 }
