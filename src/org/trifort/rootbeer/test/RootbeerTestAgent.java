@@ -192,7 +192,9 @@ public class RootbeerTestAgent {
       List<Kernel> testing_items = creator.create();
       Stopwatch watch = new Stopwatch();
       watch.start();
-      rootbeer.run(testing_items);
+      if(true)
+      throw new RuntimeException("todo fix this");
+      //rootbeer.run(testing_items);
       m_passed = true;
       watch.stop();
       m_gpuTime = watch.elapsedTimeMillis();
@@ -229,7 +231,9 @@ public class RootbeerTestAgent {
       ThreadConfig thread_config = creator.getThreadConfig();
       Stopwatch watch = new Stopwatch();
       watch.start();
-      rootbeer.run(testing_item, thread_config);
+      if(true)
+      throw new RuntimeException("todo fix this");
+      //rootbeer.run(testing_item, thread_config);
       m_passed = true;
       watch.stop();
       m_gpuTime = watch.elapsedTimeMillis();
@@ -266,7 +270,9 @@ public class RootbeerTestAgent {
     Configuration.setPrintMem(print_mem);
     List<Kernel> testing_items = creator.create();
     try {
-      rootbeer.run(testing_items);
+      if(true)
+      throw new RuntimeException("todo fix this");
+      //rootbeer.run(testing_items);
       m_passed = false;
       m_message = "No exception thrown when expecting one.";
     } catch(Throwable ex){
@@ -307,7 +313,10 @@ public class RootbeerTestAgent {
         List<Kernel> testing_items = m_creator.create();
         Stopwatch watch = new Stopwatch();
         watch.start();
-        m_rootbeer.run(testing_items);
+
+        if(true)
+        throw new RuntimeException("todo fix this");
+        //m_rootbeer.run(testing_items);
         m_passed = true;
         watch.stop();
         m_gpuTime = watch.elapsedTimeMillis();

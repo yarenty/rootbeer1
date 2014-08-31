@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 
 import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.runtime.util.Stopwatch;
+import org.trifort.rootbeer.runtimegpu.GpuException;
 import org.trifort.rootbeer.util.ResourceReader;
 
 import com.lmax.disruptor.EventHandler;
@@ -20,7 +21,7 @@ public class CUDAContext implements Context {
 
   private long nativeContext;
   private long memorySize;
-  private long rootHandle;
+  private long handle;
   private byte[] cubinFile;
   private Memory objectMemory;
   private Memory textureMemory;
@@ -34,11 +35,11 @@ public class CUDAContext implements Context {
   private Kernel kernelTemplate;
   private CompiledKernel compiledKernel;
   
-  private StatsRow stats;
-  private Stopwatch writeBlocksStopwatch;
-  private Stopwatch runStopwatch;
-  private Stopwatch runOnGpuStopwatch;
-  private Stopwatch readBlocksStopwatch;
+  final private StatsRow stats;
+  final private Stopwatch writeBlocksStopwatch;
+  final private Stopwatch runStopwatch;
+  final private Stopwatch runOnGpuStopwatch;
+  final private Stopwatch readBlocksStopwatch;
   
   final private ExecutorService exec;
   final private Disruptor<GpuEvent> disruptor;
@@ -63,6 +64,12 @@ public class CUDAContext implements Context {
     
     usingUncheckedMemory = true;
     nativeContext = allocateNativeContext();
+    
+    stats = new StatsRow();
+    writeBlocksStopwatch = new Stopwatch();
+    runStopwatch = new Stopwatch();
+    runOnGpuStopwatch = new Stopwatch();
+    readBlocksStopwatch = new Stopwatch();
   }
   
   @Override
@@ -230,11 +237,85 @@ public class CUDAContext implements Context {
         gpuEvent.getFuture().signal();
         break;
       case NATIVE_RUN:
-        cudaRun(nativeContext, 0);
+        writeBlocksTemplate();
+        runGpu();
+        readBlocksTemplate();
         gpuEvent.getFuture().signal();
         break;
       }
     }
+  }
+  
+  private void writeBlocksTemplate(){
+    writeBlocksStopwatch.start();
+    objectMemory.clearHeapEndPtr();
+    
+    Serializer serializer = compiledKernel.getSerializer(objectMemory, textureMemory);
+    serializer.writeStaticsToHeap();
+    
+    handle = serializer.writeToHeap(compiledKernel);
+    objectMemory.align16();
+   
+    if(Configuration.getPrintMem()){
+      BufferPrinter printer = new BufferPrinter();
+      printer.print(objectMemory, 0, 256);
+    }
+    
+    writeBlocksStopwatch.stop();
+    stats.setSerializationTime(writeBlocksStopwatch.elapsedTimeMillis());
+  }
+  
+  private void runGpu(){
+    runOnGpuStopwatch.start();
+    long shiftedHandle = handle >> 4;
+    cudaRun(nativeContext, (int) shiftedHandle);
+    runOnGpuStopwatch.stop();
+    stats.setExecutionTime(runOnGpuStopwatch.elapsedTimeMillis());
+  }
+  
+  private void readBlocksTemplate(){
+    readBlocksStopwatch.start();
+    objectMemory.setAddress(0);
+    exceptionsMemory.setAddress(0);
+    
+    Serializer serializer = compiledKernel.getSerializer(objectMemory, textureMemory);
+    
+    if(Configuration.runtimeInstance().getExceptions()){
+      for(long i = 0; i < threadConfig.getNumThreads(); ++i){
+        long ref = exceptionsMemory.readRef();
+        if(ref != 0){
+          long ref_num = ref >> 4;
+          if(ref_num == compiledKernel.getNullPointerNumber()){
+            throw new NullPointerException(); 
+          } else if(ref_num == compiledKernel.getOutOfMemoryNumber()){
+            throw new OutOfMemoryError();
+          }
+          
+          objectMemory.setAddress(ref);           
+          Object except = serializer.readFromHeap(null, true, ref);
+          if(except instanceof Error){
+            Error except_th = (Error) except;
+            throw except_th;
+          } else if(except instanceof GpuException){
+            GpuException gpu_except = (GpuException) except;
+            throw new ArrayIndexOutOfBoundsException("array_index: "+gpu_except.m_arrayIndex+
+                " array_length: "+gpu_except.m_arrayLength+" array: "+gpu_except.m_array);
+          } else {
+            throw new RuntimeException((Throwable) except);
+          }
+        }
+      }    
+    }
+    
+    serializer.readStaticsFromHeap();
+    serializer.readFromHeap(compiledKernel, true, handle);
+    
+    if(Configuration.getPrintMem()){
+      BufferPrinter printer = new BufferPrinter();
+      printer.print(objectMemory, 0, 256);
+    }
+    readBlocksStopwatch.stop();
+    stats.setDeserializationTime(readBlocksStopwatch.elapsedTimeMillis());
   }
   
   private int b2i(boolean value){

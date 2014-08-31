@@ -9,23 +9,12 @@ package org.trifort.rootbeer.runtime;
 
 public class StatsRow {
 
-  private long m_serializationTime;
-  private long m_executionTime;
-  private long m_deserializationTime;
-  private long m_overallTime;
+  private long serializationTime;
+  private long executionTime;
+  private long deserializationTime;
+  private long overallTime;
   
-  private long m_gridShape;
-  private int m_blockShape;
-  
-  public StatsRow(long serialization_time, long execution_time, 
-                  long deserialization_time, long overall_time,
-                  long grid_shape, int block_shape) {
-    m_serializationTime = serialization_time;
-    m_executionTime = execution_time;
-    m_deserializationTime = deserialization_time;
-    m_overallTime = overall_time;
-    m_gridShape = grid_shape;
-    m_blockShape = block_shape;
+  public StatsRow() {
   }
   
   /**
@@ -33,7 +22,11 @@ public class StatsRow {
    * @return 
    */
   public long getSerializationTime(){
-    return m_serializationTime;
+    return serializationTime;
+  }
+  
+  public void setSerializationTime(long time){
+    serializationTime = time;
   }
   
   /**
@@ -41,7 +34,11 @@ public class StatsRow {
    * @return 
    */
   public long getExecutionTime(){
-    return m_executionTime;
+    return executionTime;
+  }
+  
+  public void setExecutionTime(long time){
+    executionTime = time;
   }
   
   /**
@@ -49,7 +46,11 @@ public class StatsRow {
    * @return 
    */
   public long getDeserializationTime(){
-    return m_deserializationTime;
+    return deserializationTime;
+  }
+  
+  public void setDeserializationTime(long time){
+    deserializationTime = time;
   }
 
   /**
@@ -57,22 +58,10 @@ public class StatsRow {
    * @return 
    */
   public long getOverallTime(){
-    return m_overallTime;
-  }
-    
-  /**
-   * Number of blocks
-   * @return 
-   */
-  public long getNumBlocks(){
-    return m_gridShape;
+    return overallTime;
   }
   
-  /**
-   * Number of threads per block
-   * @return 
-   */
-  public int getNumThreads(){
-    return m_blockShape;
+  public void setOverallTime(long time){
+    overallTime = time;
   }
 }

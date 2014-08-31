@@ -18,7 +18,7 @@ public class BigGridSizeTest implements TestKernelTemplate {
   private int m_gridSize;
   public BigGridSizeTest(){ 
     m_blockSize = 1024;
-    m_gridSize = 2096128;
+    m_gridSize = 1024;
   }
 
   public Kernel create() {
@@ -27,7 +27,7 @@ public class BigGridSizeTest implements TestKernelTemplate {
   }
 
   public ThreadConfig getThreadConfig() {
-    ThreadConfig ret = new ThreadConfig(m_blockSize, m_gridSize, (long) m_blockSize * (long) m_gridSize);
+    ThreadConfig ret = new ThreadConfig(m_blockSize, m_gridSize, m_blockSize * m_gridSize);
     return ret;
   }
 

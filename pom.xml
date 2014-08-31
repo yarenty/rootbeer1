@@ -6,35 +6,18 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
   >
 
-  <groupId>edu.syr.pcpratts</groupId>
+  <groupId>org.trifort</groupId>
   <artifactId>rootbeer</artifactId>
-  <version>1.x-SNAPSHOT</version>
+  <version>1.2.0</version>
 
   <modelVersion>4.0.0</modelVersion>
   <packaging>jar</packaging>
   <name>Rootbeer::Rootbeer</name>
-  <description>Rootbeer - compile Java bytecode for a CUDA GPU</description>
-
-  <properties>
-    <java.version>1.5</java.version>
-    <soot.version>2.5.0</soot.version>
-  </properties>
-
-  <repositories>
-    <repository>
-      <id>Maven Central Repository</id>
-      <url>http://repo1.maven.org/maven2/</url>
-    </repository>
-    <repository>
-      <id>chirrup_org</id>
-      <url>http://chirrup.org/rootbeer/maven/</url>
-    </repository>
-  </repositories>
+  <description>Rootbeer GPU Compiler - Java GPU Programming</description>
 
   <dependencies>
-    <!-- need to be installed -->
     <dependency>
-      <groupId>rootbeer</groupId>
+      <groupId>org.trifort</groupId>
       <artifactId>pack</artifactId>
       <version>1.0</version>
       <scope>system</scope>
@@ -89,7 +72,7 @@
         <directory>${project.basedir}/src</directory>
         <includes>
           <include>**/*.txt</include>
-          <include>**/*.class</include> <!--TODO: does the source really include classes?-->
+          <include>**/*.class</include>
           <include>**/*.g</include>
           <include>**/*.c</include>
           <include>**/*.tokens</include>
@@ -108,11 +91,6 @@
           <includes>
             <include>**/testcases/**/*.java</include>
           </includes>
-<!--
-          <excludes>
-            <exclude>**/testcases/rootbeertest/gpurequired/**/*.java</exclude>
-          </excludes>
--->
         </configuration>
       </plugin>
       <plugin>
@@ -127,33 +105,6 @@
           </excludes>
         </configuration>
       </plugin>
-<!--
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-	      <shadedArtifactAttached>true</shadedArtifactAttached>
-	      <shadedClassifierName>uber</shadedClassifierName>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifestEntries>
-                    <Main-Class>edu.syr.pcpratts.rootbeer.Main</Main-Class>
-                    <Project-Version>${project.version}</Project-Version>
-                  </manifestEntries>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
--->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>
@@ -176,7 +127,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>edu.syr.pcpratts.rootbeer.Main</mainClass>
+              <mainClass>org.trifort.rootbeer.entry.Main</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
@@ -185,20 +136,5 @@
         </configuration>
       </plugin>
     </plugins>
-
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId> 
-        <artifactId>wagon-ssh</artifactId> 
-        <version>1.0-beta-6</version> 
-      </extension> 
-    </extensions>
-
   </build>
-
-  <reporting>
-    <plugins>
-    </plugins>
-  </reporting>
-
 </project>
