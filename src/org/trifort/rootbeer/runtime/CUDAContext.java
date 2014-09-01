@@ -3,6 +3,7 @@ package org.trifort.rootbeer.runtime;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.runtime.util.Stopwatch;
@@ -50,7 +51,13 @@ public class CUDAContext implements Context {
   }
   
   public CUDAContext(GpuDevice device){
-    exec = Executors.newCachedThreadPool();
+    exec = Executors.newCachedThreadPool(new ThreadFactory() {
+      public Thread newThread(Runnable r) {
+        Thread t = new Thread(r);
+        t.setDaemon(true);
+        return t;
+      }
+    });
     disruptor = new Disruptor<GpuEvent>(GpuEvent.EVENT_FACTORY, 64, exec);
     handler = new GpuEventHandler();
     disruptor.handleEventsWith(handler);
