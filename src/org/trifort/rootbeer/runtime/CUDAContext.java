@@ -274,31 +274,34 @@ public class CUDAContext implements Context {
   
   private class GpuEventHandler implements EventHandler<GpuEvent>{
     @Override
-    public void onEvent(final GpuEvent gpuEvent, final long sequence, final boolean endOfBatch)
-        throws Exception {
-      
-      switch(gpuEvent.getValue()){
-      case NATIVE_BUILD_STATE:
-        boolean usingExceptions = Configuration.runtimeInstance().getExceptions();
-        nativeBuildState(nativeContext, gpuDevice.getDeviceId(), cubinFile, 
-            cubinFile.length, threadConfig.getBlockShapeX(), 
-            threadConfig.getGridShapeX(), threadConfig.getNumThreads(), 
-            objectMemory, handlesMemory, exceptionsMemory, classMemory, 
-            b2i(usingExceptions), cacheConfig.ordinal());
+    public void onEvent(final GpuEvent gpuEvent, final long sequence, final boolean endOfBatch){
+      try {
+        switch(gpuEvent.getValue()){
+        case NATIVE_BUILD_STATE:
+          boolean usingExceptions = Configuration.runtimeInstance().getExceptions();
+          nativeBuildState(nativeContext, gpuDevice.getDeviceId(), cubinFile, 
+              cubinFile.length, threadConfig.getBlockShapeX(), 
+              threadConfig.getGridShapeX(), threadConfig.getNumThreads(), 
+              objectMemory, handlesMemory, exceptionsMemory, classMemory, 
+              b2i(usingExceptions), cacheConfig.ordinal());
+          gpuEvent.getFuture().signal();
+          break;
+        case NATIVE_RUN:
+          writeBlocksTemplate();
+          runGpu();
+          readBlocksTemplate();
+          gpuEvent.getFuture().signal();
+          break;
+        case NATIVE_RUN_LIST:
+          writeBlocksList(gpuEvent.getKernelList());
+          runGpu();
+          readBlocksList(gpuEvent.getKernelList());
+          gpuEvent.getFuture().signal();
+          break;
+        }
+      } catch(Exception ex){
+        gpuEvent.getFuture().setException(ex);
         gpuEvent.getFuture().signal();
-        break;
-      case NATIVE_RUN:
-        writeBlocksTemplate();
-        runGpu();
-        readBlocksTemplate();
-        gpuEvent.getFuture().signal();
-        break;
-      case NATIVE_RUN_LIST:
-        writeBlocksList(gpuEvent.getKernelList());
-        runGpu();
-        readBlocksList(gpuEvent.getKernelList());
-        gpuEvent.getFuture().signal();
-        break;
       }
     }
   }

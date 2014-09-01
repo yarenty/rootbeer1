@@ -26,7 +26,7 @@ org_trifort_gc_malloc(int size){
 }
 
 //TODO: don't pass gc_info everywhere because free pointer is __device__
-__device__ int * global_free_pointer; 
+__device__ int global_free_pointer; 
 
 __device__ int
 org_trifort_gc_malloc_no_fail(int size){
@@ -36,7 +36,7 @@ org_trifort_gc_malloc_no_fail(int size){
   size >>= 4;
 
   int ret;
-  ret = atomicAdd(global_free_pointer, size);
+  ret = atomicAdd(&global_free_pointer, size);
   return ret;
 }
 
