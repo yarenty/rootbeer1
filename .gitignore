@@ -59,3 +59,7 @@ MultiGpuApp.jar
 examples/MultiGpu/csrc/
 MatrixApp-GPU.jar
 MatrixApp.jar
+*.exp
+*.lib
+taq
+native/
