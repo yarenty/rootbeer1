@@ -57,9 +57,7 @@ __global__ void entry(char * objectMemory, int * handles, int * exceptions,
   }
   __syncthreads();
       
-  if(loop_control >= numBlocks){
-    return;
-  } else {
+  if(loop_control < numBlocks){
     int exception = 0; 
     int handle;
     if(usingKernelTemplates){

@@ -360,6 +360,7 @@ public class CUDAContext implements Context {
   private void runGpu(){
     runOnGpuStopwatch.start();
     cudaRun(nativeContext, objectMemory, b2i(!usingHandles));
+    System.out.println("end cuda run");
     runOnGpuStopwatch.stop();
     requiredMemorySize = objectMemory.getHeapEndPtr();
     stats.setExecutionTime(runOnGpuStopwatch.elapsedTimeMillis());
@@ -417,14 +418,21 @@ public class CUDAContext implements Context {
   }
 
   public void readBlocksList(List<Kernel> kernelList) {
+    System.out.println("readBlocksList #1");
     Serializer serializer = compiledKernel.getSerializer(objectMemory, textureMemory);
     readBlocksSetup(serializer);
+    System.out.println("readBlocksList #2");
     
     handlesMemory.setAddress(0);
+    int index = 0;
     for(Kernel kernel : kernelList){
+      System.out.println("index: "+index+"/"+kernelList.size());
       long ref = handlesMemory.readRef();
+      System.out.println("read from heap");
       serializer.readFromHeap(kernel, true, ref);
     }
+
+    System.out.println("readBlocksList #3");
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();

@@ -70,7 +70,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
 
     String dont_return_null_label = getNextLabel();
     bcl.ifStmt(m_refParam, "!=", LongConstant.v(-1), dont_return_null_label);
-    //bcl.println("returning null");
+    bcl.println("returning null");
     bcl.returnValue(NullConstant.v());
     bcl.label(dont_return_null_label);    
         
@@ -166,10 +166,10 @@ public class VisitorReadGen extends AbstractVisitorGen {
         
     bcl.ifInstanceOfStmt(m_param0, type, label);
     
-    //mBcl.println("reading: "+type.toString());
-    //BclMemory bcl_mem = new BclMemory(mBcl, mMem);
+    bcl.println("reading: "+type.toString());
+    //BclMemory bcl_mem = new BclMemory(bcl, m_mem);
     //Local ptr = bcl_mem.getPointer();
-    //mBcl.println(ptr);
+    //bcl.println(ptr);
     
     Local ret;
     if(type instanceof ArrayType){

@@ -24,8 +24,11 @@ public class SuperClassRunOnGpu implements Kernel {
   
   @Override
   public void gpuMethod() {
+    System.out.println("gpuMethod #1");
     m_Class = new CompositeClass6();
+    System.out.println("gpuMethod #2");
     ret = m_Class.go();
+    System.out.println("gpuMethod #3");
     //str += " world";
     //for(int i = 0; i < 5; ++i){
     //  str += "!";
