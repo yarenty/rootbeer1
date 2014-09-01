@@ -69,7 +69,7 @@ public class ParallelCompile implements Runnable {
       CompileResult[] ret = new CompileResult[2];
       ret[0] = result;
       CompileResult voidResult = new CompileResult(!result.is32Bit(), 
-          new ArrayList<byte[]>(), new ArrayList<String>());
+          null, new ArrayList<String>());
       ret[1] = voidResult;
       return ret;
     } else {

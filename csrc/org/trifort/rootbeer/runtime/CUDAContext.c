@@ -28,6 +28,7 @@ struct ContextState {
   jint grid_shape_x;
   jint using_kernel_templates_offset;
   jint using_exceptions;
+  jint context_built;
 };
 
 jclass cuda_memory_class;
@@ -93,6 +94,7 @@ JNIEXPORT jlong JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_allocateNa
   (JNIEnv *env, jobject this_ref)
 {
   struct ContextState * ret = (struct ContextState *) malloc(sizeof(struct ContextState));
+  ret->context_built = 0;
   return (jlong) ret;
 }
 
@@ -101,14 +103,16 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_freeNativeC
 {
   struct ContextState * stateObject = (struct ContextState *) reference;
 
-  free(stateObject->info_space);
-  cuMemFree(stateObject->gpu_info_space);
-  cuMemFree(stateObject->gpu_object_mem);
-  cuMemFree(stateObject->gpu_handles_mem);
-  cuMemFree(stateObject->gpu_exceptions_mem);
-  cuMemFree(stateObject->gpu_class_mem);
-  cuMemFree(stateObject->gpu_heap_end);
-  cuCtxDestroy(stateObject->context);
+  if(stateObject->context_built){
+    free(stateObject->info_space);
+    cuMemFree(stateObject->gpu_info_space);
+    cuMemFree(stateObject->gpu_object_mem);
+    cuMemFree(stateObject->gpu_handles_mem);
+    cuMemFree(stateObject->gpu_exceptions_mem);
+    cuMemFree(stateObject->gpu_class_mem);
+    cuMemFree(stateObject->gpu_heap_end);
+    cuCtxDestroy(stateObject->context);
+  }
 
   free(stateObject);
 }
@@ -239,6 +243,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
 
   status = cuFuncSetBlockShape(stateObject->function, block_shape_x, 1, 1);
   CHECK_STATUS(env, "Error in cuFuncSetBlockShape", status, stateObject->device);
+
+  stateObject->context_built = 1;
 }
 
 

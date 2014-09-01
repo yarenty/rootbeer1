@@ -68,7 +68,7 @@ public class ParallelCompileJob {
       }
       file_contents = readFile(code_file);
     } catch(Exception ex){
-      file_contents = new ArrayList<byte[]>();
+      file_contents = null;
       ex.printStackTrace();
     }
     m_result = new CompileResult(m_m32, file_contents, new ArrayList<String>());

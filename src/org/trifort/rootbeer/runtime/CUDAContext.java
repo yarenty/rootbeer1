@@ -91,10 +91,21 @@ public class CUDAContext implements Context {
     exec.shutdown();
     freeNativeContext(nativeContext);
     
-    objectMemory.close();
-    exceptionsMemory.close();
-    classMemory.close();
-    textureMemory.close();
+    if(objectMemory != null){
+      objectMemory.close();
+    }
+    if(handlesMemory != null){
+      handlesMemory.close();
+    }
+    if(exceptionsMemory != null){
+      exceptionsMemory.close();
+    }
+    if(classMemory != null){
+      classMemory.close();
+    }
+    if(textureMemory != null){
+      textureMemory.close();
+    }
   }
 
   @Override
@@ -303,7 +314,6 @@ public class CUDAContext implements Context {
           writeBlocksList(gpuEvent.getKernelList());
           runGpu();
           readBlocksList(gpuEvent.getKernelList());
-          System.out.println("signalling");
           gpuEvent.getFuture().signal();
           break;
         }
