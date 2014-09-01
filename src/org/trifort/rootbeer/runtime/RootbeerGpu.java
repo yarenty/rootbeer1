@@ -209,4 +209,159 @@ public class RootbeerGpu {
   public static double sin(double value){
     return 0;
   }  
+  
+  public static void atomicAddGlobal(int[] array, int index, int addValue){
+    synchronized(array){
+      array[index] += addValue;
+    }
+  }
+  
+  public static void atomicAddGlobal(long[] array, int index, long addValue){
+    synchronized(array){
+      array[index] += addValue;
+    }
+  }
+
+  public static void atomicAddGlobal(float[] array, int index, float addValue){
+    synchronized(array){
+      array[index] += addValue;
+    }
+  }
+  public static void atomicSubGlobal(int[] array, int index, int subValue){
+    synchronized(array){
+      array[index] -= subValue;
+    }
+  }
+  
+  public static int atomicExchGlobal(int[] array, int index, int value){
+    synchronized(array){
+      int ret = array[index];
+      array[index] = value;
+      return ret;
+    }
+  }
+  
+  public static long atomicExchGlobal(long[] array, int index, long value){
+    synchronized(array){
+      long ret = array[index];
+      array[index] = value;
+      return ret;
+    }
+  }
+  
+  public static float atomicExchGlobal(float[] array, int index, float value){
+    synchronized(array){
+      float ret = array[index];
+      array[index] = value;
+      return ret;
+    }
+  }
+  
+  public static int atomicMinGlobal(int[] array, int index, int value){
+    synchronized(array){
+      int old = array[index];
+      if(value < old){
+        array[index] = value;
+      }
+      return old;
+    }
+  }
+  
+  public static long atomicMinGlobal(long[] array, int index, long value){
+    synchronized(array){
+      long old = array[index];
+      if(value < old){
+        array[index] = value;
+      }
+      return old;
+    }
+  }
+  
+  public static int atomicMaxGlobal(int[] array, int index, int value){
+    synchronized(array){
+      int old = array[index];
+      if(value > old){
+        array[index] = value;
+      }
+      return old;
+    }
+  }
+  
+  public static long atomicMaxGlobal(long[] array, int index, long value){
+    synchronized(array){
+      long old = array[index];
+      if(value > old){
+        array[index] = value;
+      }
+      return old;
+    }
+  }
+  
+  public static int atomicCASGlobal(int[] array, int index, int compare, int value){
+    synchronized(array){
+      int old = array[index];
+      if(old == compare){
+        array[index] = value;
+      }
+      return old;
+    }
+  }
+
+  public static long atomicCASGlobal(long[] array, int index, long compare, long value){
+    synchronized(array){
+      long old = array[index];
+      if(old == compare){
+        array[index] = value;
+      }
+      return old;
+    }
+  }
+
+  public static int atomicANDGlobal(int[] array, int index, int value){
+    synchronized(array){
+      int old = array[index];
+      array[index] = old & value;
+      return old;
+    }
+  }
+
+  public static long atomicANDGlobal(long[] array, int index, long value){
+    synchronized(array){
+      long old = array[index];
+      array[index] = old & value;
+      return old;
+    }
+  }
+
+  public static int atomicORGlobal(int[] array, int index, int value){
+    synchronized(array){
+      int old = array[index];
+      array[index] = old | value;
+      return old;
+    }
+  }
+
+  public static long atomicORGlobal(long[] array, int index, long value){
+    synchronized(array){
+      long old = array[index];
+      array[index] = old | value;
+      return old;
+    }
+  }
+
+  public static int atomicXORGlobal(int[] array, int index, int value){
+    synchronized(array){
+      int old = array[index];
+      array[index] = old ^ value;
+      return old;
+    }
+  }
+
+  public static long atomicXORGlobal(long[] array, int index, long value){
+    synchronized(array){
+      long old = array[index];
+      array[index] = old ^ value;
+      return old;
+    }
+  }
 }

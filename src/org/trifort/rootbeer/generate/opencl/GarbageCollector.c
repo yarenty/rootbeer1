@@ -117,6 +117,63 @@ org_trifort_array_length(int thisref, int * exception){
   return ret;
 }
 
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a12_5_5_(int array, int index, int value, int * exception){
+  int * array_deref;
+  
+#ifdef ARRAY_CHECKS
+  int length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = (int *) org_trifort_gc_deref(array + 16 + (4 * index));
+  return atomicAdd(array_deref, value);
+}
+
+$$__device__$$ 
+unsigned long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a13_5_6_(int array, int index, unsigned long long value, int * exception){
+  unsigned long long * array_deref;
+  
+#ifdef ARRAY_CHECKS
+  int length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = (unsigned long long *) org_trifort_gc_deref(array + 16 + (8 * index));
+  return atomicAdd(array_deref, value);
+}
+
+$$__device__$$ 
+float org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a14_5_7_(int array, int index, float value, int * exception){
+  float * array_deref;
+  
+#ifdef ARRAY_CHECKS
+  int length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = (float *) org_trifort_gc_deref(array + 16 + (4 * index));
+  return atomicAdd(array_deref, value);
+}
+
 $$__device__$$
 void org_trifort_exitMonitorRef(int thisref, int old){
   char * mem = org_trifort_gc_deref(thisref); 

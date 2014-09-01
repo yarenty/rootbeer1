@@ -1,0 +1,56 @@
+package org.trifort.rootbeer.testcases.rootbeertest.serialization;
+
+import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.RootbeerGpu;
+
+public class AtomicGlobalsRunOnGpu implements Kernel {
+
+  private int[] intArray;
+  private long[] longArray;
+  private float[] floatArray;
+  
+  public AtomicGlobalsRunOnGpu(int[] intArray, long[] longArray, float[] floatArray){
+    this.intArray = intArray;
+    this.longArray = longArray;
+    this.floatArray = floatArray;
+  }
+  
+  @Override
+  public void gpuMethod() {
+    RootbeerGpu.atomicAddGlobal(intArray, 0, 2);
+    /*RootbeerGpu.atomicAddGlobal(longArray, 0, 2);
+    RootbeerGpu.atomicAddGlobal(floatArray, 0, 2);
+    RootbeerGpu.atomicAddGlobal(intArray, 1, 2);
+    RootbeerGpu.atomicAddGlobal(longArray, 1, 2);
+    RootbeerGpu.atomicAddGlobal(floatArray, 1, 2);
+    RootbeerGpu.atomicAddGlobal(intArray, 2, 2);
+    RootbeerGpu.atomicAddGlobal(longArray, 2, 2);
+    RootbeerGpu.atomicAddGlobal(floatArray, 2, 2);
+    */
+  }
+
+  public boolean compare(AtomicGlobalsRunOnGpu rhs) {
+    for(int i = 0; i < intArray.length; ++i){
+      int value1 = intArray[i];
+      int value2 = rhs.intArray[i];
+      if(value1 != value2){
+        return false;
+      }
+    }    
+    for(int i = 0; i < longArray.length; ++i){
+      long value1 = longArray[i];
+      long value2 = rhs.longArray[i];
+      if(value1 != value2){
+        return false;
+      }
+    }  
+    for(int i = 0; i < floatArray.length; ++i){
+      float value1 = floatArray[i];
+      float value2 = rhs.floatArray[i];
+      if(value1 != value2){
+        return false;
+      }
+    }
+    return true;
+  }
+}
