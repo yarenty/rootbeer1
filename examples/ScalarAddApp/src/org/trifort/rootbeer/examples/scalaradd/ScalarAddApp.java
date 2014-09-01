@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.ArrayList;
 import org.trifort.rootbeer.runtime.Kernel;
 import org.trifort.rootbeer.runtime.Rootbeer;
-import org.trifort.rootbeer.runtime.Context;
-import org.trifort.rootbeer.runtime.ThreadConfig;
 import org.trifort.rootbeer.runtime.util.Stopwatch;
 
 public class ScalarAddApp {
