@@ -166,7 +166,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
         
     bcl.ifInstanceOfStmt(m_param0, type, label);
     
-    bcl.println("reading: "+type.toString());
+    //bcl.println("reading: "+type.toString());
     //BclMemory bcl_mem = new BclMemory(bcl, m_mem);
     //Local ptr = bcl_mem.getPointer();
     //bcl.println(ptr);

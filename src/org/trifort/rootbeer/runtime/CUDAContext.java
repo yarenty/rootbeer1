@@ -303,11 +303,11 @@ public class CUDAContext implements Context {
           writeBlocksList(gpuEvent.getKernelList());
           runGpu();
           readBlocksList(gpuEvent.getKernelList());
+          System.out.println("signalling");
           gpuEvent.getFuture().signal();
           break;
         }
       } catch(Exception ex){
-        close();
         gpuEvent.getFuture().setException(ex);
         gpuEvent.getFuture().signal();
       }
@@ -418,21 +418,14 @@ public class CUDAContext implements Context {
   }
 
   public void readBlocksList(List<Kernel> kernelList) {
-    System.out.println("readBlocksList #1");
     Serializer serializer = compiledKernel.getSerializer(objectMemory, textureMemory);
     readBlocksSetup(serializer);
-    System.out.println("readBlocksList #2");
     
     handlesMemory.setAddress(0);
-    int index = 0;
     for(Kernel kernel : kernelList){
-      System.out.println("index: "+index+"/"+kernelList.size());
       long ref = handlesMemory.readRef();
-      System.out.println("read from heap");
       serializer.readFromHeap(kernel, true, ref);
     }
-
-    System.out.println("readBlocksList #3");
     
     if(Configuration.getPrintMem()){
       BufferPrinter printer = new BufferPrinter();
