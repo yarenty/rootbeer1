@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.trifort.rootbeer.configuration.Configuration;
+import org.trifort.rootbeer.runtime.Context;
 import org.trifort.rootbeer.runtime.Kernel;
 import org.trifort.rootbeer.runtime.Rootbeer;
 import org.trifort.rootbeer.runtime.RootbeerGpu;
@@ -192,9 +193,7 @@ public class RootbeerTestAgent {
       List<Kernel> testing_items = creator.create();
       Stopwatch watch = new Stopwatch();
       watch.start();
-      if(true)
-      throw new RuntimeException("todo fix this");
-      //rootbeer.run(testing_items);
+      rootbeer.run(testing_items);
       m_passed = true;
       watch.stop();
       m_gpuTime = watch.elapsedTimeMillis();
@@ -229,11 +228,15 @@ public class RootbeerTestAgent {
       Kernel known_good_item = creator.create();
       Kernel testing_item = creator.create();
       ThreadConfig thread_config = creator.getThreadConfig();
+
       Stopwatch watch = new Stopwatch();
       watch.start();
-      if(true)
-      throw new RuntimeException("todo fix this");
-      //rootbeer.run(testing_item, thread_config);
+      Context context = rootbeer.createDefaultContext();
+      context.setKernel(testing_item);
+      context.setThreadConfig(thread_config);
+      context.buildState();
+      context.run();
+      context.close();
       m_passed = true;
       watch.stop();
       m_gpuTime = watch.elapsedTimeMillis();
@@ -270,9 +273,7 @@ public class RootbeerTestAgent {
     Configuration.setPrintMem(print_mem);
     List<Kernel> testing_items = creator.create();
     try {
-      if(true)
-      throw new RuntimeException("todo fix this");
-      //rootbeer.run(testing_items);
+      rootbeer.run(testing_items);
       m_passed = false;
       m_message = "No exception thrown when expecting one.";
     } catch(Throwable ex){
@@ -313,10 +314,7 @@ public class RootbeerTestAgent {
         List<Kernel> testing_items = m_creator.create();
         Stopwatch watch = new Stopwatch();
         watch.start();
-
-        if(true)
-        throw new RuntimeException("todo fix this");
-        //m_rootbeer.run(testing_items);
+        m_rootbeer.run(testing_items);
         m_passed = true;
         watch.stop();
         m_gpuTime = watch.elapsedTimeMillis();

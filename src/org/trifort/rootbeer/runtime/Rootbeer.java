@@ -66,4 +66,24 @@ public class Rootbeer {
       return best.createContext();
     }
   }
+  
+  public ThreadConfig getThreadConfig(List<Kernel> kernels, GpuDevice device){
+    BlockShaper block_shaper = new BlockShaper();
+    block_shaper.run(kernels.size(), device.getMultiProcessorCount());
+    
+    return new ThreadConfig(block_shaper.getMaxThreadsPerBlock(), 
+                            block_shaper.getMaxBlocksPerProc(),
+                            kernels.size());
+  }
+
+  public void run(List<Kernel> work) {
+    Context context = createDefaultContext();
+    ThreadConfig thread_config = getThreadConfig(work, context.getDevice());
+    context.setThreadConfig(thread_config);
+    context.setKernel(work.get(0));
+    context.setUsingHandles(true);
+    context.buildState();
+    context.run(work);
+    context.close();
+  }
 }

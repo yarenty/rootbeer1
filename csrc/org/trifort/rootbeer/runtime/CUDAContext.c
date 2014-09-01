@@ -9,21 +9,24 @@ struct ContextState {
 
   CUdeviceptr gpu_info_space;
   CUdeviceptr gpu_object_mem;
+  CUdeviceptr gpu_handles_mem;
   CUdeviceptr gpu_exceptions_mem;
   CUdeviceptr gpu_class_mem;
   CUdeviceptr gpu_heap_end;
 
   void * cpu_object_mem;
+  void * cpu_handles_mem;
   void * cpu_exceptions_mem;
   void * cpu_class_mem;
 
   jlong cpu_object_mem_size;
+  jlong cpu_handles_mem_size;
   jlong cpu_exceptions_mem_size;
   jlong cpu_class_mem_size;
 
   jint * info_space;
   jint grid_shape_x;
-  jint handle_offset;
+  jint using_kernel_templates_offset;
   jint using_exceptions;
 };
 
@@ -101,6 +104,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_freeNativeC
   free(stateObject->info_space);
   cuMemFree(stateObject->gpu_info_space);
   cuMemFree(stateObject->gpu_object_mem);
+  cuMemFree(stateObject->gpu_handles_mem);
   cuMemFree(stateObject->gpu_exceptions_mem);
   cuMemFree(stateObject->gpu_class_mem);
   cuMemFree(stateObject->gpu_heap_end);
@@ -112,7 +116,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_freeNativeC
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuildState
   (JNIEnv *env, jobject this_ref, jlong nativeContext, jint device_index,
    jbyteArray cubin_file, jint cubin_length, jint block_shape_x,
-   jint grid_shape_x, jint num_threads, jobject object_mem,
+   jint grid_shape_x, jint num_threads, jobject object_mem, jobject handles_mem,
    jobject exceptions_mem, jobject class_mem,
    jint using_exceptions, jint cache_config)
 
@@ -143,7 +147,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   free(fatcubin);
 
   status = cuModuleGetFunction(&(stateObject->function), stateObject->module,
-    "_Z5entryPcPiS0_iii");
+    "_Z5entryPcPiS0_S0_iii");
   CHECK_STATUS(env, "Error in cuModuleGetFunction", status, stateObject->device)
 
   if(cache_config != 0){
@@ -163,10 +167,12 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   }
 
   stateObject->cpu_object_mem = (void *) (*env)->CallLongMethod(env, object_mem, get_address_method);
+  stateObject->cpu_handles_mem = (void *) (*env)->CallLongMethod(env, handles_mem, get_address_method);
   stateObject->cpu_exceptions_mem = (void *) (*env)->CallLongMethod(env, exceptions_mem, get_address_method);
   stateObject->cpu_class_mem = (void *) (*env)->CallLongMethod(env, class_mem, get_address_method);
 
   stateObject->cpu_object_mem_size = (*env)->CallLongMethod(env, object_mem, get_size_method);
+  stateObject->cpu_handles_mem_size = (*env)->CallLongMethod(env, handles_mem, get_size_method);
   stateObject->cpu_exceptions_mem_size = (*env)->CallLongMethod(env, exceptions_mem, get_size_method);
   stateObject->cpu_class_mem_size = (*env)->CallLongMethod(env, class_mem, get_size_method);
 
@@ -180,6 +186,9 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   CHECK_STATUS(env, "Error in cuMemAlloc: gpu_info_mem", status, stateObject->device)
 
   status = cuMemAlloc(&(stateObject->gpu_object_mem), stateObject->cpu_object_mem_size);
+  CHECK_STATUS(env, "Error in cuMemAlloc: gpu_object_mem", status, stateObject->device)
+
+  status = cuMemAlloc(&(stateObject->gpu_handles_mem), stateObject->cpu_handles_mem_size);
   CHECK_STATUS(env, "Error in cuMemAlloc: gpu_object_mem", status, stateObject->device)
 
   if(using_exceptions){
@@ -196,18 +205,16 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   //----------------------------------------------------------------------------
   //set function parameters
   //----------------------------------------------------------------------------
-  status = cuParamSetSize(stateObject->function, (3 * sizeof(CUdeviceptr)) + (3 * sizeof(int)));
+  status = cuParamSetSize(stateObject->function, (4 * sizeof(CUdeviceptr)) + (3 * sizeof(int)));
   CHECK_STATUS(env, "Error in cuParamSetSize", status, stateObject->device)
 
-/*
-
-__global__ void entry(char * objectMemory, int * exceptions,
-  int * classRefs, int spaceSize, int numBlocks, int handle){
-
-*/
   offset = 0;
   status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_object_mem), sizeof(CUdeviceptr));
   CHECK_STATUS(env, "Error in cuParamSetv: gpu_object_mem", status, stateObject->device)
+  offset += sizeof(CUdeviceptr);
+
+  status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_handles_mem), sizeof(CUdeviceptr));
+  CHECK_STATUS(env, "Error in cuParamSetv: gpu_handles_mem", status, stateObject->device)
   offset += sizeof(CUdeviceptr);
 
   status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_exceptions_mem), sizeof(CUdeviceptr));
@@ -227,7 +234,7 @@ __global__ void entry(char * objectMemory, int * exceptions,
   CHECK_STATUS(env, "Error in cuParamSeti: num_threads", status, stateObject->device)
   offset += sizeof(int);
 
-  stateObject->handle_offset = offset;
+  stateObject->using_kernel_templates_offset = offset;
   offset += sizeof(int);
 
   status = cuFuncSetBlockShape(stateObject->function, block_shape_x, 1, 1);
@@ -236,7 +243,7 @@ __global__ void entry(char * objectMemory, int * exceptions,
 
 
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
-  (JNIEnv *env, jobject this_ref, jlong nativeContext, jint handle, jobject object_mem)
+  (JNIEnv *env, jobject this_ref, jlong nativeContext, jobject object_mem, jint using_kernel_templates)
 {
   CUdeviceptr dptr;
   size_t bytes;
@@ -263,6 +270,9 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   status = cuMemcpyHtoD(stateObject->gpu_object_mem, stateObject->cpu_object_mem, stateObject->cpu_object_mem_size);
   CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_object_mem", status, stateObject->device)
 
+  status = cuMemcpyHtoD(stateObject->gpu_handles_mem, stateObject->cpu_handles_mem, stateObject->cpu_handles_mem_size);
+  CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_handles_mem", status, stateObject->device)
+
   status = cuMemcpyHtoD(stateObject->gpu_class_mem, stateObject->cpu_class_mem, stateObject->cpu_class_mem_size);
   CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_class_mem", status, stateObject->device)
 
@@ -277,8 +287,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   //----------------------------------------------------------------------------
   //launch
   //----------------------------------------------------------------------------
-  status = cuParamSeti(stateObject->function, stateObject->handle_offset, handle);
-  CHECK_STATUS(env, "Error in cuParamSeti: handle", status, stateObject->device)
+  status = cuParamSeti(stateObject->function, stateObject->using_kernel_templates_offset, using_kernel_templates);
+  CHECK_STATUS(env, "Error in cuParamSeti: using_kernel_templates", status, stateObject->device)
 
   status = cuLaunchGrid(stateObject->function, stateObject->grid_shape_x, 1);
   CHECK_STATUS(env, "Error in cuLaunchGrid", status, stateObject->device)

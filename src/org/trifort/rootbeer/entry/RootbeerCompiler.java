@@ -65,6 +65,7 @@ public class RootbeerCompiler {
   }
   
   private void addRuntimePackages(){
+    m_runtimePackages.add("com.lmax.disruptor.");
     m_runtimePackages.add("org.trifort.rootbeer.compiler.");
     m_runtimePackages.add("org.trifort.rootbeer.configuration.");
     m_runtimePackages.add("org.trifort.rootbeer.entry.");
@@ -108,6 +109,7 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addEntryMethodTester(m_entryDetector);
     
     ListClassTester ignore_packages = new ListClassTester();
+    ignore_packages.addPackage("com.lmax.disruptor.");
     ignore_packages.addPackage("org.trifort.rootbeer.compressor.");
     ignore_packages.addPackage("org.trifort.rootbeer.deadmethods.");
     ignore_packages.addPackage("org.trifort.rootbeer.compiler.");
