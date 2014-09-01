@@ -15,6 +15,11 @@
 #define OBJECT_HEADER_POSITION_OBJECT_SIZE      8
 #define OBJECT_HEADER_POSITION_MONITOR          16
 
+#define ARRAY_HEADER_SIZE 32
+#define INT_SIZE 4
+#define LONG_SIZE 8
+#define FLOAT_SIZE 4
+
 $$__device__$$ void org_trifort_gc_collect();
 $$__device__$$ void org_trifort_gc_assign(int * lhs, int rhs);
 $$__device__$$ $$__global$$ char * org_trifort_gc_deref(int handle);
@@ -119,10 +124,12 @@ org_trifort_array_length(int thisref, int * exception){
 
 $$__device__$$ 
 int org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a12_5_5_(int array, int index, int value, int * exception){
-  int * array_deref;
+  char * array_deref;
+  int * int_handle;
+  int length;
   
 #ifdef ARRAY_CHECKS
-  int length = org_trifort_array_length(array, exception);
+  length = org_trifort_array_length(array, exception);
   if(*exception != 0){
     return 0;
   }
@@ -132,16 +139,20 @@ int org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a12_5_5_(int array
     return 0;
   }
 #endif
-  array_deref = (int *) org_trifort_gc_deref(array + 16 + (4 * index));
-  return atomicAdd(array_deref, value);
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (INT_SIZE * index);
+  int_handle = (int *) array_deref;
+  return atomicAdd(int_handle, value);
 }
 
 $$__device__$$ 
 unsigned long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a13_5_6_(int array, int index, unsigned long long value, int * exception){
-  unsigned long long * array_deref;
+  char * array_deref;
+  unsigned long long * long_handle;
+  int length;
   
 #ifdef ARRAY_CHECKS
-  int length = org_trifort_array_length(array, exception);
+  length = org_trifort_array_length(array, exception);
   if(*exception != 0){
     return 0;
   }
@@ -151,16 +162,21 @@ unsigned long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a13
     return 0;
   }
 #endif
-  array_deref = (unsigned long long *) org_trifort_gc_deref(array + 16 + (8 * index));
-  return atomicAdd(array_deref, value);
+
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (LONG_SIZE * index);
+  long_handle = (unsigned long long *) array_deref;
+  return atomicAdd(long_handle, value);
 }
 
 $$__device__$$ 
 float org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a14_5_7_(int array, int index, float value, int * exception){
-  float * array_deref;
+  char * array_deref;
+  float * float_handle;
+  int length;
   
 #ifdef ARRAY_CHECKS
-  int length = org_trifort_array_length(array, exception);
+  length = org_trifort_array_length(array, exception);
   if(*exception != 0){
     return 0;
   }
@@ -170,8 +186,11 @@ float org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a14_5_7_(int arr
     return 0;
   }
 #endif
-  array_deref = (float *) org_trifort_gc_deref(array + 16 + (4 * index));
-  return atomicAdd(array_deref, value);
+
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (FLOAT_SIZE * index);
+  float_handle = (float *) array_deref;
+  return atomicAdd(float_handle, value);
 }
 
 $$__device__$$

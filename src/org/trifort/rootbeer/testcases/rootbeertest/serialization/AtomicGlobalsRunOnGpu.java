@@ -18,7 +18,7 @@ public class AtomicGlobalsRunOnGpu implements Kernel {
   @Override
   public void gpuMethod() {
     RootbeerGpu.atomicAddGlobal(intArray, 0, 2);
-    /*RootbeerGpu.atomicAddGlobal(longArray, 0, 2);
+    RootbeerGpu.atomicAddGlobal(longArray, 0, 2);
     RootbeerGpu.atomicAddGlobal(floatArray, 0, 2);
     RootbeerGpu.atomicAddGlobal(intArray, 1, 2);
     RootbeerGpu.atomicAddGlobal(longArray, 1, 2);
@@ -26,7 +26,6 @@ public class AtomicGlobalsRunOnGpu implements Kernel {
     RootbeerGpu.atomicAddGlobal(intArray, 2, 2);
     RootbeerGpu.atomicAddGlobal(longArray, 2, 2);
     RootbeerGpu.atomicAddGlobal(floatArray, 2, 2);
-    */
   }
 
   public boolean compare(AtomicGlobalsRunOnGpu rhs) {
@@ -34,6 +33,10 @@ public class AtomicGlobalsRunOnGpu implements Kernel {
       int value1 = intArray[i];
       int value2 = rhs.intArray[i];
       if(value1 != value2){
+        System.out.println("intArray");
+        System.out.println("index: "+i);
+        System.out.println("value1: "+value1);
+        System.out.println("value2: "+value2);
         return false;
       }
     }    
@@ -41,6 +44,10 @@ public class AtomicGlobalsRunOnGpu implements Kernel {
       long value1 = longArray[i];
       long value2 = rhs.longArray[i];
       if(value1 != value2){
+        System.out.println("longArray");
+        System.out.println("index: "+i);
+        System.out.println("value1: "+value1);
+        System.out.println("value2: "+value2);
         return false;
       }
     }  
@@ -48,6 +55,10 @@ public class AtomicGlobalsRunOnGpu implements Kernel {
       float value1 = floatArray[i];
       float value2 = rhs.floatArray[i];
       if(value1 != value2){
+        System.out.println("floatArray");
+        System.out.println("index: "+i);
+        System.out.println("value1: "+value1);
+        System.out.println("value2: "+value2);
         return false;
       }
     }
