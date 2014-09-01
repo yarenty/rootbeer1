@@ -138,7 +138,7 @@ public class CUDAContext implements Context {
   public void buildState(){
     String filename;
     int size = 0;
-    boolean error;
+    boolean error = false;
     
     if(is32bit){
       filename = compiledKernel.getCubin32();
@@ -147,7 +147,7 @@ public class CUDAContext implements Context {
     } else {
       filename = compiledKernel.getCubin64();
       size = compiledKernel.getCubin64Size();
-      error = compiledKernel.getCubin32Error();
+      error = compiledKernel.getCubin64Error();
     }
 
     if(error){
@@ -370,7 +370,6 @@ public class CUDAContext implements Context {
   private void runGpu(){
     runOnGpuStopwatch.start();
     cudaRun(nativeContext, objectMemory, b2i(!usingHandles));
-    System.out.println("end cuda run");
     runOnGpuStopwatch.stop();
     requiredMemorySize = objectMemory.getHeapEndPtr();
     stats.setExecutionTime(runOnGpuStopwatch.elapsedTimeMillis());

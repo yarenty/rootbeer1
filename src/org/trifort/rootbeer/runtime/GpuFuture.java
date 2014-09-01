@@ -1,9 +1,11 @@
 package org.trifort.rootbeer.runtime;
 
+import org.trifort.rootbeer.runtimegpu.GpuException;
+
 public class GpuFuture {
   
   private volatile boolean ready;
-  private volatile Exception ex;
+  private volatile Throwable ex;
   
   public GpuFuture(){
     ready = false;
@@ -23,7 +25,19 @@ public class GpuFuture {
       //do nothing
     }
     if(ex != null){
-      throw new RuntimeException(ex);
+      if(ex instanceof NullPointerException){
+        throw (NullPointerException) ex;
+      } else if(ex instanceof OutOfMemoryError){
+        throw (OutOfMemoryError) ex;
+      } else if(ex instanceof Error){
+        throw (Error) ex;
+      } else if(ex instanceof ArrayIndexOutOfBoundsException){
+        throw (ArrayIndexOutOfBoundsException) ex;
+      } else if(ex instanceof RuntimeException){
+        throw (RuntimeException) ex;
+      } else {
+        throw new RuntimeException(ex);
+      }
     }
   }
 
