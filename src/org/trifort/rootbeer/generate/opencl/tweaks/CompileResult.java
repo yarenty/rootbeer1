@@ -21,6 +21,9 @@ public class CompileResult {
   }
 
   private byte[] convert(List<byte[]> binary) {
+    if(binary == null){
+      return new byte[0];
+    }
     int size = 0;
     for(byte[] array : binary){
       size += array.length;
