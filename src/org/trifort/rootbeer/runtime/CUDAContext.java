@@ -300,6 +300,7 @@ public class CUDAContext implements Context {
           break;
         }
       } catch(Exception ex){
+        close();
         gpuEvent.getFuture().setException(ex);
         gpuEvent.getFuture().signal();
       }

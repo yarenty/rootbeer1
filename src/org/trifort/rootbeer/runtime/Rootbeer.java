@@ -79,11 +79,14 @@ public class Rootbeer {
   public void run(List<Kernel> work) {
     Context context = createDefaultContext();
     ThreadConfig thread_config = getThreadConfig(work, context.getDevice());
-    context.setThreadConfig(thread_config);
-    context.setKernel(work.get(0));
-    context.setUsingHandles(true);
-    context.buildState();
-    context.run(work);
-    context.close();
+    try {
+      context.setThreadConfig(thread_config);
+      context.setKernel(work.get(0));
+      context.setUsingHandles(true);
+      context.buildState();
+      context.run(work);
+    } catch(Exception ex){
+      context.close();
+    }
   }
 }

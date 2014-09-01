@@ -22,7 +22,7 @@ public class CompileResult {
 
   private byte[] convert(List<byte[]> binary) {
     if(binary == null){
-      return new byte[0];
+      return null;
     }
     int size = 0;
     for(byte[] array : binary){
