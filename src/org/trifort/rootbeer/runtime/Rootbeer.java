@@ -85,7 +85,7 @@ public class Rootbeer {
       context.setUsingHandles(true);
       context.buildState();
       context.run(work);
-    } catch(Exception ex){
+    } finally {
       context.close();
     }
   }
