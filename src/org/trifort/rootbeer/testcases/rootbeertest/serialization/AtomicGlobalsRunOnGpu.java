@@ -8,11 +8,19 @@ public class AtomicGlobalsRunOnGpu implements Kernel {
   private int[] intArray;
   private long[] longArray;
   private float[] floatArray;
+  private int[] intArray2;
+  private long[] longArray2;
+  private float[] floatArray2;
   
-  public AtomicGlobalsRunOnGpu(int[] intArray, long[] longArray, float[] floatArray){
+  public AtomicGlobalsRunOnGpu(int[] intArray, long[] longArray, 
+      float[] floatArray, int[] intArray2, long[] longArray2, 
+      float[] floatArray2){
     this.intArray = intArray;
     this.longArray = longArray;
     this.floatArray = floatArray;
+    this.intArray2 = intArray2;
+    this.longArray2 = longArray2;
+    this.floatArray2 = floatArray2;
   }
   
   @Override
@@ -26,6 +34,32 @@ public class AtomicGlobalsRunOnGpu implements Kernel {
     RootbeerGpu.atomicAddGlobal(intArray, 2, 2);
     RootbeerGpu.atomicAddGlobal(longArray, 2, 2);
     RootbeerGpu.atomicAddGlobal(floatArray, 2, 2);
+    
+    RootbeerGpu.atomicSubGlobal(intArray, 0, 1);
+    RootbeerGpu.atomicSubGlobal(intArray, 1, 1);
+    RootbeerGpu.atomicSubGlobal(intArray, 2, 1);
+    
+    RootbeerGpu.atomicExchGlobal(intArray2, 0, 2);
+    RootbeerGpu.atomicExchGlobal(longArray2, 0, 2);
+    RootbeerGpu.atomicExchGlobal(floatArray2, 0, 2);
+    
+    RootbeerGpu.atomicMinGlobal(intArray2, 0, 2);
+    RootbeerGpu.atomicMinGlobal(longArray2, 0, 2);
+    
+    RootbeerGpu.atomicMaxGlobal(intArray2, 0, 2);
+    RootbeerGpu.atomicMaxGlobal(longArray2, 0, 2);
+    
+    RootbeerGpu.atomicCASGlobal(intArray2, 0, 2, 1);
+    RootbeerGpu.atomicCASGlobal(longArray2, 0, 2, 1);
+    
+    RootbeerGpu.atomicANDGlobal(intArray2, 0, 2);
+    RootbeerGpu.atomicANDGlobal(longArray2, 0, 2);
+    
+    RootbeerGpu.atomicORGlobal(intArray2, 0, 2);
+    RootbeerGpu.atomicORGlobal(longArray2, 0, 2);
+    
+    RootbeerGpu.atomicXORGlobal(intArray2, 0, 2);
+    RootbeerGpu.atomicXORGlobal(longArray2, 0, 2);
   }
 
   public boolean compare(AtomicGlobalsRunOnGpu rhs) {
