@@ -267,29 +267,9 @@ public class RootbeerGpu {
     }
   }
   
-  public static long atomicMinGlobal(long[] array, int index, long value){
-    synchronized(array){
-      long old = array[index];
-      if(value < old){
-        array[index] = value;
-      }
-      return old;
-    }
-  }
-  
   public static int atomicMaxGlobal(int[] array, int index, int value){
     synchronized(array){
       int old = array[index];
-      if(value > old){
-        array[index] = value;
-      }
-      return old;
-    }
-  }
-  
-  public static long atomicMaxGlobal(long[] array, int index, long value){
-    synchronized(array){
-      long old = array[index];
       if(value > old){
         array[index] = value;
       }
@@ -307,33 +287,15 @@ public class RootbeerGpu {
     }
   }
 
-  public static long atomicCASGlobal(long[] array, int index, long compare, long value){
-    synchronized(array){
-      long old = array[index];
-      if(old == compare){
-        array[index] = value;
-      }
-      return old;
-    }
-  }
-
-  public static int atomicANDGlobal(int[] array, int index, int value){
+  public static int atomicAndGlobal(int[] array, int index, int value){
     synchronized(array){
       int old = array[index];
       array[index] = old & value;
       return old;
     }
   }
-
-  public static long atomicANDGlobal(long[] array, int index, long value){
-    synchronized(array){
-      long old = array[index];
-      array[index] = old & value;
-      return old;
-    }
-  }
-
-  public static int atomicORGlobal(int[] array, int index, int value){
+  
+  public static int atomicOrGlobal(int[] array, int index, int value){
     synchronized(array){
       int old = array[index];
       array[index] = old | value;
@@ -341,25 +303,9 @@ public class RootbeerGpu {
     }
   }
 
-  public static long atomicORGlobal(long[] array, int index, long value){
-    synchronized(array){
-      long old = array[index];
-      array[index] = old | value;
-      return old;
-    }
-  }
-
-  public static int atomicXORGlobal(int[] array, int index, int value){
+  public static int atomicXorGlobal(int[] array, int index, int value){
     synchronized(array){
       int old = array[index];
-      array[index] = old ^ value;
-      return old;
-    }
-  }
-
-  public static long atomicXORGlobal(long[] array, int index, long value){
-    synchronized(array){
-      long old = array[index];
       array[index] = old ^ value;
       return old;
     }

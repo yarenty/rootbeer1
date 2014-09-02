@@ -47,6 +47,14 @@ public class NameMangling {
     addBuiltIn("double");                       //8
     addBuiltIn("java.lang.String");             //9
     addBuiltIn("java.lang.StringBuilder");      //10
+    addBuiltIn("boolean[]");                    //11
+    addBuiltIn("byte[]");                       //12
+    addBuiltIn("char[]");                       //13
+    addBuiltIn("short[]");                      //14
+    addBuiltIn("int[]");                        //15
+    addBuiltIn("long[]");                       //16
+    addBuiltIn("float[]");                      //17
+    addBuiltIn("double[]");                     //18
   }
   
   private void addBuiltIn(String type){

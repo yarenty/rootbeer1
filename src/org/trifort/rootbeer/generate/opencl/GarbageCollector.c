@@ -123,7 +123,7 @@ org_trifort_array_length(int thisref, int * exception){
 }
 
 $$__device__$$ 
-int org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a12_5_5_(int array, int index, int value, int * exception){
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a15_5_5_(int array, int index, int value, int * exception){
   char * array_deref;
   int * int_handle;
   int length;
@@ -146,7 +146,7 @@ int org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a12_5_5_(int array
 }
 
 $$__device__$$ 
-unsigned long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a13_5_6_(int array, int index, unsigned long long value, int * exception){
+unsigned long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a16_5_6_(int array, int index, unsigned long long value, int * exception){
   char * array_deref;
   unsigned long long * long_handle;
   int length;
@@ -170,7 +170,7 @@ unsigned long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a13
 }
 
 $$__device__$$ 
-float org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a14_5_7_(int array, int index, float value, int * exception){
+float org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a17_5_7_(int array, int index, float value, int * exception){
   char * array_deref;
   float * float_handle;
   int length;
@@ -191,6 +191,238 @@ float org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a14_5_7_(int arr
   array_deref += ARRAY_HEADER_SIZE + (FLOAT_SIZE * index);
   float_handle = (float *) array_deref;
   return atomicAdd(float_handle, value);
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicSubGlobal0_a15_5_5_(int array, int index, int value, int * exception){
+  char * array_deref;
+  int * int_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (INT_SIZE * index);
+  int_handle = (int *) array_deref;
+  return atomicSub(int_handle, value);
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicCASGlobal5_a15_5_5_5_(int array, int index, int compare, int value, int * exception){
+  char * array_deref;
+  int * int_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (INT_SIZE * index);
+  int_handle = (int *) array_deref;
+  return atomicCAS(int_handle, compare, value);
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicExchGlobal5_a15_5_5_(int array, int index, int value, int * exception){
+  char * array_deref;
+  int * int_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (INT_SIZE * index);
+  int_handle = (int *) array_deref;
+  return atomicExch(int_handle, value);
+}
+
+$$__device__$$ 
+unsigned long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicExchGlobal6_a16_5_6_(int array, int index, unsigned long long value, int * exception){
+  char * array_deref;
+  unsigned long long * long_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (LONG_SIZE * index);
+  long_handle = (unsigned long long *) array_deref;
+  return atomicExch(long_handle, value);
+}
+
+$$__device__$$ 
+float org_trifort_rootbeer_runtime_RootbeerGpu_atomicExchGlobal7_a17_5_7_(int array, int index, float value, int * exception){
+  char * array_deref;
+  float * float_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (FLOAT_SIZE * index);
+  float_handle = (float *) array_deref;
+  return atomicExch(float_handle, value);
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicMinGlobal5_a15_5_5_(int array, int index, int value, int * exception){
+  char * array_deref;
+  int * int_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (INT_SIZE * index);
+  int_handle = (int *) array_deref;
+  return atomicMin(int_handle, value);
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicMaxGlobal5_a15_5_5_(int array, int index, int value, int * exception){
+  char * array_deref;
+  int * int_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (INT_SIZE * index);
+  int_handle = (int *) array_deref;
+  return atomicMax(int_handle, value);
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicAndGlobal5_a15_5_5_(int array, int index, int value, int * exception){
+  char * array_deref;
+  int * int_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (INT_SIZE * index);
+  int_handle = (int *) array_deref;
+  return atomicAnd(int_handle, value);
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicOrGlobal5_a15_5_5_(int array, int index, int value, int * exception){
+  char * array_deref;
+  int * int_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (INT_SIZE * index);
+  int_handle = (int *) array_deref;
+  return atomicOr(int_handle, value);
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicXorGlobal5_a15_5_5_(int array, int index, int value, int * exception){
+  char * array_deref;
+  int * int_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (INT_SIZE * index);
+  int_handle = (int *) array_deref;
+  return atomicXor(int_handle, value);
 }
 
 $$__device__$$
