@@ -196,17 +196,40 @@ See the [slides](http://trifort.org/ads/index.php/lecture/index/27/)
         Rootbeer rootbeer = new Rootbeer();
         List<GpuDevice> devices = rootbeer.getDevices();
         GpuDevice device0 = devices.get(0);
+        //create a context with 4212880 bytes objectMemory.
+        //you can leave the 4212880 missing at first to
+        //use all available GPU memory. after you run you
+        //can call context0.getRequiredMemory() to see
+        //what value to enter here
         Context context0 = device0.createContext(4212880);
+        //use more die area for shared memory instead of
+        //cache. the shared memory is a software defined
+        //cache that, if programmed properly, can perform
+        //better than the hardware cache
+        //see (CUDA Occupancy calculator)[http://developer.download.nvidia.com/compute/cuda/CUDA_Occupancy_calculator.xls]
         context0.setCacheConfig(CacheConfig.PREFER_SHARED);
+        //wire thread config for throughput mode. after
+        //calling buildState, the book-keeping information
+        //will be cached in the JNI driver
         context0.setThreadConfig(sizeBy2, outerCount, outerCount * sizeBy2);
+        //configure to use kernel templates. rather than
+        //using kernel lists where each thread has a Kernel
+        //object, there is only one kernel object (less memory copies)
+        //when using kernel templates you need to differetiate
+        //your data using thread/block indexes
         context0.setKernel(new GPUSortKernel(array));
+        //cache the state and get ready for throughput mode
         context0.buildState();
 
         while(true){
+          //randomize the array to be sorted
           for(int i = 0; i < outerCount; ++i){
             fisherYates(array[i]);
           }
           long gpuStart = System.currentTimeMillis();
+          //run the cached throughput mode state.
+          //the data now reachable from the only
+          //GPUSortKernel is serialized to the GPU
           context0.run();
           long gpuStop = System.currentTimeMillis();
           long gpuTime = gpuStop - gpuStart;
@@ -335,6 +358,191 @@ See the [slides](http://trifort.org/ads/index.php/lecture/index/27/)
 * `-64bit` = compile with 64bit (if you are on a 64bit machine you will want to use just this)
 
 Once you get started, you will find you want to use a combination of -maxregcount, -shared-mem-size and the thread count sent to the GPU to control occupancy.
+
+
+### Debugging
+
+You can use System.out.println in a limited way while on the GPU. Printing in Java requires StringBuilder support to concatenate strings/integers/etc. Rootbeer has a custom StringBuilder runtime (written with great improvements from Martin Illecker) that allows most normal printlns to work.
+
+Since you are running on a parallel GPU, it is nice to print from a single thread
+
+    public void gpuMethod(){
+      if(RootbeerGpu.getThreadIdxx() == 0 && RootbeerGpu.getBlockIdxx() == 0){
+        System.out.println("hello world");
+      }
+    }
+
+Once you are done debugging, you can get a performance improvement by disabling exceptions and array bounds checks (see command line options).
+
+### Multi-GPUs (untested)
+
+    List<GpuDevice> devices = rootbeer.getDevices();
+    GpuDevice device0 = devices.get(0);
+    GpuDevice device1 = devices.get(1);
+
+    Context context0 = device0.createContext(4212880);
+    Context context1 = device1.createContext(4212880);
+
+    context0.setCacheConfig(CacheConfig.PREFER_SHARED);
+    context`.setCacheConfig(CacheConfig.PREFER_SHARED);
+
+    context0.setThreadConfig(sizeBy2, outerCount, outerCount * sizeBy2);
+    context1.setThreadConfig(sizeBy2, outerCount, outerCount * sizeBy2);
+
+    context0.setKernel(new GPUSortKernel(array0));
+    context1.setKernel(new GPUSortKernel(array1));
+
+    context0.buildState();
+    context1.buildState();
+
+    while(true){
+      //run using two gpus without blocking the current thread
+      GpuFuture future0 = context0.runAsync();
+      GpuFuture future1 = context1.runAsync();
+      future1.take();
+      future2.take();
+    }
+
+### RootbeerGpu Builtins (compiles directly to CUDA statements)
+
+    public class RootbeerGpu (){
+        //returns true if on the gpu
+        public static boolean isOnGpu();
+
+        //returns blockIdx.x * blockDim.x + threadIdx.x
+        public static int getThreadId();
+
+        //returns threadIdx.x
+        public static int getThreadIdxx();
+
+        //returns blockIdx.x
+        public static int getBlockIdxx();
+
+        //returns blockDim.x
+        public static int getBlockDimx();
+
+        //returns gridDim.x;
+        public static long getGridDimx();
+
+        //__syncthreads
+        public static void syncthreads();
+
+        //__threadfence
+        public static void threadfence();
+
+        //__threadfence_block
+        public static void threadfenceBlock();
+
+        //__threadfence_system
+        public static void threadfenceSystem();
+
+        //given an object, returns the long handle
+        //in GPU memory
+        public static long getRef(Object obj);
+
+        //get/set byte in shared memory. requires 1 byte.
+        //index is byte offset into shared memory
+        public static byte getSharedByte(int index);
+        public static void setSharedByte(int index, byte value);
+
+        //get/set char in shared memory. requires 2 bytes.
+        //index is byte offset into shared memory
+        public static char getSharedChar(int index);
+        public static void setSharedChar(int index, char value);
+
+        //get/set boolean in shared memory. requires 1 byte.
+        //index is byte offset into shared memory
+        public static boolean getSharedBoolean(int index);
+        public static void setSharedBoolean(int index, boolean value);
+
+        //get/set short in shared memory. requires 2 bytes.
+        //index is byte offset into shared memory
+        public static short getSharedShort(int index);
+        public static void setSharedShort(int index, short value);
+
+        //get/set integer in shared memory. requires 4 bytes.
+        //index is byte offset into shared memory
+        public static int getSharedInteger(int index);
+        public static void setSharedInteger(int index, int value);
+
+        //get/set long in shared memory. requires 8 bytes.
+        //index is byte offset into shared memory
+        public static long getSharedLong(int index);
+        public static void setSharedLong(int index, long value);
+
+        //get/set float in shared memory. requires 4 bytes.
+        //index is byte offset into shared memory
+        public static float getSharedFloat(int index);
+        public static void setSharedFloat(int index, float value);
+
+        //get/set double in shared memory. requires 8 bytes.
+        //index is byte offset into shared memory
+        public static double getSharedDouble(int index);
+        public static void setSharedDouble(int index, double value);
+
+        //atomic add value to array at index
+        public static void atomicAddGlobal(int[] array, int index, int value);
+        public static void atomicAddGlobal(long[] array, int index, long value);
+        public static void atomicAddGlobal(float[] array, int index, float value);
+
+        //atomic sub value from array at index
+        public static void atomicSubGlobal(int[] array, int index, int value);
+
+        //atomic exch value at index in array. old is retured
+        public static int atomicExchGlobal(int[] array, int index, int value);
+        public static long atomicExchGlobal(long[] array, int index, long value);
+        public static float atomicExchGlobal(float[] array, int index, float value);
+
+        //from CUDA programming guide: "reads the 32-bit word old located at the
+        //address address in global memory, computes the minimum of old and val,
+        //and stores the result back to memory at the same address.
+        //These three operations are performed in one atomic transaction.
+        //The function returns old."
+        public static int atomicMinGlobal(int[] array, int index, int value);
+
+        //from CUDA programming guide: "reads the 32-bit word old located at the
+        //address address in global memory, computes the maximum of old and val,
+        //and stores the result back to memory at the same address.
+        //These three operations are performed in one atomic transaction.
+        //The function returns old."
+        public static int atomicMaxGlobal(int[] array, int index, int value);
+
+        //from CUDA programming guide: "reads the 32-bit word old located at the
+        //address address in global memory, computes (old == compare ? val : old),
+        //and stores the result back to memory at the same address.
+        //These three operations are performed in one atomic transaction. The function
+        //returns old (Compare And Swap)."
+        public static int atomicCASGlobal(int[] array, int index, int compare, int value);
+
+        //from CUDA programming guide: "reads the 32-bit word old located at the
+        //address address in global memory, computes (old & val), and stores the
+        //result back to memory at the same address.
+        //These three operations are performed in one atomic transaction.
+        //The function returns old."
+        public static int atomicAndGlobal(int[] array, int index, int value);
+
+        //from CUDA programming guide: "reads the 32-bit word old located at the
+        //address address in global memory, computes (old | val), and stores the
+        //result back to memory at the same address.
+        //These three operations are performed in one atomic transaction.
+        //The function returns old."
+        public static int atomicOrGlobal(int[] array, int index, int value);
+
+        //from CUDA programming guide: "reads the 32-bit word old located at the
+        //address address in global memory, computes (old ^ val), and stores the
+        //result back to memory at the same address.
+        //These three operations are performed in one atomic transaction.
+        //The function returns old."
+        public static int atomicXorGlobal(int[] array, int index, int value);
+    }
+
+### Viewing Code Generation
+
+CUDA code is generated and placed in ~/.rootbeer/generated.cu  
+
+You can use this to find out eh register / shared memory usage
+
+    $/usr/local/cuda/bin/nvcc --ptxas-options=-v -arch sm_20 ~/.rootbeer/generated.cu
 
 ### CUDA Setup
 
