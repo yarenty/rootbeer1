@@ -7,6 +7,9 @@
 
 package org.trifort.rootbeer.runtime;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 public class RootbeerGpu {
 
   private static boolean m_isOnGpu;
@@ -17,9 +20,12 @@ public class RootbeerGpu {
   private static long m_gridDimx;
   private static int m_blockDimx;
   
+  private static Map<Integer, Object> m_sharedArrayMap;
+  
   static {
     m_isOnGpu = false;
     m_sharedMem = new byte[48*1024];
+    m_sharedArrayMap = new TreeMap<Integer, Object>();
   }
   
   public static boolean isOnGpu(){
@@ -308,6 +314,20 @@ public class RootbeerGpu {
       int old = array[index];
       array[index] = old ^ value;
       return old;
+    }
+  }
+  
+  public static int[] createSharedIntArray(int index, int length){
+    int[] ret = new int[length];
+    m_sharedArrayMap.put(index, ret);
+    return ret;
+  }
+  
+  public static int[] getSharedIntArray(int index){
+    if(m_sharedArrayMap.containsKey(index)){
+      return (int[]) m_sharedArrayMap.get(index);
+    } else {
+      throw new IllegalArgumentException();
     }
   }
 }

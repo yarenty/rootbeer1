@@ -679,7 +679,7 @@ void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedBoolean(int index, char v
 $$__device__$$
 short org_trifort_rootbeer_runtime_RootbeerGpu_getSharedShort(int index, int * exception){
 #ifdef ARRAY_CHECKS
-  if(index < 0 || index + 2 >= %%shared_mem_size%%){
+  if(index < 0 || index + 2 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(
       index, 0, %%shared_mem_size%%, exception);
     return 0;
@@ -694,7 +694,7 @@ short org_trifort_rootbeer_runtime_RootbeerGpu_getSharedShort(int index, int * e
 $$__device__$$
 void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedShort(int index, short value, int * exception){
 #ifdef ARRAY_CHECKS
-  if(index < 0 || index + 2 >= %%shared_mem_size%%){
+  if(index < 0 || index + 2 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(
       index, 0, %%shared_mem_size%%, exception);
     return;
@@ -707,7 +707,7 @@ void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedShort(int index, short va
 $$__device__$$
 int org_trifort_rootbeer_runtime_RootbeerGpu_getSharedInteger(int index, int * exception){
 #ifdef ARRAY_CHECKS
-  if(index < 0 || index + 4 >= %%shared_mem_size%%){
+  if(index < 0 || index + 4 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(
       index, 0, %%shared_mem_size%%, exception);
     return 0;
@@ -723,7 +723,7 @@ int org_trifort_rootbeer_runtime_RootbeerGpu_getSharedInteger(int index, int * e
 $$__device__$$
 void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedInteger(int index, int value, int * exception){  
 #ifdef ARRAY_CHECKS
-  if(index < 0 || index + 4 >= %%shared_mem_size%%){
+  if(index < 0 || index + 4 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(
       index, 0, %%shared_mem_size%%, exception);
     return;
@@ -738,7 +738,7 @@ void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedInteger(int index, int va
 $$__device__$$
 long long org_trifort_rootbeer_runtime_RootbeerGpu_getSharedLong(int index, int * exception){
 #ifdef ARRAY_CHECKS
-  if(index < 0 || index + 8 >= %%shared_mem_size%%){
+  if(index < 0 || index + 8 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
       index, 0, %%shared_mem_size%%, exception);
     return 0;
@@ -759,7 +759,7 @@ long long org_trifort_rootbeer_runtime_RootbeerGpu_getSharedLong(int index, int 
 $$__device__$$
 void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedLong(int index, long long value, int * exception){
 #ifdef ARRAY_CHECKS
-  if(index < 0 || index + 8 >= %%shared_mem_size%%){
+  if(index < 0 || index + 8 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(
       index, 0, %%shared_mem_size%%, exception);
     return;
