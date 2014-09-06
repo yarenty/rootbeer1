@@ -45,8 +45,8 @@ long long java_lang_System_nanoTime(int * exception){
   return (long long) clock64();
 }
 
-__global__ void entry(char * objectMemory, int * handles, int * exceptions, 
-  int * classRefs, int spaceSize, int numBlocks, int usingKernelTemplates){
+__global__ void entry(int * handles, int * exceptions, int numBlocks, 
+  int usingKernelTemplates){
 
   int loop_control = blockIdx.x * blockDim.x + threadIdx.x;
  

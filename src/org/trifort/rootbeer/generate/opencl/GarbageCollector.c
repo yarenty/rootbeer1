@@ -678,6 +678,7 @@ void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedBoolean(int index, char v
   
 $$__device__$$
 short org_trifort_rootbeer_runtime_RootbeerGpu_getSharedShort(int index, int * exception){
+  index /= 2;
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 2 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(
@@ -685,14 +686,12 @@ short org_trifort_rootbeer_runtime_RootbeerGpu_getSharedShort(int index, int * e
     return 0;
   }  
 #endif
-  short ret = 0;
-  ret |= m_shared[index] & 0xff;
-  ret |= (m_shared[index + 1] << 8) & 0xff00;
-  return ret;
+  return ((short *) m_shared)[index];
 }
 
 $$__device__$$
 void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedShort(int index, short value, int * exception){
+  index /= 2;
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 2 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(
@@ -700,12 +699,12 @@ void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedShort(int index, short va
     return;
   }
 #endif
-  m_shared[index] = (char) (value & 0xff);
-  m_shared[index + 1] = (char) ((value >> 8) & 0xff);
+  ((short *) m_shared)[index] = value;
 }
 
 $$__device__$$
 int org_trifort_rootbeer_runtime_RootbeerGpu_getSharedInteger(int index, int * exception){
+  index /= 4;
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 4 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(
@@ -713,15 +712,12 @@ int org_trifort_rootbeer_runtime_RootbeerGpu_getSharedInteger(int index, int * e
     return 0;
   }
 #endif
-  int ret = m_shared[index] & 0x000000ff;
-  ret |= (m_shared[index + 1] << 8)  & 0x0000ff00;
-  ret |= (m_shared[index + 2] << 16) & 0x00ff0000;
-  ret |= (m_shared[index + 3] << 24) & 0xff000000; 
-  return ret;
+  return ((int *) m_shared)[index];
 }
 
 $$__device__$$
 void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedInteger(int index, int value, int * exception){  
+  index /= 4;
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 4 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(
@@ -729,14 +725,12 @@ void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedInteger(int index, int va
     return;
   }
 #endif
-  m_shared[index] = (char) (value & 0xff);
-  m_shared[index + 1] = (char) ((value >> 8)  & 0xff);
-  m_shared[index + 2] = (char) ((value >> 16) & 0xff);
-  m_shared[index + 3] = (char) ((value >> 24) & 0xff);
+  ((int *) m_shared)[index] = value;
 }
 
 $$__device__$$
 long long org_trifort_rootbeer_runtime_RootbeerGpu_getSharedLong(int index, int * exception){
+  index /= 8;
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 8 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
@@ -744,20 +738,12 @@ long long org_trifort_rootbeer_runtime_RootbeerGpu_getSharedLong(int index, int 
     return 0;
   }
 #endif
-  long long ret = 0;
-  ret |=  ((long long) m_shared[index]) & 0x00000000000000ffL;
-  ret |= ((long long) m_shared[index + 1] << 8)  & 0x000000000000ff00L;
-  ret |= ((long long) m_shared[index + 2] << 16) & 0x0000000000ff0000L;
-  ret |= ((long long) m_shared[index + 3] << 24) & 0x00000000ff000000L;
-  ret |= ((long long) m_shared[index + 4] << 32) & 0x000000ff00000000L;
-  ret |= ((long long) m_shared[index + 5] << 40) & 0x0000ff0000000000L;
-  ret |= ((long long) m_shared[index + 6] << 48) & 0x00ff000000000000L;
-  ret |= ((long long) m_shared[index + 7] << 56) & 0xff00000000000000L;
-  return ret;
+  return ((long long *) m_shared)[index];
 }
 
 $$__device__$$
 void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedLong(int index, long long value, int * exception){
+  index /= 8;
 #ifdef ARRAY_CHECKS
   if(index < 0 || index + 8 > %%shared_mem_size%%){
     *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds(
@@ -765,14 +751,7 @@ void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedLong(int index, long long
     return;
   }
 #endif
-  m_shared[index] = (char) (value & 0x00000000000000ffL);
-  m_shared[index + 1] = (char) ((value >> 8)  & 0x00000000000000ffL);
-  m_shared[index + 2] = (char) ((value >> 16) & 0x00000000000000ffL);
-  m_shared[index + 3] = (char) ((value >> 24) & 0x00000000000000ffL);
-  m_shared[index + 4] = (char) ((value >> 32) & 0x00000000000000ffL);
-  m_shared[index + 5] = (char) ((value >> 40) & 0x00000000000000ffL);
-  m_shared[index + 6] = (char) ((value >> 48) & 0x00000000000000ffL);
-  m_shared[index + 7] = (char) ((value >> 56) & 0x00000000000000ffL);
+  ((long long *) m_shared)[index] = value;
 }
   
 $$__device__$$

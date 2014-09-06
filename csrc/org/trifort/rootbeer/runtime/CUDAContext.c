@@ -151,7 +151,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   free(fatcubin);
 
   status = cuModuleGetFunction(&(stateObject->function), stateObject->module,
-    "_Z5entryPcPiS0_S0_iii");
+    "_Z5entryPiS_ii");
   CHECK_STATUS(env, "Error in cuModuleGetFunction", status, stateObject->device)
 
   if(cache_config != 0){
@@ -209,14 +209,10 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   //----------------------------------------------------------------------------
   //set function parameters
   //----------------------------------------------------------------------------
-  status = cuParamSetSize(stateObject->function, (4 * sizeof(CUdeviceptr)) + (3 * sizeof(int)));
+  status = cuParamSetSize(stateObject->function, (2 * sizeof(CUdeviceptr)) + (2 * sizeof(int)));
   CHECK_STATUS(env, "Error in cuParamSetSize", status, stateObject->device)
 
   offset = 0;
-  status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_object_mem), sizeof(CUdeviceptr));
-  CHECK_STATUS(env, "Error in cuParamSetv: gpu_object_mem", status, stateObject->device)
-  offset += sizeof(CUdeviceptr);
-
   status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_handles_mem), sizeof(CUdeviceptr));
   CHECK_STATUS(env, "Error in cuParamSetv: gpu_handles_mem", status, stateObject->device)
   offset += sizeof(CUdeviceptr);
@@ -224,15 +220,6 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_exceptions_mem), sizeof(CUdeviceptr));
   CHECK_STATUS(env, "Error in cuParamSetv: gpu_exceptions_mem", status, stateObject->device)
   offset += sizeof(CUdeviceptr);
-
-  status = cuParamSetv(stateObject->function, offset, (void *) &(stateObject->gpu_class_mem), sizeof(CUdeviceptr));
-  CHECK_STATUS(env, "Error in cuParamSetv: gpu_class_mem", status, stateObject->device)
-  offset += sizeof(CUdeviceptr);
-
-  objectMemSizeShifted = (jint) (stateObject->cpu_object_mem_size >> 4);
-  status = cuParamSeti(stateObject->function, offset, objectMemSizeShifted);
-  CHECK_STATUS(env, "Error in cuParamSeti: space_size", status, stateObject->device)
-  offset += sizeof(int);
 
   status = cuParamSeti(stateObject->function, offset, num_threads);
   CHECK_STATUS(env, "Error in cuParamSeti: num_threads", status, stateObject->device)
