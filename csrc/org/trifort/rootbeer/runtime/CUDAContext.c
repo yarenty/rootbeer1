@@ -251,12 +251,14 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   (JNIEnv *env, jobject this_ref, jlong nativeContext, jobject object_mem, jint using_kernel_templates)
 {
-  CUdeviceptr dptr;
+  CUdeviceptr deviceGlobalFreePointer;
+  CUdeviceptr deviceMLocal;
   size_t bytes;
   CUresult status;
   jlong heap_end_long;
   jint heap_end_int;
   jthrowable exc;
+  unsigned long long hostMLocal[3];
   struct ContextState * stateObject = (struct ContextState *) nativeContext;
 
   heap_end_long = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
@@ -264,14 +266,24 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   heap_end_int = (jint) heap_end_long;
   stateObject->info_space[0] = heap_end_int;
 
-  status = cuModuleGetGlobal(&dptr, &bytes, stateObject->module, "global_free_pointer");
+  status = cuModuleGetGlobal(&deviceGlobalFreePointer, &bytes, stateObject->module, "global_free_pointer");
   CHECK_STATUS(env, "Error in cuModuleGetGlobal: global_free_pointer", status, stateObject->device)
+
+  status = cuModuleGetGlobal(&deviceMLocal, &bytes, stateObject->module, "m_Local");
+  CHECK_STATUS(env, "Error in cuModuleGetGlobal: m_Local", status, stateObject->device)
 
   //----------------------------------------------------------------------------
   //copy data
   //----------------------------------------------------------------------------
-  status = cuMemcpyHtoD(dptr, stateObject->info_space, 4);
-  CHECK_STATUS(env, "Error in cuMemcpyHtoD: info_space", status, stateObject->device)
+  status = cuMemcpyHtoD(deviceGlobalFreePointer, stateObject->info_space, 4);
+  CHECK_STATUS(env, "Error in cuMemcpyHtoD: deviceGlobalFreePointer", status, stateObject->device)
+
+  hostMLocal[0] = stateObject->gpu_object_mem;
+  hostMLocal[1] = (stateObject->cpu_object_mem_size >> 4);
+  hostMLocal[2] = stateObject->gpu_class_mem;
+
+  status = cuMemcpyHtoD(deviceMLocal, hostMLocal, sizeof(hostMLocal));
+  CHECK_STATUS(env, "Error in cuMemcpyHtoD: deviceMLocal", status, stateObject->device)
 
   status = cuMemcpyHtoD(stateObject->gpu_object_mem, stateObject->cpu_object_mem, stateObject->cpu_object_mem_size);
   CHECK_STATUS(env, "Error in cuMemcpyHtoD: gpu_object_mem", status, stateObject->device)
@@ -305,8 +317,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   //----------------------------------------------------------------------------
   //copy data back
   //----------------------------------------------------------------------------
-  status = cuMemcpyDtoH(stateObject->info_space, dptr, 4);
-  CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_info_space", status, stateObject->device)
+  status = cuMemcpyDtoH(stateObject->info_space, deviceGlobalFreePointer, 4);
+  CHECK_STATUS(env, "Error in cuMemcpyDtoH: deviceGlobalFreePointer", status, stateObject->device)
 
   heap_end_long = stateObject->info_space[0];
   heap_end_long <<= 4;

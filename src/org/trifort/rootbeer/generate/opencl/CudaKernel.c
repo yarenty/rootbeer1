@@ -49,14 +49,7 @@ __global__ void entry(char * objectMemory, int * handles, int * exceptions,
   int * classRefs, int spaceSize, int numBlocks, int usingKernelTemplates){
 
   int loop_control = blockIdx.x * blockDim.x + threadIdx.x;
-  
-  if(threadIdx.x == 0){
-    m_Local[0] = (size_t) objectMemory;
-    m_Local[1] = (size_t) spaceSize;
-    m_Local[2] = (size_t) classRefs;
-  }
-  __syncthreads();
-      
+ 
   if(loop_control < numBlocks){
     int exception = 0; 
     int handle;

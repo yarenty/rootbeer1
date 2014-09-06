@@ -21,8 +21,8 @@ public class FixedMemory implements Memory {
       throw new RuntimeException("cannot allocate memory of size: "+size);
     }
     m_size = size;
-    m_instancePointer = new MemPointer();
-    m_staticPointer = new MemPointer();
+    m_instancePointer = new MemPointer("instance_mem");
+    m_staticPointer = new MemPointer("static_mem");
     m_currentPointer = m_instancePointer;
     m_integerList = new ArrayList<List<Long>>();
   }
@@ -400,9 +400,15 @@ public class FixedMemory implements Memory {
     private PointerStack m_stack; 
     private long m_pointer;
     private long m_heapEnd;
+    private String name;
     
-    public MemPointer(){
+    public MemPointer(String name){
+      this.name = name;
       m_stack = new PointerStack();
+    }
+
+    public String getName() {
+      return name;
     }
 
     public void popAddress() {
@@ -428,7 +434,7 @@ public class FixedMemory implements Memory {
       m_heapEnd += size;              
       
       if(ret + size > m_size){
-        throw new OutOfMemoryError();
+        throw new OutOfMemoryError("currentHeapEnd: "+ret+" allocationSize: "+size+" memorySize: "+m_size);
       }
       
       m_pointer = ret;

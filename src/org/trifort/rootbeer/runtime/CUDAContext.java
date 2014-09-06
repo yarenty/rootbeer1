@@ -386,9 +386,9 @@ public class CUDAContext implements Context {
         if(ref != 0){
           long ref_num = ref >> 4;
           if(ref_num == compiledKernel.getNullPointerNumber()){
-            throw new NullPointerException(); 
+            throw new NullPointerException("NPE while running on GPU"); 
           } else if(ref_num == compiledKernel.getOutOfMemoryNumber()){
-            throw new OutOfMemoryError();
+            throw new OutOfMemoryError("OOM error while running on GPU");
           }
           
           objectMemory.setAddress(ref);           
