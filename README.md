@@ -106,28 +106,6 @@ See the [example](https://github.com/pcpratts/rootbeer1/tree/master/examples/Sca
       }
     }
 
-## Results
-start array[0]: 0  
-start array[1]: 1  
-start array[2]: 2  
-start array[3]: 3  
-start array[4]: 4  
-start array[5]: 5  
-start array[6]: 6  
-start array[7]: 7  
-start array[8]: 8  
-start array[9]: 9  
-end array[0]: 1  
-end array[1]: 2  
-end array[2]: 3  
-end array[3]: 4  
-end array[4]: 5  
-end array[5]: 6  
-end array[6]: 7  
-end array[7]: 8  
-end array[8]: 9  
-end array[9]: 10  
-
 ### High Performance Example - Batcher's Even Odd Sort
 See the [example](https://github.com/pcpratts/rootbeer1/tree/master/examples/sort)  
 See the [slides](http://trifort.org/ads/index.php/lecture/index/27/)  
@@ -540,7 +518,7 @@ Once you are done debugging, you can get a performance improvement by disabling 
 
 CUDA code is generated and placed in ~/.rootbeer/generated.cu  
 
-You can use this to find out eh register / shared memory usage
+You can use this to find out the register / shared memory usage
 
     $/usr/local/cuda/bin/nvcc --ptxas-options=-v -arch sm_20 ~/.rootbeer/generated.cu
 
