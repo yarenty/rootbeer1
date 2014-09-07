@@ -1,4 +1,5 @@
 #include "CUDARuntime.h"
+#include "Stopwatch.h"
 #include <cuda.h>
 
 struct ContextState {
@@ -29,6 +30,10 @@ struct ContextState {
   jint using_kernel_templates_offset;
   jint using_exceptions;
   jint context_built;
+
+  struct stopwatch execMemcopyToDevice;
+  struct stopwatch execGpuRun;
+  struct stopwatch execMemcopyFromDevice;
 };
 
 jclass cuda_memory_class;
@@ -36,6 +41,8 @@ jmethodID get_address_method;
 jmethodID get_size_method;
 jmethodID get_heap_end_method;
 jmethodID set_heap_end_method;
+jclass stats_row_class;
+jmethodID set_driver_times;
 
 #define CHECK_STATUS(env,msg,status,device) \
 if (CUDA_SUCCESS != status) {\
@@ -88,6 +95,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_initializeD
   get_size_method = (*env)->GetMethodID(env, cuda_memory_class, "getSize", "()J");
   get_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "getHeapEndPtr", "()J");
   set_heap_end_method = (*env)->GetMethodID(env, cuda_memory_class, "setHeapEndPtr", "(J)V");
+  stats_row_class = (*env)->FindClass(env, "org/trifort/rootbeer/runtime/StatsRow");
+  set_driver_times = (*env)->GetMethodID(env, stats_row_class, "setDriverTimes", "(JJJ)V");
 }
 
 JNIEXPORT jlong JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_allocateNativeContext
@@ -234,9 +243,9 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   stateObject->context_built = 1;
 }
 
-
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
-  (JNIEnv *env, jobject this_ref, jlong nativeContext, jobject object_mem, jint using_kernel_templates)
+  (JNIEnv *env, jobject this_ref, jlong nativeContext, jobject object_mem,
+   jint using_kernel_templates, jobject stats_row)
 {
   CUdeviceptr deviceGlobalFreePointer;
   CUdeviceptr deviceMLocal;
@@ -247,6 +256,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   jthrowable exc;
   unsigned long long hostMLocal[3];
   struct ContextState * stateObject = (struct ContextState *) nativeContext;
+
+  stopwatchStart(&(stateObject->execMemcopyToDevice));
 
   heap_end_long = (*env)->CallLongMethod(env, object_mem, get_heap_end_method);
   heap_end_long >>= 4;
@@ -289,9 +300,14 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
     CHECK_STATUS(env, "Error in cuMemcpyDtoH: gpu_exceptions_mem", status, stateObject->device)
   }
 
+  stopwatchStop(&(stateObject->execMemcopyToDevice));
+
   //----------------------------------------------------------------------------
   //launch
   //----------------------------------------------------------------------------
+
+  stopwatchStart(&(stateObject->execGpuRun));
+
   status = cuParamSeti(stateObject->function, stateObject->using_kernel_templates_offset, using_kernel_templates);
   CHECK_STATUS(env, "Error in cuParamSeti: using_kernel_templates", status, stateObject->device)
 
@@ -301,9 +317,14 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   status = cuCtxSynchronize();
   CHECK_STATUS(env, "Error in cuCtxSynchronize", status, stateObject->device)
 
+  stopwatchStop(&(stateObject->execGpuRun));
+
   //----------------------------------------------------------------------------
   //copy data back
   //----------------------------------------------------------------------------
+
+  stopwatchStart(&(stateObject->execMemcopyFromDevice));
+
   status = cuMemcpyDtoH(stateObject->info_space, deviceGlobalFreePointer, 4);
   CHECK_STATUS(env, "Error in cuMemcpyDtoH: deviceGlobalFreePointer", status, stateObject->device)
 
@@ -319,4 +340,11 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   }
 
   (*env)->CallVoidMethod(env, object_mem, set_heap_end_method, heap_end_long);
+
+  stopwatchStop(&(stateObject->execMemcopyFromDevice));
+
+  (*env)->CallVoidMethod(env, stats_row, set_driver_times,
+    stopwatchTimeMS(&(stateObject->execMemcopyToDevice)),
+    stopwatchTimeMS(&(stateObject->execGpuRun)),
+    stopwatchTimeMS(&(stateObject->execMemcopyFromDevice)));
 }

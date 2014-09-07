@@ -369,7 +369,7 @@ public class CUDAContext implements Context {
   
   private void runGpu(){
     runOnGpuStopwatch.start();
-    cudaRun(nativeContext, objectMemory, b2i(!usingHandles));
+    cudaRun(nativeContext, objectMemory, b2i(!usingHandles), stats);
     runOnGpuStopwatch.stop();
     requiredMemorySize = objectMemory.getHeapEndPtr();
     stats.setExecutionTime(runOnGpuStopwatch.elapsedTimeMillis());
@@ -462,5 +462,5 @@ public class CUDAContext implements Context {
       int usingExceptions, int cacheConfig);
   
   private native void cudaRun(long nativeContext, Memory objectMem, 
-      int usingKernelTemplates);
+      int usingKernelTemplates, StatsRow stats);
 }

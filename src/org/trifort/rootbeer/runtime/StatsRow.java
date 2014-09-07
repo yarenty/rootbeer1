@@ -10,11 +10,32 @@ package org.trifort.rootbeer.runtime;
 public class StatsRow {
 
   private long serializationTime;
-  private long executionTime;
+  private long driverMemcopyToDeviceTime;
+  private long driverExecTime;
+  private long driverMemcopyFromDeviceTime;
+  private long totalDriverExecutionTime;
   private long deserializationTime;
   private long overallTime;
   
   public StatsRow() {
+  }
+  
+  public void setDriverTimes(long memcopyToDevice, long execTime, long memcopyFromDevice){
+    driverMemcopyToDeviceTime = memcopyToDevice;
+    driverExecTime = execTime;
+    driverMemcopyFromDeviceTime = memcopyFromDevice;
+  }
+  
+  public long getDriverMemcopyToDeviceTime(){
+    return driverMemcopyToDeviceTime;
+  }
+  
+  public long getDriverMemcopyFromDeviceTime(){
+    return driverMemcopyFromDeviceTime;
+  }
+  
+  public long getDriverExecTime(){
+    return driverExecTime;
   }
   
   /**
@@ -33,12 +54,12 @@ public class StatsRow {
    * Time to execute on GPU
    * @return 
    */
-  public long getExecutionTime(){
-    return executionTime;
+  public long getTotalDriverExecutionTime(){
+    return totalDriverExecutionTime;
   }
   
   public void setExecutionTime(long time){
-    executionTime = time;
+    totalDriverExecutionTime = time;
   }
   
   /**
