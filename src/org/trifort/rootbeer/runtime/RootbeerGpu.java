@@ -317,6 +317,8 @@ public class RootbeerGpu {
     }
   }
   
+  /*
+  //TODO: working on this
   public static int[] createSharedIntArray(int index, int length){
     int[] ret = new int[length];
     m_sharedArrayMap.put(index, ret);
@@ -330,4 +332,5 @@ public class RootbeerGpu {
       throw new IllegalArgumentException();
     }
   }
+  */
 }
