@@ -205,6 +205,7 @@ public class CUDAContext implements Context {
       byte[] buffer = ResourceReader.getResourceArray(filename, length);
       return buffer;
     } catch(Exception ex){
+	  ex.printStackTrace();
       throw new RuntimeException(ex);
     }
   }

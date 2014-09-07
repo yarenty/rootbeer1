@@ -30,7 +30,7 @@ long long stopwatchTimeMS(struct stopwatch * watch){
   #else
     long long freq;
     long long d;
-    QueryPerformanceFrequency((LARGE_INTEGER*)&freq)
+    QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
     d = watch->stopTime - watch->startTime;
     return (d * 1000UL) / freq;
   #endif
