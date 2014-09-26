@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.generate.opencl.tweaks.GencodeOptions.CompileArchitecture;
+import org.trifort.rootbeer.generate.opencl.tweaks.GencodeOptions.ComputeCapability;
 import org.trifort.rootbeer.runtime.CUDALoader;
 import org.trifort.rootbeer.runtime.GpuDevice;
 import org.trifort.rootbeer.runtime.Rootbeer;
@@ -119,6 +120,24 @@ public class Main {
         ++i;
         Configuration.compilerInstance().setManualCuda();
         Configuration.compilerInstance().setManualCudaFilename(filename);
+      } else if(arg.equals("-computecapability")){
+        String computeCapability = safeGet(args, i+1, "-computecapability");
+        ++i;
+        if (computeCapability.equalsIgnoreCase("sm_11")) {
+          Configuration.compilerInstance().setComputeCapability(ComputeCapability.SM_11);
+        } else if (computeCapability.equalsIgnoreCase("sm_12")) {
+          Configuration.compilerInstance().setComputeCapability(ComputeCapability.SM_12);
+        } else if (computeCapability.equalsIgnoreCase("sm_20")) {
+          Configuration.compilerInstance().setComputeCapability(ComputeCapability.SM_20);
+        } else if (computeCapability.equalsIgnoreCase("sm_21")) {
+          Configuration.compilerInstance().setComputeCapability(ComputeCapability.SM_21);
+        } else if (computeCapability.equalsIgnoreCase("sm_30")) {
+          Configuration.compilerInstance().setComputeCapability(ComputeCapability.SM_30);
+        } else if (computeCapability.equalsIgnoreCase("sm_35")) {
+          Configuration.compilerInstance().setComputeCapability(ComputeCapability.SM_35);
+        } else {
+          System.out.println("Unsupported compute capability: "+ computeCapability);
+        }
       } else if(m_simpleCompile == false){      
         m_mainJar = arg;
         m_destJar = safeGet(args, i+1, arg);
