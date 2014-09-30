@@ -159,7 +159,7 @@ public class OpenCLField {
       prefix = "";
     }
     SootClass null_cls = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
-    int null_num = RootbeerClassLoader.v().getClassNumber(null_cls);
+    int null_num = RootbeerClassLoader.v().getClassNumber(null_cls.getName());
     
     //instance getter
     ret.append(decls.get(0)+"{\n");

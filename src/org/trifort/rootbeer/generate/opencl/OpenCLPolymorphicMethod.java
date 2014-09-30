@@ -17,8 +17,7 @@ import java.util.Set;
 import org.trifort.rootbeer.generate.opencl.tweaks.Tweaks;
 
 import soot.*;
-import soot.rbclassload.ClassHierarchy;
-import soot.rbclassload.HierarchyGraph;
+import soot.rbclassload.MethodSignature;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -91,10 +90,9 @@ public class OpenCLPolymorphicMethod {
   }
   
   private List<SootMethod> getVirtualMethods(){
-    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    List<String> virtual_methods = class_hierarchy.getVirtualMethods(m_sootMethod.getSignature());
+    List<MethodSignature> virtual_methods = RootbeerClassLoader.v().getVirtualMethods(m_sootMethod.getSignature());
     List<SootMethod> ret = new ArrayList<SootMethod>();
-    for(String virtual_method : virtual_methods){
+    for(MethodSignature virtual_method : virtual_methods){
       m_util.parse(virtual_method);
       SootMethod soot_method = m_util.getSootMethod();
       if(soot_method.isConcrete()){
@@ -163,7 +161,7 @@ public class OpenCLPolymorphicMethod {
           SootClass sclass = method.getDeclaringClass();
           String invoke_string = getInvokeString(sclass);
         
-          ret.append("else if(derived_type == "+RootbeerClassLoader.v().getClassNumber(sclass)+"){\n");
+          ret.append("else if(derived_type == "+RootbeerClassLoader.v().getClassNumber(sclass.getName())+"){\n");
           if(m_sootMethod.getReturnType() instanceof VoidType == false){
             ret.append("return ");
           }
@@ -224,8 +222,8 @@ public class OpenCLPolymorphicMethod {
       SootClass lhs_class = lhs.getDeclaringClass();
       SootClass rhs_class = rhs.getDeclaringClass();
       
-      Integer lhs_number = RootbeerClassLoader.v().getClassNumber(lhs_class);
-      Integer rhs_number = RootbeerClassLoader.v().getClassNumber(rhs_class);
+      Integer lhs_number = RootbeerClassLoader.v().getClassNumber(lhs_class.getName());
+      Integer rhs_number = RootbeerClassLoader.v().getClassNumber(rhs_class.getName());
       return lhs_number.compareTo(rhs_number);
     }
   }

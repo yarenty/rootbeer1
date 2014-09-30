@@ -59,8 +59,7 @@ public class RootbeerDfs {
     FieldSignatureUtil futil = new FieldSignatureUtil();
     
     //load all virtual methods to be followed
-    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    List<MethodSignature> virt_methods = class_hierarchy.getVirtualMethods(signature);
+    List<MethodSignature> virt_methods = RootbeerClassLoader.v().getVirtualMethods(signature);
     for(MethodSignature virt_method : virt_methods){
       if(virt_method.equals(signature) == false){
     	  queue.add(virt_method);

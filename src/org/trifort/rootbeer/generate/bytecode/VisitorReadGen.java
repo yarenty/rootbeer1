@@ -85,8 +85,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     Local ctor_used = bcl_mem.readByte();
     Local class_number = bcl_mem.readInt();
     
-    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    long string_number = class_hierarchy.getNumberForType("java.lang.String");
+    int string_number = RootbeerClassLoader.v().getClassNumber("java.lang.String");
     
     //create readers for String and char[]
     Local ret;
@@ -95,7 +94,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     String ctors_label = getNextLabel();
     String string_label = getNextLabel();
     String increment_addr_label = getNextLabel();
-    bcl.ifStmt(class_number, "==", IntConstant.v((int) string_number), string_label);
+    bcl.ifStmt(class_number, "==", IntConstant.v(string_number), string_label);
     bcl.ifStmt(ctor_used, "==", IntConstant.v(1), ctors_label);
     bcl.ifStmt(m_param0, "==", NullConstant.v(), ctors_label);
     
@@ -212,10 +211,8 @@ public class VisitorReadGen extends AbstractVisitorGen {
     String label = getNextLabel();
     BytecodeLanguage bcl = m_bcl.top();
         
-    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    long number = class_hierarchy.getNumberForType(type.toString());
-    
-    bcl.ifStmt(class_number, "!=", IntConstant.v((int) number), label);
+    int number = RootbeerClassLoader.v().getClassNumber(type.toString());
+    bcl.ifStmt(class_number, "!=", IntConstant.v(number), label);
     
     Local ret;
     if(type instanceof ArrayType){

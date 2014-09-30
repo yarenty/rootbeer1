@@ -26,7 +26,6 @@ import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
 import soot.options.Options;
-import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.util.Chain;
@@ -151,7 +150,7 @@ public class OpenCLMethod {
       if(Configuration.compilerInstance().getExceptions()){
         ret += "if(thisref == -1){\n";
         SootClass null_ptr = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
-        ret += "  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr)+";\n";
+        ret += "  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr.getName())+";\n";
         if(returnsAValue()){
           ret += "  return 0;\n";
         } else {

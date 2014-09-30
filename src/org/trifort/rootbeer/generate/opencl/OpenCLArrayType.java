@@ -150,7 +150,7 @@ public class OpenCLArrayType {
     
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("if(thisref == -1){\n");
-      ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
+      ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr.getName()) +";\n");
       ret.append("  return 0;\n");
       ret.append("}\n");
     }
@@ -172,7 +172,7 @@ public class OpenCLArrayType {
     ret.append(address_qual+" char * thisref_deref;\n");
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("  if(thisref == -1){\n");
-      ret.append("    *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
+      ret.append("    *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr.getName()) +";\n");
       ret.append("    return;\n");
       ret.append("  }\n");
     }
@@ -206,7 +206,7 @@ public class OpenCLArrayType {
     ret.append("thisref = org_trifort_gc_malloc(total_size);\n");
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("if(thisref == -1){\n");
-      ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
+      ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr.getName()) +";\n");
       ret.append("  return -1;\n");
       ret.append("}\n");
     }
@@ -242,7 +242,7 @@ public class OpenCLArrayType {
     ret.append("thisref = org_trifort_gc_malloc(total_size);\n");
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("if(thisref == -1){\n");
-      ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr) +";\n");
+      ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr.getName()) +";\n");
       ret.append("  return -1;\n");
       ret.append("}\n");
     }

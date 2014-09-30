@@ -16,8 +16,7 @@ import soot.Hierarchy;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
-import soot.rbclassload.ClassHierarchy;
-import soot.rbclassload.HierarchyGraph;
+import soot.rbclassload.MethodSignature;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -86,8 +85,8 @@ public class MethodHierarchies {
         return ret;
       }
       
-      List<String> methods = RootbeerClassLoader.v().getClassHierarchy().getVirtualMethods(m_method.getSignature());
-      for(String virt_method : methods){
+      List<MethodSignature> methods = RootbeerClassLoader.v().getVirtualMethods(m_method.getSignature());
+      for(MethodSignature virt_method : methods){
         m_util.parse(virt_method);
         SootMethod soot_method = m_util.getSootMethod();
         OpenCLMethod method = new OpenCLMethod(soot_method, soot_method.getDeclaringClass());
@@ -124,8 +123,8 @@ public class MethodHierarchies {
       
       SootClass lhs_class = m_method.getDeclaringClass();
       SootClass rhs_class = other.m_method.getDeclaringClass();
-      Integer lhs_number = RootbeerClassLoader.v().getClassNumber(lhs_class);
-      Integer rhs_number = RootbeerClassLoader.v().getClassNumber(rhs_class);
+      Integer lhs_number = RootbeerClassLoader.v().getClassNumber(lhs_class.getName());
+      Integer rhs_number = RootbeerClassLoader.v().getClassNumber(rhs_class.getName());
       HierarchyGraph hgraph = RootbeerClassLoader.v().getClassHierarchy().getHierarchyGraph();
       if(hgraph.sameHierarchy(lhs_number, rhs_number)){
         return true;

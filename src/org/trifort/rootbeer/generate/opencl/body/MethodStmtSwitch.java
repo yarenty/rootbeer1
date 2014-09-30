@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.trifort.rootbeer.configuration.Configuration;
+import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.generate.opencl.OpenCLClass;
 import org.trifort.rootbeer.generate.opencl.OpenCLMethod;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
@@ -328,8 +329,8 @@ public class MethodStmtSwitch implements StmtSwitch {
     }
     SootClass oom_cls = Scene.v().getSootClass(prefix+"java.lang.OutOfMemoryError");
     SootClass null_cls = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
-    int oom_num = RootbeerClassLoader.v().getClassNumber(oom_cls);
-    int null_num = RootbeerClassLoader.v().getClassNumber(null_cls);
+    int oom_num = RootbeerClassLoader.v().getClassNumber(oom_cls.getName());
+    int null_num = RootbeerClassLoader.v().getClassNumber(null_cls.getName());
     m_output.append("if(*exception != 0) { \n");
     if(m_trapItems != null){    
       m_output.append("  GC_OBJ_TYPE_TYPE ex_type;\n");
@@ -343,7 +344,7 @@ public class MethodStmtSwitch implements StmtSwitch {
       m_output.append("if(0){}\n");
       for(TrapItem item : m_trapItems){
         m_output.append("else if(");
-        List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedHierarchyUp(item.getException());
+        List<NumberedType> types = DfsInfo.v().getNumberedHierarchyUp(item.getException());
         for(int i = 0; i < types.size(); ++i){
           m_output.append("ex_type == "+types.get(i).getNumber());
           if(i < types.size() - 1){

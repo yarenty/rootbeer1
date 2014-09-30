@@ -81,4 +81,19 @@ public class DfsInfo {
     // TODO Auto-generated method stub
     
   }
+
+  public Set<String> getMethods() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public Set<SootField> getFields() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public Set<Type> getInstanceOfs() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

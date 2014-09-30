@@ -9,6 +9,7 @@ package org.trifort.rootbeer.generate.opencl;
 
 import soot.jimple.NewExpr;
 import soot.rbclassload.MethodSignatureUtil;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -26,6 +27,7 @@ import java.util.Set;
 
 import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.configuration.RootbeerPaths;
+import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.entry.ForcedFields;
 import org.trifort.rootbeer.entry.CompilerSetup;
 import org.trifort.rootbeer.generate.bytecode.MethodCodeSegment;
@@ -107,7 +109,7 @@ public class OpenCLScene {
   }
 
   public int getClassType(SootClass soot_class){
-    return RootbeerClassLoader.v().getClassNumber(soot_class);
+    return RootbeerClassLoader.v().getClassNumber(soot_class.getName());
   }
   
   public void addMethod(SootMethod soot_method){
@@ -199,12 +201,12 @@ public class OpenCLScene {
   
   public int getOutOfMemoryNumber(){
     SootClass soot_class = Scene.v().getSootClass("java.lang.OutOfMemoryError");
-    int ret = RootbeerClassLoader.v().getClassNumber(soot_class); 
+    int ret = RootbeerClassLoader.v().getClassNumber(soot_class.getName()); 
     return ret;
   }
   
   private void loadTypes(){
-    Set<String> methods = RootbeerClassLoader.v().getDfsInfo().getMethods();  
+    Set<String> methods = DfsInfo.v().getMethods();  
     MethodSignatureUtil util = new MethodSignatureUtil();
     for(String method_sig : methods){
       util.parse(method_sig);
@@ -217,7 +219,7 @@ public class OpenCLScene {
       addMethod(util.getSootMethod());
     }
     
-    Set<SootField> fields = RootbeerClassLoader.v().getDfsInfo().getFields();
+    Set<SootField> fields = DfsInfo.v().getFields();
     for(SootField field : fields){
       addField(field);
     }
@@ -229,7 +231,7 @@ public class OpenCLScene {
       addField(field_util.getSootField());
     }
     
-    Set<ArrayType> array_types = RootbeerClassLoader.v().getDfsInfo().getArrayTypes();
+    Set<ArrayType> array_types = DfsInfo.v().getArrayTypes();
     for(ArrayType array_type : array_types){
       OpenCLArrayType ocl_array_type = new OpenCLArrayType(array_type);
       addArrayType(ocl_array_type);
@@ -239,7 +241,7 @@ public class OpenCLScene {
       addArrayType(ocl_array_type);
     }
     
-    Set<Type> instanceofs = RootbeerClassLoader.v().getDfsInfo().getInstanceOfs();
+    Set<Type> instanceofs = DfsInfo.v().getInstanceOfs();
     for(Type type : instanceofs){
       addInstanceof(type);
     }
@@ -260,7 +262,7 @@ public class OpenCLScene {
     
     m_usesGarbageCollector = false;
     
-    List<NumberedType> types = RootbeerClassLoader.v().getDfsInfo().getNumberedTypes();
+    List<NumberedType> types = DfsInfo.v().getNumberedTypes();
     writeTypesToFile(types);
         
     StringBuilder unix_code = new StringBuilder();

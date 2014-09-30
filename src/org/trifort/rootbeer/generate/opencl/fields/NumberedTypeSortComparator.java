@@ -20,8 +20,8 @@ public class NumberedTypeSortComparator implements Comparator<SootClass>{
   }
 
   public int compare(SootClass lhs, SootClass rhs) {
-    Integer lhs_number = Integer.valueOf(RootbeerClassLoader.v().getClassNumber(lhs));
-    Integer rhs_number = Integer.valueOf(RootbeerClassLoader.v().getClassNumber(rhs));
+    Integer lhs_number = Integer.valueOf(RootbeerClassLoader.v().getClassNumber(lhs.getName()));
+    Integer rhs_number = Integer.valueOf(RootbeerClassLoader.v().getClassNumber(rhs.getName()));
     
     if(m_lowest){
       return lhs_number.compareTo(rhs_number);
