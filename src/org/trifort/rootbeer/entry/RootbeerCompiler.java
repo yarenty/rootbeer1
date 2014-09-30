@@ -31,7 +31,7 @@ import org.trifort.rootbeer.util.*;
 import pack.Pack;
 import soot.*;
 import soot.options.Options;
-import soot.rbclassload.DfsInfo;
+import soot.rbclassload.EntryMethodTester;
 import soot.rbclassload.ListClassTester;
 import soot.rbclassload.ListMethodTester;
 import soot.rbclassload.MethodTester;
@@ -44,7 +44,7 @@ public class RootbeerCompiler {
   private String m_jimpleOutputFolder;
   private String m_provider;
   private boolean m_enableClassRemapping;
-  private MethodTester m_entryDetector;
+  private EntryMethodTester m_entryDetector;
   private Set<String> m_runtimePackages;
   
   public RootbeerCompiler(){
@@ -232,16 +232,14 @@ public class RootbeerCompiler {
        
     Transform2 transform2 = new Transform2();
     for(SootMethod kernel_method : kernel_methods){   
+      DfsInfo.reset();
       
       System.out.println("running transform2 on: "+kernel_method.getSignature()+"...");
-      RootbeerClassLoader.v().loadDfsInfo(kernel_method);
-      DfsInfo dfs_info = RootbeerClassLoader.v().getDfsInfo();
-      
       RootbeerDfs rootbeer_dfs = new RootbeerDfs();
-      rootbeer_dfs.run(dfs_info);
+      rootbeer_dfs.run(kernel_method.getSignature());
       
-      dfs_info.expandArrayTypes();
-      dfs_info.finalizeTypes();
+      DfsInfo.v().expandArrayTypes();
+      DfsInfo.v().finalizeTypes();
 
       SootClass soot_class = kernel_method.getDeclaringClass();
       transform2.run(soot_class.getName());

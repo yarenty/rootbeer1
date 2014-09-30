@@ -13,7 +13,6 @@ import org.trifort.rootbeer.generate.bytecode.GenerateForKernel;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 
 import soot.*;
-import soot.rbclassload.DfsInfo;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class Transform2 {

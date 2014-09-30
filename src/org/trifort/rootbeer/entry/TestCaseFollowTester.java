@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import soot.rbclassload.ClassTester;
-import soot.rbclassload.HierarchySootClass;
+import soot.rbclassload.RTAClass;
 
 public class TestCaseFollowTester implements ClassTester {
 
@@ -26,8 +27,9 @@ public class TestCaseFollowTester implements ClassTester {
     m_testCaseInterfaces.add("org.trifort.rootbeer.test.TestSerialization");
   }
   
-  public boolean test(HierarchySootClass hsc) {
-    List<String> interfaces = hsc.getInterfaces();
+  @Override
+  public boolean matches(RTAClass rtaClass) {
+    List<String> interfaces = rtaClass.getInterfaceStrings();
     for(String iface : interfaces){
       if(m_testCaseInterfaces.contains(iface)){
         return true;

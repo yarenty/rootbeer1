@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.generate.opencl.OpenCLClass;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 
@@ -41,7 +42,7 @@ public class ReverseClassHierarchy {
     
     List<TreeNode> all_tree_nodes = new ArrayList<TreeNode>();
     
-    Set<Type> dfs_types = RootbeerClassLoader.v().getDfsInfo().getDfsTypes();
+    Set<Type> dfs_types = DfsInfo.v().getDfsTypes();
     Set<String> dfs_string_types = getRefTypes(dfs_types);
     
     ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();

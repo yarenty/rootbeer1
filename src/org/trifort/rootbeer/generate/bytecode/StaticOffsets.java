@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.generate.opencl.OpenCLClass;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 import org.trifort.rootbeer.generate.opencl.fields.CompositeField;
@@ -98,7 +99,7 @@ public class StaticOffsets {
       index += leftover;
     }
     m_lockStart = index;
-    Set<Type> types = RootbeerClassLoader.v().getDfsInfo().getDfsTypes();
+    Set<Type> types = DfsInfo.v().getDfsTypes();
     for(Type type : types){
       if(type instanceof RefType == false){
         continue;

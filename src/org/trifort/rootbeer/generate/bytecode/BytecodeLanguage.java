@@ -14,11 +14,8 @@ import java.util.List;
 import java.util.Stack;
 import soot.*;
 import soot.jimple.*;
-import soot.rbclassload.ClassHierarchy;
-import soot.rbclassload.HierarchyGraph;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RootbeerClassLoader;
-import soot.rbclassload.TypeToString;
 
 public class BytecodeLanguage {
 

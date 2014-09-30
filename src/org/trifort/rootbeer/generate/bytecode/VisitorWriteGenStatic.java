@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.generate.bytecode.permissiongraph.PermissionGraph;
 import org.trifort.rootbeer.generate.bytecode.permissiongraph.PermissionGraphNode;
 import org.trifort.rootbeer.generate.opencl.ClassConstantNumbers;
@@ -63,7 +64,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     }
     
     //write .class's for array types
-    Set<ArrayType> array_types = RootbeerClassLoader.v().getDfsInfo().getArrayTypes();
+    Set<ArrayType> array_types = DfsInfo.v().getArrayTypes();
     for(ArrayType type : array_types){
       writeType(type);
     }
@@ -189,7 +190,7 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
   }
 
   private boolean reachesJavaLangClass(){
-    List<RefType> ref_types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefTypes();  
+    List<RefType> ref_types = DfsInfo.v().getOrderedRefTypes();  
     RefType java_lang_class = RefType.v("java.lang.Class");
     return ref_types.contains(java_lang_class);
   }

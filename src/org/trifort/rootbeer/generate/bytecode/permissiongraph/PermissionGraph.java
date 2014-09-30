@@ -9,6 +9,9 @@ package org.trifort.rootbeer.generate.bytecode.permissiongraph;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.trifort.rootbeer.entry.DfsInfo;
+
 import soot.RefType;
 import soot.SootClass;
 import soot.rbclassload.RootbeerClassLoader;
@@ -19,7 +22,7 @@ public class PermissionGraph {
   
   public PermissionGraph(){
     m_Roots = new ArrayList<PermissionGraphNode>();
-    build(RootbeerClassLoader.v().getDfsInfo().getOrderedRefTypes());
+    build(DfsInfo.v().getOrderedRefTypes());
   }
 
   private void build(List<RefType> history) {

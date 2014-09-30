@@ -7,13 +7,13 @@
 
 package org.trifort.rootbeer.entry;
 
-import soot.rbclassload.HierarchySootMethod;
 import soot.rbclassload.MethodTester;
+import soot.rbclassload.RTAMethod;
 
 public class MainTester implements MethodTester {
 
-  public boolean test(HierarchySootMethod hsm) {
-    if(hsm.getSubSignature().equals("void main(java.lang.String[])")){
+  public boolean matches(RTAMethod hsm) {
+    if(hsm.getSignature().getSubSignatureString().equals("void main(java.lang.String[])")){
       return true;
     }
     return false;

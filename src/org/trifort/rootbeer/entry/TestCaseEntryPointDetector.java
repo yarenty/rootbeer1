@@ -10,21 +10,24 @@ package org.trifort.rootbeer.entry;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import soot.*;
-import soot.rbclassload.HierarchySootClass;
-import soot.rbclassload.HierarchySootMethod;
 import soot.jimple.InvokeExpr;
 import soot.jimple.Jimple;
 import soot.jimple.ReturnStmt;
 import soot.jimple.StringConstant;
-import soot.rbclassload.ClassHierarchy;
-import soot.rbclassload.HierarchyInstruction;
+import soot.rbclassload.EntryMethodTester;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.MethodTester;
 import soot.rbclassload.Operand;
+import soot.rbclassload.RTAClass;
+import soot.rbclassload.RTAInstruction;
+import soot.rbclassload.RTAMethod;
 import soot.rbclassload.RootbeerClassLoader;
 
-public class TestCaseEntryPointDetector implements MethodTester {
+public class TestCaseEntryPointDetector implements EntryMethodTester {
 
   private String m_testCase;
   private List<SootClass> m_kernels;
@@ -67,12 +70,11 @@ public class TestCaseEntryPointDetector implements MethodTester {
     }
     m_provider = m_testCase;
     
-    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    HierarchySootClass prov_class = class_hierarchy.getHierarchySootClass(m_provider);
-    HierarchySootMethod create_method = prov_class.findMethodByName("create");
-    HierarchySootClass kernel_class = searchMethod(create_method);
-    HierarchySootMethod gpu_method = kernel_class.findMethodBySubSignature("void gpuMethod()");
-    m_signature = gpu_method.getSignature();
+    RTAClass provClass = RootbeerClassLoader.v().getRTAClass(m_provider);
+    RTAMethod createMethod = provClass.findMethodByName("create");
+    RTAClass kernelClass = searchMethod(createMethod);
+    RTAMethod gpuMethod = kernelClass.findMethodBySubSignature("void gpuMethod()");
+    m_signature = gpuMethod.getSignature().toString();
     m_initialized = true;
   }
 
@@ -80,10 +82,9 @@ public class TestCaseEntryPointDetector implements MethodTester {
     return m_provider;
   }
     
-  private HierarchySootClass searchMethod(HierarchySootMethod method) {
-    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    List<HierarchyInstruction> instructions = method.getInstructions();
-    for(HierarchyInstruction inst : instructions){
+  private RTAClass searchMethod(RTAMethod method) {
+    List<RTAInstruction> instructions = method.getInstructions();
+    for(RTAInstruction inst : instructions){
       String name = inst.getName();
       if(name.equals("new")){
         List<Operand> operands = inst.getOperands();
@@ -92,11 +93,11 @@ public class TestCaseEntryPointDetector implements MethodTester {
             continue;
           }
           String class_name = operand.getValue();
-          HierarchySootClass hclass = class_hierarchy.getHierarchySootClass(class_name);
-          List<String> ifaces = hclass.getInterfaces();
+          RTAClass rtaClass = RootbeerClassLoader.v().getRTAClass(class_name);
+          List<String> ifaces = rtaClass.getInterfaceStrings();
           for(String iface : ifaces){
             if(iface.equals("org.trifort.rootbeer.runtime.Kernel")){
-              return hclass;
+              return rtaClass;
             }
           }
         }
@@ -108,14 +109,15 @@ public class TestCaseEntryPointDetector implements MethodTester {
   private String findTestCaseClass(String test_case) {
     for(String pkg : m_testCasePackages){
       String name = pkg + test_case;
-      if(RootbeerClassLoader.v().getClassHierarchy().containsClass(name)){
+      RTAClass existTest = RootbeerClassLoader.v().getRTAClass(name);
+      if(existTest != null){
         return name;
       }
     }
     return null;
   }
 
-  public boolean test(HierarchySootMethod sm) {
+  public boolean matches(RTAMethod sm) {
     if(m_initialized == false){
       init();
     }
@@ -125,5 +127,12 @@ public class TestCaseEntryPointDetector implements MethodTester {
       }
     }
     return false;
+  }
+
+  @Override
+  public Set<String> getNewInvokes() {
+    Set<String> ret = new TreeSet<String>();
+    ret.add(m_provider);
+    return ret;
   }
 }

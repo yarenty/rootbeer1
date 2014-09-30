@@ -22,7 +22,6 @@ import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 import soot.jimple.NullConstant;
-import soot.rbclassload.ClassHierarchy;
 import soot.rbclassload.RootbeerClassLoader;
 
 public class VisitorReadGen extends AbstractVisitorGen {

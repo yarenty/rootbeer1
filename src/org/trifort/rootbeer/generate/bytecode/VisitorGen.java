@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.generate.opencl.OpenCLClass;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 import org.trifort.rootbeer.generate.opencl.OpenCLType;
@@ -19,7 +20,6 @@ import org.trifort.rootbeer.generate.opencl.OpenCLType;
 import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.NullConstant;
-import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.StringToType;
 
@@ -69,7 +69,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_thisRef = m_bcl.top().refThis();
     m_param0 = m_bcl.top().refParameter(0);
     
-    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
+    List<Type> types = DfsInfo.v().getOrderedRefLikeTypes();
     for(Type type : types){
       makeGetSizeMethodForType(type);
     }
@@ -84,7 +84,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_thisRef = m_bcl.top().refThis();
     m_param0 = m_bcl.top().refParameter(0);
     
-    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
+    List<Type> types = DfsInfo.v().getOrderedRefLikeTypes();
     for(Type type : types){
       makeGetLengthMethodForType(type);
     }
@@ -160,14 +160,14 @@ public class VisitorGen extends AbstractVisitorGen {
   }
   
   private void makeWriteToHeapMethod() {
-    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
+    List<Type> types = DfsInfo.v().getOrderedRefLikeTypes();
     VisitorWriteGen write_gen = new VisitorWriteGen(types, 
       m_className, m_bcl.top());
     write_gen.makeWriteToHeapMethod();
   }
       
   private void makeReadFromHeapMethod() {
-    List<Type> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefLikeTypes();
+    List<Type> types = DfsInfo.v().getOrderedRefLikeTypes();
     VisitorReadGen read_gen = new VisitorReadGen(types, 
       m_className, m_bcl.top());
     read_gen.makeReadFromHeapMethod();
@@ -249,7 +249,7 @@ public class VisitorGen extends AbstractVisitorGen {
   }
 
   private void makeSentinalCtors() {
-    List<RefType> types = RootbeerClassLoader.v().getDfsInfo().getOrderedRefTypes();
+    List<RefType> types = DfsInfo.v().getOrderedRefTypes();
     //types are ordered from largest type number to smallest
     //reverse the order for this computation because the sentinal ctors
     //need the parent to first have the sential ctor made.
