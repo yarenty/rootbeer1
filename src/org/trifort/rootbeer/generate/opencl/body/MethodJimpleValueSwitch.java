@@ -10,7 +10,7 @@ package org.trifort.rootbeer.generate.opencl.body;
 import org.trifort.rootbeer.generate.opencl.*;
 import org.trifort.rootbeer.generate.opencl.fields.OpenCLField;
 
-import soot.rbclassload.ClassConstantReader;
+import soot.rbclassload.StringToType;
 import soot.*;
 import soot.jimple.AddExpr;
 import soot.jimple.AndExpr;
@@ -71,12 +71,10 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   private String m_thisRef;
   private String m_previousLocal;
   private boolean m_checkException;
-  private ClassConstantReader m_classConstantReader;
 
   public MethodJimpleValueSwitch(StringBuilder output) {
     m_output = output;
     m_newCalled = false;
-    m_classConstantReader = new ClassConstantReader();
     clearLhsRhs();
   }
   
@@ -387,7 +385,8 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
 
   public void caseClassConstant(ClassConstant arg0) {
     String value = arg0.getValue();
-    Type type = m_classConstantReader.stringToType(value);
+    StringToType converter = new StringToType();
+    Type type = converter.convert(value);
     int num = OpenCLScene.v().getClassConstantNumbers().get(type);
     m_output.append("org_trifort_classConstant("+num+")");
   }

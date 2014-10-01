@@ -16,6 +16,10 @@ import soot.SootField;
 import soot.Type;
 import soot.rbclassload.FieldSignatureUtil;
 import soot.rbclassload.MethodSignature;
+import soot.rbclassload.MethodSignatureUtil;
+import soot.rbclassload.RTAClass;
+import soot.rbclassload.RTAMethod;
+import soot.rbclassload.RTAMethodVisitor;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.StringNumbers;
 import soot.rbclassload.StringToType;
@@ -66,7 +70,7 @@ public class RootbeerDfs {
       }
     }
 
-    //if we should follow into method, don't
+    //if we shouldn't follow into method, don't
     if(RootbeerClassLoader.v().dontFollow(signature)){
       return;
     }
@@ -76,14 +80,18 @@ public class RootbeerDfs {
     DfsInfo.v().addMethod(signature.toString());
     
     //go into the method
-    RTAValueSwitch value_switch = RootbeerClassLoader.v().getValueSwitch(signature);
-    for(Integer num : value_switch.getAllTypesInteger()){
+    MethodSignatureUtil util = new MethodSignatureUtil();
+    util.parse(signature);
+    RTAClass rtaClass = RootbeerClassLoader.v().getRTAClass(util.getClassName());
+    RTAMethod rtaMethod = rtaClass.getMethod(signature);
+    RTAMethodVisitor value_switch = RootbeerClassLoader.v().getMethodVisitor(rtaMethod);
+    for(Integer num : value_switch.getAllTypes()){
       String type_str = StringNumbers.v().getString(num);
       Type type = converter.convert(type_str);
       DfsInfo.v().addType(type);
     }    
 
-    for(MethodSignature method_sig : value_switch.getMethodRefsHierarchy()){
+    for(MethodSignature method_sig : value_switch.getMethodRefs()){
       DfsInfo.v().addMethod(signature.toString());
       queue.add(method_sig);
     }
@@ -94,7 +102,7 @@ public class RootbeerDfs {
       DfsInfo.v().addField(soot_field);
     }
 
-    for(Integer num : value_switch.getInstanceOfsInteger()){
+    for(Integer num : value_switch.getInstanceOfs()){
       String type_str = StringNumbers.v().getString(num);
       Type type = converter.convert(type_str);
       DfsInfo.v().addInstanceOf(type);

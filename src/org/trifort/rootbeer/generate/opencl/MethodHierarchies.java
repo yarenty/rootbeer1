@@ -123,13 +123,25 @@ public class MethodHierarchies {
       
       SootClass lhs_class = m_method.getDeclaringClass();
       SootClass rhs_class = other.m_method.getDeclaringClass();
-      Integer lhs_number = RootbeerClassLoader.v().getClassNumber(lhs_class.getName());
-      Integer rhs_number = RootbeerClassLoader.v().getClassNumber(rhs_class.getName());
-      HierarchyGraph hgraph = RootbeerClassLoader.v().getClassHierarchy().getHierarchyGraph();
-      if(hgraph.sameHierarchy(lhs_number, rhs_number)){
+      if(parent(lhs_class, rhs_class)){
+        return true;
+      } else if(parent(rhs_class, lhs_class)){
         return true;
       }
       return false;
+    }
+
+    private boolean parent(SootClass child, SootClass parent) {
+      while(true){
+        if(child == parent){
+          return true;
+        }
+        if(child.hasSuperclass()){
+          child = child.getSuperclass();
+        } else {
+          return false;
+        }
+      }
     }
   }
 }

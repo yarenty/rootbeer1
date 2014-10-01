@@ -46,8 +46,8 @@ import org.trifort.rootbeer.util.ResourceReader;
 
 import soot.*;
 import soot.rbclassload.FieldSignatureUtil;
-import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
+import soot.rbclassload.TypeToString;
 
 public class OpenCLScene {
   private static OpenCLScene m_instance;
@@ -186,11 +186,13 @@ public class OpenCLScene {
     return m_usesGarbageCollector;
   }
   
-  private void writeTypesToFile(List<NumberedType> types){
+  private void writeTypesToFile(Set<Type> types){
+    TypeToString converter = new TypeToString();
     try {
       PrintWriter writer = new PrintWriter(RootbeerPaths.v().getTypeFile());
-      for(NumberedType type : types){
-        writer.println(type.getNumber()+" "+type.getType().toString());
+      for(Type type : types){
+        String typeStr = converter.convert(type);
+        writer.println(RootbeerClassLoader.v().getClassNumber(typeStr)+" "+typeStr);
       }
       writer.flush();
       writer.close();
@@ -262,7 +264,7 @@ public class OpenCLScene {
     
     m_usesGarbageCollector = false;
     
-    List<NumberedType> types = DfsInfo.v().getNumberedTypes();
+    Set<Type> types = DfsInfo.v().getDfsTypes();
     writeTypesToFile(types);
         
     StringBuilder unix_code = new StringBuilder();

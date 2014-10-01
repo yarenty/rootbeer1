@@ -8,6 +8,7 @@
 package org.trifort.rootbeer.generate.opencl.fields;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,13 +19,12 @@ import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.generate.opencl.OpenCLClass;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 
+import soot.FastHierarchy;
 import soot.RefType;
 import soot.Scene;
 import soot.SootClass;
 import soot.Type;
 import soot.options.Options;
-import soot.rbclassload.ClassHierarchy;
-import soot.rbclassload.HierarchyGraph;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.StringNumbers;
 
@@ -45,15 +45,10 @@ public class ReverseClassHierarchy {
     Set<Type> dfs_types = DfsInfo.v().getDfsTypes();
     Set<String> dfs_string_types = getRefTypes(dfs_types);
     
-    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    SootClass obj_class = Scene.v().getSootClass("java.lang.Object");
-    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph();
-    Set<Integer> roots = hgraph.getChildren(0);   //java.lang.Object is 0
+    FastHierarchy hierarchy = Scene.v().getOrMakeFastHierarchy();
+    Collection<SootClass> roots = hierarchy.getSubclassesOf(Scene.v().getSootClass("java.lang.Object"));
     
-    for(Integer root : roots){    
-      String root_name = StringNumbers.v().getString(root);
-      SootClass root_class = Scene.v().getSootClass(root_name);
- 
+    for(SootClass root_class : roots){    
       if(root_class.isInterface()){
         continue;
       }
@@ -68,16 +63,13 @@ public class ReverseClassHierarchy {
       while(queue.isEmpty() == false){
         TreeNode curr = queue.removeFirst();
         SootClass soot_class = curr.getSootClass();
-        int num = StringNumbers.v().addString(soot_class.getName());
         
-        Set<Integer> children = hgraph.getChildren(num);
-        for(Integer child : children){
-          String child_str = StringNumbers.v().getString(child);
-          SootClass child_class = Scene.v().getSootClass(child_str);
+        Collection<SootClass> children = hierarchy.getSubclassesOf(soot_class);
+        for(SootClass child_class : children){
           if(child_class.isInterface()){
             continue;
           }
-          if(dfs_string_types.contains(child_str) == false){
+          if(dfs_string_types.contains(child_class.getName()) == false){
             continue;
           }
           OpenCLClass ocl_class2 = OpenCLScene.v().getOpenCLClass(child_class);

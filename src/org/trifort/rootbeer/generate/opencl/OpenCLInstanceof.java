@@ -15,15 +15,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.generate.opencl.tweaks.Tweaks;
 
+import soot.FastHierarchy;
 import soot.RefType;
+import soot.Scene;
 import soot.SootClass;
 import soot.Type;
 import soot.jimple.InstanceOfExpr;
-import soot.rbclassload.ClassHierarchy;
-import soot.rbclassload.HierarchyGraph;
-import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.StringNumbers;
 
@@ -59,7 +59,7 @@ public class OpenCLInstanceof {
       throw new RuntimeException("not supported yet");
     }
     RefType ref_type = (RefType) m_type;    
-    List<NumberedType> type_list = getTypeList(ref_type.getSootClass());
+    List<Integer> type_list = getTypeList(ref_type.getSootClass());
     
     String ret = getDecl();
     ret += "{\n";
@@ -71,8 +71,8 @@ public class OpenCLInstanceof {
     ret += "  thisref_deref = org_trifort_gc_deref(thisref);\n";
     ret += "  type = org_trifort_gc_get_type(thisref_deref);\n";
     ret += "  switch(type){\n";
-    for(NumberedType ntype : type_list){
-      ret += "    case "+ntype.getNumber()+":\n";
+    for(Integer ntype : type_list){
+      ret += "    case "+ntype+":\n";
     }
     ret += "      return 1;\n";
     ret += "  }\n";
@@ -107,34 +107,31 @@ public class OpenCLInstanceof {
     return hash;
   }
 
-  private List<NumberedType> getTypeList(SootClass soot_class) {
-    
-    ClassHierarchy class_hierarchy = RootbeerClassLoader.v().getClassHierarchy();
-    HierarchyGraph hgraph = class_hierarchy.getHierarchyGraph();
-
-    Set<Integer> visited = new TreeSet<Integer>();
-    visited.add(StringNumbers.v().addString(soot_class.getName()));
+  private List<Integer> getTypeList(SootClass soot_class) {
+    Set<String> visited = new TreeSet<String>();
     LinkedList<String> queue = new LinkedList<String>();
     queue.add(soot_class.getName());
     
-    Set<Integer> new_invokes = RootbeerClassLoader.v().getNewInvokes();
-    List<NumberedType> ret = new ArrayList<NumberedType>();
+    Set<Integer> new_invokes = DfsInfo.v().getNewInvokes();
+    List<Integer> ret = new ArrayList<Integer>();
     
     while(queue.isEmpty() == false){
       String entry = queue.removeFirst();
+      if(visited.contains(entry)){
+        continue;
+      }
+      visited.add(entry);
+      
       Integer num = StringNumbers.v().addString(entry);
       if(new_invokes.contains(num)){
-        NumberedType ntype = class_hierarchy.getNumberedType(entry);
-        ret.add(ntype);
+        ret.add(num);
       }
       
-      Set<Integer> children = hgraph.getChildren(num);
-      for(Integer child : children){
-        if(visited.contains(child)){
-          continue;
-        }
-        visited.add(child);
-        queue.add(StringNumbers.v().getString(child));
+      FastHierarchy hierarchy = Scene.v().getOrMakeFastHierarchy();
+      SootClass curr = Scene.v().getSootClass(entry);
+      Collection<SootClass> children = hierarchy.getSubclassesOf(curr);
+      for(SootClass child : children){
+        queue.add(child.getName());
       }
     }
     

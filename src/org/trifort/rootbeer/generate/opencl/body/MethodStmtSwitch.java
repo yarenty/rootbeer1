@@ -8,10 +8,10 @@
 package org.trifort.rootbeer.generate.opencl.body;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.trifort.rootbeer.configuration.Configuration;
-import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.generate.opencl.OpenCLClass;
 import org.trifort.rootbeer.generate.opencl.OpenCLMethod;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
@@ -45,8 +45,8 @@ import soot.jimple.StmtSwitch;
 import soot.jimple.TableSwitchStmt;
 import soot.jimple.ThrowStmt;
 import soot.options.Options;
-import soot.rbclassload.NumberedType;
 import soot.rbclassload.RootbeerClassLoader;
+import soot.rbclassload.StringNumbers;
 
 public class MethodStmtSwitch implements StmtSwitch {
   protected StringBuilder m_output;
@@ -344,9 +344,9 @@ public class MethodStmtSwitch implements StmtSwitch {
       m_output.append("if(0){}\n");
       for(TrapItem item : m_trapItems){
         m_output.append("else if(");
-        List<NumberedType> types = DfsInfo.v().getNumberedHierarchyUp(item.getException());
+        List<Integer> types = getNumberedHierarchyUp(item.getException());
         for(int i = 0; i < types.size(); ++i){
-          m_output.append("ex_type == "+types.get(i).getNumber());
+          m_output.append("ex_type == "+types.get(i));
           if(i < types.size() - 1){
             m_output.append(" || ");
           }
@@ -364,5 +364,21 @@ public class MethodStmtSwitch implements StmtSwitch {
     if(methodReturnsAValue())
       m_output.append("0");
     m_output.append("; }\n");
+  }
+
+  private List<Integer> getNumberedHierarchyUp(SootClass start) {
+    List<Integer> ret = new ArrayList<Integer>();
+    LinkedList<SootClass> queue = new LinkedList<SootClass>();
+    queue.add(start);
+    
+    while(queue.isEmpty() == false){
+      SootClass curr = queue.removeFirst();
+      ret.add(RootbeerClassLoader.v().getClassNumber(curr.getName()));
+  
+      if(curr.hasSuperclass()){
+        queue.add(curr.getSuperclass());
+      }
+    }
+    return ret;
   }
 }

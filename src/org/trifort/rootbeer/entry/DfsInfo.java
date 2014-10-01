@@ -96,4 +96,9 @@ public class DfsInfo {
     // TODO Auto-generated method stub
     return null;
   }
+
+  public Set<Integer> getNewInvokes() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }
