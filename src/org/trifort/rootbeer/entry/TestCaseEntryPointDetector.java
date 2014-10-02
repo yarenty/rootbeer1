@@ -35,6 +35,7 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
   private String m_provider;
   private boolean m_initialized;
   private String m_signature;
+  private RTAClass kernelClass;
   
   public TestCaseEntryPointDetector(String test_case){
     m_testCase = test_case;
@@ -70,7 +71,8 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     
     RTAClass provClass = RootbeerClassLoader.v().getRTAClass(m_provider);
     RTAMethod createMethod = provClass.findMethodByName("create");
-    RTAClass kernelClass = searchMethod(createMethod);
+    System.out.println(createMethod.getSignature().toString());
+    kernelClass = searchMethod(createMethod);
     RTAMethod gpuMethod = kernelClass.findMethodBySubSignature("void gpuMethod()");
     m_signature = gpuMethod.getSignature().toString();
     m_initialized = true;
@@ -128,7 +130,7 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
   @Override
   public Set<String> getNewInvokes() {
     Set<String> ret = new TreeSet<String>();
-    ret.add(m_provider);
+    ret.add(kernelClass.getName());
     return ret;
   }
 }

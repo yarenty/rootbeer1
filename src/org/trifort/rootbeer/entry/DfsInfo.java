@@ -7,6 +7,7 @@ import soot.ArrayType;
 import soot.RefType;
 import soot.SootField;
 import soot.Type;
+import soot.rbclassload.RTAType;
 
 public class DfsInfo {
 
@@ -27,16 +28,11 @@ public class DfsInfo {
     
   }
 
-  public void addType(int className) {
+  public void addType(RTAType className) {
     // TODO Auto-generated method stub
     
   }
   
-  public void addType(long className) {
-    // TODO Auto-generated method stub
-    
-  }
-
   public void addMethod(String string) {
     // TODO Auto-generated method stub
     

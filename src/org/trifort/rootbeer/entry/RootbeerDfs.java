@@ -14,12 +14,14 @@ import java.util.Set;
 
 import soot.SootField;
 import soot.Type;
+import soot.rbclassload.FieldSignature;
 import soot.rbclassload.FieldSignatureUtil;
 import soot.rbclassload.MethodSignature;
 import soot.rbclassload.MethodSignatureUtil;
 import soot.rbclassload.RTAClass;
 import soot.rbclassload.RTAMethod;
 import soot.rbclassload.RTAMethodVisitor;
+import soot.rbclassload.RTAType;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.StringNumbers;
 import soot.rbclassload.StringToType;
@@ -85,10 +87,8 @@ public class RootbeerDfs {
     RTAClass rtaClass = RootbeerClassLoader.v().getRTAClass(util.getClassName());
     RTAMethod rtaMethod = rtaClass.getMethod(signature);
     RTAMethodVisitor value_switch = RootbeerClassLoader.v().getMethodVisitor(rtaMethod);
-    for(Integer num : value_switch.getAllTypes()){
-      String type_str = StringNumbers.v().getString(num);
-      Type type = converter.convert(type_str);
-      DfsInfo.v().addType(type);
+    for(RTAType num : value_switch.getAllTypes()){
+      DfsInfo.v().addType(num.toSootType());
     }    
 
     for(MethodSignature method_sig : value_switch.getMethodRefs()){
@@ -96,16 +96,14 @@ public class RootbeerDfs {
       queue.add(method_sig);
     }
 
-    for(String field_ref : value_switch.getFieldRefs()){
+    for(FieldSignature field_ref : value_switch.getFieldRefs()){
       futil.parse(field_ref);
       SootField soot_field = futil.getSootField();
       DfsInfo.v().addField(soot_field);
     }
 
-    for(Integer num : value_switch.getInstanceOfs()){
-      String type_str = StringNumbers.v().getString(num);
-      Type type = converter.convert(type_str);
-      DfsInfo.v().addInstanceOf(type);
+    for(RTAType num : value_switch.getInstanceOfs()){
+      DfsInfo.v().addType(num.toSootType());
     }
   }
 }
