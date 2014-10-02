@@ -31,6 +31,11 @@ public class DfsInfo {
     // TODO Auto-generated method stub
     
   }
+  
+  public void addType(long className) {
+    // TODO Auto-generated method stub
+    
+  }
 
   public void addMethod(String string) {
     // TODO Auto-generated method stub

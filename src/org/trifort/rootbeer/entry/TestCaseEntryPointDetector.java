@@ -35,7 +35,6 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
   private String m_provider;
   private boolean m_initialized;
   private String m_signature;
-  private List<String> m_entryPoints;
   
   public TestCaseEntryPointDetector(String test_case){
     m_testCase = test_case;
@@ -56,7 +55,6 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.serialization.");
 
     m_initialized = false;
-    m_entryPoints = new ArrayList<String>();
   }
   
   private void init(){
@@ -121,10 +119,8 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     if(m_initialized == false){
       init();
     }
-    if(sm.getSignature().equals(m_signature)){
-      if(m_entryPoints.contains(sm.getSignature()) == false){
-        return true;
-      }
+    if(sm.getSignature().toString().equals(m_signature)){
+      return true;
     }
     return false;
   }

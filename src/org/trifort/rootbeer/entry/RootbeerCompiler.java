@@ -226,7 +226,7 @@ public class RootbeerCompiler {
     
     if(kernel_methods.isEmpty()){
       System.out.println("There are no kernel classes. Please implement the following interface to use rootbeer:");
-      System.out.println("org.trifort.runtime.Kernel");
+      System.out.println("org.trifort.rootbeer.runtime.Kernel");
       System.exit(0);
     }
        
