@@ -208,11 +208,9 @@ public class OpenCLScene {
   }
   
   private void loadTypes(){
-    Set<String> methods = DfsInfo.v().getMethods();  
+    Set<SootMethod> methods = DfsInfo.v().getMethods();  
     MethodSignatureUtil util = new MethodSignatureUtil();
-    for(String method_sig : methods){
-      util.parse(method_sig);
-      SootMethod method = util.getSootMethod();
+    for(SootMethod method : methods){
       addMethod(method);
     }
     CompilerSetup compiler_setup = new CompilerSetup();

@@ -1,11 +1,15 @@
 package org.trifort.rootbeer.entry;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import soot.ArrayType;
 import soot.RefType;
+import soot.SootClass;
 import soot.SootField;
+import soot.SootMethod;
 import soot.Type;
 import soot.rbclassload.RTAType;
 
@@ -23,54 +27,57 @@ public class DfsInfo {
   }
   
   private static DfsInfo instance;
+
+  private Set<SootClass> classes;
+  private Set<SootMethod> methods;
+  private Set<SootField> fields;
+  private Set<Type> instanceOfs;
+  private Set<ArrayType> arrayTypes;
+  private Set<Type> dfsTypes;
+  private List<Type> orderedRefLikeTypes;
+  private List<RefType> orderedRefTypes;
   
   public DfsInfo(){
-    
+    classes = new HashSet<SootClass>();
+    methods = new HashSet<SootMethod>();
+    fields = new HashSet<SootField>();
+    instanceOfs = new HashSet<Type>();
+    arrayTypes = new HashSet<ArrayType>();
+    dfsTypes = new HashSet<Type>();
+    orderedRefLikeTypes = new ArrayList<Type>();
+    orderedRefTypes = new ArrayList<RefType>();
   }
 
-  public void addType(RTAType className) {
-    // TODO Auto-generated method stub
-    
+  public void addClass(SootClass sootClass) {
+    classes.add(sootClass);
   }
   
-  public void addMethod(String string) {
-    // TODO Auto-generated method stub
-    
+  public void addMethod(SootMethod sootMethod) {
+    methods.add(sootMethod);
   }
 
-  public void addField(SootField soot_field) {
-    // TODO Auto-generated method stub
-    
+  public void addField(SootField sootField) {
+    fields.add(sootField);
   }
 
   public void addInstanceOf(Type type) {
-    // TODO Auto-generated method stub
-    
-  }
-
-  public void addType(Type type) {
-    // TODO Auto-generated method stub
-    
+    instanceOfs.add(type);
   }
 
   public Set<Type> getDfsTypes() {
-    // TODO Auto-generated method stub
-    return null;
+    return dfsTypes;
   }
 
   public List<Type> getOrderedRefLikeTypes() {
-    // TODO Auto-generated method stub
-    return null;
+    return orderedRefLikeTypes;
   }
 
   public List<RefType> getOrderedRefTypes() {
-    // TODO Auto-generated method stub
-    return null;
+    return orderedRefTypes;
   }
 
   public Set<ArrayType> getArrayTypes() {
-    // TODO Auto-generated method stub
-    return null;
+    return arrayTypes;
   }
 
   public void expandArrayTypes() {
@@ -83,19 +90,16 @@ public class DfsInfo {
     
   }
 
-  public Set<String> getMethods() {
-    // TODO Auto-generated method stub
-    return null;
+  public Set<SootMethod> getMethods() {
+    return methods;
   }
 
   public Set<SootField> getFields() {
-    // TODO Auto-generated method stub
-    return null;
+    return fields;
   }
 
   public Set<Type> getInstanceOfs() {
-    // TODO Auto-generated method stub
-    return null;
+    return instanceOfs;
   }
 
   public Set<Integer> getNewInvokes() {

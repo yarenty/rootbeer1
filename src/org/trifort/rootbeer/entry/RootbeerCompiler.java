@@ -145,23 +145,13 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addToSignaturesClassTester(keep_packages);
     
     RootbeerClassLoader.v().addNewInvoke("java.lang.StringBuilder");
-  
-    ListMethodTester follow_tester = new ListMethodTester();
-    follow_tester.addSignature("<java.lang.String: void <init>()>");
-    follow_tester.addSignature("<java.lang.String: void <init>(char[])>");
-    follow_tester.addSignature("<java.lang.StringBuilder: void <init>()>");
-    follow_tester.addSignature("<java.lang.Boolean: java.lang.String toString(boolean)>");
-    follow_tester.addSignature("<java.lang.Character: java.lang.String toString(char)>");
-    follow_tester.addSignature("<java.lang.Double: java.lang.String toString(double)>");
-    follow_tester.addSignature("<java.lang.Float: java.lang.String toString(float)>");
-    follow_tester.addSignature("<java.lang.Integer: java.lang.String toString(int)>");
-    follow_tester.addSignature("<java.lang.Long: java.lang.String toString(long)>");
-    follow_tester.addSignature("<org.trifort.rootbeer.runtime.Sentinal: void <init>()>");
-    follow_tester.addSignature("<org.trifort.rootbeer.runtimegpu.GpuException: void <init>()>");
-    follow_tester.addSignature("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
-    follow_tester.addSignature("<org.trifort.rootbeer.runtime.Serializer: void <init>(org.trifort.rootbeer.runtime.Memory,org.trifort.rootbeer.runtime.Memory)>");
-    follow_tester.addSignature("<org.trifort.rootbeer.testcases.rootbeertest.serialization.CovarientTest: void <init>()>");
-    RootbeerClassLoader.v().addFollowMethodTester(follow_tester);
+
+    CompilerSetup setup = new CompilerSetup();
+    ListMethodTester followTester = new ListMethodTester();
+    for(String method : setup.getExtraMethods()){
+      followTester.addSignature(method);
+    }
+    RootbeerClassLoader.v().addFollowMethodTester(followTester);
     
     if(runtests){
       RootbeerClassLoader.v().addFollowClassTester(new TestCaseFollowTester());
@@ -173,8 +163,6 @@ public class RootbeerCompiler {
     }    
 
     ListMethodTester dont_dfs_tester = new ListMethodTester();
-
-    CompilerSetup setup = new CompilerSetup();
     for(String no_dfs : setup.getDontDfs()){
       dont_dfs_tester.addSignature(no_dfs);
     }
@@ -185,12 +173,11 @@ public class RootbeerCompiler {
       RootbeerClassLoader.v().loadField(field_sig);
     }
     
-    ListMethodTester to_sig_methods = new ListMethodTester();
-    to_sig_methods.addSignature("<java.lang.Object: int hashCode()>");
-    to_sig_methods.addSignature("<java.io.PrintStream: void println(java.lang.String)>");
-    to_sig_methods.addSignature("<java.io.PrintStream: void println(int)>");
-    to_sig_methods.addSignature("<java.io.PrintStream: void println(long)>");
-    RootbeerClassLoader.v().addToSignaturesMethodTester(to_sig_methods);
+    ListMethodTester toSigMethods = new ListMethodTester();
+    for(String method : setup.getToSignaturesMethods()){
+      toSigMethods.addSignature(method);
+    }
+    RootbeerClassLoader.v().addToSignaturesMethodTester(toSigMethods);
     
     RootbeerClassLoader.v().addClassRemapping("java.util.concurrent.atomic.AtomicLong", "org.trifort.rootbeer.remap.GpuAtomicLong");
     RootbeerClassLoader.v().addClassRemapping("org.trifort.rootbeer.testcases.rootbeertest.remaptest.CallsPrivateMethod", "org.trifort.rootbeer.remap.DoesntCallPrivateMethod");
@@ -222,27 +209,27 @@ public class RootbeerCompiler {
     compileForKernels(outname, kernel_methods, jar_filename);
   }
   
-  private void compileForKernels(String outname, List<SootMethod> kernel_methods, String jar_filename) throws Exception {
+  private void compileForKernels(String outname, List<SootMethod> kernelMethods, String jarFilename) throws Exception {
     
-    if(kernel_methods.isEmpty()){
+    if(kernelMethods.isEmpty()){
       System.out.println("There are no kernel classes. Please implement the following interface to use rootbeer:");
       System.out.println("org.trifort.rootbeer.runtime.Kernel");
       System.exit(0);
     }
        
     Transform2 transform2 = new Transform2();
-    for(SootMethod kernel_method : kernel_methods){   
+    for(SootMethod kernelMethod : kernelMethods){   
       DfsInfo.reset();
       
-      System.out.println("running transform2 on: "+kernel_method.getSignature()+"...");
-      RootbeerDfs rootbeer_dfs = new RootbeerDfs();
-      rootbeer_dfs.run(kernel_method.getSignature());
+      System.out.println("running transform2 on: "+kernelMethod.getSignature()+"...");
+      RootbeerDfs rootbeerDfs = new RootbeerDfs();
+      rootbeerDfs.run(kernelMethod.getSignature());
       
       DfsInfo.v().expandArrayTypes();
       DfsInfo.v().finalizeTypes();
 
-      SootClass soot_class = kernel_method.getDeclaringClass();
-      transform2.run(soot_class.getName());
+      SootClass sootClass = kernelMethod.getDeclaringClass();
+      transform2.run(sootClass.getName());
     }
     
     System.out.println("writing classes out...");
@@ -275,7 +262,7 @@ public class RootbeerCompiler {
       }
     }
     
-    makeOutJar(jar_filename);
+    makeOutJar(jarFilename);
     pack(outname);
   }
   

@@ -10,9 +10,31 @@ import org.trifort.rootbeer.generate.opencl.OpenCLArrayType;
 import soot.ArrayType;
 import soot.CharType;
 import soot.RefType;
+import soot.rbclassload.MethodSignature;
 
 public class CompilerSetup {
 
+  public Set<String> getToSignaturesMethods(){
+    Set<String> ret = new HashSet<String>();
+    ret.add("<java.lang.Object: int hashCode()>");
+    ret.add("<java.io.PrintStream: void println(java.lang.String)>");
+    ret.add("<java.io.PrintStream: void println(int)>");
+    ret.add("<java.io.PrintStream: void println(long)>");
+    ret.add("<java.lang.Object: int hashCode()>");
+    ret.add("<java.lang.Boolean: java.lang.String toString(boolean)>");
+    ret.add("<java.lang.Character: java.lang.String toString(char)>");
+    ret.add("<java.lang.Double: java.lang.String toString(double)>");
+    ret.add("<java.lang.Float: java.lang.String toString(float)>");
+    ret.add("<java.lang.Integer: java.lang.String toString(int)>");
+    ret.add("<java.lang.Long: java.lang.String toString(long)>");
+    ret.add("<org.trifort.rootbeer.runtime.Serializer: void <init>(org.trifort.rootbeer.runtime.Memory,org.trifort.rootbeer.runtime.Memory)>");
+    ret.add("<java.lang.StringBuilder: void <init>()>");
+    ret.add("<java.lang.String: void <init>(char[])>");
+    ret.add("<java.lang.String: void <init>()>");
+    ret.add("<org.trifort.rootbeer.testcases.rootbeertest.serialization.CovarientTest: void <init>()>");
+    return ret;
+  }
+  
   public Set<String> getDontDfs(){
     Set<String> ret = new HashSet<String>();
     ret.add("<java.lang.Object: void <clinit>()>");
@@ -276,14 +298,7 @@ public class CompilerSetup {
     Set<String> ret = new HashSet<String>();
     ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
     ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: void <init>()>");
-    ret.add("<java.lang.String: void <init>(char[])>");
-    ret.add("<java.lang.Object: int hashCode()>");
-    ret.add("<java.lang.Boolean: java.lang.String toString(boolean)>");
-    ret.add("<java.lang.Character: java.lang.String toString(char)>");
-    ret.add("<java.lang.Double: java.lang.String toString(double)>");
-    ret.add("<java.lang.Float: java.lang.String toString(float)>");
-    ret.add("<java.lang.Integer: java.lang.String toString(int)>");
-    ret.add("<java.lang.Long: java.lang.String toString(long)>");
+    ret.add("<org.trifort.rootbeer.runtime.Sentinal: void <init>()>");
     return ret;
   }
 }

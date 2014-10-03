@@ -12,8 +12,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import soot.Body;
+import soot.RefType;
+import soot.SootClass;
 import soot.SootField;
+import soot.SootMethod;
 import soot.Type;
+import soot.Value;
+import soot.ValueBox;
+import soot.jimple.FieldRef;
+import soot.jimple.InstanceOfExpr;
+import soot.jimple.InvokeExpr;
 import soot.rbclassload.FieldSignature;
 import soot.rbclassload.FieldSignatureUtil;
 import soot.rbclassload.MethodSignature;
@@ -26,84 +35,67 @@ import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.StringNumbers;
 import soot.rbclassload.StringToType;
 
-/**
- *
- * @author pcpratts
- */
 public class RootbeerDfs {
+  
+  private Set<String> visited;
+  private LinkedList<String> queue;
+  private MethodSignatureUtil methodUtil;
+  
+  public RootbeerDfs(){
+    visited = new HashSet<String>();
+    queue = new LinkedList<String>();
+    methodUtil = new MethodSignatureUtil();
+  }
   
   public void run(String signature) {
     
-    Set<MethodSignature> visited = new HashSet<MethodSignature>();
-    //System.out.println("doing rootbeer dfs: "+signature);
-    LinkedList<MethodSignature> queue = new LinkedList<MethodSignature>();
-    queue.add(new MethodSignature(signature));
-    queue.add(new MethodSignature("<org.trifort.rootbeer.runtime.Sentinal: void <init>()>"));
-    queue.add(new MethodSignature("<org.trifort.rootbeer.runtimegpu.GpuException: void <init>()>"));
-    queue.add(new MethodSignature("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>"));
-
+    queue.add(signature);
     CompilerSetup setup = new CompilerSetup();
+    for(String method : setup.getExtraMethods()){
+      queue.add(method);
+    }
     for(String method : setup.getDontDfs()){
-      visited.add(new MethodSignature(method));
+      visited.add(method);
     }
     
     while(queue.isEmpty() == false){
-      MethodSignature curr = queue.removeFirst();
-      doDfsForRootbeer(curr, queue, visited);
+      String curr = queue.removeFirst();
+      searchMethod(curr);
     }
   }
 
-  private void doDfsForRootbeer(MethodSignature signature, 
-    LinkedList<MethodSignature> queue, Set<MethodSignature> visited){
-
+  private void searchMethod(String signature){
     if(visited.contains(signature)){
       return;
     }
     visited.add(signature);
-        
-    StringToType converter = new StringToType();
-    FieldSignatureUtil futil = new FieldSignatureUtil();
     
-    //load all virtual methods to be followed
-    List<MethodSignature> virt_methods = RootbeerClassLoader.v().getVirtualMethods(signature);
-    for(MethodSignature virt_method : virt_methods){
-      if(virt_method.equals(signature) == false){
-    	  queue.add(virt_method);
-      }
-    }
-
-    //if we shouldn't follow into method, don't
-    if(RootbeerClassLoader.v().dontFollow(signature)){
+    methodUtil.parse(signature);
+    SootMethod sootMethod = methodUtil.getSootMethod();
+    if(sootMethod.isConcrete() == false){
       return;
     }
-    
-    DfsInfo.v().addType(signature.getClassName());
-    DfsInfo.v().addType(signature.getReturnType());
-    DfsInfo.v().addMethod(signature.toString());
-    
-    //go into the method
-    MethodSignatureUtil util = new MethodSignatureUtil();
-    util.parse(signature);
-    RTAClass rtaClass = RootbeerClassLoader.v().getRTAClass(util.getClassName());
-    RTAMethod rtaMethod = rtaClass.getMethod(signature);
-    RTAMethodVisitor value_switch = RootbeerClassLoader.v().getMethodVisitor(rtaMethod);
-    for(RTAType num : value_switch.getAllTypes()){
-      DfsInfo.v().addType(num.toSootType());
-    }    
-
-    for(MethodSignature method_sig : value_switch.getMethodRefs()){
-      DfsInfo.v().addMethod(signature.toString());
-      queue.add(method_sig);
-    }
-
-    for(FieldSignature field_ref : value_switch.getFieldRefs()){
-      futil.parse(field_ref);
-      SootField soot_field = futil.getSootField();
-      DfsInfo.v().addField(soot_field);
-    }
-
-    for(RTAType num : value_switch.getInstanceOfs()){
-      DfsInfo.v().addType(num.toSootType());
+    System.out.println("  searchMethod: "+sootMethod.getSignature());
+    Body body = sootMethod.getActiveBody();
+    List<ValueBox> values = body.getUseAndDefBoxes();
+    for(ValueBox box : values){
+      Value value = box.getValue();
+      if(value instanceof FieldRef){
+        FieldRef fieldRef = (FieldRef) value;
+        SootField sootField = fieldRef.getField();
+        DfsInfo.v().addField(sootField);
+      } else if(value instanceof InvokeExpr){
+        InvokeExpr invokeExpr = (InvokeExpr) value;
+        SootMethod invokeMethod = invokeExpr.getMethod();
+        DfsInfo.v().addMethod(invokeMethod);
+      } else if(value instanceof RefType){
+        RefType refType = (RefType) value;
+        SootClass sootClass = refType.getSootClass();
+        DfsInfo.v().addClass(sootClass);
+      } else if(value instanceof InstanceOfExpr){
+        InstanceOfExpr instanceOf = (InstanceOfExpr) value;
+        DfsInfo.v().addInstanceOf(instanceOf.getType());
+      }
     }
   }
 }
