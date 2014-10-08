@@ -185,7 +185,7 @@ public class OpenCLBody {
 
     m_allocSize = ocl_class.getSize();
     m_refFieldsSize = ocl_class.getRefFieldsSize();
-    m_derivedType = OpenCLScene.v().getClassType(soot_class);
+    m_derivedType = OpenCLScene.v().getTypeNumber(soot_class.getType());
   }
   
   private String writeConstructorBody(){

@@ -64,12 +64,14 @@ public class VisitorReadGen extends AbstractVisitorGen {
     m_objSerializing.push(m_param0);
     m_param1 = bcl.refParameter(1);
     m_refParam = bcl.refParameter(2);
-    m_mem = bcl.refInstanceField(m_thisRef, "mMem");
-    m_textureMem = bcl.refInstanceField(m_thisRef, "mTextureMem");
+    SootClass memoryClass = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
+    bcl.pushMethod(m_thisRef, "getMem", memoryClass.getType());
+    m_mem = bcl.invokeMethodRet(m_thisRef); 
+    bcl.pushMethod(m_thisRef, "getTextureMem", memoryClass.getType());
+    m_textureMem = bcl.invokeMethodRet(m_thisRef); 
 
     String dont_return_null_label = getNextLabel();
     bcl.ifStmt(m_refParam, "!=", LongConstant.v(-1), dont_return_null_label);
-    bcl.println("returning null");
     bcl.returnValue(NullConstant.v());
     bcl.label(dont_return_null_label);    
         
@@ -85,7 +87,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     Local ctor_used = bcl_mem.readByte();
     Local class_number = bcl_mem.readInt();
     
-    int string_number = RootbeerClassLoader.v().getClassNumber("java.lang.String");
+    int string_number = OpenCLScene.v().getTypeNumber("java.lang.String");
     
     //create readers for String and char[]
     Local ret;
@@ -211,7 +213,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     String label = getNextLabel();
     BytecodeLanguage bcl = m_bcl.top();
         
-    int number = RootbeerClassLoader.v().getClassNumber(type.toString());
+    int number = OpenCLScene.v().getTypeNumber(type);
     bcl.ifStmt(class_number, "!=", IntConstant.v(number), label);
     
     Local ret;

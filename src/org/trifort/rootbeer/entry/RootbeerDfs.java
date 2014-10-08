@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import soot.ArrayType;
 import soot.Body;
 import soot.RefType;
 import soot.SootClass;
@@ -23,6 +24,7 @@ import soot.ValueBox;
 import soot.jimple.FieldRef;
 import soot.jimple.InstanceOfExpr;
 import soot.jimple.InvokeExpr;
+import soot.jimple.NewExpr;
 import soot.rbclassload.FieldSignature;
 import soot.rbclassload.FieldSignatureUtil;
 import soot.rbclassload.MethodSignature;
@@ -51,9 +53,6 @@ public class RootbeerDfs {
     
     queue.add(signature);
     CompilerSetup setup = new CompilerSetup();
-    for(String method : setup.getExtraMethods()){
-      queue.add(method);
-    }
     for(String method : setup.getDontDfs()){
       visited.add(method);
     }
@@ -95,6 +94,12 @@ public class RootbeerDfs {
       } else if(value instanceof InstanceOfExpr){
         InstanceOfExpr instanceOf = (InstanceOfExpr) value;
         DfsInfo.v().addInstanceOf(instanceOf.getType());
+      } else if(value instanceof ArrayType){
+        ArrayType arrayType = (ArrayType) value;
+        DfsInfo.v().addArrayType(arrayType);
+      } else if(value instanceof NewExpr){
+        NewExpr newExpr = (NewExpr) value;
+        DfsInfo.v().addNewInvoke(newExpr.getType());
       }
     }
   }

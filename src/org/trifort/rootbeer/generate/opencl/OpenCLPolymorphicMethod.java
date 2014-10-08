@@ -161,7 +161,7 @@ public class OpenCLPolymorphicMethod {
           SootClass sclass = method.getDeclaringClass();
           String invoke_string = getInvokeString(sclass);
         
-          ret.append("else if(derived_type == "+RootbeerClassLoader.v().getClassNumber(sclass.getName())+"){\n");
+          ret.append("else if(derived_type == "+OpenCLScene.v().getTypeNumber(sclass.getName())+"){\n");
           if(m_sootMethod.getReturnType() instanceof VoidType == false){
             ret.append("return ");
           }
@@ -222,8 +222,8 @@ public class OpenCLPolymorphicMethod {
       SootClass lhs_class = lhs.getDeclaringClass();
       SootClass rhs_class = rhs.getDeclaringClass();
       
-      Integer lhs_number = RootbeerClassLoader.v().getClassNumber(lhs_class.getName());
-      Integer rhs_number = RootbeerClassLoader.v().getClassNumber(rhs_class.getName());
+      Integer lhs_number = OpenCLScene.v().getTypeNumber(lhs_class.getName());
+      Integer rhs_number = OpenCLScene.v().getTypeNumber(rhs_class.getName());
       return lhs_number.compareTo(rhs_number);
     }
   }

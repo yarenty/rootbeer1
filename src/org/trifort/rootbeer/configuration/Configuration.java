@@ -48,7 +48,6 @@ public class Configuration {
   private boolean m_doubles;
   private boolean m_recursion;
   private boolean m_exceptions;
-  private boolean m_keepMains;
   private int m_sharedMemSize;
   private CompileArchitecture m_arch;
   private boolean m_manualCuda;
@@ -66,7 +65,6 @@ public class Configuration {
     m_doubles = true;
     m_recursion = true;
     m_exceptions = true;
-    m_keepMains = false;
     m_sharedMemSize = 40*1024;
     m_arch = CompileArchitecture.Arch32bit64bit;
     m_manualCuda = false;
@@ -164,14 +162,6 @@ public class Configuration {
   
   public boolean getExceptions() {
     return m_exceptions;
-  }
-
-  public boolean getKeepMains() {
-    return m_keepMains;
-  }
-  
-  public void setKeepMains(boolean value) {
-    m_keepMains = value;
   }
 
   public void setSharedMemSize(int size) {

@@ -65,7 +65,6 @@ public class RootbeerCompiler {
   }
   
   private void addRuntimePackages(){
-    m_runtimePackages.add("com.lmax.disruptor.");
     m_runtimePackages.add("org.trifort.rootbeer.compiler.");
     m_runtimePackages.add("org.trifort.rootbeer.configuration.");
     m_runtimePackages.add("org.trifort.rootbeer.entry.");
@@ -102,66 +101,17 @@ public class RootbeerCompiler {
       Options.v().set_soot_classpath(rootbeer_jar);
     }
     
-    //Options.v().set_rbcl_remap_all(Configuration.compilerInstance().getRemapAll());
-    Options.v().set_rbcl_remap_all(false);
-    Options.v().set_rbcl_remap_prefix("org.trifort.rootbeer.runtime.remap.");
-    
     RootbeerClassLoader.v().addEntryMethodTester(m_entryDetector);
-    
-    ListClassTester ignore_packages = new ListClassTester();
-    ignore_packages.addPackage("com.lmax.disruptor.");
-    ignore_packages.addPackage("org.trifort.rootbeer.compressor.");
-    ignore_packages.addPackage("org.trifort.rootbeer.deadmethods.");
-    ignore_packages.addPackage("org.trifort.rootbeer.compiler.");
-    ignore_packages.addPackage("org.trifort.rootbeer.configuration.");
-    ignore_packages.addPackage("org.trifort.rootbeer.entry.");
-    ignore_packages.addPackage("org.trifort.rootbeer.generate.");
-    ignore_packages.addPackage("org.trifort.rootbeer.test.");
-    if(!runtests){
-      ignore_packages.addPackage("org.trifort.rootbeer.testcases.");
-    }
-    ignore_packages.addPackage("org.trifort.rootbeer.util.");
-    ignore_packages.addPackage("pack.");
-    ignore_packages.addPackage("jasmin.");
-    ignore_packages.addPackage("soot.");
-    ignore_packages.addPackage("beaver.");
-    ignore_packages.addPackage("polyglot.");
-    ignore_packages.addPackage("org.antlr.");
-    ignore_packages.addPackage("java_cup.");
-    ignore_packages.addPackage("ppg.");
-    ignore_packages.addPackage("antlr.");
-    ignore_packages.addPackage("jas.");
-    ignore_packages.addPackage("scm.");
-    ignore_packages.addPackage("org.xmlpull.v1.");
-    ignore_packages.addPackage("android.util.");
-    ignore_packages.addPackage("android.content.res.");
-    ignore_packages.addPackage("org.apache.commons.codec.");
-    RootbeerClassLoader.v().addDontFollowClassTester(ignore_packages);
-    
-    ListClassTester keep_packages = new ListClassTester();
-    for(String runtime_class : m_runtimePackages){
-      keep_packages.addPackage(runtime_class);
-    }
-    RootbeerClassLoader.v().addToSignaturesClassTester(keep_packages);
-    
     RootbeerClassLoader.v().addNewInvoke("java.lang.StringBuilder");
+    RootbeerClassLoader.v().addSignaturesClass("java.lang.Object");
+    RootbeerClassLoader.v().addSignaturesClass("java.lang.StringBuilder");
+    RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.Serializer");
+    RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.Memory");
+    RootbeerClassLoader.v().addSignaturesClass("java.lang.String");
+    RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtimegpu.GpuException");
+    RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.Sentinal");
 
     CompilerSetup setup = new CompilerSetup();
-    ListMethodTester followTester = new ListMethodTester();
-    for(String method : setup.getExtraMethods()){
-      followTester.addSignature(method);
-    }
-    RootbeerClassLoader.v().addFollowMethodTester(followTester);
-    
-    if(runtests){
-      RootbeerClassLoader.v().addFollowClassTester(new TestCaseFollowTester());
-    }
-    
-    if(Configuration.compilerInstance().getKeepMains()){
-      MainTester main_tester = new MainTester();
-      RootbeerClassLoader.v().addFollowMethodTester(main_tester);
-    }    
-
     ListMethodTester dont_dfs_tester = new ListMethodTester();
     for(String no_dfs : setup.getDontDfs()){
       dont_dfs_tester.addSignature(no_dfs);

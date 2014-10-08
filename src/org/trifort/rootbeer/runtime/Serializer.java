@@ -38,6 +38,14 @@ public abstract class Serializer {
     m_classRefToTypeNumber.clear();
   }
   
+  public Memory getMem(){
+    return mMem;
+  }
+  
+  public Memory getTextureMem(){
+    return mTextureMem;
+  }
+  
   public void writeStaticsToHeap(){
     doWriteStaticsToHeap();
   }

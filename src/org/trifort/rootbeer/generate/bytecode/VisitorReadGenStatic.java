@@ -47,7 +47,9 @@ public class VisitorReadGenStatic extends AbstractVisitorGen {
     bcl.startMethod("doReadStaticsFromHeap", VoidType.v());
 
     m_thisRef = bcl.refThis();
-    m_mem = bcl.refInstanceField(m_thisRef, "mMem"); 
+    SootClass memoryClass = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
+    bcl.pushMethod(m_thisRef, "getMem", memoryClass.getType());
+    m_mem = bcl.invokeMethodRet(m_thisRef); 
     m_currMem.push(m_mem);
     m_gcObjVisitor.push(m_thisRef);
     

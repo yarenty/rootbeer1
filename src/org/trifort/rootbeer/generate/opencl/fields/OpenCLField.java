@@ -154,12 +154,7 @@ public class OpenCLField {
     
     calculateOffsets(composite);
     
-    String prefix = Options.v().rbcl_remap_prefix();    
-    if(Options.v().rbcl_remap_all() == false){
-      prefix = "";
-    }
-    SootClass null_cls = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
-    int null_num = RootbeerClassLoader.v().getClassNumber(null_cls.getName());
+    int null_num = OpenCLScene.v().getTypeNumber("java.lang.NullPointerException");
     
     //instance getter
     ret.append(decls.get(0)+"{\n");

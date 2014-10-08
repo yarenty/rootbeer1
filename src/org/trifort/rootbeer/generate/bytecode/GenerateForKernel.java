@@ -293,7 +293,7 @@ public class GenerateForKernel {
   }
   
   private void makeExceptionMethod(String method_name, String cls_name) {
-    int number = RootbeerClassLoader.v().getClassNumber(cls_name);
+    int number = OpenCLScene.v().getTypeNumber(cls_name);
     
     BytecodeLanguage bcl = new BytecodeLanguage();
     bcl.openClass(m_sootClass);

@@ -323,14 +323,8 @@ public class MethodStmtSwitch implements StmtSwitch {
     if(Configuration.compilerInstance().getExceptions() == false){
       return;
     }
-    String prefix = Options.v().rbcl_remap_prefix();
-    if(Options.v().rbcl_remap_all() == false){
-      prefix = "";
-    }
-    SootClass oom_cls = Scene.v().getSootClass(prefix+"java.lang.OutOfMemoryError");
-    SootClass null_cls = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
-    int oom_num = RootbeerClassLoader.v().getClassNumber(oom_cls.getName());
-    int null_num = RootbeerClassLoader.v().getClassNumber(null_cls.getName());
+    int oom_num = OpenCLScene.v().getTypeNumber("java.lang.OutOfMemoryError");
+    int null_num = OpenCLScene.v().getTypeNumber("java.lang.NullPointerException");
     m_output.append("if(*exception != 0) { \n");
     if(m_trapItems != null){    
       m_output.append("  GC_OBJ_TYPE_TYPE ex_type;\n");
@@ -373,7 +367,7 @@ public class MethodStmtSwitch implements StmtSwitch {
     
     while(queue.isEmpty() == false){
       SootClass curr = queue.removeFirst();
-      ret.add(RootbeerClassLoader.v().getClassNumber(curr.getName()));
+      ret.add(OpenCLScene.v().getTypeNumber(curr.getName()));
   
       if(curr.hasSuperclass()){
         queue.add(curr.getSuperclass());

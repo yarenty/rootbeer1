@@ -8,6 +8,9 @@
 package org.trifort.rootbeer.generate.opencl.fields;
 
 import java.util.Comparator;
+
+import org.trifort.rootbeer.generate.opencl.OpenCLScene;
+
 import soot.SootClass;
 import soot.rbclassload.RootbeerClassLoader;
 
@@ -20,8 +23,8 @@ public class NumberedTypeSortComparator implements Comparator<SootClass>{
   }
 
   public int compare(SootClass lhs, SootClass rhs) {
-    Integer lhs_number = Integer.valueOf(RootbeerClassLoader.v().getClassNumber(lhs.getName()));
-    Integer rhs_number = Integer.valueOf(RootbeerClassLoader.v().getClassNumber(rhs.getName()));
+    Integer lhs_number = Integer.valueOf(OpenCLScene.v().getTypeNumber(lhs.getName()));
+    Integer rhs_number = Integer.valueOf(OpenCLScene.v().getTypeNumber(rhs.getName()));
     
     if(m_lowest){
       return lhs_number.compareTo(rhs_number);

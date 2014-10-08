@@ -69,9 +69,12 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     m_Param1 = bcl.refParameter(1);
     m_RefParam = bcl.refParameter(2);
     m_ReadOnlyParam = bcl.refParameter(3);    
-    
-    m_Mem = bcl.refInstanceField(m_thisRef, "mMem");
-    m_TextureMem = bcl.refInstanceField(m_thisRef, "mTextureMem");
+
+    SootClass memoryClass = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
+    bcl.pushMethod(m_thisRef, "getMem", memoryClass.getType());
+    m_Mem = bcl.invokeMethodRet(m_thisRef); 
+    bcl.pushMethod(m_thisRef, "getTextureMem", memoryClass.getType());
+    m_TextureMem = bcl.invokeMethodRet(m_thisRef); 
     
     String label1 = getNextLabel();    
     String label2 = getNextLabel();
@@ -156,7 +159,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     Local object_to_write_from = bcl.cast(type, m_Param0);
 
     Local length = bcl.lengthof(object_to_write_from);
-    int class_id = RootbeerClassLoader.v().getClassNumber(type.toString());
+    int class_id = OpenCLScene.v().getTypeNumber(type);
 
     BclMemory bcl_mem = new BclMemory(bcl, m_CurrentMem.top());
     bcl_mem.writeByte((byte) 0);      //ref_type count              [0]
@@ -241,7 +244,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   private void makeWriteToHeapBodyForString(RefType type){
     BytecodeLanguage bcl = m_bcl.top();
     BclMemory bcl_mem = new BclMemory(bcl, m_CurrentMem.top());
-    int class_id = RootbeerClassLoader.v().getClassNumber(type.toString());
+    int class_id = OpenCLScene.v().getTypeNumber(type);
     SootClass soot_class = type.getSootClass();
     
     Local object_to_write_from = bcl.cast(type, m_Param0);
@@ -302,7 +305,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   private void makeWriteToHeapBodyForRefType(RefType type){
     BytecodeLanguage bcl = m_bcl.top();
     BclMemory bcl_mem = new BclMemory(bcl, m_CurrentMem.top());
-    int class_id = RootbeerClassLoader.v().getClassNumber(type.toString());
+    int class_id = OpenCLScene.v().getTypeNumber(type);
     SootClass soot_class = type.getSootClass();
     
     Local object_to_write_from = bcl.cast(type, m_Param0);

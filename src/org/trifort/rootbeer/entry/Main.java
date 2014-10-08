@@ -103,8 +103,6 @@ public class Main {
         Configuration.compilerInstance().setRecursion(false);
       } else if(arg.equals("-noexceptions")){
         Configuration.compilerInstance().setExceptions(false);
-      } else if(arg.equals("-keepmains")){
-        Configuration.compilerInstance().setKeepMains(true);
       } else if(arg.equals("-shared-mem-size")){
         String size = safeGet(args, i+1, "-shared-mem-size");
         ++i;

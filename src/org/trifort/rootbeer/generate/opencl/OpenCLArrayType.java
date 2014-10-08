@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.trifort.rootbeer.configuration.Configuration;
+import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.generate.bytecode.Constants;
 import org.trifort.rootbeer.generate.opencl.body.MethodJimpleValueSwitch;
 import org.trifort.rootbeer.generate.opencl.tweaks.Tweaks;
@@ -150,7 +151,7 @@ public class OpenCLArrayType {
     
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("if(thisref == -1){\n");
-      ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr.getName()) +";\n");
+      ret.append("  *exception = "+OpenCLScene.v().getTypeNumber(null_ptr.getName()) +";\n");
       ret.append("  return 0;\n");
       ret.append("}\n");
     }
@@ -172,7 +173,7 @@ public class OpenCLArrayType {
     ret.append(address_qual+" char * thisref_deref;\n");
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("  if(thisref == -1){\n");
-      ret.append("    *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr.getName()) +";\n");
+      ret.append("    *exception = "+OpenCLScene.v().getTypeNumber(null_ptr.getName()) +";\n");
       ret.append("    return;\n");
       ret.append("  }\n");
     }
@@ -192,7 +193,7 @@ public class OpenCLArrayType {
     ret.append("}\n");
     
     //new
-    int derived_type = RootbeerClassLoader.v().getClassNumber(m_arrayType.toString());
+    int derived_type = OpenCLScene.v().getTypeNumber(m_arrayType);
     ret.append(decls.get(2)+"{\n");
     ret.append("int i;\n");
     ret.append("int total_size;\n");
@@ -206,7 +207,7 @@ public class OpenCLArrayType {
     ret.append("thisref = org_trifort_gc_malloc(total_size);\n");
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("if(thisref == -1){\n");
-      ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr.getName()) +";\n");
+      ret.append("  *exception = "+OpenCLScene.v().getTypeNumber(null_ptr.getName()) +";\n");
       ret.append("  return -1;\n");
       ret.append("}\n");
     }
@@ -242,7 +243,7 @@ public class OpenCLArrayType {
     ret.append("thisref = org_trifort_gc_malloc(total_size);\n");
     if(Configuration.compilerInstance().getExceptions()){
       ret.append("if(thisref == -1){\n");
-      ret.append("  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr.getName()) +";\n");
+      ret.append("  *exception = "+OpenCLScene.v().getTypeNumber(null_ptr.getName()) +";\n");
       ret.append("  return -1;\n");
       ret.append("}\n");
     }
@@ -328,7 +329,7 @@ public class OpenCLArrayType {
   }
 
   int getTypeInteger() {
-    return RootbeerClassLoader.v().getClassNumber(m_arrayType.toString());
+    return OpenCLScene.v().getTypeNumber(m_arrayType);
   }
 
   private boolean isCharArray() {

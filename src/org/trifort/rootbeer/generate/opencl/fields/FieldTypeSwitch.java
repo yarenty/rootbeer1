@@ -67,7 +67,7 @@ public class FieldTypeSwitch {
       List<SootClass> classes = offsets.get(key);
       Collections.sort(classes, new NumberedTypeSortComparator(true));
       for(SootClass sclass : classes){
-        ret.append(" case "+OpenCLScene.v().getClassType(sclass)+":\n");
+        ret.append(" case "+OpenCLScene.v().getTypeNumber(sclass.getType())+":\n");
       }
       ret.append("  offset = "+key+";\n");
       ret.append("  break;\n");

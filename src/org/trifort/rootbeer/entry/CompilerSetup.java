@@ -189,6 +189,8 @@ public class CompilerSetup {
     ret.add("<java.lang.Integer: java.lang.String toString(int)>");
     ret.add("<java.lang.Long: java.lang.String toString(long)>");
     ret.add("<java.lang.Object: java.lang.String toString()>");
+    ret.add("<org.trifort.rootbeer.runtime.Sentinal: void <init>()>");
+    ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: void <init>()>"); 
     return ret;
   }
   

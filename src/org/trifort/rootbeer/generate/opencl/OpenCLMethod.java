@@ -132,12 +132,7 @@ public class OpenCLMethod {
     return false;
   }
   
-  private String synchronizedEnter(){
-    String prefix = Options.v().rbcl_remap_prefix();    
-    if(Options.v().rbcl_remap_all() == false){
-      prefix = "";
-    }
-    
+  private String synchronizedEnter(){    
     String ret = "";
     ret += "int id;\n";
     ret += "char * mem;\n";
@@ -149,8 +144,7 @@ public class OpenCLMethod {
     if(m_sootMethod.isStatic() == false){
       if(Configuration.compilerInstance().getExceptions()){
         ret += "if(thisref == -1){\n";
-        SootClass null_ptr = Scene.v().getSootClass(prefix+"java.lang.NullPointerException");
-        ret += "  *exception = "+RootbeerClassLoader.v().getClassNumber(null_ptr.getName())+";\n";
+        ret += "  *exception = "+OpenCLScene.v().getTypeNumber("java.lang.NullPointerException")+";\n";
         if(returnsAValue()){
           ret += "  return 0;\n";
         } else {
@@ -215,6 +209,10 @@ public class OpenCLMethod {
   }
   
   public String getMethodBody(){
+    CompilerSetup setup = new CompilerSetup();
+    if(setup.getDontEmit().contains(m_sootMethod.getSignature())){
+      return "";
+    }
     SootMethod body_method = findBodyMethod();
     
     StringBuilder ret = new StringBuilder();
@@ -314,7 +312,7 @@ public class OpenCLMethod {
   public String getInstanceInvokeString(InstanceInvokeExpr arg0){
     IsPolymorphic is_polymorphic = new IsPolymorphic();
     if(is_polymorphic.test(arg0.getMethod(), arg0 instanceof SpecialInvokeExpr)){
-      return writeInstanceInvoke(arg0, "invoke_", is_polymorphic.getBaseMethod().getDeclaringClass().getType());
+      return writeInstanceInvoke(arg0, "invoke_", is_polymorphic.getHighestType());
     } else {
       return writeInstanceInvoke(arg0, "", m_sootClass.getType());
     }

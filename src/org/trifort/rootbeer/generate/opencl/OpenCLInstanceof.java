@@ -59,7 +59,7 @@ public class OpenCLInstanceof {
       throw new RuntimeException("not supported yet");
     }
     RefType ref_type = (RefType) m_type;    
-    List<Integer> type_list = getTypeList(ref_type.getSootClass());
+    List<Integer> type_list = getTypeList(ref_type);
     
     String ret = getDecl();
     ret += "{\n";
@@ -107,32 +107,35 @@ public class OpenCLInstanceof {
     return hash;
   }
 
-  private List<Integer> getTypeList(SootClass soot_class) {
-    Set<String> visited = new TreeSet<String>();
-    LinkedList<String> queue = new LinkedList<String>();
-    queue.add(soot_class.getName());
+  private List<Integer> getTypeList(Type type) {
+    Set<Type> visited = new TreeSet<Type>();
+    LinkedList<Type> queue = new LinkedList<Type>();
+    queue.add(type);
     
-    Set<Integer> new_invokes = DfsInfo.v().getNewInvokes();
+    Set<Type> newInvokes = DfsInfo.v().getNewInvokes();
     List<Integer> ret = new ArrayList<Integer>();
     
     while(queue.isEmpty() == false){
-      String entry = queue.removeFirst();
+      Type entry = queue.removeFirst();
       if(visited.contains(entry)){
         continue;
       }
       visited.add(entry);
       
-      Integer num = StringNumbers.v().addString(entry);
-      if(new_invokes.contains(num)){
-        ret.add(num);
+      if(type instanceof RefType){
+        RefType refType = (RefType) type;
+        SootClass sootClass = refType.getSootClass();
+        if(newInvokes.contains(type)){
+          ret.add(OpenCLScene.v().getTypeNumber(sootClass.getType()));
+        }
+        
+        FastHierarchy hierarchy = Scene.v().getOrMakeFastHierarchy();
+        Collection<SootClass> children = hierarchy.getSubclassesOf(sootClass);
+        for(SootClass child : children){
+          queue.add(child.getType());
+        }
       }
       
-      FastHierarchy hierarchy = Scene.v().getOrMakeFastHierarchy();
-      SootClass curr = Scene.v().getSootClass(entry);
-      Collection<SootClass> children = hierarchy.getSubclassesOf(curr);
-      for(SootClass child : children){
-        queue.add(child.getName());
-      }
     }
     
     return ret;

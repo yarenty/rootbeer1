@@ -45,7 +45,9 @@ public class VisitorWriteGenStatic extends AbstractVisitorGen {
     m_thisRef = bcl.refThis();
     m_currThisRef.push(m_thisRef);
     m_gcObjVisitor.push(m_thisRef);
-    m_Mem = bcl.refInstanceField(m_thisRef, "mMem");  
+    SootClass memoryClass = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
+    bcl.pushMethod(m_thisRef, "getMem", memoryClass.getType());
+    m_Mem = bcl.invokeMethodRet(m_thisRef); 
     m_currMem.push(m_Mem);
     
     BclMemory bcl_mem = new BclMemory(bcl, m_Mem);

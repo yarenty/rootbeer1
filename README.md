@@ -330,7 +330,6 @@ See the [slides](http://trifort.org/ads/index.php/lecture/index/27/)
 * `-nodoubles` = you are telling rootbeer that there are no doubles and we can compile with older versions of CUDA
 * `-norecursion` = you are telling rootbeer that there are no recursions and we can compile with older versions of CUDA
 * `-noexceptions` = remove exception checking
-* `-keepmains` = keep main methods
 * `-shared-mem-size` = specify the shared memory size
 * `-32bit` = compile with 32bit
 * `-64bit` = compile with 64bit (if you are on a 64bit machine you will want to use just this)
