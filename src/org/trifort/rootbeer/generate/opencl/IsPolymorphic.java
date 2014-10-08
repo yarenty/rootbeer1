@@ -41,8 +41,7 @@ public class IsPolymorphic {
       return true;
     }
     
-    FastHierarchy fastHierarchy = Scene.v().getOrMakeFastHierarchy();
-    Set<SootMethod> methods = fastHierarchy.resolveAbstractDispatch(sootClass, sootMethod);
+    List<MethodSignature> methods = OpenCLScene.v().getVirtualMethods(sootMethod.getSignature());
     
     if(methods.size() == 1 || sootMethod.isConstructor() || specialInvoke){
       return false;
@@ -52,30 +51,9 @@ public class IsPolymorphic {
     }
   }
 
-  private void findHighestType(Set<SootMethod> methods) {
-    Map<SootClass, Boolean> parentExists = new HashMap<SootClass, Boolean>();
-    for(SootMethod method : methods){
-      SootClass declaring = method.getDeclaringClass();
-      if(declaring.hasSuperclass() == false){
-        highestType = declaring.getType();
-        return;
-      }
-      parentExists.put(declaring, false);
-    }
-    for(SootMethod method : methods){
-      SootClass declaring = method.getDeclaringClass();
-      if(declaring.hasSuperclass()){
-        SootClass parent = declaring.getSuperclass();
-        parentExists.put(parent, true);
-      }
-    }
-    for(SootClass key : parentExists.keySet()){
-      if(parentExists.get(key) == false){
-        highestType = key.getType();
-        return;
-      }
-    }
-    throw new RuntimeException("cannot find highest type");
+  private void findHighestType(List<MethodSignature> methods) {
+    MethodSignature highest = methods.get(0);
+    highestType = highest.getClassName().toSootType();
   }
 
   public Type getHighestType() {

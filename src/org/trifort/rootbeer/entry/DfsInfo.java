@@ -38,7 +38,6 @@ public class DfsInfo {
   private Set<Type> dfsTypes;
   private List<Type> orderedRefLikeTypes;
   private List<RefType> orderedRefTypes;
-  private Map<String, Integer> classNumbers;
   
   public DfsInfo(){
     classes = new HashSet<SootClass>();
@@ -54,26 +53,37 @@ public class DfsInfo {
 
   public void addClass(SootClass sootClass) {
     classes.add(sootClass);
+    addType(sootClass.getType());
   }
   
   public void addMethod(SootMethod sootMethod) {
     methods.add(sootMethod);
+    addType(sootMethod.getDeclaringClass().getType());
   }
 
   public void addField(SootField sootField) {
     fields.add(sootField);
+    addType(sootField.getDeclaringClass().getType());
   }
 
   public void addInstanceOf(Type type) {
     instanceOfs.add(type);
+    addType(type);
   }
 
+  public void addType(Type type){
+    dfsTypes.add(type);
+  }
+  
   public void addArrayType(ArrayType arrayType) {
     arrayTypes.add(arrayType);
+    addType(arrayType);
+    addType(arrayType.baseType);
   }
   
   public void addNewInvoke(Type type) {
     newInvokes.add(type);
+    addType(type);
   }
   
   public Set<Type> getDfsTypes() {
@@ -104,9 +114,18 @@ public class DfsInfo {
   }
 
   public void finalizeTypes() {
-    
+    for(Type type : dfsTypes){
+      if(type instanceof RefType){
+        RefType refType = (RefType) type;
+        SootClass sootClass = refType.getSootClass();
+        if(sootClass.isInterface() == false){
+          orderedRefLikeTypes.add(type);
+          orderedRefTypes.add(refType);
+        }
+      }
+    }
   }
-
+ 
   public Set<SootMethod> getMethods() {
     return methods;
   }

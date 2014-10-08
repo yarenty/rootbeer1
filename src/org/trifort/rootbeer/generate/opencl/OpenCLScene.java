@@ -16,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ import org.trifort.rootbeer.util.ResourceReader;
 
 import soot.*;
 import soot.rbclassload.FieldSignatureUtil;
+import soot.rbclassload.MethodSignature;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.TypeToString;
 
@@ -118,7 +120,6 @@ public class OpenCLScene {
     if(typeNumbers.containsKey(type) == false){
       numberType(type);
     }
-    System.out.println("getTypeNumber: "+type.toString());
     return typeNumbers.get(type);
   }
 
@@ -237,8 +238,10 @@ public class OpenCLScene {
     addType("java.lang.Boolean");
     
     Set<SootMethod> methods = DfsInfo.v().getMethods();  
+    System.out.println("METHODS_SIZE: "+methods.size());
     MethodSignatureUtil util = new MethodSignatureUtil();
     for(SootMethod method : methods){
+      System.out.println(method.getSignature());
       addMethod(method);
     }
     CompilerSetup compiler_setup = new CompilerSetup();
@@ -497,6 +500,30 @@ public class OpenCLScene {
       ret.append(iter.next());
     }
     return ret.toString();
+  }
+  
+  public List<MethodSignature> getVirtualMethods(String signature){
+    List<MethodSignature> ret = new ArrayList<MethodSignature>();
+    
+    MethodSignatureUtil util = new MethodSignatureUtil();
+    util.parse(signature);
+    SootMethod sootMethod = util.getSootMethod();
+    SootClass sootClass = sootMethod.getDeclaringClass();
+    
+    FastHierarchy fastHierarchy = Scene.v().getOrMakeFastHierarchy();
+    Set<SootMethod> methods = fastHierarchy.resolveAbstractDispatch(sootClass, sootMethod);
+    
+    List<SootMethod> methodList = new ArrayList<SootMethod>();
+    methodList.addAll(methods);
+    Collections.sort(methodList, new VirtualMethodSorter());
+    
+    for(SootMethod method : methodList){
+      util.parse(method.getSignature());
+      MethodSignature methodSignature = new MethodSignature(util);
+      ret.add(methodSignature);
+    }
+    
+    return ret;
   }
 
   private String methodBodiesString() throws IOException{

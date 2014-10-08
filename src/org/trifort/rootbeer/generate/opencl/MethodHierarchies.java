@@ -85,7 +85,7 @@ public class MethodHierarchies {
         return ret;
       }
       
-      List<MethodSignature> methods = RootbeerClassLoader.v().getVirtualMethods(m_method.getSignature());
+      List<MethodSignature> methods = OpenCLScene.v().getVirtualMethods(m_method.getSignature());
       for(MethodSignature virt_method : methods){
         m_util.parse(virt_method);
         SootMethod soot_method = m_util.getSootMethod();

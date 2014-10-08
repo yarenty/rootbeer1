@@ -90,7 +90,7 @@ public class OpenCLPolymorphicMethod {
   }
   
   private List<SootMethod> getVirtualMethods(){
-    List<MethodSignature> virtual_methods = RootbeerClassLoader.v().getVirtualMethods(m_sootMethod.getSignature());
+    List<MethodSignature> virtual_methods = OpenCLScene.v().getVirtualMethods(m_sootMethod.getSignature());
     List<SootMethod> ret = new ArrayList<SootMethod>();
     for(MethodSignature virtual_method : virtual_methods){
       m_util.parse(virtual_method);

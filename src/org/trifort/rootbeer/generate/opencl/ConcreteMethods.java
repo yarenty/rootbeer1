@@ -12,7 +12,7 @@ public class ConcreteMethods {
 
   public List<String> get(String signature){
     MethodSignatureUtil util = new MethodSignatureUtil();
-    List<MethodSignature> virtual_methods = RootbeerClassLoader.v().getVirtualMethods(signature);
+    List<MethodSignature> virtual_methods = OpenCLScene.v().getVirtualMethods(signature);
     
     List<String> ret = new ArrayList<String>();
     for(MethodSignature virt_method : virtual_methods){

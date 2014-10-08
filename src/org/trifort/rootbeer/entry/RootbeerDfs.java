@@ -71,6 +71,7 @@ public class RootbeerDfs {
     
     methodUtil.parse(signature);
     SootMethod sootMethod = methodUtil.getSootMethod();
+    DfsInfo.v().addMethod(sootMethod);
     if(sootMethod.isConcrete() == false){
       return;
     }
@@ -87,6 +88,7 @@ public class RootbeerDfs {
         InvokeExpr invokeExpr = (InvokeExpr) value;
         SootMethod invokeMethod = invokeExpr.getMethod();
         DfsInfo.v().addMethod(invokeMethod);
+        queue.add(invokeMethod.getSignature());
       } else if(value instanceof RefType){
         RefType refType = (RefType) value;
         SootClass sootClass = refType.getSootClass();
