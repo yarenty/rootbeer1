@@ -182,18 +182,10 @@ public class Main {
       compiler.disableClassRemapping(); 
     }
     
-    if(m_simpleCompile){
-      try {
-        compiler.compile(m_mainJar, m_destJar);
-      } catch(Exception ex){
-        ex.printStackTrace();
-      }
-    } else {
-      try {
-        compiler.compile(m_mainJar, m_libJars, m_directories, m_destJar);
-      } catch(Exception ex){
-        ex.printStackTrace();
-      }
+    try {
+      compiler.compile(m_mainJar, m_destJar);
+    } catch(Exception ex){
+      ex.printStackTrace();
     }
   }
   

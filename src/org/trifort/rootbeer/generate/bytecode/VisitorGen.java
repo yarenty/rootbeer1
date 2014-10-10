@@ -60,6 +60,7 @@ public class VisitorGen extends AbstractVisitorGen {
   private void makeGcObjectClass() {
     String base_name = m_runtimeBasicBlock.getName();
     m_className = base_name+"Serializer";
+    RootbeerClassLoader.v().addModifiedClass(m_className);
     m_bcl.top().makeClass(m_className, "org.trifort.rootbeer.runtime.Serializer");
   }
     

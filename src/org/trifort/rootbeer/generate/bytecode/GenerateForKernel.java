@@ -49,6 +49,7 @@ public class GenerateForKernel {
 
   public void makeClass() throws Exception {
     m_serializerClassName = m_codeSegment.getSootClass().getName()+"Serializer";
+    RootbeerClassLoader.v().addModifiedClass(m_serializerClassName);
     
     makeCpuBody();
     makeGpuBody();
@@ -108,7 +109,7 @@ public class GenerateForKernel {
     getCode.setDeclaringClass(m_sootClass);
     m_sootClass.addMethod(getCode);
     
-    RootbeerClassLoader.v().addGeneratedMethod(getCode.getSignature());
+    RootbeerClassLoader.v().addModifiedClass(m_sootClass.getName());
 
     JimpleBody body = m_jimple.newBody(getCode);
     UnitAssembler assembler = new UnitAssembler();
@@ -276,10 +277,7 @@ public class GenerateForKernel {
     bcl.openClass(m_sootClass);
     bcl.startMethod("isReadOnly", BooleanType.v());
     bcl.refThis();
-    if(OpenCLScene.v().getReadOnlyTypes().isRootReadOnly())
-      bcl.returnValue(IntConstant.v(1));
-    else
-      bcl.returnValue(IntConstant.v(0));
+    bcl.returnValue(IntConstant.v(0));
     bcl.endMethod();
   }
 

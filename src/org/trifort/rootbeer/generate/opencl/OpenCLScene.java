@@ -32,7 +32,6 @@ import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.entry.ForcedFields;
 import org.trifort.rootbeer.entry.CompilerSetup;
 import org.trifort.rootbeer.generate.bytecode.MethodCodeSegment;
-import org.trifort.rootbeer.generate.bytecode.ReadOnlyTypes;
 import org.trifort.rootbeer.generate.opencl.fields.CompositeField;
 import org.trifort.rootbeer.generate.opencl.fields.CompositeFieldFactory;
 import org.trifort.rootbeer.generate.opencl.fields.FieldCodeGeneration;
@@ -60,7 +59,6 @@ public class OpenCLScene {
   private boolean usesGarbageCollector;
   private SootClass rootSootClass;
   private int endOfStatics;
-  private ReadOnlyTypes readOnlyTypes;
   private Set<OpenCLInstanceof> instanceOfs;
   private List<CompositeField> compositeFields;
   private List<SootMethod> methods;
@@ -571,7 +569,6 @@ public class OpenCLScene {
 
   public void addCodeSegment(MethodCodeSegment codeSegment){
     rootSootClass = codeSegment.getRootSootClass();    
-    readOnlyTypes = new ReadOnlyTypes(codeSegment.getRootMethod());
     getOpenCLClass(rootSootClass);
   }
 
@@ -579,10 +576,6 @@ public class OpenCLScene {
     return true;
   }
   
-  public ReadOnlyTypes getReadOnlyTypes(){
-    return readOnlyTypes;
-  }
-
   public boolean isRootClass(SootClass soot_class) {
     return soot_class.getName().equals(rootSootClass.getName());
   }

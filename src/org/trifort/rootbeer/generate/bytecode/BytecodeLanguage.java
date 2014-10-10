@@ -97,7 +97,7 @@ public class BytecodeLanguage {
     m_currMethod.setActiveBody(m_currBody);
     m_currClass.addMethod(m_currMethod);
     
-    RootbeerClassLoader.v().addGeneratedMethod(m_currMethod.getSignature());
+    RootbeerClassLoader.v().addModifiedClass(m_currClass.getName());
   }
   
   public void startStaticMethod(String method_name, Type return_type, Type... arg_types){
