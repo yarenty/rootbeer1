@@ -73,9 +73,9 @@ public class Configuration {
   private Configuration(boolean load) {
     m_compilerInstance = false;
     try {
-      List<byte[]> data = ResourceReader.getResourceArray("org/trifort/rootbeer/runtime/config.txt");
-      int mode = data.get(0)[0];
-      int exceptions = data.get(0)[1];
+      byte[] data = ResourceReader.getResourceArray("org/trifort/rootbeer/runtime/config.txt", 2 * 4);
+      int mode = data[0];
+      int exceptions = data[1];
       m_mode = mode;
       if(exceptions == 1){
         m_exceptions = true;
