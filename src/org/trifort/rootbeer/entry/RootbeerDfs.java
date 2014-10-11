@@ -16,6 +16,7 @@ import java.util.TreeSet;
 
 import soot.ArrayType;
 import soot.Body;
+import soot.Local;
 import soot.RefType;
 import soot.SootClass;
 import soot.SootField;
@@ -100,16 +101,22 @@ public class RootbeerDfs {
         SootMethod invokeMethod = invokeExpr.getMethod();
         DfsInfo.v().addMethod(invokeMethod);
         queue.add(invokeMethod.getSignature());
-      } else if(value instanceof RefType){
-        RefType refType = (RefType) value;
-        SootClass sootClass = refType.getSootClass();
-        DfsInfo.v().addClass(sootClass);
+      } else if(value instanceof Local){ 
+        Local local = (Local) value;
+        Type localType = local.getType();
+        if(localType instanceof RefType){
+          System.out.println("ROOTBEER_DFS::REF_TYPE::"+localType.toString());
+          RefType refType = (RefType) localType;
+          SootClass sootClass = refType.getSootClass();
+          DfsInfo.v().addClass(sootClass);
+        } else if(localType instanceof ArrayType){
+          System.out.println("ROOTBEER_DFS::ARRAY_TYPE::"+localType.toString());
+          ArrayType arrayType = (ArrayType) localType;
+          DfsInfo.v().addArrayType(arrayType);
+        } 
       } else if(value instanceof InstanceOfExpr){
         InstanceOfExpr instanceOf = (InstanceOfExpr) value;
         DfsInfo.v().addInstanceOf(instanceOf.getType());
-      } else if(value instanceof ArrayType){
-        ArrayType arrayType = (ArrayType) value;
-        DfsInfo.v().addArrayType(arrayType);
       } else if(value instanceof NewExpr){
         NewExpr newExpr = (NewExpr) value;
         DfsInfo.v().addNewInvoke(newExpr.getType());

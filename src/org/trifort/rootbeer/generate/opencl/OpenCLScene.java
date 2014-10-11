@@ -148,6 +148,7 @@ public class OpenCLScene {
   }
 
   public void addArrayType(OpenCLArrayType arrayType){
+    System.out.println("ADDING ARRAY TYPE: "+arrayType.getArrayType().toString());
     arrayTypes.add(arrayType);
     allTypes.add(arrayType.getArrayType());
   }  
