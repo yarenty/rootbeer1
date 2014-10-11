@@ -484,10 +484,12 @@ public class OpenCLScene {
     
     List<OpenCLMethod> methods = methodHierarchies.getMethods();
     for(OpenCLMethod method : methods){ 
+      System.out.println("ADDING PROTOTYPE:: "+method.getSignature());
       protos.add(method.getMethodPrototype());
     }    
     List<OpenCLPolymorphicMethod> poly_methods = methodHierarchies.getPolyMorphicMethods();
     for(OpenCLPolymorphicMethod poly_method : poly_methods){
+      System.out.println("ADDING POLYMETHODS:: "+poly_method.getMethodPrototypes()+"::END");
       protos.add(poly_method.getMethodPrototypes());
     }
     protos.add(fieldCodeGeneration.prototypes(classes));
@@ -509,6 +511,7 @@ public class OpenCLScene {
     
     MethodSignatureUtil util = new MethodSignatureUtil();
     util.parse(signature);
+    
     SootMethod sootMethod = util.getSootMethod();
     SootClass sootClass = sootMethod.getDeclaringClass();
     

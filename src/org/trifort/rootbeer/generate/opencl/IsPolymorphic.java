@@ -36,19 +36,20 @@ public class IsPolymorphic {
   
   public boolean test(SootMethod sootMethod, boolean specialInvoke){
     SootClass sootClass = sootMethod.getDeclaringClass();
-    List<MethodSignature> methods = OpenCLScene.v().getVirtualMethods(sootMethod.getSignature());
-
     if(sootMethod.isConstructor() || specialInvoke || sootMethod.isNative()){
       highestType = sootClass.getType();
       return false;
     } else {
+      List<MethodSignature> methods = OpenCLScene.v().getVirtualMethods(sootMethod.getSignature());
       findHighestType(methods);
-      for(MethodSignature method : methods){
-        System.out.println("  testMethod: "+method.toString());
-      }
       if(methods.size() == 1){
         return false;
       } else {
+        System.out.println("+++++++++++++MANY POLY METHODS++++++++++++");
+        for(MethodSignature method : methods){
+          System.out.println("  testMethod: "+method.toString());
+        }
+        System.out.println("+++++++++++++END MANY POLY METHODS++++++++++++");
         return true;
       }
     }

@@ -26,42 +26,53 @@ import soot.rbclassload.RootbeerClassLoader;
  */
 public class MethodHierarchies {
 
-  private Set<MethodHierarchy> m_hierarchies;
-  private MethodSignatureUtil m_util;
+  private Set<MethodHierarchy> hierarchies;
+  private MethodSignatureUtil util;
+  private List<SootMethod> constructors;
   
   public MethodHierarchies(){
-    m_hierarchies = new LinkedHashSet<MethodHierarchy>();
-    m_util = new MethodSignatureUtil();
+    hierarchies = new LinkedHashSet<MethodHierarchy>();
+    util = new MethodSignatureUtil();
+    constructors = new ArrayList<SootMethod>();
   }
   
   public void addMethod(SootMethod method){
+    if(method.isConstructor()){
+      if(constructors.contains(method) == false){
+        constructors.add(method);
+      }
+      return;
+    }
     MethodHierarchy new_hierarchy = new MethodHierarchy(method);
     
-    for(MethodHierarchy curr : m_hierarchies){
+    for(MethodHierarchy curr : hierarchies){
       if(curr.contains(new_hierarchy)){
         return;
       }
     }
     
-    m_hierarchies.add(new_hierarchy);
+    hierarchies.add(new_hierarchy);
   }
   
   public List<OpenCLMethod> getMethods(){
     List<OpenCLMethod> ret = new ArrayList<OpenCLMethod>();
     //for each method    
-    for(MethodHierarchy method_hierarchy : m_hierarchies){
+    for(MethodHierarchy method_hierarchy : hierarchies){
       //get the list of classes in the hierarchy
       List<OpenCLMethod> methods = method_hierarchy.getMethods();
       for(OpenCLMethod method : methods){ 
         ret.add(method);
       }
     }   
+    for(SootMethod ctor : constructors){
+      ret.add(new OpenCLMethod(ctor, ctor.getDeclaringClass()));
+    }
     return ret;
   }
   
   public List<OpenCLPolymorphicMethod> getPolyMorphicMethods(){
     List<OpenCLPolymorphicMethod> ret = new ArrayList<OpenCLPolymorphicMethod>();
-    for(MethodHierarchy method_hierarchy : m_hierarchies){
+    for(MethodHierarchy method_hierarchy : hierarchies){
       if(method_hierarchy.isPolyMorphic()){
         ret.add(method_hierarchy.getOpenCLPolyMorphicMethod());
       }
@@ -79,16 +90,10 @@ public class MethodHierarchies {
     
     public List<OpenCLMethod> getMethods(){
       List<OpenCLMethod> ret = new ArrayList<OpenCLMethod>();
-      if(m_method.isConstructor()){
-        OpenCLMethod method = new OpenCLMethod(m_method, m_method.getDeclaringClass());
-        ret.add(method);
-        return ret;
-      }
-      
       List<MethodSignature> methods = OpenCLScene.v().getVirtualMethods(m_method.getSignature());
       for(MethodSignature virt_method : methods){
-        m_util.parse(virt_method);
-        SootMethod soot_method = m_util.getSootMethod();
+        util.parse(virt_method);
+        SootMethod soot_method = util.getSootMethod();
         OpenCLMethod method = new OpenCLMethod(soot_method, soot_method.getDeclaringClass());
         ret.add(method);
       }

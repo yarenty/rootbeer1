@@ -144,20 +144,10 @@ public class DfsInfo {
   }
 
   public void setVirtualMethodBases(Set<Type> newInvokes) {
-    if(newInvokes == null){
-      System.out.println("setVirtualMethodBases null");
-    } else {
-      System.out.println("setVirtualMethodBases valid");
-    }
     virtualMethodBases = newInvokes;
   }
   
   public Set<Type> getVirtualMethodBases(){
-    if(virtualMethodBases == null){
-      System.out.println("getVirtualMethodBases null");
-    } else {
-      System.out.println("getVirtualMethodBases valid");
-    }
     return virtualMethodBases;
   }
 }
