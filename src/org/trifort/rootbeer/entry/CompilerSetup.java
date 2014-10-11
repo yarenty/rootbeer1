@@ -14,7 +14,11 @@ import soot.rbclassload.MethodSignature;
 
 public class CompilerSetup {
 
-  public Set<String> getToSignaturesMethods(){
+  private CompilerSetup(){
+    
+  }
+  
+  public static Set<String> getToSignaturesMethods(){
     Set<String> ret = new HashSet<String>();
     ret.add("<java.lang.Object: int hashCode()>");
     ret.add("<java.io.PrintStream: void println(java.lang.String)>");
@@ -35,7 +39,7 @@ public class CompilerSetup {
     return ret;
   }
   
-  public Set<String> getDontDfs(){
+  public static Set<String> getDontDfs(){
     Set<String> ret = new HashSet<String>();
     ret.add("<java.lang.Object: void <clinit>()>");
     ret.add("<java.lang.Object: void registerNatives()>");
@@ -170,7 +174,7 @@ public class CompilerSetup {
     return ret;
   }
   
-  public Set<String> getDontEmit(){
+  public static Set<String> getDontEmit(){
     Set<String> ret = new HashSet<String>();
     ret.add("<java.lang.String: void <init>(java.lang.String)>");
     ret.add("<java.lang.String: void <init>(char[])>");
@@ -194,7 +198,7 @@ public class CompilerSetup {
     return ret;
   }
   
-  public Set<String> getDontMangle(){
+  public static Set<String> getDontMangle(){
     Set<String> ret = new HashSet<String>();
     ret.add("<java.lang.Object: void <clinit>()>");
     ret.add("<java.lang.Object: void registerNatives()>");
@@ -283,24 +287,30 @@ public class CompilerSetup {
     return ret;
   }
 
-  public Set<String> getEmitUnmanged() {
+  public static Set<String> getEmitUnmanged() {
     Set<String> ret = new HashSet<String>();
     ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
     return ret;
   }
 
-  public Set<ArrayType> getExtraArrayTypes() {
+  public static Set<ArrayType> getExtraArrayTypes() {
     Set<ArrayType> ret = new HashSet<ArrayType>();
     ret.add(ArrayType.v(CharType.v(), 1));
     ret.add(ArrayType.v(RefType.v("java.lang.String"), 1));
     return ret;
   }
 
-  public Set<String> getExtraMethods() {
+  public static Set<String> getExtraMethods() {
     Set<String> ret = new HashSet<String>();
     ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
     ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: void <init>()>");
     ret.add("<org.trifort.rootbeer.runtime.Sentinal: void <init>()>");
+    return ret;
+  }
+  
+  public static Set<String> getNewInvokes(){
+    Set<String> ret = new HashSet<String>();
+    ret.add("java.lang.Class");
     return ret;
   }
 }

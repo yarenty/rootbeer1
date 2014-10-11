@@ -7,10 +7,12 @@
 
 package org.trifort.rootbeer.entry;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import soot.ArrayType;
 import soot.Body;
@@ -29,6 +31,7 @@ import soot.rbclassload.FieldSignature;
 import soot.rbclassload.FieldSignatureUtil;
 import soot.rbclassload.MethodSignature;
 import soot.rbclassload.MethodSignatureUtil;
+import soot.rbclassload.Pair;
 import soot.rbclassload.RTAClass;
 import soot.rbclassload.RTAMethod;
 import soot.rbclassload.RTAMethodVisitor;
@@ -36,6 +39,7 @@ import soot.rbclassload.RTAType;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.StringNumbers;
 import soot.rbclassload.StringToType;
+import soot.rbclassload.TypeToString;
 
 public class RootbeerDfs {
   
@@ -50,16 +54,23 @@ public class RootbeerDfs {
   }
   
   public void run(String signature) {
-    
-    queue.add(signature);
-    CompilerSetup setup = new CompilerSetup();
-    for(String method : setup.getDontDfs()){
+    System.out.println("hello world");
+    MethodSignature entrySignature = new MethodSignature(signature);
+    Set<Type> virtualMethodBases = DfsInfo.v().getVirtualMethodBases();
+    Set<RTAType> newInvokes = new TreeSet<RTAType>();
+    for(Type virtualMethodBase : virtualMethodBases){
+      RTAType rtaType = RTAType.create(TypeToString.convert(virtualMethodBase));
+      newInvokes.add(rtaType);
+    }
+    for(String method : CompilerSetup.getDontDfs()){
       visited.add(method);
     }
-    
-    while(queue.isEmpty() == false){
-      String curr = queue.removeFirst();
-      searchMethod(curr);
+    List<Pair<MethodSignature, Set<RTAType>>> entryPairs = new ArrayList<Pair<MethodSignature, Set<RTAType>>>();
+    entryPairs.add(new Pair<MethodSignature, Set<RTAType>>(entrySignature, newInvokes));
+    Set<MethodSignature> methods = RootbeerClassLoader.v().callGraphFixedPoint(entryPairs);
+    for(MethodSignature method : methods){
+      String methodSignature = method.toString();
+      searchMethod(methodSignature);
     }
   }
 
@@ -72,10 +83,10 @@ public class RootbeerDfs {
     methodUtil.parse(signature);
     SootMethod sootMethod = methodUtil.getSootMethod();
     DfsInfo.v().addMethod(sootMethod);
-    if(sootMethod.isConcrete() == false){
+    if(sootMethod.isConcrete() == false || sootMethod.isNative() == true){
       return;
     }
-    System.out.println("  searchMethod: "+sootMethod.getSignature());
+    System.out.println("  searchMethod: "+sootMethod.getSignature()+" "+sootMethod.isNative());
     Body body = sootMethod.getActiveBody();
     List<ValueBox> values = body.getUseAndDefBoxes();
     for(ValueBox box : values){

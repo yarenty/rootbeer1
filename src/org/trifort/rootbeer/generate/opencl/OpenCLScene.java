@@ -16,12 +16,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,9 +48,11 @@ import org.trifort.rootbeer.util.ResourceReader;
 
 import soot.*;
 import soot.rbclassload.FieldSignatureUtil;
+import soot.rbclassload.MethodFieldFinder;
 import soot.rbclassload.MethodSignature;
 import soot.rbclassload.RootbeerClassLoader;
 import soot.rbclassload.TypeToString;
+import soot.util.Chain;
 
 public class OpenCLScene {
   private static OpenCLScene instance;
@@ -127,6 +131,7 @@ public class OpenCLScene {
   }
   
   public void addMethod(SootMethod sootMethod){
+    System.out.println("ADDING_METHOD: "+sootMethod.getSignature());
     SootClass sootClass = sootMethod.getDeclaringClass();
     allTypes.add(sootClass.getType());
 
@@ -242,8 +247,7 @@ public class OpenCLScene {
       System.out.println(method.getSignature());
       addMethod(method);
     }
-    CompilerSetup compiler_setup = new CompilerSetup();
-    for(String extra_method : compiler_setup.getExtraMethods()){
+    for(String extra_method : CompilerSetup.getExtraMethods()){
       util.parse(extra_method);
       addMethod(util.getSootMethod());
     }
@@ -265,7 +269,7 @@ public class OpenCLScene {
       OpenCLArrayType ocl_array_type = new OpenCLArrayType(array_type);
       addArrayType(ocl_array_type);
     }
-    for(ArrayType array_type : compiler_setup.getExtraArrayTypes()){
+    for(ArrayType array_type : CompilerSetup.getExtraArrayTypes()){
       OpenCLArrayType ocl_array_type = new OpenCLArrayType(array_type);
       addArrayType(ocl_array_type);
     }
@@ -508,20 +512,70 @@ public class OpenCLScene {
     SootMethod sootMethod = util.getSootMethod();
     SootClass sootClass = sootMethod.getDeclaringClass();
     
-    FastHierarchy fastHierarchy = Scene.v().getOrMakeFastHierarchy();
-    Set<SootMethod> methods = fastHierarchy.resolveAbstractDispatch(sootClass, sootMethod);
-    
-    List<SootMethod> methodList = new ArrayList<SootMethod>();
-    methodList.addAll(methods);
+    if(sootMethod.isStatic()){
+      util.parse(sootMethod.getSignature());
+      MethodSignature methodSignature = new MethodSignature(util);
+      ret.add(methodSignature);
+      return ret;
+    }
+
+    System.out.println("virtual methods: "+signature);
+    List<SootMethod> methodList = findVirtualHierarchy(sootClass, sootMethod);
     Collections.sort(methodList, new VirtualMethodSorter());
     
     for(SootMethod method : methodList){
+      System.out.println("  "+method.getSignature());
       util.parse(method.getSignature());
       MethodSignature methodSignature = new MethodSignature(util);
       ret.add(methodSignature);
     }
     
     return ret;
+  }
+  
+  private List<SootMethod> findVirtualHierarchy(SootClass sootClass, SootMethod sootMethod) {
+    List<SootMethod> ret = new ArrayList<SootMethod>();
+    for(Type type : DfsInfo.v().getVirtualMethodBases()){
+      if(type instanceof RefType){
+        RefType refType = (RefType) type;
+        SootClass virtualBaseClass = refType.getSootClass();
+        MethodSignatureUtil util = new MethodSignatureUtil(sootMethod.getSignature());
+        util.setClassName(virtualBaseClass.getName());
+        SootMethod declaredMethod;
+        try {
+          declaredMethod = util.getSootMethod();
+        } catch(RuntimeException ex){
+          declaredMethod = null;
+        }
+        if(declaredMethod != null){
+          System.out.println("  virtualBaseCase: "+virtualBaseClass+" "+sootMethod.getSignature());
+          if(above(declaredMethod, sootMethod)){
+            ret.add(declaredMethod);
+          } else if(above(sootMethod, declaredMethod)){
+            ret.add(declaredMethod);
+          }
+        }
+      }
+    }
+    return ret;
+  }
+
+  private boolean above(SootMethod method1, SootMethod method2) {
+    LinkedList<SootClass> queue = new LinkedList<SootClass>();
+    queue.add(method2.getDeclaringClass());
+    while(queue.isEmpty() == false){
+      SootClass sootClass = queue.removeFirst();
+      if(sootClass.getName().equals(method1.getDeclaringClass().getName())){
+        return true;
+      }
+      if(sootClass.hasSuperclass()){
+        queue.add(sootClass.getSuperclass());
+      }
+      for(SootClass iface : sootClass.getInterfaces()){
+        queue.add(iface);
+      }
+    }
+    return false;
   }
 
   private String methodBodiesString() throws IOException{

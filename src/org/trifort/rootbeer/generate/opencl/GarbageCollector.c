@@ -1385,43 +1385,6 @@ java_lang_StringValue_from(int thisref, int * exception ) {
   return new_ref;
 }
 
-$$__device__$$ int
-java_util_Arrays_copyOf(int object_array, int new_size, int * exception ){
-  int ret;
-  char * ret_deref;
-  char * object_array_deref;
-  int length;
-  int i;
-  
-  ret = org_trifort_gc_malloc(32 + (4 * new_size));
-  ret_deref = org_trifort_gc_deref(ret);
-  object_array_deref = org_trifort_gc_deref(object_array);
-    
-  for(i = 0; i < 32; ++i){
-    ret_deref[i] = object_array_deref[i];
-  }
-
-  length = org_trifort_getint(object_array_deref, 12);
-  org_trifort_setint(ret_deref, 8, 32 + (4 * new_size));
-  org_trifort_setint(ret_deref, 12, new_size);
-
-  if(length < new_size){
-    for(i = 0; i < length * 4; ++i){
-      ret_deref[32+i], object_array_deref[32+i];
-    }
-    int diff = new_size - length;
-    for(i = 0; i < diff; ++i){
-      * ((int *) &ret_deref[32 + (length * 4) + (i * 4)]) = -1;
-    }
-  } else {
-    for(i = 0; i < new_size * 4; ++i){
-      ret_deref[32+i], object_array_deref[32+i];
-    }
-  }
-
-  return ret; 
-}
-
 //<java.lang.StringBuilder: java.lang.StringBuilder init()>
 $$__device__$$
 int java_lang_StringBuilder_initab850b60f96d11de8a390800200c9a660_(int * exception){ 

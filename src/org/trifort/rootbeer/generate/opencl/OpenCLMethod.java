@@ -209,8 +209,7 @@ public class OpenCLMethod {
   }
   
   public String getMethodBody(){
-    CompilerSetup setup = new CompilerSetup();
-    if(setup.getDontEmit().contains(m_sootMethod.getSignature())){
+    if(CompilerSetup.getDontEmit().contains(m_sootMethod.getSignature())){
       return "";
     }
     SootMethod body_method = findBodyMethod();
@@ -314,7 +313,7 @@ public class OpenCLMethod {
     if(is_polymorphic.test(arg0.getMethod(), arg0 instanceof SpecialInvokeExpr)){
       return writeInstanceInvoke(arg0, "invoke_", is_polymorphic.getHighestType());
     } else {
-      return writeInstanceInvoke(arg0, "", m_sootClass.getType());
+      return writeInstanceInvoke(arg0, "", is_polymorphic.getHighestType());
     }
   }
 
@@ -458,10 +457,9 @@ public class OpenCLMethod {
   }
   
   private void createDontMangleMethods() {
-    CompilerSetup setup = new CompilerSetup();
-    m_dontMangleMethods = setup.getDontMangle();
-    m_dontEmitMethods = setup.getDontEmit();
-    m_emitUnmangled = setup.getEmitUnmanged();   
+    m_dontMangleMethods = CompilerSetup.getDontMangle();
+    m_dontEmitMethods = CompilerSetup.getDontEmit();
+    m_emitUnmangled = CompilerSetup.getEmitUnmanged();   
   }
 
   public String getSignature() {

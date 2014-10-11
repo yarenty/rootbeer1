@@ -15,7 +15,7 @@ public class VirtualMethodSorter implements Comparator<SootMethod> {
     return 1;
   }
 
-  private boolean above(SootMethod arg0, SootMethod arg1) {
+  public boolean above(SootMethod arg0, SootMethod arg1) {
     SootClass leftClass = arg0.getDeclaringClass();
     while(true){
       if(leftClass.hasSuperclass()){

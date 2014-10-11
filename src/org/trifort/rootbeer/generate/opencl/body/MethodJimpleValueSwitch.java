@@ -384,9 +384,7 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   }
 
   public void caseClassConstant(ClassConstant arg0) {
-    String value = arg0.getValue();
-    StringToType converter = new StringToType();
-    Type type = converter.convert(value);
+    Type type = arg0.getType();
     int num = OpenCLScene.v().getClassConstantNumbers().get(type);
     m_output.append("org_trifort_classConstant("+num+")");
   }

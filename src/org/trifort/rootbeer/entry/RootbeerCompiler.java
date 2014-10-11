@@ -39,6 +39,7 @@ import soot.rbclassload.ListClassTester;
 import soot.rbclassload.ListMethodTester;
 import soot.rbclassload.MethodTester;
 import soot.rbclassload.RootbeerClassLoader;
+import soot.util.Chain;
 import soot.util.JasminOutputStream;
 
 public class RootbeerCompiler {
@@ -50,8 +51,9 @@ public class RootbeerCompiler {
   private String inputJarFilename;
   private String outputJarFilename;
   private String rootbeerJarFilename;
+  private List<SootMethod> entryMethods;
   private List<SootMethod> kernelMethods;
-  private JarOutputStream jarOutputStream;
+  private Set<Type> newInvokes;
   
   public RootbeerCompiler(){
     clearOutputFolders();
@@ -113,10 +115,10 @@ public class RootbeerCompiler {
     RootbeerClassLoader.v().addSignaturesClass("java.lang.String");
     RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtimegpu.GpuException");
     RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.Sentinal");
+    RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.PrivateFields");
 
-    CompilerSetup setup = new CompilerSetup();
     ListMethodTester dont_dfs_tester = new ListMethodTester();
-    for(String no_dfs : setup.getDontDfs()){
+    for(String no_dfs : CompilerSetup.getDontDfs()){
       dont_dfs_tester.addSignature(no_dfs);
     }
     RootbeerClassLoader.v().addDontFollowMethodTester(dont_dfs_tester);
@@ -127,7 +129,7 @@ public class RootbeerCompiler {
     }
     
     ListMethodTester toSigMethods = new ListMethodTester();
-    for(String method : setup.getToSignaturesMethods()){
+    for(String method : CompilerSetup.getToSignaturesMethods()){
       toSigMethods.addSignature(method);
     }
     RootbeerClassLoader.v().addToSignaturesMethodTester(toSigMethods);
@@ -144,7 +146,7 @@ public class RootbeerCompiler {
     setupSoot(true);
     provider = detector.getProvider();
         
-    kernelMethods = RootbeerClassLoader.v().getEntryPoints();
+    entryMethods = RootbeerClassLoader.v().getEntryPoints();
     compileForKernels();
   }
   
@@ -156,11 +158,13 @@ public class RootbeerCompiler {
     entryDetector = new KernelEntryPointDetector(run_tests);
     setupSoot(run_tests);
     
-    kernelMethods = RootbeerClassLoader.v().getEntryPoints();
+    entryMethods = RootbeerClassLoader.v().getEntryPoints();
     compileForKernels();
   }
   
   private void compileForKernels() throws Exception {
+    findKernelMethods();
+    
     if(kernelMethods.isEmpty()){
       System.out.println("There are no kernel classes. Please implement the following interface to use rootbeer:");
       System.out.println("org.trifort.rootbeer.runtime.Kernel");
@@ -172,9 +176,9 @@ public class RootbeerCompiler {
       DfsInfo.reset();
       
       System.out.println("running KernelTransform on: "+kernelMethod.getSignature()+"...");
+      DfsInfo.v().setVirtualMethodBases(newInvokes);
       RootbeerDfs rootbeerDfs = new RootbeerDfs();
       rootbeerDfs.run(kernelMethod.getSignature());
-      
       DfsInfo.v().expandArrayTypes();
       DfsInfo.v().finalizeTypes();
 
@@ -186,9 +190,34 @@ public class RootbeerCompiler {
     emitOutput();
   }
   
+  private void findKernelMethods(){
+    kernelMethods = new ArrayList<SootMethod>();
+    newInvokes = new TreeSet<Type>();
+    for(SootMethod entryMethod : entryMethods){
+      DfsInfo.reset();
+      DfsInfo.v().setVirtualMethodBases(newInvokes);
+      RootbeerDfs rootbeerDfs = new RootbeerDfs();
+      rootbeerDfs.run(entryMethod.getSignature());
+      newInvokes.addAll(DfsInfo.v().getNewInvokes());
+      
+      for(SootMethod sootMethod : DfsInfo.v().getMethods()){
+        SootClass declaringClass = sootMethod.getDeclaringClass();
+        Chain<SootClass> interfaces = declaringClass.getInterfaces();
+        for(SootClass iface : interfaces){
+          if(iface.getName().equals("org.trifort.rootbeer.runtime.Kernel")){
+            if(sootMethod.getSubSignature().equals("void gpuMethod()")){
+              if(kernelMethods.contains(sootMethod) == false){
+                System.out.println("adding kernel method: "+sootMethod.getSignature());
+                kernelMethods.add(sootMethod);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   private void emitOutput() throws Exception {
-    jarOutputStream = new JarOutputStream(new FileOutputStream(outputJarFilename));
-    
     Map<String, byte[]> rootbeerFiles = readJar(rootbeerJarFilename);
     Map<String, byte[]> applicationFiles = readJar(inputJarFilename);
     for(String filename : rootbeerFiles.keySet()){

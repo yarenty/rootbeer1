@@ -29,59 +29,60 @@ import soot.rbclassload.RootbeerClassLoader;
 
 public class TestCaseEntryPointDetector implements EntryMethodTester {
 
-  private String m_testCase;
-  private List<SootClass> m_kernels;
-  private List<String> m_testCasePackages;
-  private String m_provider;
-  private boolean m_initialized;
-  private String m_signature;
+  private String testCase;
+  private List<String> testCasePackages;
+  private String provider;
+  private boolean initialized;
+  private String kernelSignature;
+  private String createSignature;
   private RTAClass kernelClass;
+  private RTAClass createClass;
   
   public TestCaseEntryPointDetector(String test_case){
-    m_testCase = test_case;
-    m_testCasePackages = new ArrayList<String>();
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.otherpackage.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.otherpackage2.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.apps.fastmatrixdebug.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.arraysum.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.baseconversion.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.canonical.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.canonical2.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.exception.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.gpurequired.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.ofcoarse.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.remaptest.");
-    m_testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.serialization.");
+    testCase = test_case;
+    testCasePackages = new ArrayList<String>();
+    testCasePackages.add("org.trifort.rootbeer.testcases.otherpackage.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.otherpackage2.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.apps.fastmatrixdebug.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.arraysum.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.baseconversion.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.canonical.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.canonical2.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.exception.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.gpurequired.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.ofcoarse.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.remaptest.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.serialization.");
 
-    m_initialized = false;
+    initialized = false;
   }
   
   private void init(){
-    if(m_testCase.contains(".") == false){
-      String new_test_case = findTestCaseClass(m_testCase);
+    if(testCase.contains(".") == false){
+      String new_test_case = findTestCaseClass(testCase);
       if(new_test_case == null){
-        System.out.println("cannot find test case class: "+m_testCase);
+        System.out.println("cannot find test case class: "+testCase);
         System.exit(0);
       }
-      m_testCase = new_test_case;
+      testCase = new_test_case;
     }
-    m_provider = m_testCase;
+    provider = testCase;
     
-    RTAClass provClass = RootbeerClassLoader.v().getRTAClass(m_provider);
-    RTAMethod createMethod = provClass.findMethodByName("create");
-    System.out.println(createMethod.getSignature().toString());
+    createClass = RootbeerClassLoader.v().getRTAClass(provider);
+    RTAMethod createMethod = createClass.findMethodByName("create");
+    createSignature = createMethod.getSignature().toString();
     kernelClass = searchMethod(createMethod);
     RTAMethod gpuMethod = kernelClass.findMethodBySubSignature("void gpuMethod()");
-    m_signature = gpuMethod.getSignature().toString();
-    m_initialized = true;
+    kernelSignature = gpuMethod.getSignature().toString();
+    initialized = true;
   }
 
   public String getProvider() {
-    return m_provider;
+    return provider;
   }
-    
+  
   private RTAClass searchMethod(RTAMethod method) {
     List<RTAInstruction> instructions = method.getInstructions();
     for(RTAInstruction inst : instructions){
@@ -105,9 +106,9 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     }
     return null;
   }
-
+  
   private String findTestCaseClass(String test_case) {
-    for(String pkg : m_testCasePackages){
+    for(String pkg : testCasePackages){
       String name = pkg + test_case;
       RTAClass existTest = RootbeerClassLoader.v().getRTAClass(name);
       if(existTest != null){
@@ -118,10 +119,13 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
   }
 
   public boolean matches(RTAMethod sm) {
-    if(m_initialized == false){
+    if(initialized == false){
       init();
     }
-    if(sm.getSignature().toString().equals(m_signature)){
+    if(sm.getSignature().toString().equals(kernelSignature)){
+      return true;
+    }
+    if(sm.getSignature().toString().equals(createSignature)){
       return true;
     }
     return false;
@@ -131,6 +135,8 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
   public Set<String> getNewInvokes() {
     Set<String> ret = new TreeSet<String>();
     ret.add(kernelClass.getName());
+    ret.add(createClass.getName());
+    ret.addAll(CompilerSetup.getNewInvokes());
     return ret;
   }
 }

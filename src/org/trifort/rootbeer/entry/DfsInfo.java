@@ -17,7 +17,7 @@ import soot.rbclassload.RTAType;
 public class DfsInfo {
 
   public static void reset(){
-    
+    instance = null;
   }
   
   public static DfsInfo v(){
@@ -36,6 +36,7 @@ public class DfsInfo {
   private Set<ArrayType> arrayTypes;
   private Set<Type> newInvokes;
   private Set<Type> dfsTypes;
+  private Set<Type> virtualMethodBases;
   private List<Type> orderedRefLikeTypes;
   private List<RefType> orderedRefTypes;
   
@@ -140,5 +141,23 @@ public class DfsInfo {
 
   public Set<Type> getNewInvokes() {
     return newInvokes;
+  }
+
+  public void setVirtualMethodBases(Set<Type> newInvokes) {
+    if(newInvokes == null){
+      System.out.println("setVirtualMethodBases null");
+    } else {
+      System.out.println("setVirtualMethodBases valid");
+    }
+    virtualMethodBases = newInvokes;
+  }
+  
+  public Set<Type> getVirtualMethodBases(){
+    if(virtualMethodBases == null){
+      System.out.println("getVirtualMethodBases null");
+    } else {
+      System.out.println("getVirtualMethodBases valid");
+    }
+    return virtualMethodBases;
   }
 }
