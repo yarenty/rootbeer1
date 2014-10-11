@@ -38,11 +38,10 @@ public class ResourceReader {
 
 
   public static byte[] getResourceArray(String jar_path, int length) throws IOException {
-    System.out.println(jar_path);
-    //if(File.separator == "\\"){
 	  jar_path = jar_path.replace("\\", "/");
-	//}
-    System.out.println(jar_path);
+	  if(jar_path.startsWith("/") == false){
+	    jar_path = "/" + jar_path;
+	  }
     InputStream is = ResourceReader.class.getResourceAsStream(jar_path);
     byte[] ret = new byte[length];
     int offset = 0;

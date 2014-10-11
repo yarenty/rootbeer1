@@ -17,6 +17,7 @@ import java.util.List;
 import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.configuration.RootbeerPaths;
 import org.trifort.rootbeer.deadmethods.DeadMethods;
+import org.trifort.rootbeer.entry.CubinFiles;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 import org.trifort.rootbeer.generate.opencl.tweaks.CompileResult;
 
@@ -175,13 +176,13 @@ public class GenerateForKernel {
       for (CompileResult res : result) {
         String suffix = res.is32Bit() ? "-32" : "-64";
         if (res.getBinary() == null) {
-          makeGetCodeMethodThatReturnsBytes(res.is32Bit(), cubinFilename(false, suffix) + ".error");
+          makeGetCodeMethodThatReturnsBytes(res.is32Bit(), cubinFilename(suffix) + ".error");
           makeGetCubinSizeMethod(res.is32Bit(), 0);
           makeGetCubinErrorMethod(res.is32Bit(), true);
         } else {
           byte[] bytes = res.getBinary();
-          writeBytesToFile(bytes, cubinFilename(true, suffix));
-          makeGetCodeMethodThatReturnsBytes(res.is32Bit(), cubinFilename(false, suffix));
+          CubinFiles.v().put(cubinFilename(suffix), bytes);
+          makeGetCodeMethodThatReturnsBytes(res.is32Bit(), cubinFilename(suffix));
           makeGetCubinSizeMethod(res.is32Bit(), bytes.length);
           makeGetCubinErrorMethod(res.is32Bit(), false);
         }
@@ -220,28 +221,8 @@ public class GenerateForKernel {
     }
   }
   
-  private String cubinFilename(boolean use_class_folder, String suffix){
-    String class_name = File.separator +
-            m_serializerClassName.replace(".", File.separator) +
-            suffix + ".cubin";
-    if(use_class_folder)
-      return RootbeerPaths.v().getOutputClassFolder() + class_name;
-    else
-      return class_name;
-  }
-  
-  private void writeBytesToFile(byte[] bytes, String filename) {
-    try {
-      File file = new File(filename);
-      File parent = file.getParentFile();
-      parent.mkdirs();
-      OutputStream os = new FileOutputStream(filename);
-      os.write(bytes);
-      os.flush();
-      os.close();
-    } catch(Exception ex){
-      ex.printStackTrace();
-    }
+  private String cubinFilename(String suffix){
+    return m_serializerClassName.replace(".", File.separator) + suffix + ".cubin";
   }
   
   public SootField getField(String name, Type type){
