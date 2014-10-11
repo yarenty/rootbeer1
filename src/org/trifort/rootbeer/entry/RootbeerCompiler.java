@@ -231,10 +231,8 @@ public class RootbeerCompiler {
     }
     applicationFiles.put("org/trifort/rootbeer/runtime/config.txt", getConfigurationFile());
     Map<String, byte[]> cubinFiles = CubinFiles.v().getCubinFiles();
-    System.out.println("CUBIN_FILES_SIZE: "+cubinFiles.size());
     for(String cubinFilename : cubinFiles.keySet()){
       byte[] cubinFile = cubinFiles.get(cubinFilename);
-      System.out.println("cubinFilename: "+cubinFilename+" length: "+cubinFile.length);
       applicationFiles.put(cubinFilename, cubinFiles.get(cubinFilename));
     }
     writeJar(applicationFiles, outputJarFilename);

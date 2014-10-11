@@ -55,7 +55,6 @@ public class RootbeerDfs {
   }
   
   public void run(String signature) {
-    System.out.println("hello world");
     MethodSignature entrySignature = new MethodSignature(signature);
     Set<Type> virtualMethodBases = DfsInfo.v().getVirtualMethodBases();
     Set<RTAType> newInvokes = new TreeSet<RTAType>();
@@ -87,7 +86,6 @@ public class RootbeerDfs {
     if(sootMethod.isConcrete() == false || sootMethod.isNative() == true){
       return;
     }
-    System.out.println("  searchMethod: "+sootMethod.getSignature()+" "+sootMethod.isNative());
     Body body = sootMethod.getActiveBody();
     List<ValueBox> values = body.getUseAndDefBoxes();
     for(ValueBox box : values){
@@ -105,12 +103,10 @@ public class RootbeerDfs {
         Local local = (Local) value;
         Type localType = local.getType();
         if(localType instanceof RefType){
-          System.out.println("ROOTBEER_DFS::REF_TYPE::"+localType.toString());
           RefType refType = (RefType) localType;
           SootClass sootClass = refType.getSootClass();
           DfsInfo.v().addClass(sootClass);
         } else if(localType instanceof ArrayType){
-          System.out.println("ROOTBEER_DFS::ARRAY_TYPE::"+localType.toString());
           ArrayType arrayType = (ArrayType) localType;
           DfsInfo.v().addArrayType(arrayType);
         } 

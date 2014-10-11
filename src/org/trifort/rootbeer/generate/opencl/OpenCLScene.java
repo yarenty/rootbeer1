@@ -131,7 +131,6 @@ public class OpenCLScene {
   }
   
   public void addMethod(SootMethod sootMethod){
-    System.out.println("ADDING_METHOD: "+sootMethod.getSignature());
     SootClass sootClass = sootMethod.getDeclaringClass();
     allTypes.add(sootClass.getType());
 
@@ -148,7 +147,6 @@ public class OpenCLScene {
   }
 
   public void addArrayType(OpenCLArrayType arrayType){
-    System.out.println("ADDING ARRAY TYPE: "+arrayType.getArrayType().toString());
     arrayTypes.add(arrayType);
     allTypes.add(arrayType.getArrayType());
   }  
@@ -206,11 +204,10 @@ public class OpenCLScene {
   }
   
   private void writeTypesToFile(){
-    TypeToString converter = new TypeToString();
     try {
       PrintWriter writer = new PrintWriter(RootbeerPaths.v().getTypeFile());
       for(Type type : allTypes){
-        String typeStr = converter.convert(type);
+        String typeStr = TypeToString.convert(type);
         writer.println(getTypeNumber(type)+" "+typeStr);
       }
       writer.flush();
@@ -242,10 +239,8 @@ public class OpenCLScene {
     addType("java.lang.Boolean");
     
     Set<SootMethod> methods = DfsInfo.v().getMethods();  
-    System.out.println("METHODS_SIZE: "+methods.size());
     MethodSignatureUtil util = new MethodSignatureUtil();
     for(SootMethod method : methods){
-      System.out.println(method.getSignature());
       addMethod(method);
     }
     for(String extra_method : CompilerSetup.getExtraMethods()){
@@ -485,12 +480,10 @@ public class OpenCLScene {
     
     List<OpenCLMethod> methods = methodHierarchies.getMethods();
     for(OpenCLMethod method : methods){ 
-      System.out.println("ADDING PROTOTYPE:: "+method.getSignature());
       protos.add(method.getMethodPrototype());
     }    
     List<OpenCLPolymorphicMethod> poly_methods = methodHierarchies.getPolyMorphicMethods();
     for(OpenCLPolymorphicMethod poly_method : poly_methods){
-      System.out.println("ADDING POLYMETHODS:: "+poly_method.getMethodPrototypes()+"::END");
       protos.add(poly_method.getMethodPrototypes());
     }
     protos.add(fieldCodeGeneration.prototypes(classes));
@@ -523,12 +516,10 @@ public class OpenCLScene {
       return ret;
     }
 
-    System.out.println("virtual methods: "+signature);
     List<SootMethod> methodList = findVirtualHierarchy(sootClass, sootMethod);
     Collections.sort(methodList, new VirtualMethodSorter());
     
     for(SootMethod method : methodList){
-      System.out.println("  "+method.getSignature());
       util.parse(method.getSignature());
       MethodSignature methodSignature = new MethodSignature(util);
       ret.add(methodSignature);
@@ -552,7 +543,6 @@ public class OpenCLScene {
           declaredMethod = null;
         }
         if(declaredMethod != null){
-          System.out.println("  virtualBaseCase: "+virtualBaseClass+" "+sootMethod.getSignature());
           if(above(declaredMethod, sootMethod)){
             ret.add(declaredMethod);
           } else if(above(sootMethod, declaredMethod)){
