@@ -7,10 +7,10 @@
 
 package org.trifort.rootbeer.configuration;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 import org.trifort.rootbeer.generate.opencl.tweaks.GencodeOptions.CompileArchitecture;
+import org.trifort.rootbeer.generate.opencl.tweaks.GencodeOptions.ComputeCapability;
 import org.trifort.rootbeer.util.ResourceReader;
 
 public class Configuration {
@@ -52,6 +52,7 @@ public class Configuration {
   private CompileArchitecture m_arch;
   private boolean m_manualCuda;
   private String m_manualCudaFilename;
+  private ComputeCapability m_computeCapability;
   
   static {
     m_printMem = false;
@@ -68,6 +69,7 @@ public class Configuration {
     m_sharedMemSize = 40*1024;
     m_arch = CompileArchitecture.Arch32bit64bit;
     m_manualCuda = false;
+    m_computeCapability = ComputeCapability.ALL;
   }
 
   private Configuration(boolean load) {
@@ -194,5 +196,13 @@ public class Configuration {
   
   public String getManualCudaFilename(){
     return m_manualCudaFilename;
+  }
+  
+  public void setComputeCapability(ComputeCapability computeCapability) {
+    m_computeCapability = computeCapability;
+  }
+
+  public ComputeCapability getComputeCapability() {
+    return m_computeCapability;
   }
 }
