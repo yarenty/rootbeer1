@@ -150,11 +150,13 @@ public class RootbeerCompiler {
     compileForKernels();
   }
   
-  public void compile(String jar_filename, String outname) throws Exception {
-    compile(jar_filename, outname, false);
+  public void compile(String inputJarFilename, String outputJarFilename) throws Exception {
+    compile(inputJarFilename, outputJarFilename, false);
   }
   
-  public void compile(String jar_filename, String outname, boolean run_tests) throws Exception {
+  public void compile(String inputJarFilename, String outputJarFilename, boolean run_tests) throws Exception {
+    this.inputJarFilename = inputJarFilename;
+    this.outputJarFilename = outputJarFilename;
     entryDetector = new KernelEntryPointDetector(run_tests);
     setupSoot(run_tests);
     
