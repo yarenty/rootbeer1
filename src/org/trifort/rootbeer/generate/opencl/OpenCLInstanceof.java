@@ -24,8 +24,8 @@ import soot.Scene;
 import soot.SootClass;
 import soot.Type;
 import soot.jimple.InstanceOfExpr;
-import soot.rbclassload.RootbeerClassLoader;
-import soot.rbclassload.StringNumbers;
+import soot.rtaclassload.RTAClassLoader;
+import soot.rtaclassload.StringNumbers;
 
 public class OpenCLInstanceof {
 

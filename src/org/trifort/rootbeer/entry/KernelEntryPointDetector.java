@@ -15,10 +15,10 @@ import java.util.TreeSet;
 
 import soot.SootClass;
 import soot.SootMethod;
-import soot.rbclassload.EntryMethodTester;
-import soot.rbclassload.MethodTester;
-import soot.rbclassload.RTAClass;
-import soot.rbclassload.RTAMethod;
+import soot.rtaclassload.EntryMethodTester;
+import soot.rtaclassload.MethodTester;
+import soot.rtaclassload.RTAClass;
+import soot.rtaclassload.RTAMethod;
 
 public class KernelEntryPointDetector implements EntryMethodTester {
 

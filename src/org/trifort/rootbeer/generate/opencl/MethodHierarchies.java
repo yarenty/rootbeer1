@@ -16,9 +16,9 @@ import soot.Hierarchy;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
-import soot.rbclassload.MethodSignature;
-import soot.rbclassload.MethodSignatureUtil;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.MethodSignature;
+import soot.rtaclassload.MethodSignatureUtil;
+import soot.rtaclassload.RTAClassLoader;
 
 /**
  * Represents all the versions of methods in a class Hierarchy

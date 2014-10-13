@@ -12,7 +12,7 @@ import soot.SootClass;
 import soot.SootField;
 import soot.SootMethod;
 import soot.Type;
-import soot.rbclassload.RTAType;
+import soot.rtaclassload.RTAType;
 
 public class DfsInfo {
 

@@ -26,8 +26,8 @@ import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.SpecialInvokeExpr;
 import soot.jimple.StaticInvokeExpr;
 import soot.options.Options;
-import soot.rbclassload.MethodSignatureUtil;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.MethodSignatureUtil;
+import soot.rtaclassload.RTAClassLoader;
 import soot.util.Chain;
 
 /**

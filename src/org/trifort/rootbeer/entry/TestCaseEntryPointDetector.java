@@ -18,14 +18,14 @@ import soot.jimple.InvokeExpr;
 import soot.jimple.Jimple;
 import soot.jimple.ReturnStmt;
 import soot.jimple.StringConstant;
-import soot.rbclassload.EntryMethodTester;
-import soot.rbclassload.MethodSignatureUtil;
-import soot.rbclassload.MethodTester;
-import soot.rbclassload.Operand;
-import soot.rbclassload.RTAClass;
-import soot.rbclassload.RTAInstruction;
-import soot.rbclassload.RTAMethod;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.EntryMethodTester;
+import soot.rtaclassload.MethodSignatureUtil;
+import soot.rtaclassload.MethodTester;
+import soot.rtaclassload.Operand;
+import soot.rtaclassload.RTAClass;
+import soot.rtaclassload.RTAInstruction;
+import soot.rtaclassload.RTAMethod;
+import soot.rtaclassload.RTAClassLoader;
 
 public class TestCaseEntryPointDetector implements EntryMethodTester {
 
@@ -70,7 +70,7 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     }
     provider = testCase;
     
-    createClass = RootbeerClassLoader.v().getRTAClass(provider);
+    createClass = RTAClassLoader.v().getRTAClass(provider);
     RTAMethod createMethod = createClass.findMethodBySubSignature("void create()");
     createSignature = createMethod.getSignature().toString();
     kernelClass = searchMethod(createMethod);
@@ -94,7 +94,7 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
             continue;
           }
           String class_name = operand.getValue();
-          RTAClass rtaClass = RootbeerClassLoader.v().getRTAClass(class_name);
+          RTAClass rtaClass = RTAClassLoader.v().getRTAClass(class_name);
           List<String> ifaces = rtaClass.getInterfaceStrings();
           for(String iface : ifaces){
             if(iface.equals("org.trifort.rootbeer.runtime.Kernel")){
@@ -110,7 +110,7 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
   private String findTestCaseClass(String test_case) {
     for(String pkg : testCasePackages){
       String name = pkg + test_case;
-      RTAClass existTest = RootbeerClassLoader.v().getRTAClass(name);
+      RTAClass existTest = RTAClassLoader.v().getRTAClass(name);
       if(existTest != null){
         return name;
       }

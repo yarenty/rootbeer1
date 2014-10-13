@@ -12,7 +12,7 @@ import java.util.Comparator;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 
 import soot.SootClass;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.RTAClassLoader;
 
 public class NumberedTypeSortComparator implements Comparator<SootClass>{
 

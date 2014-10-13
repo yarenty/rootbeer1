@@ -25,8 +25,8 @@ import soot.Scene;
 import soot.SootClass;
 import soot.Type;
 import soot.options.Options;
-import soot.rbclassload.RootbeerClassLoader;
-import soot.rbclassload.StringNumbers;
+import soot.rtaclassload.RTAClassLoader;
+import soot.rtaclassload.StringNumbers;
 
 public class ReverseClassHierarchy {
   private List<TreeNode> m_hierarchy;

@@ -23,7 +23,7 @@ import soot.jimple.ClassConstant;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 import soot.jimple.StringConstant;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.RTAClassLoader;
 
 public class VisitorReadGenStatic extends AbstractVisitorGen {
   

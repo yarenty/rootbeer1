@@ -20,7 +20,7 @@ import soot.*;
 import soot.jimple.ArrayRef;
 import soot.jimple.NewArrayExpr;
 import soot.jimple.NewMultiArrayExpr;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.RTAClassLoader;
 
 public class OpenCLArrayType {
 

@@ -21,7 +21,7 @@ import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 
 import soot.RefType;
 import soot.SootField;
-import soot.rbclassload.FieldSignatureUtil;
+import soot.rtaclassload.FieldSignatureUtil;
 
 public class FieldCodeGeneration {
   

@@ -27,7 +27,7 @@ import soot.jimple.Jimple;
 import soot.jimple.JimpleBody;
 import soot.jimple.StringConstant;
 import soot.options.Options;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.RTAClassLoader;
 
 public class GenerateForKernel {
   private MethodCodeSegment m_codeSegment;
@@ -50,7 +50,7 @@ public class GenerateForKernel {
 
   public void makeClass() throws Exception {
     m_serializerClassName = m_codeSegment.getSootClass().getName()+"Serializer";
-    RootbeerClassLoader.v().addModifiedClass(m_serializerClassName);
+    RTAClassLoader.v().addModifiedClass(m_serializerClassName);
     
     makeCpuBody();
     makeGpuBody();
@@ -110,7 +110,7 @@ public class GenerateForKernel {
     getCode.setDeclaringClass(m_sootClass);
     m_sootClass.addMethod(getCode);
     
-    RootbeerClassLoader.v().addModifiedClass(m_sootClass.getName());
+    RTAClassLoader.v().addModifiedClass(m_sootClass.getName());
 
     JimpleBody body = m_jimple.newBody(getCode);
     UnitAssembler assembler = new UnitAssembler();
@@ -263,12 +263,8 @@ public class GenerateForKernel {
   }
 
   private void makeExceptionNumbers() {
-    String prefix = Options.v().rbcl_remap_prefix();
-    if(Options.v().rbcl_remap_all() == false){
-      prefix = "";
-    }
-    makeExceptionMethod("getNullPointerNumber", prefix+"java.lang.NullPointerException");
-    makeExceptionMethod("getOutOfMemoryNumber", prefix+"java.lang.OutOfMemoryError");
+    makeExceptionMethod("getNullPointerNumber", "java.lang.NullPointerException");
+    makeExceptionMethod("getOutOfMemoryNumber", "java.lang.OutOfMemoryError");
   }
   
   private void makeExceptionMethod(String method_name, String cls_name) {

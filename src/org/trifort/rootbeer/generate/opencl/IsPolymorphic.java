@@ -19,9 +19,9 @@ import soot.SootClass;
 import soot.SootMethod;
 import soot.Type;
 import soot.jimple.SpecialInvokeExpr;
-import soot.rbclassload.MethodSignature;
-import soot.rbclassload.MethodSignatureUtil;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.MethodSignature;
+import soot.rtaclassload.MethodSignatureUtil;
+import soot.rtaclassload.RTAClassLoader;
 
 public class IsPolymorphic {
   

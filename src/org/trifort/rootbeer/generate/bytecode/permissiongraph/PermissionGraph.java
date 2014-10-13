@@ -14,7 +14,7 @@ import org.trifort.rootbeer.entry.DfsInfo;
 
 import soot.RefType;
 import soot.SootClass;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.RTAClassLoader;
 
 public class PermissionGraph {
 

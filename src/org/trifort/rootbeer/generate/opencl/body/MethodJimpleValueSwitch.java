@@ -10,7 +10,7 @@ package org.trifort.rootbeer.generate.opencl.body;
 import org.trifort.rootbeer.generate.opencl.*;
 import org.trifort.rootbeer.generate.opencl.fields.OpenCLField;
 
-import soot.rbclassload.StringToType;
+import soot.rtaclassload.StringToType;
 import soot.*;
 import soot.jimple.AddExpr;
 import soot.jimple.AndExpr;
@@ -60,7 +60,7 @@ import soot.jimple.ThisRef;
 import soot.jimple.UshrExpr;
 import soot.jimple.VirtualInvokeExpr;
 import soot.jimple.XorExpr;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.RTAClassLoader;
 
 public class MethodJimpleValueSwitch implements JimpleValueSwitch {
   protected final StringBuilder m_output;

@@ -17,9 +17,9 @@ import java.util.Set;
 import org.trifort.rootbeer.generate.opencl.tweaks.Tweaks;
 
 import soot.*;
-import soot.rbclassload.MethodSignature;
-import soot.rbclassload.MethodSignatureUtil;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.MethodSignature;
+import soot.rtaclassload.MethodSignatureUtil;
+import soot.rtaclassload.RTAClassLoader;
 
 /**
  * Represents an OpenCL function that dispatches to the real OpenCL function

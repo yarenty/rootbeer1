@@ -8,7 +8,7 @@
 package org.trifort.rootbeer.generate.opencl;
 
 import soot.jimple.NewExpr;
-import soot.rbclassload.MethodSignatureUtil;
+import soot.rtaclassload.MethodSignatureUtil;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -47,11 +47,11 @@ import org.trifort.rootbeer.util.ReadFile;
 import org.trifort.rootbeer.util.ResourceReader;
 
 import soot.*;
-import soot.rbclassload.FieldSignatureUtil;
-import soot.rbclassload.MethodFieldFinder;
-import soot.rbclassload.MethodSignature;
-import soot.rbclassload.RootbeerClassLoader;
-import soot.rbclassload.TypeToString;
+import soot.rtaclassload.FieldSignatureUtil;
+import soot.rtaclassload.MethodFieldFinder;
+import soot.rtaclassload.MethodSignature;
+import soot.rtaclassload.RTAClassLoader;
+import soot.rtaclassload.TypeToString;
 import soot.util.Chain;
 
 public class OpenCLScene {

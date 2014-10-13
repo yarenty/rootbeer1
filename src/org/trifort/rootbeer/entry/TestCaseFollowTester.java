@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import soot.rbclassload.ClassTester;
-import soot.rbclassload.RTAClass;
+import soot.rtaclassload.ClassTester;
+import soot.rtaclassload.RTAClass;
 
 public class TestCaseFollowTester implements ClassTester {
 

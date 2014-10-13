@@ -10,7 +10,7 @@ import org.trifort.rootbeer.generate.opencl.OpenCLArrayType;
 import soot.ArrayType;
 import soot.CharType;
 import soot.RefType;
-import soot.rbclassload.MethodSignature;
+import soot.rtaclassload.MethodSignature;
 
 public class CompilerSetup {
 

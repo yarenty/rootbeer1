@@ -45,8 +45,8 @@ import soot.jimple.StmtSwitch;
 import soot.jimple.TableSwitchStmt;
 import soot.jimple.ThrowStmt;
 import soot.options.Options;
-import soot.rbclassload.RootbeerClassLoader;
-import soot.rbclassload.StringNumbers;
+import soot.rtaclassload.RTAClassLoader;
+import soot.rtaclassload.StringNumbers;
 
 public class MethodStmtSwitch implements StmtSwitch {
   protected StringBuilder m_output;

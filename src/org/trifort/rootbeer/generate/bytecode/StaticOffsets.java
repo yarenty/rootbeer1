@@ -25,7 +25,7 @@ import soot.RefType;
 import soot.Scene;
 import soot.SootClass;
 import soot.Type;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.RTAClassLoader;
 
 public class StaticOffsets {
   

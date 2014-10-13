@@ -33,12 +33,12 @@ import org.trifort.rootbeer.util.*;
 import pack.Pack;
 import soot.*;
 import soot.options.Options;
-import soot.rbclassload.BytecodeFile;
-import soot.rbclassload.EntryMethodTester;
-import soot.rbclassload.ListClassTester;
-import soot.rbclassload.ListMethodTester;
-import soot.rbclassload.MethodTester;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.BytecodeFile;
+import soot.rtaclassload.EntryMethodTester;
+import soot.rtaclassload.ListClassTester;
+import soot.rtaclassload.ListMethodTester;
+import soot.rtaclassload.MethodTester;
+import soot.rtaclassload.RTAClassLoader;
 import soot.util.Chain;
 import soot.util.JasminOutputStream;
 
@@ -90,52 +90,48 @@ public class RootbeerCompiler {
   }
     
   private void setupSoot(boolean runtests){
-    RootbeerClassLoader.v().setUserJar(inputJarFilename);
+    RTAClassLoader.v().setUserJar(inputJarFilename);
     
     List<String> proc_dir = new ArrayList<String>();
     proc_dir.add(inputJarFilename);
     
     Options.v().set_allow_phantom_refs(true);
-    Options.v().set_rbclassload(true);
     Options.v().set_prepend_classpath(true);
     Options.v().set_process_dir(proc_dir);
-    if(enableClassRemapping){
-      Options.v().set_rbclassload_buildcg(true);
-    }
     if(rootbeerJarFilename.equals("") == false){
       Options.v().set_soot_classpath(rootbeerJarFilename);
     }
     
-    RootbeerClassLoader.v().addEntryMethodTester(entryDetector);
-    RootbeerClassLoader.v().addNewInvoke("java.lang.StringBuilder");
-    RootbeerClassLoader.v().addSignaturesClass("java.lang.Object");
-    RootbeerClassLoader.v().addSignaturesClass("java.lang.StringBuilder");
-    RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.Serializer");
-    RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.Memory");
-    RootbeerClassLoader.v().addSignaturesClass("java.lang.String");
-    RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtimegpu.GpuException");
-    RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.Sentinal");
-    RootbeerClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.PrivateFields");
+    RTAClassLoader.v().addEntryMethodTester(entryDetector);
+    RTAClassLoader.v().addNewInvoke("java.lang.StringBuilder");
+    RTAClassLoader.v().addSignaturesClass("java.lang.Object");
+    RTAClassLoader.v().addSignaturesClass("java.lang.StringBuilder");
+    RTAClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.Serializer");
+    RTAClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.Memory");
+    RTAClassLoader.v().addSignaturesClass("java.lang.String");
+    RTAClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtimegpu.GpuException");
+    RTAClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.Sentinal");
+    RTAClassLoader.v().addSignaturesClass("org.trifort.rootbeer.runtime.PrivateFields");
 
     ListMethodTester dont_dfs_tester = new ListMethodTester();
     for(String no_dfs : CompilerSetup.getDontDfs()){
       dont_dfs_tester.addSignature(no_dfs);
     }
-    RootbeerClassLoader.v().addDontFollowMethodTester(dont_dfs_tester);
+    RTAClassLoader.v().addDontFollowMethodTester(dont_dfs_tester);
     
     ForcedFields forced_fields = new ForcedFields();
     for(String field_sig : forced_fields.get()){
-      RootbeerClassLoader.v().loadField(field_sig);
+      RTAClassLoader.v().loadField(field_sig);
     }
     
     ListMethodTester toSigMethods = new ListMethodTester();
     for(String method : CompilerSetup.getToSignaturesMethods()){
       toSigMethods.addSignature(method);
     }
-    RootbeerClassLoader.v().addToSignaturesMethodTester(toSigMethods);
-    RootbeerClassLoader.v().addClassRemapping("java.util.concurrent.atomic.AtomicLong", "org.trifort.rootbeer.remap.GpuAtomicLong");
-    RootbeerClassLoader.v().addClassRemapping("org.trifort.rootbeer.testcases.rootbeertest.remaptest.CallsPrivateMethod", "org.trifort.rootbeer.remap.DoesntCallPrivateMethod");
-    RootbeerClassLoader.v().loadNecessaryClasses();
+    RTAClassLoader.v().addToSignaturesMethodTester(toSigMethods);
+    RTAClassLoader.v().addClassRemapping("java.util.concurrent.atomic.AtomicLong", "org.trifort.rootbeer.remap.GpuAtomicLong");
+    RTAClassLoader.v().addClassRemapping("org.trifort.rootbeer.testcases.rootbeertest.remaptest.CallsPrivateMethod", "org.trifort.rootbeer.remap.DoesntCallPrivateMethod");
+    RTAClassLoader.v().loadNecessaryClasses();
   }
   
   public void compile(String inputJarFilename, String outputJarFilename, String test_case) throws Exception {
@@ -146,7 +142,7 @@ public class RootbeerCompiler {
     setupSoot(true);
     provider = detector.getProvider();
         
-    entryMethods = RootbeerClassLoader.v().getEntryPoints();
+    entryMethods = RTAClassLoader.v().getEntryPoints();
     compileForKernels();
   }
   
@@ -160,7 +156,7 @@ public class RootbeerCompiler {
     entryDetector = new KernelEntryPointDetector(run_tests);
     setupSoot(run_tests);
     
-    entryMethods = RootbeerClassLoader.v().getEntryPoints();
+    entryMethods = RTAClassLoader.v().getEntryPoints();
     compileForKernels();
   }
   
@@ -227,7 +223,7 @@ public class RootbeerCompiler {
         applicationFiles.put(filename, rootbeerFiles.get(filename));
       }
     }
-    List<BytecodeFile> bytecodeFiles = RootbeerClassLoader.v().getModifiedBytecodeFiles();
+    List<BytecodeFile> bytecodeFiles = RTAClassLoader.v().getModifiedBytecodeFiles();
     for(BytecodeFile bytecodeFile : bytecodeFiles){
       applicationFiles.put(bytecodeFile.getFileName(), bytecodeFile.getContents());
     }
@@ -258,7 +254,7 @@ public class RootbeerCompiler {
         break;
       }
       String filename = jarEntry.getName();
-      byte[] contents = RootbeerClassLoader.v().readFully(jarInput);
+      byte[] contents = RTAClassLoader.v().readFully(jarInput);
       ret.put(filename, contents);
     }
     jarInput.close();

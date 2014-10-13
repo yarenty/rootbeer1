@@ -7,8 +7,8 @@
 
 package org.trifort.rootbeer.entry;
 
-import soot.rbclassload.MethodTester;
-import soot.rbclassload.RTAMethod;
+import soot.rtaclassload.MethodTester;
+import soot.rtaclassload.RTAMethod;
 
 public class MainTester implements MethodTester {
 

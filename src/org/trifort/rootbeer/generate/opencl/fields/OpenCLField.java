@@ -31,8 +31,8 @@ import soot.Type;
 import soot.Value;
 import soot.jimple.toolkits.typing.fast.Integer127Type;
 import soot.options.Options;
-import soot.rbclassload.FieldSignatureUtil;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.FieldSignatureUtil;
+import soot.rtaclassload.RTAClassLoader;
 
 public class OpenCLField {
   private final SootField m_sootField;

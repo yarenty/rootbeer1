@@ -13,7 +13,7 @@ import org.trifort.rootbeer.generate.bytecode.GenerateForKernel;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 
 import soot.*;
-import soot.rbclassload.RootbeerClassLoader;
+import soot.rtaclassload.RTAClassLoader;
 
 public class KernelTransform {
   
@@ -45,7 +45,7 @@ public class KernelTransform {
     SootClass soot_class = method.getDeclaringClass();
     SootClass iface_class = Scene.v().getSootClass("org.trifort.rootbeer.runtime.CompiledKernel");
     soot_class.addInterface(iface_class);
-    RootbeerClassLoader.v().addModifiedClass(cls);
+    RTAClassLoader.v().addModifiedClass(cls);
     
     System.out.println("added interface CompiledKernel");
     

@@ -15,9 +15,9 @@ import java.util.Stack;
 
 import soot.*;
 import soot.jimple.*;
-import soot.rbclassload.MethodSignatureUtil;
-import soot.rbclassload.RootbeerClassLoader;
-import soot.rbclassload.TypeToString;
+import soot.rtaclassload.MethodSignatureUtil;
+import soot.rtaclassload.RTAClassLoader;
+import soot.rtaclassload.TypeToString;
 
 public class BytecodeLanguage {
 
@@ -97,7 +97,7 @@ public class BytecodeLanguage {
     m_currMethod.setActiveBody(m_currBody);
     m_currClass.addMethod(m_currMethod);
     
-    RootbeerClassLoader.v().addModifiedClass(m_currClass.getName());
+    RTAClassLoader.v().addModifiedClass(m_currClass.getName());
   }
   
   public void startStaticMethod(String method_name, Type return_type, Type... arg_types){

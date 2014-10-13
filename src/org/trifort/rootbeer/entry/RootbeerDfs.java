@@ -28,19 +28,19 @@ import soot.jimple.FieldRef;
 import soot.jimple.InstanceOfExpr;
 import soot.jimple.InvokeExpr;
 import soot.jimple.NewExpr;
-import soot.rbclassload.FieldSignature;
-import soot.rbclassload.FieldSignatureUtil;
-import soot.rbclassload.MethodSignature;
-import soot.rbclassload.MethodSignatureUtil;
-import soot.rbclassload.Pair;
-import soot.rbclassload.RTAClass;
-import soot.rbclassload.RTAMethod;
-import soot.rbclassload.RTAMethodVisitor;
-import soot.rbclassload.RTAType;
-import soot.rbclassload.RootbeerClassLoader;
-import soot.rbclassload.StringNumbers;
-import soot.rbclassload.StringToType;
-import soot.rbclassload.TypeToString;
+import soot.rtaclassload.FieldSignature;
+import soot.rtaclassload.FieldSignatureUtil;
+import soot.rtaclassload.MethodSignature;
+import soot.rtaclassload.MethodSignatureUtil;
+import soot.rtaclassload.Pair;
+import soot.rtaclassload.RTAClass;
+import soot.rtaclassload.RTAMethod;
+import soot.rtaclassload.RTAMethodVisitor;
+import soot.rtaclassload.RTAType;
+import soot.rtaclassload.RTAClassLoader;
+import soot.rtaclassload.StringNumbers;
+import soot.rtaclassload.StringToType;
+import soot.rtaclassload.TypeToString;
 
 public class RootbeerDfs {
   
@@ -67,7 +67,7 @@ public class RootbeerDfs {
     }
     List<Pair<MethodSignature, Set<RTAType>>> entryPairs = new ArrayList<Pair<MethodSignature, Set<RTAType>>>();
     entryPairs.add(new Pair<MethodSignature, Set<RTAType>>(entrySignature, newInvokes));
-    Set<MethodSignature> methods = RootbeerClassLoader.v().callGraphFixedPoint(entryPairs);
+    Set<MethodSignature> methods = RTAClassLoader.v().callGraphFixedPoint(entryPairs);
     for(MethodSignature method : methods){
       String methodSignature = method.toString();
       searchMethod(methodSignature);

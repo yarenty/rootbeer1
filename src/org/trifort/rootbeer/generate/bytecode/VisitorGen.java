@@ -20,8 +20,8 @@ import org.trifort.rootbeer.generate.opencl.OpenCLType;
 import soot.*;
 import soot.jimple.IntConstant;
 import soot.jimple.NullConstant;
-import soot.rbclassload.RootbeerClassLoader;
-import soot.rbclassload.StringToType;
+import soot.rtaclassload.RTAClassLoader;
+import soot.rtaclassload.StringToType;
 
 public class VisitorGen extends AbstractVisitorGen {
 
@@ -60,7 +60,7 @@ public class VisitorGen extends AbstractVisitorGen {
   private void makeGcObjectClass() {
     String base_name = m_runtimeBasicBlock.getName();
     m_className = base_name+"Serializer";
-    RootbeerClassLoader.v().addModifiedClass(m_className);
+    RTAClassLoader.v().addModifiedClass(m_className);
     m_bcl.top().makeClass(m_className, "org.trifort.rootbeer.runtime.Serializer");
   }
     
