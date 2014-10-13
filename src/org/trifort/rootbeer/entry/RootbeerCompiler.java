@@ -90,14 +90,14 @@ public class RootbeerCompiler {
   }
     
   private void setupSoot(boolean runtests){
-    RTAClassLoader.v().setUserJar(inputJarFilename);
+    RTAClassLoader.v().addApplicationJar(inputJarFilename);
     
-    List<String> proc_dir = new ArrayList<String>();
-    proc_dir.add(inputJarFilename);
+    List<String> procesDirectory = new ArrayList<String>();
+    procesDirectory.add(inputJarFilename);
     
     Options.v().set_allow_phantom_refs(true);
     Options.v().set_prepend_classpath(true);
-    Options.v().set_process_dir(proc_dir);
+    Options.v().set_process_dir(procesDirectory);
     if(rootbeerJarFilename.equals("") == false){
       Options.v().set_soot_classpath(rootbeerJarFilename);
     }
