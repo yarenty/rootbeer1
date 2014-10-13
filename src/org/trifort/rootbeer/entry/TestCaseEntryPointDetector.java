@@ -71,7 +71,7 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     provider = testCase;
     
     createClass = RootbeerClassLoader.v().getRTAClass(provider);
-    RTAMethod createMethod = createClass.findMethodByName("create");
+    RTAMethod createMethod = createClass.findMethodBySubSignature("void create()");
     createSignature = createMethod.getSignature().toString();
     kernelClass = searchMethod(createMethod);
     RTAMethod gpuMethod = kernelClass.findMethodBySubSignature("void gpuMethod()");
