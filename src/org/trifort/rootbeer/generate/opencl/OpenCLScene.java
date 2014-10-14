@@ -529,7 +529,10 @@ public class OpenCLScene {
   }
   
   private List<SootMethod> findVirtualHierarchy(SootClass sootClass, SootMethod sootMethod) {
-    List<SootMethod> ret = new ArrayList<SootMethod>();
+    Set<SootMethod> returnSet = new HashSet<SootMethod>();
+    if(sootMethod.isConcrete()){
+      returnSet.add(sootMethod);
+    }
     for(Type type : DfsInfo.v().getVirtualMethodBases()){
       if(type instanceof RefType){
         RefType refType = (RefType) type;
@@ -544,13 +547,15 @@ public class OpenCLScene {
         }
         if(declaredMethod != null){
           if(above(declaredMethod, sootMethod)){
-            ret.add(declaredMethod);
+            returnSet.add(declaredMethod);
           } else if(above(sootMethod, declaredMethod)){
-            ret.add(declaredMethod);
+            returnSet.add(declaredMethod);
           }
         }
       }
     }
+    List<SootMethod> ret = new ArrayList<SootMethod>();
+    ret.addAll(returnSet);
     return ret;
   }
 

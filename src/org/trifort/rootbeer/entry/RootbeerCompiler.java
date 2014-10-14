@@ -37,6 +37,7 @@ import soot.rtaclassload.BytecodeFile;
 import soot.rtaclassload.EntryMethodTester;
 import soot.rtaclassload.ListClassTester;
 import soot.rtaclassload.ListMethodTester;
+import soot.rtaclassload.MethodFieldFinder;
 import soot.rtaclassload.MethodTester;
 import soot.rtaclassload.RTAClassLoader;
 import soot.util.Chain;
@@ -95,6 +96,7 @@ public class RootbeerCompiler {
     List<String> procesDirectory = new ArrayList<String>();
     procesDirectory.add(inputJarFilename);
     
+    Options.v().set_rtaclassload_verbose(true);
     Options.v().set_allow_phantom_refs(true);
     Options.v().set_prepend_classpath(true);
     Options.v().set_process_dir(procesDirectory);
@@ -199,6 +201,8 @@ public class RootbeerCompiler {
       newInvokes.addAll(DfsInfo.v().getNewInvokes());
       
       for(SootMethod sootMethod : DfsInfo.v().getMethods()){
+        MethodFieldFinder finder = new MethodFieldFinder();
+        sootMethod = finder.findMethod(sootMethod.getSignature());
         SootClass declaringClass = sootMethod.getDeclaringClass();
         Chain<SootClass> interfaces = declaringClass.getInterfaces();
         for(SootClass iface : interfaces){

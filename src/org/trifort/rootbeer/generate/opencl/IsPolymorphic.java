@@ -41,15 +41,13 @@ public class IsPolymorphic {
       return false;
     } else {
       List<MethodSignature> methods = OpenCLScene.v().getVirtualMethods(sootMethod.getSignature());
+      if(methods.size() == 0){
+        System.out.println("empty methods: "+sootMethod.getSignature());
+      }
       findHighestType(methods);
       if(methods.size() == 1){
         return false;
       } else {
-        System.out.println("+++++++++++++MANY POLY METHODS++++++++++++");
-        for(MethodSignature method : methods){
-          System.out.println("  testMethod: "+method.toString());
-        }
-        System.out.println("+++++++++++++END MANY POLY METHODS++++++++++++");
         return true;
       }
     }

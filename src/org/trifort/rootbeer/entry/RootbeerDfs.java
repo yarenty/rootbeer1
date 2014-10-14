@@ -86,6 +86,9 @@ public class RootbeerDfs {
     if(sootMethod.isConcrete() == false || sootMethod.isNative() == true){
       return;
     }
+    if(sootMethod.hasActiveBody() == false){
+      return;
+    }
     Body body = sootMethod.getActiveBody();
     List<ValueBox> values = body.getUseAndDefBoxes();
     for(ValueBox box : values){

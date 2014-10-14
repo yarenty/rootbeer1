@@ -39,6 +39,7 @@ import soot.jimple.LeExpr;
 import soot.jimple.LengthExpr;
 import soot.jimple.LongConstant;
 import soot.jimple.LtExpr;
+import soot.jimple.MethodHandle;
 import soot.jimple.MulExpr;
 import soot.jimple.NeExpr;
 import soot.jimple.NegExpr;
@@ -444,6 +445,11 @@ public class MethodJimpleValueSwitch implements JimpleValueSwitch {
 
   public void caseDynamicInvokeExpr(DynamicInvokeExpr die) {
     throw new UnsupportedOperationException("Not supported yet.");
+  }
+  
+  @Override
+  public void caseMethodHandle(MethodHandle arg0) {
+    //ignore
   }
 
   void reset() {
