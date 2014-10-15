@@ -273,6 +273,9 @@ public class OpenCLScene {
     
     Set<Type> instanceofs = DfsInfo.v().getInstanceOfs();
     for(Type type : instanceofs){
+      if(type instanceof RefType == false){
+        continue;
+      }
       addInstanceof(type);
     }
     

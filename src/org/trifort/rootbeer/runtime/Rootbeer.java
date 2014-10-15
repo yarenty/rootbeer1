@@ -89,4 +89,19 @@ public class Rootbeer {
       context.close();
     }
   }
+
+  public void run(List<Kernel> work, long memorySize) {
+    Context context = createDefaultContext();
+    ThreadConfig thread_config = getThreadConfig(work, context.getDevice());
+    try {
+      context.setThreadConfig(thread_config);
+      context.setKernel(work.get(0));
+      context.setMemorySize(memorySize);
+      context.setUsingHandles(true);
+      context.buildState();
+      context.run(work);
+    } finally {
+      context.close();
+    }
+  }
 }

@@ -96,12 +96,14 @@ public class RootbeerCompiler {
     procesDirectory.add(inputJarFilename);
     
     Options.v().set_rtaclassload_verbose(true);
+    Options.v().set_rtaclassload_callgraph_print(false);
     Options.v().set_allow_phantom_refs(true);
     Options.v().set_prepend_classpath(true);
     Options.v().set_process_dir(procesDirectory);
     if(rootbeerJarFilename.equals("") == false){
       Options.v().set_soot_classpath(rootbeerJarFilename);
     }
+    Options.v().set_rtaclassload_context_sensitive_new_invokes(true);
     
     RTAClassLoader.v().addApplicationJar(inputJarFilename);
     RTAClassLoader.v().addEntryMethodTester(entryDetector);

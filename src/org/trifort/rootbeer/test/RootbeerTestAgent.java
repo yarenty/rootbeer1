@@ -193,7 +193,7 @@ public class RootbeerTestAgent {
       List<Kernel> testing_items = creator.create();
       Stopwatch watch = new Stopwatch();
       watch.start();
-      rootbeer.run(testing_items);
+      rootbeer.run(testing_items, 128*1024*1024);
       m_passed = true;
       watch.stop();
       m_gpuTime = watch.elapsedTimeMillis();

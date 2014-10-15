@@ -56,16 +56,13 @@ public class RootbeerDfs {
   
   public void run(String signature) {
     MethodSignature entrySignature = new MethodSignature(signature);
-    Set<Type> virtualMethodBases = DfsInfo.v().getVirtualMethodBases();
-    Set<RTAType> newInvokes = new TreeSet<RTAType>();
-    for(Type virtualMethodBase : virtualMethodBases){
-      RTAType rtaType = RTAType.create(TypeToString.convert(virtualMethodBase));
-      newInvokes.add(rtaType);
-    }
     for(String method : CompilerSetup.getDontDfs()){
       visited.add(method);
     }
-    List<Pair<MethodSignature, Set<RTAType>>> entryPairs = new ArrayList<Pair<MethodSignature, Set<RTAType>>>();
+    Set<RTAType> newInvokes = new TreeSet<RTAType>();
+    newInvokes.add(entrySignature.getClassName());
+    List<Pair<MethodSignature, Set<RTAType>>> entryPairs = 
+        new ArrayList<Pair<MethodSignature, Set<RTAType>>>();
     entryPairs.add(new Pair<MethodSignature, Set<RTAType>>(entrySignature, newInvokes));
     Set<MethodSignature> methods = RTAClassLoader.v().callGraphFixedPoint(entryPairs);
     for(MethodSignature method : methods){

@@ -19,6 +19,7 @@ import soot.jimple.Jimple;
 import soot.jimple.ReturnStmt;
 import soot.jimple.StringConstant;
 import soot.rtaclassload.EntryMethodTester;
+import soot.rtaclassload.MethodSignature;
 import soot.rtaclassload.MethodSignatureUtil;
 import soot.rtaclassload.MethodTester;
 import soot.rtaclassload.Operand;
@@ -26,6 +27,8 @@ import soot.rtaclassload.RTAClass;
 import soot.rtaclassload.RTAInstruction;
 import soot.rtaclassload.RTAMethod;
 import soot.rtaclassload.RTAClassLoader;
+import soot.rtaclassload.RTAType;
+import soot.rtaclassload.StringNumbers;
 
 public class TestCaseEntryPointDetector implements EntryMethodTester {
 
@@ -74,11 +77,14 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     RTAMethod createMethod = createClass.findMethodBySubSignature("java.util.List create()");
     createSignature = createMethod.getSignature().toString();
     
-    RTAClassLoader.v().addCallGraphLink(createSignature, "<org.trifort.rootbeer.runtime.Kernel: void gpuMethod()>");
-    
-    //kernelClass = searchMethod(createMethod);
-    //RTAMethod gpuMethod = kernelClass.findMethodBySubSignature("void gpuMethod()");
-    //kernelSignature = gpuMethod.getSignature().toString();
+    kernelClass = searchMethod(createMethod);
+    RTAMethod[] methods = kernelClass.getMethods();
+    for(RTAMethod method : methods){
+      MethodSignature sig = method.getSignature();
+      if(StringNumbers.v().getString(sig.getMethodName()).equals("<init>")){
+        RTAClassLoader.v().addCallGraphLink(sig.toString(), "<org.trifort.rootbeer.runtime.Kernel: void gpuMethod()>");
+      }
+    }
     initialized = true;
   }
 
@@ -113,7 +119,7 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
   private String findTestCaseClass(String test_case) {
     for(String pkg : testCasePackages){
       String name = pkg + test_case;
-      RTAClass existTest = RTAClassLoader.v().getRTAClass(name);
+      RTAClass existTest = RTAClassLoader.v().getRTAClass(RTAType.create(name), false);
       if(existTest != null){
         return name;
       }

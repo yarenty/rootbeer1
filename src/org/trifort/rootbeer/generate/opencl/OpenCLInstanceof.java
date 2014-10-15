@@ -56,7 +56,7 @@ public class OpenCLInstanceof {
 
   public String getBody() {
     if(m_type instanceof RefType == false){
-      throw new RuntimeException("not supported yet");
+      throw new RuntimeException("not supported yet: instanceof "+m_type.toString());
     }
     RefType ref_type = (RefType) m_type;    
     List<Integer> type_list = getTypeList(ref_type);
