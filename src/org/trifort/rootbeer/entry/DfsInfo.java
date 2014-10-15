@@ -12,6 +12,8 @@ import soot.SootClass;
 import soot.SootField;
 import soot.SootMethod;
 import soot.Type;
+import soot.rtaclassload.NumberedType;
+import soot.rtaclassload.RTAClassLoader;
 import soot.rtaclassload.RTAType;
 
 public class DfsInfo {
@@ -74,6 +76,13 @@ public class DfsInfo {
 
   public void addType(Type type){
     dfsTypes.add(type);
+    if(type instanceof RefType){
+      RefType refType = (RefType) type;
+      SootClass sootClass = refType.getSootClass();
+      if(sootClass.hasSuperclass()){
+        addType(sootClass.getSuperclass().getType());
+      }
+    }
   }
   
   public void addArrayType(ArrayType arrayType) {
@@ -115,13 +124,18 @@ public class DfsInfo {
   }
 
   public void finalizeTypes() {
-    for(Type type : dfsTypes){
-      if(type instanceof RefType){
-        RefType refType = (RefType) type;
-        SootClass sootClass = refType.getSootClass();
-        if(sootClass.isInterface() == false){
-          orderedRefLikeTypes.add(type);
-          orderedRefTypes.add(refType);
+    List<NumberedType> numberedTypes = RTAClassLoader.v().getNumberedTypes();
+    for(int i = numberedTypes.size() - 1; i >= 0; --i){
+      NumberedType numberedType = numberedTypes.get(i);
+      Type type = numberedType.getType().toSootType();
+      if(dfsTypes.contains(type)){
+        if(type instanceof RefType){
+          RefType refType = (RefType) type;
+          SootClass sootClass = refType.getSootClass();
+          if(sootClass.isInterface() == false){
+            orderedRefLikeTypes.add(type);
+            orderedRefTypes.add(refType);
+          }
         }
       }
     }

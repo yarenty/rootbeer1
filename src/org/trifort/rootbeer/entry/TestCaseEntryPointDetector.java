@@ -73,9 +73,12 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     createClass = RTAClassLoader.v().getRTAClass(provider);
     RTAMethod createMethod = createClass.findMethodBySubSignature("java.util.List create()");
     createSignature = createMethod.getSignature().toString();
-    kernelClass = searchMethod(createMethod);
-    RTAMethod gpuMethod = kernelClass.findMethodBySubSignature("void gpuMethod()");
-    kernelSignature = gpuMethod.getSignature().toString();
+    
+    RTAClassLoader.v().addCallGraphLink(createSignature, "<org.trifort.rootbeer.runtime.Kernel: void gpuMethod()>");
+    
+    //kernelClass = searchMethod(createMethod);
+    //RTAMethod gpuMethod = kernelClass.findMethodBySubSignature("void gpuMethod()");
+    //kernelSignature = gpuMethod.getSignature().toString();
     initialized = true;
   }
 
@@ -122,9 +125,6 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     if(initialized == false){
       init();
     }
-    if(sm.getSignature().toString().equals(kernelSignature)){
-      return true;
-    }
     if(sm.getSignature().toString().equals(createSignature)){
       return true;
     }
@@ -134,7 +134,6 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
   @Override
   public Set<String> getNewInvokes() {
     Set<String> ret = new TreeSet<String>();
-    ret.add(kernelClass.getName());
     ret.add(createClass.getName());
     ret.addAll(CompilerSetup.getNewInvokes());
     return ret;

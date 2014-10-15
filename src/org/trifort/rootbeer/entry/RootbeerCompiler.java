@@ -25,6 +25,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.trifort.rootbeer.configuration.Configuration;
 import org.trifort.rootbeer.configuration.RootbeerPaths;
+import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 import org.trifort.rootbeer.generate.opencl.tweaks.CudaTweaks;
 import org.trifort.rootbeer.generate.opencl.tweaks.NativeCpuTweaks;
 import org.trifort.rootbeer.generate.opencl.tweaks.Tweaks;
@@ -91,8 +92,6 @@ public class RootbeerCompiler {
   }
     
   private void setupSoot(boolean runtests){
-    RTAClassLoader.v().addApplicationJar(inputJarFilename);
-    
     List<String> procesDirectory = new ArrayList<String>();
     procesDirectory.add(inputJarFilename);
     
@@ -104,6 +103,7 @@ public class RootbeerCompiler {
       Options.v().set_soot_classpath(rootbeerJarFilename);
     }
     
+    RTAClassLoader.v().addApplicationJar(inputJarFilename);
     RTAClassLoader.v().addEntryMethodTester(entryDetector);
     RTAClassLoader.v().addNewInvoke("java.lang.StringBuilder");
     RTAClassLoader.v().addSignaturesClass("java.lang.Object");
@@ -174,9 +174,9 @@ public class RootbeerCompiler {
     KernelTransform kernelTransform = new KernelTransform();
     for(SootMethod kernelMethod : kernelMethods){   
       DfsInfo.reset();
+      DfsInfo.v().setVirtualMethodBases(newInvokes);
       
       System.out.println("running KernelTransform on: "+kernelMethod.getSignature()+"...");
-      DfsInfo.v().setVirtualMethodBases(newInvokes);
       RootbeerDfs rootbeerDfs = new RootbeerDfs();
       rootbeerDfs.run(kernelMethod.getSignature());
       DfsInfo.v().expandArrayTypes();

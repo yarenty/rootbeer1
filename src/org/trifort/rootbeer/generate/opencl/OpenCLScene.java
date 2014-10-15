@@ -50,6 +50,7 @@ import soot.*;
 import soot.rtaclassload.FieldSignatureUtil;
 import soot.rtaclassload.MethodFieldFinder;
 import soot.rtaclassload.MethodSignature;
+import soot.rtaclassload.NumberedType;
 import soot.rtaclassload.RTAClassLoader;
 import soot.rtaclassload.TypeToString;
 import soot.util.Chain;
@@ -280,17 +281,9 @@ public class OpenCLScene {
   }
   
   private void numberTypes() {
-    numberType(VoidType.v());
-    numberType(BooleanType.v());
-    numberType(ByteType.v());
-    numberType(CharType.v());
-    numberType(ShortType.v());
-    numberType(IntType.v());
-    numberType(LongType.v());
-    numberType(FloatType.v());
-    numberType(DoubleType.v());
-    for(Type type : allTypes){
-      numberType(type);
+    List<NumberedType> numberedTypes = RTAClassLoader.v().getNumberedTypes();
+    for(NumberedType type : numberedTypes){
+      numberType(type.getType().toSootType());
     }
   }
   

@@ -216,7 +216,6 @@ public class VisitorGen extends AbstractVisitorGen {
       return;
     m_sentinalCtorsCreated.add(soot_class.getName());
     
-    soot_class = Scene.v().getSootClass(soot_class.getName());
     if(soot_class.isApplicationClass() == false)
       return;
     
@@ -256,10 +255,7 @@ public class VisitorGen extends AbstractVisitorGen {
     //need the parent to first have the sential ctor made.
     Collections.reverse(types);
     for(RefType ref_type : types){
-      AcceptableGpuTypes accept = new AcceptableGpuTypes();
-      if(accept.shouldGenerateCtor(ref_type.getClassName())){
-        generateSentinalCtor(ref_type);
-      }
+      generateSentinalCtor(ref_type);
     }
   }
 

@@ -23,7 +23,7 @@ public class KernelTransform {
     m_Uuid = 1;
   }
 
-  public void run(String cls){    
+  public void run(String cls){   
     OpenCLScene scene = new OpenCLScene();
     OpenCLScene.setInstance(scene);
     scene.init();
