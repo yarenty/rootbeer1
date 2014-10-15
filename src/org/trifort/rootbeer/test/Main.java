@@ -132,7 +132,7 @@ public class Main implements TestSerializationFactory {
     ret.add(new SynchronizedObjectTest());
     ret.add(new ForceArrayNewTest());
     ret.add(new CanonicalTest());
-    ret.add(new GpuVectorMapTest());
+    //ret.add(new GpuVectorMapTest());
     ret.add(new StringBuilderTest4());
     ret.add(new AtomicGlobalsTest());
             

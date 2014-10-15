@@ -24,7 +24,7 @@ public class KernelTemplateMain implements TestKernelTemplateFactory {
     ret.add(new DoubleToStringKernelTemplateTest());
     ret.add(new DoubleToStringKernelTemplateBuilderTest());
     ret.add(new GpuParametersTest());
-    ret.add(new GpuVectorMapTest2());
+    //ret.add(new GpuVectorMapTest2());
     return ret;
   }
 

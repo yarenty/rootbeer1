@@ -234,6 +234,7 @@ public class RootbeerTestAgent {
       Context context = rootbeer.createDefaultContext();
       context.setKernel(testing_item);
       context.setThreadConfig(thread_config);
+      context.setMemorySize(128*1024*1024);
       context.buildState();
       context.run();
       context.close();
@@ -273,7 +274,7 @@ public class RootbeerTestAgent {
     Configuration.setPrintMem(print_mem);
     List<Kernel> testing_items = creator.create();
     try {
-      rootbeer.run(testing_items);
+      rootbeer.run(testing_items, 128*1024*1024);
       m_passed = false;
       m_message = "No exception thrown when expecting one.";
     } catch(Throwable ex){
@@ -314,7 +315,7 @@ public class RootbeerTestAgent {
         List<Kernel> testing_items = m_creator.create();
         Stopwatch watch = new Stopwatch();
         watch.start();
-        m_rootbeer.run(testing_items);
+        m_rootbeer.run(testing_items, 64*1024*1024);
         m_passed = true;
         watch.stop();
         m_gpuTime = watch.elapsedTimeMillis();
