@@ -74,7 +74,12 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     provider = testCase;
     
     createClass = RTAClassLoader.v().getRTAClass(provider);
-    RTAMethod createMethod = createClass.findMethodBySubSignature("java.util.List create()");
+    RTAMethod createMethod;
+    if(isNormalTest()){
+      createMethod = createClass.findMethodBySubSignature("java.util.List create()");
+    } else {
+      createMethod = createClass.findMethodBySubSignature("org.trifort.rootbeer.runtime.Kernel create()");
+    }
     createSignature = createMethod.getSignature().toString();
     
     kernelClass = searchMethod(createMethod);
@@ -86,6 +91,17 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
       }
     }
     initialized = true;
+  }
+
+  private boolean isNormalTest() {
+    RTAType[] interfaces = createClass.getInterfaces();
+    for(RTAType iface : interfaces){
+      RTAType kernelIface = RTAType.create("org.trifort.rootbeer.test.TestKernelTemplate");
+      if(iface == kernelIface){ //note flyweight
+        return false;
+      }
+    }
+    return true;
   }
 
   public String getProvider() {
