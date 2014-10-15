@@ -55,6 +55,7 @@ public class TestCaseEntryPointDetector implements EntryMethodTester {
     testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.exception.");
     testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.gpurequired.");
     testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.");
+    testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.math.");
     testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.ofcoarse.");
     testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.remaptest.");
     testCasePackages.add("org.trifort.rootbeer.testcases.rootbeertest.serialization.");

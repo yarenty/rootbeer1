@@ -52,15 +52,6 @@ public class RootbeerTest {
       System.exit(-1);
     } 
   }
-
-  public void repeatTests() {
-    try {
-      runTestCases(null, false);
-    } catch(Exception ex){
-      ex.printStackTrace();
-      System.exit(-1);
-    } 
-  }
   
   private void runTestCases(String test_case, boolean run_hard_tests) throws Exception {   
     JarClassLoader loader_factory = new JarClassLoader(destJAR);

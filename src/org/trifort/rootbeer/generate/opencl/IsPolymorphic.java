@@ -41,9 +41,6 @@ public class IsPolymorphic {
       return false;
     } else {
       List<MethodSignature> methods = OpenCLScene.v().getVirtualMethods(sootMethod.getSignature());
-      if(methods.size() == 0){
-        System.out.println("empty methods: "+sootMethod.getSignature());
-      }
       findHighestType(methods);
       if(methods.size() == 1){
         return false;

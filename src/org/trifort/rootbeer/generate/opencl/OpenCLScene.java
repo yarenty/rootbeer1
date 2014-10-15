@@ -552,6 +552,9 @@ public class OpenCLScene {
     }
     List<SootMethod> ret = new ArrayList<SootMethod>();
     ret.addAll(returnSet);
+    if(ret.isEmpty()){
+      ret.add(sootMethod);
+    }
     return ret;
   }
 

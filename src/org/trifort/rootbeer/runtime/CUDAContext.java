@@ -291,7 +291,7 @@ public class CUDAContext implements Context {
     return stats;
   }
   
-  private class GpuEventHandler implements EventHandler<GpuEvent>{
+  private class GpuEventHandler implements EventHandler<GpuEvent> {
     @Override
     public void onEvent(final GpuEvent gpuEvent, final long sequence, final boolean endOfBatch){
       try {
