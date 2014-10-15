@@ -125,6 +125,7 @@ public class DfsInfo {
 
   public void finalizeTypes() {
     List<NumberedType> numberedTypes = RTAClassLoader.v().getNumberedTypes();
+    orderedRefLikeTypes.addAll(arrayTypes);
     for(int i = numberedTypes.size() - 1; i >= 0; --i){
       NumberedType numberedType = numberedTypes.get(i);
       Type type = numberedType.getType().toSootType();

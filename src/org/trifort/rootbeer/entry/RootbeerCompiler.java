@@ -237,7 +237,7 @@ public class RootbeerCompiler {
     Map<String, byte[]> cubinFiles = CubinFiles.v().getCubinFiles();
     for(String cubinFilename : cubinFiles.keySet()){
       byte[] cubinFile = cubinFiles.get(cubinFilename);
-      applicationFiles.put(cubinFilename, cubinFiles.get(cubinFilename));
+      applicationFiles.put(cubinFilename, cubinFile);
     }
     writeJar(applicationFiles, outputJarFilename);
   }
