@@ -69,7 +69,7 @@ public class OpenCLScene {
   private List<SootMethod> methods;
   private ClassConstantNumbers constantNumbers;
   private FieldCodeGeneration fieldCodeGeneration;
-  private Map<Type, Integer> typeNumbers;
+  private List<Type> typeNumbers;
   private Set<Type> allTypes;
   private int typeNumber;
   private String cudaCode;
@@ -89,7 +89,7 @@ public class OpenCLScene {
     methods = new ArrayList<SootMethod>();
     constantNumbers = new ClassConstantNumbers();
     fieldCodeGeneration = new FieldCodeGeneration();
-    typeNumbers = new HashMap<Type, Integer>();
+    typeNumbers = new ArrayList<Type>();
     allTypes = new HashSet<Type>();
     loadTypes(); 
   }
@@ -120,10 +120,16 @@ public class OpenCLScene {
   }
 
   public int getTypeNumber(Type type){
-    if(typeNumbers.containsKey(type) == false){
+    if(typeNumbers.contains(type) == false){
       numberType(type);
     }
-    return typeNumbers.get(type);
+    for(int i = 0; i < typeNumbers.size(); ++i){
+      Type curr = typeNumbers.get(i);
+      if(curr.equals(type)){
+        return i;
+      }
+    }
+    throw new RuntimeException();
   }
 
   public int getTypeNumber(String className) {
@@ -155,6 +161,9 @@ public class OpenCLScene {
   public void addInstanceof(Type type){
     instanceOfs.add(new OpenCLInstanceof(type));
     allTypes.add(type);
+    if(type instanceof ArrayType){
+      arrayTypes.add(new OpenCLArrayType((ArrayType) type));
+    }
   }
 
   public OpenCLClass getOpenCLClass(SootClass sootClass){    
@@ -266,6 +275,7 @@ public class OpenCLScene {
       OpenCLArrayType ocl_array_type = new OpenCLArrayType(array_type);
       addArrayType(ocl_array_type);
     }
+    
     for(ArrayType array_type : CompilerSetup.getExtraArrayTypes()){
       OpenCLArrayType ocl_array_type = new OpenCLArrayType(array_type);
       addArrayType(ocl_array_type);
@@ -273,7 +283,7 @@ public class OpenCLScene {
     
     Set<Type> instanceofs = DfsInfo.v().getInstanceOfs();
     for(Type type : instanceofs){
-      if(type instanceof RefType == false){
+      if(type instanceof RefType == false && type instanceof ArrayType){
         continue;
       }
       addInstanceof(type);
@@ -288,12 +298,14 @@ public class OpenCLScene {
     for(NumberedType type : numberedTypes){
       numberType(type.getType().toSootType());
     }
+    for(OpenCLArrayType arrayType : arrayTypes){
+      numberType(arrayType.getArrayType());
+    }
   }
   
   private void numberType(Type type){
-    if(typeNumbers.containsKey(type) == false){
-      typeNumbers.put(type, typeNumber);
-      ++typeNumber;
+    if(typeNumbers.contains(type) == false){
+      typeNumbers.add(type);
     }
   }
 
@@ -314,7 +326,7 @@ public class OpenCLScene {
         
     StringBuilder unix_code = new StringBuilder();
     StringBuilder windows_code = new StringBuilder();
-    
+
     String method_protos = methodPrototypesString();
     String gc_string = garbageCollectorString();
     String bodies_string = methodBodiesString();
@@ -652,6 +664,10 @@ public class OpenCLScene {
   
   public ClassConstantNumbers getClassConstantNumbers(){
     return constantNumbers;
+  }
+
+  public List<Type> getNumberedTypes() {
+    return typeNumbers;
   }
 
 }

@@ -18,12 +18,14 @@ import java.util.TreeSet;
 import org.trifort.rootbeer.entry.DfsInfo;
 import org.trifort.rootbeer.generate.opencl.tweaks.Tweaks;
 
+import soot.ArrayType;
 import soot.FastHierarchy;
 import soot.RefType;
 import soot.Scene;
 import soot.SootClass;
 import soot.Type;
 import soot.jimple.InstanceOfExpr;
+import soot.rtaclassload.NumberedType;
 import soot.rtaclassload.RTAClassLoader;
 import soot.rtaclassload.StringNumbers;
 
@@ -108,36 +110,54 @@ public class OpenCLInstanceof {
   }
 
   private List<Integer> getTypeList(Type type) {
-    Set<Type> visited = new TreeSet<Type>();
-    LinkedList<Type> queue = new LinkedList<Type>();
-    queue.add(type);
-    
-    Set<Type> newInvokes = DfsInfo.v().getNewInvokes();
     List<Integer> ret = new ArrayList<Integer>();
-    
-    while(queue.isEmpty() == false){
-      Type entry = queue.removeFirst();
-      if(visited.contains(entry)){
-        continue;
+    List<Type> numberedTypes = OpenCLScene.v().getNumberedTypes();
+    for(int i = 0; i < numberedTypes.size(); ++i){
+      int number = i;
+      Type currType = numberedTypes.get(i);
+      if(parent(type, currType) || parent(currType, type)){
+        ret.add(number);
       }
-      visited.add(entry);
-      
-      if(type instanceof RefType){
-        RefType refType = (RefType) type;
-        SootClass sootClass = refType.getSootClass();
-        if(newInvokes.contains(type)){
-          ret.add(OpenCLScene.v().getTypeNumber(sootClass.getType()));
-        }
-        
-        FastHierarchy hierarchy = Scene.v().getOrMakeFastHierarchy();
-        Collection<SootClass> children = hierarchy.getSubclassesOf(sootClass);
-        for(SootClass child : children){
-          queue.add(child.getType());
-        }
-      }
-      
     }
-    
     return ret;
+  }
+
+  private boolean parent(Type type0, Type type1) {
+    if(type1 instanceof RefType){
+      RefType refType1 = (RefType) type1;
+      SootClass sootClass1 = refType1.getSootClass();
+      if(type0 instanceof RefType){
+        RefType refType0 = (RefType) type0;
+        SootClass sootClass2 = refType0.getSootClass();
+        LinkedList<SootClass> queue = new LinkedList<SootClass>();
+        queue.add(sootClass2);
+        while(queue.isEmpty() == false){
+          SootClass curr = queue.removeFirst();
+          if(curr.equals(sootClass1)){
+            return true;
+          } else {
+            if(curr.hasSuperclass() == false){
+              return false;
+            } else {
+              queue.add(curr.getSuperclass());
+            }
+            for(SootClass iface : curr.getInterfaces()){
+              queue.add(iface);
+            }
+          }
+        }
+        return false;
+      } else if(type0 instanceof ArrayType){
+        if(sootClass1.getName().equals("java.lang.Object")){
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 }

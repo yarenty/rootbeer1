@@ -112,7 +112,7 @@ public class RootbeerDfs {
         } 
       } else if(value instanceof InstanceOfExpr){
         InstanceOfExpr instanceOf = (InstanceOfExpr) value;
-        DfsInfo.v().addInstanceOf(instanceOf.getType());
+        DfsInfo.v().addInstanceOf(instanceOf.getCheckType());
       } else if(value instanceof NewExpr){
         NewExpr newExpr = (NewExpr) value;
         DfsInfo.v().addNewInvoke(newExpr.getType());
