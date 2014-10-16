@@ -1235,7 +1235,7 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a660_9_(int parameter0, in
 
 //<java.lang.String: void <init>(char[])>
 $$__device__$$
-int java_lang_String_initab850b60f96d11de8a390800200c9a660_a12_(int parameter0, int * exception){
+int java_lang_String_initab850b60f96d11de8a390800200c9a660_a13_(int parameter0, int * exception){
 
   int i;
   int len;
@@ -1253,7 +1253,7 @@ int java_lang_String_initab850b60f96d11de8a390800200c9a660_a12_(int parameter0, 
   return org_trifort_rootbeer_string_from_chars(characters_copy, exception);
 }
 
-__device__ void java_lang_String_initab850b60f96d11de8a390800200c9a66_body0_a12_(int thisref, int parameter0, int * exception);
+__device__ void java_lang_String_initab850b60f96d11de8a390800200c9a66_body0_a13_(int thisref, int parameter0, int * exception);
 
 $$__device__$$ int 
 char__array_new(int size, int * exception);
@@ -1615,7 +1615,7 @@ int java_lang_StringBuilder_toString9_(int thisref,
 
 $$__device__$$
 int java_lang_Boolean_initab850b60f96d11de8a390800200c9a66(
-  bool value, int * exception){
+  char value, int * exception){
   int thisref;
   char * thisref_deref;
 
@@ -1805,7 +1805,7 @@ int java_lang_Double_initab850b60f96d11de8a390800200c9a66(
   return thisref;
 }
 $$__device__$$
-int java_lang_Boolean_valueOf(bool bool_value, int * exception) {
+int java_lang_Boolean_valueOf(char bool_value, int * exception) {
   int return_obj = -1;
   
   org_trifort_gc_assign(
