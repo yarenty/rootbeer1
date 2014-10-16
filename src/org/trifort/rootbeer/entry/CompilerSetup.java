@@ -101,10 +101,10 @@ public class CompilerSetup {
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: double getSharedDouble(int)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void setSharedDouble(int,double)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: double sin(double)>");
-    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void atomicAddGlobal(int[],int,int)>");
-    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void atomicAddGlobal(long[],int,long)>");
-    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void atomicAddGlobal(float[],int,float)>");
-    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: void atomicSubGlobal(int[],int,int)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicAddGlobal(int[],int,int)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: long atomicAddGlobal(long[],int,long)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: float atomicAddGlobal(float[],int,float)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicSubGlobal(int[],int,int)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicExchGlobal(int[],int,int)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: long atomicExchGlobal(long[],int,long)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: float atomicExchGlobal(float[],int,float)>");
@@ -195,6 +195,19 @@ public class CompilerSetup {
     ret.add("<java.lang.Object: java.lang.String toString()>");
     ret.add("<org.trifort.rootbeer.runtime.Sentinal: void <init>()>");
     ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: void <init>()>"); 
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicAddGlobal(int[],int,int)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: long atomicAddGlobal(long[],int,long)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: float atomicAddGlobal(float[],int,float)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicSubGlobal(int[],int,int)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicExchGlobal(int[],int,int)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: long atomicExchGlobal(long[],int,long)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: float atomicExchGlobal(float[],int,float)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicMinGlobal(int[],int,int)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicMaxGlobal(int[],int,int)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicCASGlobal(int[],int,int,int)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicAndGlobal(int[],int,int)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicOrGlobal(int[],int,int)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicXorGlobal(int[],int,int)>");
     return ret;
   }
   

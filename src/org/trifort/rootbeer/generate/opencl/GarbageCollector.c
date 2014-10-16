@@ -123,7 +123,7 @@ org_trifort_array_length(int thisref, int * exception){
 }
 
 $$__device__$$ 
-int org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a15_5_5_(int array, int index, int value, int * exception){
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal5_a15_5_5_(int array, int index, int value, int * exception){
   char * array_deref;
   int * int_handle;
   int length;
@@ -146,7 +146,7 @@ int org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a15_5_5_(int array
 }
 
 $$__device__$$ 
-unsigned long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a16_5_6_(int array, int index, unsigned long long value, int * exception){
+long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal6_a16_5_6_(int array, int index, long long value, int * exception){
   char * array_deref;
   unsigned long long * long_handle;
   int length;
@@ -170,7 +170,7 @@ unsigned long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a16
 }
 
 $$__device__$$ 
-float org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a17_5_7_(int array, int index, float value, int * exception){
+float org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal7_a17_5_7_(int array, int index, float value, int * exception){
   char * array_deref;
   float * float_handle;
   int length;
@@ -194,7 +194,7 @@ float org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a17_5_7_(int arr
 }
 
 $$__device__$$ 
-int org_trifort_rootbeer_runtime_RootbeerGpu_atomicSubGlobal0_a15_5_5_(int array, int index, int value, int * exception){
+int org_trifort_rootbeer_runtime_RootbeerGpu_atomicSubGlobal5_a15_5_5_(int array, int index, int value, int * exception){
   char * array_deref;
   int * int_handle;
   int length;
@@ -263,7 +263,7 @@ int org_trifort_rootbeer_runtime_RootbeerGpu_atomicExchGlobal5_a15_5_5_(int arra
 }
 
 $$__device__$$ 
-unsigned long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicExchGlobal6_a16_5_6_(int array, int index, unsigned long long value, int * exception){
+long long org_trifort_rootbeer_runtime_RootbeerGpu_atomicExchGlobal6_a16_5_6_(int array, int index, long long value, int * exception){
   char * array_deref;
   unsigned long long * long_handle;
   int length;

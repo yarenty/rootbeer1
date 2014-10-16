@@ -216,26 +216,34 @@ public class RootbeerGpu {
     return 0;
   }  
   
-  public static void atomicAddGlobal(int[] array, int index, int addValue){
+  public static int atomicAddGlobal(int[] array, int index, int addValue){
     synchronized(array){
+      int ret = array[index];
       array[index] += addValue;
+      return ret;
     }
   }
   
-  public static void atomicAddGlobal(long[] array, int index, long addValue){
+  public static long atomicAddGlobal(long[] array, int index, long addValue){
     synchronized(array){
+      long ret = array[index];
       array[index] += addValue;
+      return ret;
     }
   }
 
-  public static void atomicAddGlobal(float[] array, int index, float addValue){
+  public static float atomicAddGlobal(float[] array, int index, float addValue){
     synchronized(array){
+      float ret = array[index];
       array[index] += addValue;
+      return ret;
     }
   }
-  public static void atomicSubGlobal(int[] array, int index, int subValue){
+  public static int atomicSubGlobal(int[] array, int index, int subValue){
     synchronized(array){
+      int ret = array[index];
       array[index] -= subValue;
+      return ret;
     }
   }
   

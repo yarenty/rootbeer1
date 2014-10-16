@@ -417,13 +417,13 @@ public class OpenCLMethod {
   
   private boolean shouldEmitBody(){
     String signature = getSignature();
+    if(m_dontEmitMethods.contains(signature)){
+      return false;
+    }
     if(m_emitUnmangled.contains(signature)){
       return true;
     }
     if(m_dontMangleMethods.contains(signature)){
-      return false;
-    }
-    if(m_dontEmitMethods.contains(signature)){
       return false;
     }
     return true;
