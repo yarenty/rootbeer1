@@ -481,43 +481,43 @@ running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.SuperCl
 [rtaclassload] callGraphFixedPoint: <org.trifort.rootbeer.testcases.rootbeertest.SuperClassRunOnGpu: void gpuMethod()>
 error creating method body: <org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>
 compiling CUDA code for 64bit only...
-/home/pcpratts/.rootbeer/generated.cu(515): warning: variable "r0" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(527): warning: variable "r0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(516): warning: variable "r1" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(528): warning: variable "r1" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(517): warning: variable "i0" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(529): warning: variable "i0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(518): warning: variable "$r2" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(530): warning: variable "$r2" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(521): warning: variable "i" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(533): warning: variable "i" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(522): warning: variable "len" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(534): warning: variable "len" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(523): warning: variable "characters_copy" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(535): warning: variable "characters_copy" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(524): warning: variable "ch" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(536): warning: variable "ch" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(657): warning: variable "new_str" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(669): warning: variable "new_str" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(707): warning: variable "hash_code" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(719): warning: variable "hash_code" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(708): warning: variable "hex_string" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(720): warning: variable "hex_string" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1135): error: identifier "org_trifort_rootbeer_testcases_otherpackage_CompositeClass5_go5_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1386): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1141): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1415): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(1430): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1468): error: identifier "org_trifort_rootbeer_testcases_otherpackage_CompositeClass5_go5_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(1506): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1474): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1513): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1524): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(1664): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1618): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1667): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1679): warning: variable "r0" was set but never used
 
-1 error detected in the compilation of "/tmp/tmpxft_000034f3_00000000-12_generated.compute_20.cpp1.ii".
+1 error detected in the compilation of "/tmp/tmpxft_000010f9_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.arraysum.ArraySum: void gpuMethod()>...
@@ -752,251 +752,625 @@ generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.math.BigDecimalRunOnGpu: void gpuMethod()>...
 [rtaclassload] callGraphFixedPoint: <org.trifort.rootbeer.testcases.rootbeertest.math.BigDecimalRunOnGpu: void gpuMethod()>
-error creating method body: <java.lang.Thread: java.lang.Thread currentThread()>
 error creating method body: <java.lang.ref.Reference: java.lang.Object get()>
-error creating method body: <java.lang.CharacterData: int digit(int,int)>
-error creating method body: <java.lang.Throwable: java.lang.Throwable initCause(java.lang.Throwable)>
+error creating method body: <java.lang.Double: int hashCode()>
 error creating method body: <java.lang.Boolean: int hashCode()>
 error creating method body: <java.lang.Float: int hashCode()>
-error creating method body: <java.lang.Integer: int hashCode()>
-error creating method body: <java.lang.String: int hashCode()>
 error creating method body: <java.lang.Long: int hashCode()>
-error creating method body: <java.lang.Double: int hashCode()>
+error creating method body: <java.lang.String: int hashCode()>
+error creating method body: <java.lang.Integer: int hashCode()>
+error creating method body: <java.lang.Throwable: java.lang.Throwable initCause(java.lang.Throwable)>
+error creating method body: <java.lang.Thread: java.lang.Thread currentThread()>
+error creating method body: <java.lang.CharacterData: int digit(int,int)>
 error creating method body: <org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>
 compiling CUDA code for 64bit only...
-/home/pcpratts/.rootbeer/generated.cu(1099): warning: variable "r0" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1095): warning: variable "r0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1100): warning: variable "r1" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1096): warning: variable "r1" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1101): warning: variable "i0" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1097): warning: variable "i0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1102): warning: variable "$r2" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1098): warning: variable "$r2" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1105): warning: variable "i" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1101): warning: variable "i" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1106): warning: variable "len" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1102): warning: variable "len" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1107): warning: variable "characters_copy" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1103): warning: variable "characters_copy" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1108): warning: variable "ch" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1104): warning: variable "ch" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1132): warning: variable "characters_src" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1128): warning: variable "characters_src" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1290): warning: variable "new_str" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1286): warning: variable "new_str" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1321): error: identifier "java_lang_Character_toString9_3_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1342): warning: variable "hash_code" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1353): warning: variable "hash_code" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1343): warning: variable "hex_string" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1354): warning: variable "hex_string" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(1718): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1733): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1739): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1750): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1800): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1837): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1860): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1876): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2036): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1933): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2102): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1982): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2151): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2043): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2212): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1985): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(2154): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(2193): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2362): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2147): warning: variable "z0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(2316): warning: variable "z0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(2256): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2400): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2294): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2488): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2395): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2403): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(2483): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2560): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2398): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(2583): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(2486): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(2588): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(2599): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2597): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(2660): error: identifier "org_trifort_rootbeer_instanceof_java_lang_Throwable" is undefined
+/home/pcpratts/.rootbeer/generated.cu(2681): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2671): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2716): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2780): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2736): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2783): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(2799): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2845): warning: variable "i46" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(2828): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3071): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(3343): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3080): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(3568): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3187): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3591): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3207): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3571): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(3242): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3595): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3271): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3598): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(3322): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3737): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3515): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3805): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4067): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3944): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4080): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3973): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4147): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4110): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4158): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4207): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4216): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4239): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4441): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4303): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4464): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4777): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4444): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(4321): warning: variable "z0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(4468): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4322): warning: variable "z1" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(4471): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(4833): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4576): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4921): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4625): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4997): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4764): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5014): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4793): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5079): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4936): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5094): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4992): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5083): warning: variable "z0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(5125): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5123): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5212): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5201): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5288): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5219): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5358): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5303): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5407): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5222): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(5422): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5312): warning: variable "l5" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(5411): warning: variable "z0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(5498): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5508): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5531): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5586): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5809): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5872): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5879): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5890): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5894): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5974): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5970): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5893): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(5988): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6085): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6211): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6113): warning: variable "l5" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(6248): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6280): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6252): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6314): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6263): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6385): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6306): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6418): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6377): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6696): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6546): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6711): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6603): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6787): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6753): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6805): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6606): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(7116): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6757): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7153): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6820): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7157): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7233): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7184): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7236): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(7195): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7329): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7238): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7389): warning: variable "i46" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(7254): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7713): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7405): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7764): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7628): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7875): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7778): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7974): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7631): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(8075): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7782): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(8226): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7811): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(8537): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7874): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(8566): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7915): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(8677): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(8101): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(8680): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(8277): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(8879): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(8280): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(8972): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(8318): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(9105): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(8394): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1095): warning: variable "r0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(8925): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1096): warning: variable "r1" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(8469): warning: variable "z0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1097): warning: variable "i0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(8470): warning: variable "z1" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1098): warning: variable "$r2" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(9094): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1101): warning: variable "i" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(9136): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1102): warning: variable "len" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(9517): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1103): warning: variable "characters_copy" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(9544): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1104): warning: variable "ch" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(9622): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1128): warning: variable "characters_src" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(9643): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1286): warning: variable "new_str" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(9672): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1342): warning: variable "hash_code" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(9783): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1343): warning: variable "hex_string" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(9786): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1718): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(9856): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1739): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(9949): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1800): warning: statement is unreachable
 
-2 errors detected in the compilation of "/tmp/tmpxft_000068f8_00000000-12_generated.compute_20.cpp1.ii".
+/home/pcpratts/.rootbeer/generated.cu(1860): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2036): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2102): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2151): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2212): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2154): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2362): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2316): warning: variable "z0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2400): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2488): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2403): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2560): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2583): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2588): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2597): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2681): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2716): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2736): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2799): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2828): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3343): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3568): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3591): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3571): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(3595): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3598): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(3737): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3805): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3944): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3973): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4110): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4207): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4239): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4303): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4777): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4321): warning: variable "z0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(4322): warning: variable "z1" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(4833): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4921): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4997): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5014): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5079): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5094): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5083): warning: variable "z0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(5123): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5201): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5219): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5303): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5222): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(5312): warning: variable "l5" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(5498): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5531): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5809): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5879): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5894): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5970): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5988): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6211): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6248): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6252): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6263): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6306): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6377): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6546): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6603): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6753): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6606): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(6757): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6820): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7233): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7236): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(7329): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7389): warning: variable "i46" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(7713): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7764): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7875): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7974): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8075): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8226): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8537): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8566): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8677): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8680): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(8879): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8972): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(9105): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(1095): warning: variable "r0" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1096): warning: variable "r1" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1097): warning: variable "i0" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1098): warning: variable "$r2" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1101): warning: variable "i" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1102): warning: variable "len" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1103): warning: variable "characters_copy" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1104): warning: variable "ch" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1128): warning: variable "characters_src" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1286): warning: variable "new_str" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1342): warning: variable "hash_code" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1343): warning: variable "hex_string" was declared but never referenced
+
+/home/pcpratts/.rootbeer/generated.cu(1718): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(1739): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(1800): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(1860): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2036): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2102): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2151): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2212): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2154): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2362): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2316): warning: variable "z0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2400): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2488): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2403): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2560): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2583): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2588): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2597): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(2681): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2716): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2736): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2799): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(2828): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3343): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3568): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3591): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3571): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(3595): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3598): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(3737): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3805): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3944): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(3973): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4110): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4207): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4239): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4303): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4777): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4321): warning: variable "z0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(4322): warning: variable "z1" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(4833): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4921): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(4997): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5014): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5079): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5094): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5083): warning: variable "z0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(5123): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5201): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5219): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5303): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5222): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(5312): warning: variable "l5" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(5498): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5531): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5809): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5879): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5894): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5970): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(5988): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6211): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6248): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6252): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6263): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6306): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6377): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6546): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6603): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6753): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6606): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(6757): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(6820): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7233): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7236): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(7329): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7389): warning: variable "i46" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(7713): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7764): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7875): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(7974): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8075): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8226): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8537): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8566): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8677): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8680): warning: variable "r0" was set but never used
+
+/home/pcpratts/.rootbeer/generated.cu(8879): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(8972): warning: statement is unreachable
+
+/home/pcpratts/.rootbeer/generated.cu(9105): warning: statement is unreachable
+
+ptxas fatal   : Unresolved extern function '_Z26java_lang_System_arraycopyiiiiiPi'
 generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.ofcoarse.GpuWorkItem: void gpuMethod()>...
@@ -1038,121 +1412,121 @@ generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.ArraysSortComparatorRunOnGpu: void gpuMethod()>...
 [rtaclassload] callGraphFixedPoint: <org.trifort.rootbeer.testcases.rootbeertest.serialization.ArraysSortComparatorRunOnGpu: void gpuMethod()>
-error creating method body: <java.util.Comparator: int compare(java.lang.Object,java.lang.Object)>
 error creating method body: <java.lang.reflect.Array: java.lang.Object newArray(java.lang.Class,int)>
-error creating method body: <java.lang.String: int compareTo(java.lang.Object)>
-error creating method body: <java.lang.Comparable: int compareTo(java.lang.Object)>
-error creating method body: <java.lang.Double: int compareTo(java.lang.Object)>
-error creating method body: <java.lang.Integer: int compareTo(java.lang.Object)>
-error creating method body: <java.lang.Float: int compareTo(java.lang.Object)>
-error creating method body: <java.lang.Boolean: int compareTo(java.lang.Object)>
-error creating method body: <java.lang.Long: int compareTo(java.lang.Object)>
+error creating method body: <java.lang.Class: java.lang.Class getComponentType()>
+error creating method body: <java.lang.Double: int hashCode()>
 error creating method body: <java.lang.Boolean: int hashCode()>
 error creating method body: <java.lang.Float: int hashCode()>
-error creating method body: <java.lang.Integer: int hashCode()>
-error creating method body: <java.lang.String: int hashCode()>
 error creating method body: <java.lang.Long: int hashCode()>
-error creating method body: <java.lang.Double: int hashCode()>
-error creating method body: <java.lang.Class: java.lang.Class getComponentType()>
+error creating method body: <java.lang.String: int hashCode()>
+error creating method body: <java.lang.Integer: int hashCode()>
+error creating method body: <java.lang.Long: int compareTo(java.lang.Object)>
+error creating method body: <java.lang.Integer: int compareTo(java.lang.Object)>
+error creating method body: <java.lang.String: int compareTo(java.lang.Object)>
+error creating method body: <java.lang.Float: int compareTo(java.lang.Object)>
+error creating method body: <java.lang.Double: int compareTo(java.lang.Object)>
+error creating method body: <java.lang.Comparable: int compareTo(java.lang.Object)>
+error creating method body: <java.lang.Boolean: int compareTo(java.lang.Object)>
+error creating method body: <java.util.Comparator: int compare(java.lang.Object,java.lang.Object)>
 error creating method body: <org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>
 compiling CUDA code for 64bit only...
-/home/pcpratts/.rootbeer/generated.cu(674): warning: variable "r0" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(680): warning: variable "r0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(675): warning: variable "r1" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(681): warning: variable "r1" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(676): warning: variable "i0" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(682): warning: variable "i0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(677): warning: variable "$r2" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(683): warning: variable "$r2" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(680): warning: variable "i" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(686): warning: variable "i" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(681): warning: variable "len" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(687): warning: variable "len" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(682): warning: variable "characters_copy" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(688): warning: variable "characters_copy" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(683): warning: variable "ch" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(689): warning: variable "ch" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(816): warning: variable "new_str" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(822): warning: variable "new_str" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(872): warning: variable "hash_code" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(878): warning: variable "hash_code" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(873): warning: variable "hex_string" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(879): warning: variable "hex_string" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1099): error: identifier "invoke_java_lang_String_compareTo5_20_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1629): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2095): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1970): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(2206): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2124): error: identifier "invoke_java_lang_Long_compareTo5_20_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(2238): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2265): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2264): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2291): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2398): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2425): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2428): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2578): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(2623): error: identifier "invoke_java_lang_String_compareTo5_20_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(2625): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(2994): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(2858): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(3041): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2961): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3045): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(2965): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3220): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(3053): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3323): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3106): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3387): error: identifier "invoke_java_lang_String_compareTo5_20_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(3473): error: identifier "invoke_java_lang_Long_compareTo5_20_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(3584): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3721): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3620): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3775): error: identifier "invoke_java_lang_Long_compareTo5_20_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(3641): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3833): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(3817): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(3866): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4056): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4076): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4167): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4187): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(4718): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(4411): error: identifier "invoke_java_lang_Long_compareTo5_20_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(5296): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5057): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(5461): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(5108): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(5661): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5308): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6254): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5901): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6258): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5922): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6311): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(5926): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6542): error: identifier "invoke_java_lang_String_compareTo5_20_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(6425): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6662): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6593): error: identifier "invoke_java_lang_Long_compareTo5_20_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(6691): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(6931): error: identifier "invoke_java_lang_Long_compareTo5_20_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(6759): error: identifier "invoke_java_lang_String_compareTo5_20_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(7051): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(6879): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7243): error: identifier "invoke_java_lang_Long_compareTo5_20_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(7071): error: identifier "invoke_java_lang_String_compareTo5_20_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(7363): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7402): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7392): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7456): error: identifier "invoke_java_lang_String_compareTo5_20_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(7420): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7514): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7497): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(7591): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(7597): warning: statement is unreachable
 
-7 errors detected in the compilation of "/tmp/tmpxft_000001aa_00000000-12_generated.compute_20.cpp1.ii".
+7 errors detected in the compilation of "/tmp/tmpxft_00006621_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.ArraysSortRunOnGpu: void gpuMethod()>...
@@ -1271,7 +1645,7 @@ compiling CUDA code for 64bit only...
 
 /home/pcpratts/.rootbeer/generated.cu(250): warning: variable "r0" was set but never used
 
-2 errors detected in the compilation of "/tmp/tmpxft_00001b94_00000000-12_generated.compute_20.cpp1.ii".
+2 errors detected in the compilation of "/tmp/tmpxft_00007f09_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.GpuListRunOnGpu: void gpuMethod()>...
@@ -1306,15 +1680,15 @@ compiling CUDA code for 64bit only...
 
 /home/pcpratts/.rootbeer/generated.cu(437): warning: variable "ch" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(615): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(585): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(626): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(596): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(691): error: function "java_io_PrintStream_println0_9_" has already been defined
+/home/pcpratts/.rootbeer/generated.cu(661): error: function "java_io_PrintStream_println0_9_" has already been defined
 
-/home/pcpratts/.rootbeer/generated.cu(735): error: identifier "java_io_PrintStream_newLine0_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(705): error: identifier "java_io_PrintStream_newLine0_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(1075): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(908): warning: statement is unreachable
 
 /home/pcpratts/.rootbeer/generated.cu(1079): warning: statement is unreachable
 
@@ -1324,13 +1698,13 @@ compiling CUDA code for 64bit only...
 
 /home/pcpratts/.rootbeer/generated.cu(1159): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1224): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1183): warning: statement is unreachable
 
 /home/pcpratts/.rootbeer/generated.cu(1271): warning: statement is unreachable
 
 /home/pcpratts/.rootbeer/generated.cu(1238): warning: variable "r0" was set but never used
 
-2 errors detected in the compilation of "/tmp/tmpxft_00001e54_00000000-12_generated.compute_20.cpp1.ii".
+2 errors detected in the compilation of "/tmp/tmpxft_000002ec_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.HashMapRunOnGpu: void gpuMethod()>...
@@ -1338,57 +1712,57 @@ running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.seriali
 error creating method body: <java.util.Map: java.lang.Object put(java.lang.Object,java.lang.Object)>
 error creating method body: <org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>
 compiling CUDA code for 64bit only...
-/home/pcpratts/.rootbeer/generated.cu(525): warning: variable "r0" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(531): warning: variable "r0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(526): warning: variable "r1" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(532): warning: variable "r1" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(527): warning: variable "i0" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(533): warning: variable "i0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(528): warning: variable "$r2" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(534): warning: variable "$r2" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(531): warning: variable "i" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(537): warning: variable "i" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(532): warning: variable "len" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(538): warning: variable "len" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(533): warning: variable "characters_copy" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(539): warning: variable "characters_copy" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(534): warning: variable "ch" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(540): warning: variable "ch" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(667): warning: variable "new_str" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(673): warning: variable "new_str" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(765): warning: variable "hash_code" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(771): warning: variable "hash_code" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(766): warning: variable "hex_string" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(772): warning: variable "hex_string" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1188): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1194): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(1256): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1204): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1408): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1356): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1423): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1371): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1759): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1765): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(1768): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1774): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(1850): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1856): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1885): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1891): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1889): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1895): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1900): error: identifier "java_util_LinkedHashMap$Entry_initab850b60f96d11de8a390800200c9a660_5_20_20_46_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1906): error: identifier "java_util_LinkedHashMap$Entry_initab850b60f96d11de8a390800200c9a660_5_20_20_46_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(1908): error: identifier "instance_setter_java_util_LinkedHashMap_header" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1914): error: identifier "instance_setter_java_util_LinkedHashMap_header" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(1912): error: identifier "instance_getter_java_util_LinkedHashMap_header" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1918): error: identifier "instance_getter_java_util_LinkedHashMap_header" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(1924): error: identifier "instance_setter_java_util_LinkedHashMap$Entry_after" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1930): error: identifier "instance_setter_java_util_LinkedHashMap$Entry_after" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(1928): error: identifier "instance_setter_java_util_LinkedHashMap$Entry_before" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1934): error: identifier "instance_setter_java_util_LinkedHashMap$Entry_before" is undefined
 
-5 errors detected in the compilation of "/tmp/tmpxft_00001e8e_00000000-12_generated.compute_20.cpp1.ii".
+5 errors detected in the compilation of "/tmp/tmpxft_00000329_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.HashSetRunOnGpu: void gpuMethod()>...
@@ -1396,101 +1770,69 @@ running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.seriali
 error creating method body: <java.util.Set: boolean add(java.lang.Object)>
 error creating method body: <org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>
 compiling CUDA code for 64bit only...
-/home/pcpratts/.rootbeer/generated.cu(541): warning: variable "r0" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(547): warning: variable "r0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(542): warning: variable "r1" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(548): warning: variable "r1" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(543): warning: variable "i0" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(549): warning: variable "i0" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(544): warning: variable "$r2" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(550): warning: variable "$r2" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(547): warning: variable "i" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(553): warning: variable "i" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(548): warning: variable "len" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(554): warning: variable "len" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(549): warning: variable "characters_copy" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(555): warning: variable "characters_copy" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(550): warning: variable "ch" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(556): warning: variable "ch" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(683): warning: variable "new_str" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(689): warning: variable "new_str" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(781): warning: variable "hash_code" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(787): warning: variable "hash_code" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(782): warning: variable "hex_string" was declared but never referenced
+/home/pcpratts/.rootbeer/generated.cu(788): warning: variable "hex_string" was declared but never referenced
 
-/home/pcpratts/.rootbeer/generated.cu(1173): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1434): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(1265): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1444): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1280): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1596): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1283): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1630): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1289): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1645): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1294): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1706): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(1536): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1715): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(1713): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1722): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1716): warning: variable "r0" was set but never used
+/home/pcpratts/.rootbeer/generated.cu(1725): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(1726): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1846): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1826): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1881): warning: statement is unreachable
 
-/home/pcpratts/.rootbeer/generated.cu(1880): warning: statement is unreachable
+/home/pcpratts/.rootbeer/generated.cu(1884): warning: variable "r0" was set but never used
 
-/home/pcpratts/.rootbeer/generated.cu(1891): error: identifier "java_util_LinkedHashMap$Entry_initab850b60f96d11de8a390800200c9a660_5_20_20_46_" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1897): error: identifier "java_util_LinkedHashMap$Entry_initab850b60f96d11de8a390800200c9a660_5_20_20_46_" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(1899): error: identifier "instance_setter_java_util_LinkedHashMap_header" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1905): error: identifier "instance_setter_java_util_LinkedHashMap_header" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(1903): error: identifier "instance_getter_java_util_LinkedHashMap_header" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1909): error: identifier "instance_getter_java_util_LinkedHashMap_header" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(1915): error: identifier "instance_setter_java_util_LinkedHashMap$Entry_after" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1921): error: identifier "instance_setter_java_util_LinkedHashMap$Entry_after" is undefined
 
-/home/pcpratts/.rootbeer/generated.cu(1919): error: identifier "instance_setter_java_util_LinkedHashMap$Entry_before" is undefined
+/home/pcpratts/.rootbeer/generated.cu(1925): error: identifier "instance_setter_java_util_LinkedHashMap$Entry_before" is undefined
 
-5 errors detected in the compilation of "/tmp/tmpxft_00001ecb_00000000-12_generated.compute_20.cpp1.ii".
+5 errors detected in the compilation of "/tmp/tmpxft_00000363_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.InstanceofRunOnGpu: void gpuMethod()>...
 [rtaclassload] callGraphFixedPoint: <org.trifort.rootbeer.testcases.rootbeertest.serialization.InstanceofRunOnGpu: void gpuMethod()>
 error creating method body: <org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>
 compiling CUDA code for 64bit only...
-/home/pcpratts/.rootbeer/generated.cu(297): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(310): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(323): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(446): warning: variable "aref1" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(476): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(297): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(310): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(323): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(446): warning: variable "aref1" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(476): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(297): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(310): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(323): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(446): warning: variable "aref1" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(476): warning: statement is unreachable
-
-Error: Internal Compiler Error (codegen): "there was an error in verifying the lgenfe output!"
-
 generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.IntArraysRunOnGpu: void gpuMethod()>...
@@ -1558,65 +1900,14 @@ generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.ObjectToStringRunOnGpu: void gpuMethod()>...
 [rtaclassload] callGraphFixedPoint: <org.trifort.rootbeer.testcases.rootbeertest.serialization.ObjectToStringRunOnGpu: void gpuMethod()>
+error creating method body: <java.lang.Double: int hashCode()>
 error creating method body: <java.lang.Boolean: int hashCode()>
 error creating method body: <java.lang.Float: int hashCode()>
-error creating method body: <java.lang.Integer: int hashCode()>
-error creating method body: <java.lang.String: int hashCode()>
 error creating method body: <java.lang.Long: int hashCode()>
-error creating method body: <java.lang.Double: int hashCode()>
+error creating method body: <java.lang.String: int hashCode()>
+error creating method body: <java.lang.Integer: int hashCode()>
 error creating method body: <org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>
 compiling CUDA code for 64bit only...
-/home/pcpratts/.rootbeer/generated.cu(527): warning: variable "r0" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(528): warning: variable "r1" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(529): warning: variable "i0" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(530): warning: variable "$r2" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(533): warning: variable "i" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(534): warning: variable "len" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(535): warning: variable "characters_copy" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(536): warning: variable "ch" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(932): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(942): error: identifier "invoke_java_math_BigInteger_toString9_" is undefined
-
-/home/pcpratts/.rootbeer/generated.cu(949): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1087): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1076): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1101): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1090): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1115): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1104): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1129): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1118): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1135): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1132): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1149): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1138): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1163): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1152): warning: variable "r0" was set but never used
-
-1 error detected in the compilation of "/tmp/tmpxft_0000304d_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.OuterClass3RunOnGpu: void gpuMethod()>...
@@ -1729,73 +2020,14 @@ generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderRunOnGpu3: void gpuMethod()>...
 [rtaclassload] callGraphFixedPoint: <org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderRunOnGpu3: void gpuMethod()>
+error creating method body: <java.lang.Double: int hashCode()>
 error creating method body: <java.lang.Boolean: int hashCode()>
 error creating method body: <java.lang.Float: int hashCode()>
-error creating method body: <java.lang.Integer: int hashCode()>
-error creating method body: <java.lang.String: int hashCode()>
 error creating method body: <java.lang.Long: int hashCode()>
-error creating method body: <java.lang.Double: int hashCode()>
+error creating method body: <java.lang.String: int hashCode()>
+error creating method body: <java.lang.Integer: int hashCode()>
 error creating method body: <org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>
 compiling CUDA code for 64bit only...
-/home/pcpratts/.rootbeer/generated.cu(507): warning: variable "r0" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(508): warning: variable "r1" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(509): warning: variable "i0" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(510): warning: variable "$r2" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(513): warning: variable "i" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(514): warning: variable "len" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(515): warning: variable "characters_copy" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(516): warning: variable "ch" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(665): warning: variable "new_str" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(825): warning: variable "hash_code" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(826): warning: variable "hex_string" was declared but never referenced
-
-/home/pcpratts/.rootbeer/generated.cu(1223): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1237): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1226): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1247): error: identifier "invoke_java_math_BigInteger_toString9_" is undefined
-
-/home/pcpratts/.rootbeer/generated.cu(1254): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1260): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1257): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1274): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1263): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1307): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1296): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1321): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1310): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1335): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1324): warning: variable "r0" was set but never used
-
-/home/pcpratts/.rootbeer/generated.cu(1470): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1484): warning: statement is unreachable
-
-/home/pcpratts/.rootbeer/generated.cu(1473): warning: variable "r0" was set but never used
-
-1 error detected in the compilation of "/tmp/tmpxft_0000502b_00000000-12_generated.compute_20.cpp1.ii".
 generating serialization bytecode...
 added interface CompiledKernel
 running KernelTransform on: <org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderRunOnGpu4: void gpuMethod()>...
@@ -1879,131 +2111,91 @@ compiling CUDA code for 64bit only...
 generating serialization bytecode...
 added interface CompiledKernel
 writing classes out...
-[TEST 1/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.NewOnGpu@6e57c691
+[TEST 1/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.NewOnGpu@4179782b
   PASSED
   Cpu time: 0 ms
-  Gpu time: 441 ms
-[TEST 2/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.SimpleTest@600dd877
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 283 ms
-[TEST 3/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.LongArrays@1ed0a35c
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 299 ms
-[TEST 4/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ByteArrays@3424b1d9
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 331 ms
-[TEST 5/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ByteArrays@43490745
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 324 ms
-[TEST 6/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.CharArrays@7febfb6d
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 321 ms
-[TEST 7/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ShortArrays@301d3ea2
-  PASSED
-  Cpu time: 1 ms
-  Gpu time: 574 ms
-[TEST 8/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.IntArrays@47167cd4
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 292 ms
-[TEST 9/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest1@2e24b910
-  PASSED
-  Cpu time: 1 ms
-  Gpu time: 294 ms
-[TEST 10/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest2@439c20e0
-  PASSED
-  Cpu time: 1 ms
-  Gpu time: 289 ms
-[TEST 11/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest3@63e87234
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 290 ms
-[TEST 12/88] org.trifort.rootbeer.testcases.rootbeertest.exception.NullPointer4Test@2a1fa3f2
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 288 ms
-[TEST 13/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.MultiArrayTest@6ecdb2d2
-  PASSED
-  Cpu time: 11 ms
-  Gpu time: 455 ms
-[TEST 14/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.OuterClassTest@7c33737e
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 296 ms
-[TEST 15/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.OuterClassTest2@1450d8c2
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 292 ms
-[TEST 16/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.OuterClassTest3@2e4f2f67
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 294 ms
-[TEST 17/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.SameClassUsedTwiceTest1@15b71f21
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 291 ms
-[TEST 18/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.SameClassUsedTwiceTest2@3419e4ec
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 290 ms
-[TEST 19/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.RefTypeArrays@5a5a39f5
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 638 ms
-[TEST 20/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StrictMathTest@4e7f555e
-floor: 3.0 1.2884901888E10
-  FAILED
-  Compare failed at: 0
-[TEST 21/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.NativeStrictMathTest@6b6b9c0d
-  PASSED
-  Cpu time: 1 ms
-  Gpu time: 294 ms
-[TEST 22/88] org.trifort.rootbeer.testcases.rootbeertest.SuperClass@5ae07505
-java.lang.RuntimeException: CUDA code compiled with error
-	at org.trifort.rootbeer.runtime.CUDAContext.buildState(CUDAContext.java:154)
-	at org.trifort.rootbeer.runtime.Rootbeer.run(Rootbeer.java:101)
-	at org.trifort.rootbeer.test.RootbeerTestAgent.test(RootbeerTestAgent.java:196)
-	at org.trifort.rootbeer.test.RootbeerTestAgent.test(RootbeerTestAgent.java:104)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:606)
-	at org.trifort.rootbeer.entry.RootbeerTest.runTestCases(RootbeerTest.java:66)
-	at org.trifort.rootbeer.entry.RootbeerTest.runTests(RootbeerTest.java:48)
-	at org.trifort.rootbeer.entry.Main.run(Main.java:196)
-	at org.trifort.rootbeer.entry.Main.main(Main.java:233)
-  FAILED
-  Exception thrown at index: 0
-[TEST 23/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringTest@1d877148
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 299 ms
-[TEST 24/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.String2Test@6cf91acc
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 293 ms
-[TEST 25/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.StepFilterTest@105b2b1b
-  PASSED
-  Cpu time: 127 ms
-  Gpu time: 811 ms
-[TEST 26/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.GpuListTest@3219a210
-  PASSED
-  Cpu time: 3 ms
-  Gpu time: 320 ms
-[TEST 27/88] org.trifort.rootbeer.testcases.rootbeertest.arraysum.ArraySumTest@80da962
-  PASSED
-  Cpu time: 5 ms
-  Gpu time: 330 ms
-[TEST 28/88] org.trifort.rootbeer.testcases.rootbeertest.remaptest.RemapTest@2eff3e31
+  Gpu time: 469 ms
+[TEST 2/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.SimpleTest@324da9a
   PASSED
   Cpu time: 0 ms
   Gpu time: 287 ms
-[TEST 29/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.InstanceofTest@790de4d6
+[TEST 3/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.LongArrays@2fc6c758
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 292 ms
+[TEST 4/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ByteArrays@35fed777
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 335 ms
+[TEST 5/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ByteArrays@1d583108
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 318 ms
+[TEST 6/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.CharArrays@73c54449
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 303 ms
+[TEST 7/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ShortArrays@4724e456
+  PASSED
+  Cpu time: 1 ms
+  Gpu time: 556 ms
+[TEST 8/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.IntArrays@688b9520
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 287 ms
+[TEST 9/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest1@30198ecc
+  PASSED
+  Cpu time: 1 ms
+  Gpu time: 287 ms
+[TEST 10/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest2@4ee1968d
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 285 ms
+[TEST 11/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.StaticsTest3@34a671e6
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 283 ms
+[TEST 12/88] org.trifort.rootbeer.testcases.rootbeertest.exception.NullPointer4Test@39e24613
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 288 ms
+[TEST 13/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.MultiArrayTest@20d1ae58
+  PASSED
+  Cpu time: 11 ms
+  Gpu time: 441 ms
+[TEST 14/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.OuterClassTest@68256f24
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 292 ms
+[TEST 15/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.OuterClassTest2@563ca886
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 291 ms
+[TEST 16/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.OuterClassTest3@4c718d79
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 290 ms
+[TEST 17/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.SameClassUsedTwiceTest1@697b3caa
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 294 ms
+[TEST 18/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.SameClassUsedTwiceTest2@5a29f954
+  PASSED
+  Cpu time: 1 ms
+  Gpu time: 287 ms
+[TEST 19/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.RefTypeArrays@1794f155
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 630 ms
+[TEST 20/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StrictMathTest@72282cb8
+floor: 3.0 1.2884901888E10
+  FAILED
+  Compare failed at: 0
+[TEST 21/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.NativeStrictMathTest@11f423eb
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 290 ms
+[TEST 22/88] org.trifort.rootbeer.testcases.rootbeertest.SuperClass@19d5690c
 java.lang.RuntimeException: CUDA code compiled with error
 	at org.trifort.rootbeer.runtime.CUDAContext.buildState(CUDAContext.java:154)
 	at org.trifort.rootbeer.runtime.Rootbeer.run(Rootbeer.java:101)
@@ -2019,28 +2211,56 @@ java.lang.RuntimeException: CUDA code compiled with error
 	at org.trifort.rootbeer.entry.Main.main(Main.java:233)
   FAILED
   Exception thrown at index: 0
-[TEST 30/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.DotClassTest@5d01b19b
+[TEST 23/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringTest@5c836743
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 297 ms
+[TEST 24/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.String2Test@769d2085
+  PASSED
+  Cpu time: 1 ms
+  Gpu time: 292 ms
+[TEST 25/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.StepFilterTest@592fc91b
+  PASSED
+  Cpu time: 127 ms
+  Gpu time: 834 ms
+[TEST 26/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.GpuListTest@154c3c18
+  PASSED
+  Cpu time: 3 ms
+  Gpu time: 319 ms
+[TEST 27/88] org.trifort.rootbeer.testcases.rootbeertest.arraysum.ArraySumTest@54db2571
+  PASSED
+  Cpu time: 5 ms
+  Gpu time: 321 ms
+[TEST 28/88] org.trifort.rootbeer.testcases.rootbeertest.remaptest.RemapTest@56da7809
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 284 ms
+[TEST 29/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.InstanceofTest@383a2cab
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 289 ms
+[TEST 30/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.DotClassTest@1be9e3c4
   FAILED
   Compare failed at: 0
-[TEST 31/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.PrintTest@3973dc65
+[TEST 31/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.PrintTest@b1e46c9
 hello world
 hello world
   PASSED
   Cpu time: 0 ms
-  Gpu time: 290 ms
-[TEST 32/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.BarrierTest@5709f718
+  Gpu time: 284 ms
+[TEST 32/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.BarrierTest@5f35617e
   PASSED
-  Cpu time: 0 ms
-  Gpu time: 294 ms
-[TEST 33/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SharedMemSimpleTest@355c1feb
+  Cpu time: 1 ms
+  Gpu time: 289 ms
+[TEST 33/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SharedMemSimpleTest@3fded465
 m_short
   FAILED
   Compare failed at: 0
-[TEST 34/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringConstantTest@4b2e3319
+[TEST 34/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringConstantTest@3eb92314
   PASSED
   Cpu time: 0 ms
-  Gpu time: 294 ms
-[TEST 35/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.AbstractTest@4af2406b
+  Gpu time: 282 ms
+[TEST 35/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.AbstractTest@18a52369
 java.lang.ClassFormatError: Absent Code attribute in method that is not native or abstract in class file org/trifort/rootbeer/testcases/rootbeertest/serialization/AbstractTestBaseClass
 	at java.lang.ClassLoader.defineClass1(Native Method)
 	at java.lang.ClassLoader.defineClass(ClassLoader.java:800)
@@ -2066,193 +2286,177 @@ java.lang.ClassFormatError: Absent Code attribute in method that is not native o
 	at org.trifort.rootbeer.entry.Main.main(Main.java:233)
   FAILED
   Exception thrown at index: 0
-[TEST 36/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.PairHmmJimpleTest@5486528b
+[TEST 36/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.PairHmmJimpleTest@bdc15d
   PASSED
   Cpu time: 0 ms
-  Gpu time: 292 ms
-[TEST 37/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.AutoboxingTest@63effef7
+  Gpu time: 289 ms
+[TEST 37/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.AutoboxingTest@137193d6
   PASSED
   Cpu time: 0 ms
   Gpu time: 286 ms
-[TEST 38/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.Autoboxing2Test@3f04f413
+[TEST 38/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.Autoboxing2Test@437c513c
   PASSED
-  Cpu time: 1 ms
+  Cpu time: 0 ms
   Gpu time: 285 ms
-[TEST 39/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ChangeThreadTest@6c455804
+[TEST 39/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ChangeThreadTest@b5b5526
   PASSED
   Cpu time: 0 ms
   Gpu time: 286 ms
-[TEST 40/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ShiftTest@41a76046
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 286 ms
-[TEST 41/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ArrayLengthTest@4c43498e
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 286 ms
-[TEST 42/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ByteByteValueTest@1a86a5e6
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 294 ms
-[TEST 43/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringArrayTest1@677b3ee4
-  PASSED
-  Cpu time: 49 ms
-  Gpu time: 8064 ms
-[TEST 44/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.CmplInfTest@4bc38754
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 389 ms
-[TEST 45/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.GpuMethodTest@5175b3fb
-  PASSED
-  Cpu time: 1 ms
-  Gpu time: 285 ms
-[TEST 46/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.RegularExpressionTest@6c841e2d
-  FAILED
-  Compare failed at: 0
-[TEST 47/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderTest1@47202183
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 300 ms
-[TEST 48/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderTest2@487c0e32
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 301 ms
-[TEST 49/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.DoubleToStringTest@16153e37
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 298 ms
-[TEST 50/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.FloatToStringTest@1caba5c6
-  PASSED
-  Cpu time: 1 ms
-  Gpu time: 291 ms
-[TEST 51/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ZeroLengthArrayTest@4a4b678a
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 286 ms
-[TEST 52/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ArraysSortTest@657eb10d
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 291 ms
-[TEST 53/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ArrayCloneTest@2ab99275
+[TEST 40/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ShiftTest@932f031
   PASSED
   Cpu time: 0 ms
   Gpu time: 290 ms
-[TEST 54/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringSplitTest@25f9fb0
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 294 ms
-[TEST 55/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringIndexOfTest@34c0573f
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 288 ms
-[TEST 56/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.SubstringTest@3e2b3fcf
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 294 ms
-[TEST 57/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ArraysSortComparatorTest@2b1e9e16
-java.lang.RuntimeException: CUDA code compiled with error
-	at org.trifort.rootbeer.runtime.CUDAContext.buildState(CUDAContext.java:154)
-	at org.trifort.rootbeer.runtime.Rootbeer.run(Rootbeer.java:101)
-	at org.trifort.rootbeer.test.RootbeerTestAgent.test(RootbeerTestAgent.java:196)
-	at org.trifort.rootbeer.test.RootbeerTestAgent.test(RootbeerTestAgent.java:104)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:606)
-	at org.trifort.rootbeer.entry.RootbeerTest.runTestCases(RootbeerTest.java:66)
-	at org.trifort.rootbeer.entry.RootbeerTest.runTests(RootbeerTest.java:48)
-	at org.trifort.rootbeer.entry.Main.run(Main.java:196)
-	at org.trifort.rootbeer.entry.Main.main(Main.java:233)
-  FAILED
-  Exception thrown at index: 0
-[TEST 58/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.IntegerToStringTest@572727ee
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 291 ms
-[TEST 59/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.LongToStringTest@567a28b
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 298 ms
-[TEST 60/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringToIntegerTest@53242250
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 293 ms
-[TEST 61/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringToLongTest@62c5fe1b
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 294 ms
-[TEST 62/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringToFloatTest@74a60d36
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 292 ms
-[TEST 63/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringToDoubleTest@62ce1c27
+[TEST 41/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ArrayLengthTest@1f58d41f
   PASSED
   Cpu time: 0 ms
   Gpu time: 287 ms
-[TEST 64/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ByteToStringTest@51d53f83
-  PASSED
-  Cpu time: 1 ms
-  Gpu time: 289 ms
-[TEST 65/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.CharToStringTest@718777e0
+[TEST 42/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ByteByteValueTest@37aa0267
   PASSED
   Cpu time: 0 ms
-  Gpu time: 296 ms
-[TEST 66/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.BooleanToStringTest@1737b580
+  Gpu time: 287 ms
+[TEST 43/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringArrayTest1@660de5b2
+  PASSED
+  Cpu time: 49 ms
+  Gpu time: 8029 ms
+[TEST 44/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.CmplInfTest@2129f827
   PASSED
   Cpu time: 0 ms
-  Gpu time: 292 ms
-[TEST 67/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ShortToStringTest@15657db8
-  PASSED
-  Cpu time: 1 ms
-  Gpu time: 295 ms
-[TEST 68/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ObjectToStringTest@56b9d7a0
-java.lang.RuntimeException: CUDA code compiled with error
-	at org.trifort.rootbeer.runtime.CUDAContext.buildState(CUDAContext.java:154)
-	at org.trifort.rootbeer.runtime.Rootbeer.run(Rootbeer.java:101)
-	at org.trifort.rootbeer.test.RootbeerTestAgent.test(RootbeerTestAgent.java:196)
-	at org.trifort.rootbeer.test.RootbeerTestAgent.test(RootbeerTestAgent.java:104)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:606)
-	at org.trifort.rootbeer.entry.RootbeerTest.runTestCases(RootbeerTest.java:66)
-	at org.trifort.rootbeer.entry.RootbeerTest.runTests(RootbeerTest.java:48)
-	at org.trifort.rootbeer.entry.Main.run(Main.java:196)
-	at org.trifort.rootbeer.entry.Main.main(Main.java:233)
-  FAILED
-  Exception thrown at index: 0
-[TEST 69/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderTest3@29a72bda
-java.lang.RuntimeException: CUDA code compiled with error
-	at org.trifort.rootbeer.runtime.CUDAContext.buildState(CUDAContext.java:154)
-	at org.trifort.rootbeer.runtime.Rootbeer.run(Rootbeer.java:101)
-	at org.trifort.rootbeer.test.RootbeerTestAgent.test(RootbeerTestAgent.java:196)
-	at org.trifort.rootbeer.test.RootbeerTestAgent.test(RootbeerTestAgent.java:104)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:606)
-	at org.trifort.rootbeer.entry.RootbeerTest.runTestCases(RootbeerTest.java:66)
-	at org.trifort.rootbeer.entry.RootbeerTest.runTests(RootbeerTest.java:48)
-	at org.trifort.rootbeer.entry.Main.run(Main.java:196)
-	at org.trifort.rootbeer.entry.Main.main(Main.java:233)
-  FAILED
-  Exception thrown at index: 0
-[TEST 70/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StaticInitTest@118523b4
+  Gpu time: 378 ms
+[TEST 45/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.GpuMethodTest@30344bbe
   PASSED
   Cpu time: 0 ms
-  Gpu time: 289 ms
-[TEST 71/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.NestedMonitorTest@64ad0d0f
+  Gpu time: 293 ms
+[TEST 46/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.RegularExpressionTest@d8a6484
   FAILED
   Compare failed at: 0
-[TEST 72/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SimpleSynchronizedTest@2b63b85
+[TEST 47/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderTest1@27201473
   PASSED
   Cpu time: 0 ms
-  Gpu time: 324 ms
-[TEST 73/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedMethodTest@39c60626
+  Gpu time: 303 ms
+[TEST 48/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderTest2@718ab8ca
   PASSED
   Cpu time: 0 ms
-  Gpu time: 295 ms
-[TEST 74/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedMethod2Test@48073d62
+  Gpu time: 301 ms
+[TEST 49/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.DoubleToStringTest@184098de
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 288 ms
+[TEST 50/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.FloatToStringTest@598749ce
+  PASSED
+  Cpu time: 1 ms
+  Gpu time: 288 ms
+[TEST 51/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ZeroLengthArrayTest@70c960ee
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 289 ms
+[TEST 52/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ArraysSortTest@34f9e196
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 289 ms
+[TEST 53/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ArrayCloneTest@4a0697ff
+  PASSED
+  Cpu time: 1 ms
+  Gpu time: 282 ms
+[TEST 54/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringSplitTest@cbf97ea
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 291 ms
+[TEST 55/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringIndexOfTest@5c199516
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 284 ms
+[TEST 56/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.SubstringTest@5a2a39ff
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 285 ms
+[TEST 57/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ArraysSortComparatorTest@3b584094
+java.lang.RuntimeException: CUDA code compiled with error
+	at org.trifort.rootbeer.runtime.CUDAContext.buildState(CUDAContext.java:154)
+	at org.trifort.rootbeer.runtime.Rootbeer.run(Rootbeer.java:101)
+	at org.trifort.rootbeer.test.RootbeerTestAgent.test(RootbeerTestAgent.java:196)
+	at org.trifort.rootbeer.test.RootbeerTestAgent.test(RootbeerTestAgent.java:104)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.trifort.rootbeer.entry.RootbeerTest.runTestCases(RootbeerTest.java:66)
+	at org.trifort.rootbeer.entry.RootbeerTest.runTests(RootbeerTest.java:48)
+	at org.trifort.rootbeer.entry.Main.run(Main.java:196)
+	at org.trifort.rootbeer.entry.Main.main(Main.java:233)
+  FAILED
+  Exception thrown at index: 0
+[TEST 58/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.IntegerToStringTest@1667da1
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 288 ms
+[TEST 59/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.LongToStringTest@3f78e14e
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 290 ms
+[TEST 60/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringToIntegerTest@43bfd8e4
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 291 ms
+[TEST 61/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringToLongTest@7c2f769
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 340 ms
+[TEST 62/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringToFloatTest@f48d261
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 288 ms
+[TEST 63/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringToDoubleTest@459b4af5
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 285 ms
+[TEST 64/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ByteToStringTest@1d7b9310
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 286 ms
+[TEST 65/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.CharToStringTest@719c2ead
+  PASSED
+  Cpu time: 1 ms
+  Gpu time: 286 ms
+[TEST 66/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.BooleanToStringTest@73e06944
+  PASSED
+  Cpu time: 1 ms
+  Gpu time: 286 ms
+[TEST 67/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ShortToStringTest@48f7e4d
+  PASSED
+  Cpu time: 1 ms
+  Gpu time: 293 ms
+[TEST 68/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ObjectToStringTest@590df868
+rhs.m_toString1 == null
+  FAILED
+  Compare failed at: 0
+[TEST 69/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderTest3@1ca31d4c
+java.lang.NullPointerException: NPE while running on GPU
+	at org.trifort.rootbeer.runtime.CUDAContext.readBlocksSetup(CUDAContext.java:390)
+	at org.trifort.rootbeer.runtime.CUDAContext.readBlocksList(CUDAContext.java:432)
+	at org.trifort.rootbeer.runtime.CUDAContext$GpuEventHandler.onEvent(CUDAContext.java:317)
+	at org.trifort.rootbeer.runtime.CUDAContext$GpuEventHandler.onEvent(CUDAContext.java:294)
+	at com.lmax.disruptor.BatchEventProcessor.run(BatchEventProcessor.java:128)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+	at java.lang.Thread.run(Thread.java:745)
+  FAILED
+  Exception thrown at index: 0
+[TEST 70/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StaticInitTest@44dce300
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 289 ms
+[TEST 71/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.NestedMonitorTest@1d924a55
+  FAILED
+  Compare failed at: 0
+[TEST 72/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SimpleSynchronizedTest@d0a58ff
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 283 ms
+[TEST 73/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedMethodTest@479ae421
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 287 ms
+[TEST 74/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedMethod2Test@6d16d80
 java.lang.RuntimeException: java.lang.RuntimeException
 	at org.trifort.rootbeer.runtime.CUDAContext.readBlocksSetup(CUDAContext.java:405)
 	at org.trifort.rootbeer.runtime.CUDAContext.readBlocksList(CUDAContext.java:432)
@@ -2269,11 +2473,11 @@ Caused by: java.lang.RuntimeException
 	... 7 more
   FAILED
   Exception thrown at index: 0
-[TEST 75/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedMethod3Test@2ac496fe
+[TEST 75/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedMethod3Test@13905f47
   PASSED
-  Cpu time: 87 ms
+  Cpu time: 88 ms
   Gpu time: 476 ms
-[TEST 76/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedStaticMethodTest@13f52368
+[TEST 76/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedStaticMethodTest@5b4d1c25
 java.lang.RuntimeException: java.lang.RuntimeException
 	at org.trifort.rootbeer.runtime.CUDAContext.readBlocksSetup(CUDAContext.java:405)
 	at org.trifort.rootbeer.runtime.CUDAContext.readBlocksList(CUDAContext.java:432)
@@ -2290,11 +2494,11 @@ Caused by: java.lang.RuntimeException
 	... 7 more
   FAILED
   Exception thrown at index: 0
-[TEST 77/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedObjectTest@c949a1b
+[TEST 77/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedObjectTest@4b34bad7
   PASSED
-  Cpu time: 1 ms
-  Gpu time: 300 ms
-[TEST 78/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ForceArrayNewTest@5723fda0
+  Cpu time: 0 ms
+  Gpu time: 289 ms
+[TEST 78/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.ForceArrayNewTest@7e644c30
 java.lang.RuntimeException: CUDA code compiled with error
 	at org.trifort.rootbeer.runtime.CUDAContext.buildState(CUDAContext.java:154)
 	at org.trifort.rootbeer.runtime.Rootbeer.run(Rootbeer.java:101)
@@ -2310,7 +2514,7 @@ java.lang.RuntimeException: CUDA code compiled with error
 	at org.trifort.rootbeer.entry.Main.main(Main.java:233)
   FAILED
   Exception thrown at index: 0
-[TEST 79/88] org.trifort.rootbeer.testcases.rootbeertest.canonical.CanonicalTest@6108d02a
+[TEST 79/88] org.trifort.rootbeer.testcases.rootbeertest.canonical.CanonicalTest@355730a0
 java.lang.ClassCastException: org.trifort.rootbeer.testcases.rootbeertest.canonical2.CanonicalArrays cannot be cast to org.trifort.rootbeer.testcases.rootbeertest.canonical2.CanonicalObject
 	at org.trifort.rootbeer.testcases.rootbeertest.canonical2.CanonicalObject.org_trifort_readFromHeapRefFields_org_trifort_rootbeer_testcases_rootbeertest_canonical2_CanonicalObject4(Jasmin)
 	at org.trifort.rootbeer.testcases.rootbeertest.canonical.CanonicalKernelSerializer.doReadFromHeap(Jasmin)
@@ -2328,54 +2532,53 @@ java.lang.ClassCastException: org.trifort.rootbeer.testcases.rootbeertest.canoni
 	at java.lang.Thread.run(Thread.java:745)
   FAILED
   Exception thrown at index: 0
-[TEST 80/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderTest4@2e133d50
+[TEST 80/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderTest4@b0ad4d4
 init big_array: double[16500][1000]
 init big_array: double[16500][1000]
   PASSED
   Cpu time: 0 ms
-  Gpu time: 772 ms
-[TEST 81/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.AtomicGlobalsTest@5fd19a9b
+  Gpu time: 771 ms
+[TEST 81/88] org.trifort.rootbeer.testcases.rootbeertest.serialization.AtomicGlobalsTest@58fd1481
   PASSED
   Cpu time: 0 ms
-  Gpu time: 287 ms
-[TEST 82/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ExceptionBasicTest@31fbf699
+  Gpu time: 284 ms
+[TEST 82/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ExceptionBasicTest@15e5651f
   FAILED
   Exception is: java.lang.ClassCastException: java.lang.RuntimeException cannot be cast to java.lang.String
-[TEST 83/88] org.trifort.rootbeer.testcases.rootbeertest.exception.NullPointer1Test@ad5c073
+[TEST 83/88] org.trifort.rootbeer.testcases.rootbeertest.exception.NullPointer1Test@290a6d8a
   PASSED
-[TEST 84/88] org.trifort.rootbeer.testcases.rootbeertest.exception.NullPointer2Test@4c54408b
+[TEST 84/88] org.trifort.rootbeer.testcases.rootbeertest.exception.NullPointer2Test@7f18e80d
   PASSED
-[TEST 85/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ChangeThreadTest@331c3788
+[TEST 85/88] org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ChangeThreadTest@2e18a85e
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 286 ms
+[TEST 86/88] org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.DoubleToStringKernelTemplateTest@6e168dc6
+  PASSED
+  Cpu time: 0 ms
+  Gpu time: 288 ms
+[TEST 87/88] org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.DoubleToStringKernelTemplateBuilderTest@281717fa
   PASSED
   Cpu time: 0 ms
   Gpu time: 289 ms
-[TEST 86/88] org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.DoubleToStringKernelTemplateTest@31100f45
+[TEST 88/88] org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.GpuParametersTest@3d1a0d0f
   PASSED
-  Cpu time: 0 ms
-  Gpu time: 297 ms
-[TEST 87/88] org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.DoubleToStringKernelTemplateBuilderTest@6f2ccb3f
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 296 ms
-[TEST 88/88] org.trifort.rootbeer.testcases.rootbeertest.kerneltemplate.GpuParametersTest@7c1ad580
-  PASSED
-  Cpu time: 0 ms
-  Gpu time: 289 ms
-72/88 tests PASS
+  Cpu time: 1 ms
+  Gpu time: 290 ms
+73/88 tests PASS
 Failing tests:
-  org.trifort.rootbeer.testcases.rootbeertest.serialization.StrictMathTest@4e7f555e
-  org.trifort.rootbeer.testcases.rootbeertest.SuperClass@5ae07505
-  org.trifort.rootbeer.testcases.rootbeertest.serialization.InstanceofTest@790de4d6
-  org.trifort.rootbeer.testcases.rootbeertest.gpurequired.DotClassTest@5d01b19b
-  org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SharedMemSimpleTest@355c1feb
-  org.trifort.rootbeer.testcases.rootbeertest.serialization.AbstractTest@4af2406b
-  org.trifort.rootbeer.testcases.rootbeertest.serialization.RegularExpressionTest@6c841e2d
-  org.trifort.rootbeer.testcases.rootbeertest.serialization.ArraysSortComparatorTest@2b1e9e16
-  org.trifort.rootbeer.testcases.rootbeertest.serialization.ObjectToStringTest@56b9d7a0
-  org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderTest3@29a72bda
-  org.trifort.rootbeer.testcases.rootbeertest.serialization.NestedMonitorTest@64ad0d0f
-  org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedMethod2Test@48073d62
-  org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedStaticMethodTest@13f52368
-  org.trifort.rootbeer.testcases.rootbeertest.serialization.ForceArrayNewTest@5723fda0
-  org.trifort.rootbeer.testcases.rootbeertest.canonical.CanonicalTest@6108d02a
-  org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ExceptionBasicTest@31fbf699
+  org.trifort.rootbeer.testcases.rootbeertest.serialization.StrictMathTest@72282cb8
+  org.trifort.rootbeer.testcases.rootbeertest.SuperClass@19d5690c
+  org.trifort.rootbeer.testcases.rootbeertest.gpurequired.DotClassTest@1be9e3c4
+  org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SharedMemSimpleTest@3fded465
+  org.trifort.rootbeer.testcases.rootbeertest.serialization.AbstractTest@18a52369
+  org.trifort.rootbeer.testcases.rootbeertest.serialization.RegularExpressionTest@d8a6484
+  org.trifort.rootbeer.testcases.rootbeertest.serialization.ArraysSortComparatorTest@3b584094
+  org.trifort.rootbeer.testcases.rootbeertest.serialization.ObjectToStringTest@590df868
+  org.trifort.rootbeer.testcases.rootbeertest.serialization.StringBuilderTest3@1ca31d4c
+  org.trifort.rootbeer.testcases.rootbeertest.serialization.NestedMonitorTest@1d924a55
+  org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedMethod2Test@6d16d80
+  org.trifort.rootbeer.testcases.rootbeertest.gpurequired.SynchronizedStaticMethodTest@5b4d1c25
+  org.trifort.rootbeer.testcases.rootbeertest.serialization.ForceArrayNewTest@7e644c30
+  org.trifort.rootbeer.testcases.rootbeertest.canonical.CanonicalTest@355730a0
+  org.trifort.rootbeer.testcases.rootbeertest.gpurequired.ExceptionBasicTest@15e5651f
