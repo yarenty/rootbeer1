@@ -28,6 +28,12 @@ $$__device__$$ int org_trifort_gc_malloc_no_fail(int size);
 $$__device__$$ int org_trifort_classConstant(int type_num);
 $$__device__$$ long long java_lang_System_nanoTime(int * exception);
 
+$$__device__$$ int java_lang_Double_toString9_8_(double double_val, int * exception);
+$$__device__$$ int java_lang_Float_toString9_7_(float float_val, int * exception);
+$$__device__$$ int at_illecker_long_to_string(long long value, int max, int base, int * exception);
+$$__device__$$ int java_lang_Long_toString9_6_(long long long_val, int * exception);
+$$__device__$$ int java_lang_Integer_toString9_5_(int int_val, int * exception);
+
 #define CACHE_SIZE_BYTES 32
 #define CACHE_SIZE_INTS (CACHE_SIZE_BYTES / sizeof(int))
 #define CACHE_ENTRY_SIZE 4
