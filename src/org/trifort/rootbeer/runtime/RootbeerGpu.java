@@ -13,7 +13,7 @@ import java.util.TreeMap;
 public class RootbeerGpu {
 
   private static boolean m_isOnGpu;
-  private static byte[] m_sharedMem;
+  private static short[] m_sharedMem;
   private static int m_blockIdxx;
   private static int m_threadIdxx;
   private static int m_threadId;
@@ -24,7 +24,7 @@ public class RootbeerGpu {
   
   static {
     m_isOnGpu = false;
-    m_sharedMem = new byte[48*1024];
+    m_sharedMem = new short[48*1024];
     m_sharedArrayMap = new TreeMap<Integer, Object>();
   }
   
@@ -103,7 +103,7 @@ public class RootbeerGpu {
   }
   
   public static byte getSharedByte(int index){
-    return m_sharedMem[index];
+    return (byte) m_sharedMem[index];
   }
   
   public static void setSharedByte(int index, byte value){
@@ -112,14 +112,14 @@ public class RootbeerGpu {
   
   public static char getSharedChar(int index){
     char ret = 0;
-    ret |= m_sharedMem[index] & 0xff;
-    ret |= (m_sharedMem[index + 1] << 8) & 0xff00;
+    ret |= m_sharedMem[index];
+    ret |= (m_sharedMem[index + 1] << 8);
     return ret;
   }
   
   public static void setSharedChar(int index, char value){ 
-    m_sharedMem[index] = (byte) (value & 0xff);
-    m_sharedMem[index + 1] = (byte) ((value >> 8) & 0xff);
+    m_sharedMem[index] = (short) (value & 0xff);
+    m_sharedMem[index + 1] = (short) ((value >> 8) & 0xff);
   }
   
   public static boolean getSharedBoolean(int index){
@@ -142,54 +142,54 @@ public class RootbeerGpu {
   
   public static short getSharedShort(int index){
     short ret = 0;
-    ret |= m_sharedMem[index] & 0xff;
-    ret |= (m_sharedMem[index + 1] << 8) & 0xff00;
+    ret |= m_sharedMem[index];
+    ret |= (m_sharedMem[index + 1] << 8);
     return ret;
   }
   
   public static void setSharedShort(int index, short value){
-    m_sharedMem[index] = (byte) (value & 0xff);
-    m_sharedMem[index + 1] = (byte) ((value >> 8) & 0xff);
+    m_sharedMem[index] = (short) (value & 0xff);
+    m_sharedMem[index + 1] = (short) ((value >> 8) & 0xff);
   }
   
   public static int getSharedInteger(int index){
     int ret = 0;
-    ret |= m_sharedMem[index] & 0x000000ff;
-    ret |= (m_sharedMem[index + 1] <<  8) & 0x0000ff00;
-    ret |= (m_sharedMem[index + 2] << 16) & 0x00ff0000;
-    ret |= (m_sharedMem[index + 3] << 24) & 0xff000000;
+    ret |= m_sharedMem[index];
+    ret |= (m_sharedMem[index + 1] <<  8);
+    ret |= (m_sharedMem[index + 2] << 16);
+    ret |= (m_sharedMem[index + 3] << 24);
     return ret;  
   }
   
   public static void setSharedInteger(int index, int value){
-    m_sharedMem[index] = (byte) (value & 0xff);
-    m_sharedMem[index + 1] = (byte) ((value >> 8)  & 0xff);
-    m_sharedMem[index + 2] = (byte) ((value >> 16) & 0xff);
-    m_sharedMem[index + 3] = (byte) ((value >> 24) & 0xff);
+    m_sharedMem[index] = (short) (value & 0xff);
+    m_sharedMem[index + 1] = (short) ((value >> 8)  & 0xff);
+    m_sharedMem[index + 2] = (short) ((value >> 16) & 0xff);
+    m_sharedMem[index + 3] = (short) ((value >> 24) & 0xff);
   }
   
   public static long getSharedLong(int index){
     long ret = 0;
-    ret |=  (long) m_sharedMem[index]            & 0x00000000000000ffL;
-    ret |= ((long) m_sharedMem[index + 1] <<  8) & 0x000000000000ff00L;
-    ret |= ((long) m_sharedMem[index + 2] << 16) & 0x0000000000ff0000L;
-    ret |= ((long) m_sharedMem[index + 3] << 24) & 0x00000000ff000000L;
-    ret |= ((long) m_sharedMem[index + 4] << 32) & 0x000000ff00000000L;
-    ret |= ((long) m_sharedMem[index + 5] << 40) & 0x0000ff0000000000L;
-    ret |= ((long) m_sharedMem[index + 6] << 48) & 0x00ff000000000000L;
-    ret |= ((long) m_sharedMem[index + 7] << 56) & 0xff00000000000000L;
+    ret |=  ((long) m_sharedMem[index]);
+    ret |= (((long) m_sharedMem[index + 1]) <<  8);
+    ret |= (((long) m_sharedMem[index + 2]) << 16);
+    ret |= (((long) m_sharedMem[index + 3]) << 24);
+    ret |= (((long) m_sharedMem[index + 4]) << 32);
+    ret |= (((long) m_sharedMem[index + 5]) << 40);
+    ret |= (((long) m_sharedMem[index + 6]) << 48);
+    ret |= (((long) m_sharedMem[index + 7]) << 56);
     return ret;    
   }
   
   public static void setSharedLong(int index, long value){
-    m_sharedMem[index] = (byte) (value & 0xff);
-    m_sharedMem[index + 1] = (byte) ((value >> 8)  & 0xff);
-    m_sharedMem[index + 2] = (byte) ((value >> 16) & 0xff);
-    m_sharedMem[index + 3] = (byte) ((value >> 24) & 0xff);
-    m_sharedMem[index + 4] = (byte) ((value >> 32) & 0xff);
-    m_sharedMem[index + 5] = (byte) ((value >> 40) & 0xff);
-    m_sharedMem[index + 6] = (byte) ((value >> 48) & 0xff);
-    m_sharedMem[index + 7] = (byte) ((value >> 56) & 0xff);
+    m_sharedMem[index] = (short) (value & 0xff);
+    m_sharedMem[index + 1] = (short) ((value >> 8)  & 0xff);
+    m_sharedMem[index + 2] = (short) ((value >> 16) & 0xff);
+    m_sharedMem[index + 3] = (short) ((value >> 24) & 0xff);
+    m_sharedMem[index + 4] = (short) ((value >> 32) & 0xff);
+    m_sharedMem[index + 5] = (short) ((value >> 40) & 0xff);
+    m_sharedMem[index + 6] = (short) ((value >> 48) & 0xff);
+    m_sharedMem[index + 7] = (short) ((value >> 56) & 0xff);
   }
   
   public static float getSharedFloat(int index){

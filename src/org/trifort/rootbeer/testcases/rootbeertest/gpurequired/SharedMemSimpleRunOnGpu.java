@@ -22,25 +22,29 @@ public class SharedMemSimpleRunOnGpu implements Kernel {
   private double m_double;
   
   public void gpuMethod() {
+    /*
     RootbeerGpu.setSharedBoolean(0, true);
-    RootbeerGpu.setSharedByte(1, (byte) 2);
-    RootbeerGpu.setSharedChar(2, (char) 3);
-    RootbeerGpu.setSharedShort(4, (short) 4);
-    RootbeerGpu.setSharedInteger(6, 5);
-    RootbeerGpu.setSharedLong(10, 6);
-    RootbeerGpu.setSharedFloat(18, 7.1f);
-    RootbeerGpu.setSharedDouble(22, 8.2);
+    RootbeerGpu.setSharedByte(16, (byte) 2);
+    RootbeerGpu.setSharedChar(32, (char) 3);
+    RootbeerGpu.setSharedShort(48, (short) 4);
+    RootbeerGpu.setSharedInteger(64, 5);
+    RootbeerGpu.setSharedLong(80, 6);
+    RootbeerGpu.setSharedFloat(96, 7.1f);
+    */
+    RootbeerGpu.setSharedDouble(112, 8.2);
     
     RootbeerGpu.syncthreads();
     
+    /*
     m_boolean = RootbeerGpu.getSharedBoolean(0);
-    m_byte = RootbeerGpu.getSharedByte(1);
-    m_char = RootbeerGpu.getSharedChar(2);
-    m_short = RootbeerGpu.getSharedShort(4);
-    m_integer = RootbeerGpu.getSharedInteger(6);
-    m_long = RootbeerGpu.getSharedLong(10);
-    m_float = RootbeerGpu.getSharedFloat(18);
-    m_double = RootbeerGpu.getSharedDouble(22);
+    m_byte = RootbeerGpu.getSharedByte(16);
+    m_char = RootbeerGpu.getSharedChar(32);
+    m_short = RootbeerGpu.getSharedShort(48);
+    m_integer = RootbeerGpu.getSharedInteger(64);
+    m_long = RootbeerGpu.getSharedLong(80);
+    m_float = RootbeerGpu.getSharedFloat(96);
+    */
+    m_double = RootbeerGpu.getSharedDouble(112);
   }
 
   private String floatToString(float value){
@@ -103,8 +107,6 @@ public class SharedMemSimpleRunOnGpu implements Kernel {
       System.out.println("org: "+longToString(6));
       System.out.println("lhs: "+longToString(m_long));
       System.out.println("rhs: "+longToString(rhs.m_long));
-      System.out.println("  rhs byte 0: "+byteToString(RootbeerGpu.getSharedByte(10)));
-      System.out.println("  rhs byte 7: "+byteToString(RootbeerGpu.getSharedByte(17)));
       return false;
     }
     if(m_float != rhs.m_float){
@@ -118,15 +120,9 @@ public class SharedMemSimpleRunOnGpu implements Kernel {
       System.out.println("m_double");
       System.out.println("org: "+doubleToString(8.2));
       System.out.println("lhs: "+doubleToString(m_double));
-      System.out.println("  lhs byte 0: "+byteToString(RootbeerGpu.getSharedByte(22)));
-      System.out.println("  lhs byte 1: "+byteToString(RootbeerGpu.getSharedByte(22+1)));
-      System.out.println("  lhs byte 2: "+byteToString(RootbeerGpu.getSharedByte(22+2)));
-      System.out.println("  lhs byte 3: "+byteToString(RootbeerGpu.getSharedByte(22+3)));
-      System.out.println("  lhs byte 4: "+byteToString(RootbeerGpu.getSharedByte(22+4)));
-      System.out.println("  lhs byte 5: "+byteToString(RootbeerGpu.getSharedByte(22+5)));
-      System.out.println("  lhs byte 6: "+byteToString(RootbeerGpu.getSharedByte(22+6)));
-      System.out.println("  lhs byte 7: "+byteToString(RootbeerGpu.getSharedByte(22+7)));
       System.out.println("rhs: "+doubleToString(rhs.m_double));
+      System.out.println("bits: "+Double.doubleToLongBits(8.2));
+      System.out.println("lhs double: "+m_double);
       return false;
     }
     return true;

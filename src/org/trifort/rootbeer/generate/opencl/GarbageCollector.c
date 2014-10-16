@@ -775,12 +775,12 @@ void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedFloat(int index, float va
 $$__device__$$
 double org_trifort_rootbeer_runtime_RootbeerGpu_getSharedDouble(int index, int * exception){
   long long long_value = org_trifort_rootbeer_runtime_RootbeerGpu_getSharedLong(index, exception);
-  return *((double *) &long_value);
+  return __longlong_as_double(long_value);
 }
 
 $$__device__$$
 void org_trifort_rootbeer_runtime_RootbeerGpu_setSharedDouble(int index, double value, int * exception){
-  long long long_value = *((long long *) &value);
+  long long long_value = __double_as_longlong(value);
   org_trifort_rootbeer_runtime_RootbeerGpu_setSharedLong(index, long_value, exception);
 }
 
