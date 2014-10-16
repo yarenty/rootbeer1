@@ -1613,7 +1613,102 @@ int java_lang_StringBuilder_toString9_(int thisref,
   return org_trifort_rootbeer_string_from_chars(new_chars, exception);
 }
 
-//<java.lang.Integer: java.lang.Integer <init>(int)>
+$$__device__$$
+int java_lang_Boolean_initab850b60f96d11de8a390800200c9a66(
+  bool value, int * exception){
+  int thisref;
+  char * thisref_deref;
+
+  thisref = -1;
+  thisref = org_trifort_gc_malloc(48);
+  if ( thisref ==-1 ) { 
+    * exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
+    return-1 ; 
+  }
+  thisref_deref = org_trifort_gc_deref(thisref);
+  org_trifort_gc_set_count(thisref_deref, 0);
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY);
+  org_trifort_gc_set_type(thisref_deref, %%java_lang_Boolean_TypeNumber%%);
+  org_trifort_gc_set_ctor_used(thisref_deref, 1);
+  org_trifort_gc_set_size(thisref_deref, 48);
+  org_trifort_gc_init_monitor(thisref_deref);
+
+  instance_setter_java_lang_Boolean_value(thisref, value, exception);
+  return thisref;
+}
+
+$$__device__$$
+int java_lang_Byte_initab850b60f96d11de8a390800200c9a66(
+  char value, int * exception){
+  int thisref;
+  char * thisref_deref;
+
+  thisref = -1;
+  thisref = org_trifort_gc_malloc(48);
+  if ( thisref ==-1 ) { 
+    * exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
+    return-1 ; 
+  }
+  thisref_deref = org_trifort_gc_deref(thisref);
+  org_trifort_gc_set_count(thisref_deref, 0);
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY);
+  org_trifort_gc_set_type(thisref_deref, %%java_lang_Byte_TypeNumber%%);
+  org_trifort_gc_set_ctor_used(thisref_deref, 1);
+  org_trifort_gc_set_size(thisref_deref, 48);
+  org_trifort_gc_init_monitor(thisref_deref);
+
+  instance_setter_java_lang_Byte_value(thisref, value, exception);
+  return thisref;
+}
+
+$$__device__$$
+int java_lang_Character_initab850b60f96d11de8a390800200c9a66(
+  char value, int * exception){
+  int thisref;
+  char * thisref_deref;
+
+  thisref = -1;
+  thisref = org_trifort_gc_malloc(48);
+  if ( thisref ==-1 ) { 
+    * exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
+    return-1 ; 
+  }
+  thisref_deref = org_trifort_gc_deref(thisref);
+  org_trifort_gc_set_count(thisref_deref, 0);
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY);
+  org_trifort_gc_set_type(thisref_deref, %%java_lang_Character_TypeNumber%%);
+  org_trifort_gc_set_ctor_used(thisref_deref, 1);
+  org_trifort_gc_set_size(thisref_deref, 48);
+  org_trifort_gc_init_monitor(thisref_deref);
+
+  instance_setter_java_lang_Character_value(thisref, value, exception);
+  return thisref;
+}
+
+$$__device__$$
+int java_lang_Short_initab850b60f96d11de8a390800200c9a66(
+  short value, int * exception){
+  int thisref;
+  char * thisref_deref;
+
+  thisref = -1;
+  thisref = org_trifort_gc_malloc(48);
+  if ( thisref ==-1 ) { 
+    * exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
+    return-1 ; 
+  }
+  thisref_deref = org_trifort_gc_deref(thisref);
+  org_trifort_gc_set_count(thisref_deref, 0);
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY);
+  org_trifort_gc_set_type(thisref_deref, %%java_lang_Short_TypeNumber%%);
+  org_trifort_gc_set_ctor_used(thisref_deref, 1);
+  org_trifort_gc_set_size(thisref_deref, 48);
+  org_trifort_gc_init_monitor(thisref_deref);
+
+  instance_setter_java_lang_Short_value(thisref, value, exception);
+  return thisref;
+}
+
 $$__device__$$
 int java_lang_Integer_initab850b60f96d11de8a390800200c9a66(
   int int_value, int * exception){
@@ -1638,7 +1733,137 @@ int java_lang_Integer_initab850b60f96d11de8a390800200c9a66(
   return thisref;
 }
 
-//<java.lang.Integer: java.lang.Integer valueOf(int)>
+$$__device__$$
+int java_lang_Long_initab850b60f96d11de8a390800200c9a66(
+  long long value, int * exception){
+  int thisref;
+  char * thisref_deref;
+
+  thisref = -1;
+  thisref = org_trifort_gc_malloc(64);
+  if ( thisref ==-1 ) { 
+    * exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
+    return-1 ; 
+  }
+  thisref_deref = org_trifort_gc_deref(thisref);
+  org_trifort_gc_set_count(thisref_deref, 0);
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY);
+  org_trifort_gc_set_type(thisref_deref, %%java_lang_Long_TypeNumber%%);
+  org_trifort_gc_set_ctor_used(thisref_deref, 1);
+  org_trifort_gc_set_size(thisref_deref, 64);
+  org_trifort_gc_init_monitor(thisref_deref);
+
+  instance_setter_java_lang_Long_value(thisref, value, exception);
+  return thisref;
+}
+
+$$__device__$$
+int java_lang_Float_initab850b60f96d11de8a390800200c9a66(
+  float value, int * exception){
+  int thisref;
+  char * thisref_deref;
+
+  thisref = -1;
+  thisref = org_trifort_gc_malloc(48);
+  if ( thisref ==-1 ) { 
+    * exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
+    return-1 ; 
+  }
+  thisref_deref = org_trifort_gc_deref(thisref);
+  org_trifort_gc_set_count(thisref_deref, 0);
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY);
+  org_trifort_gc_set_type(thisref_deref, %%java_lang_Float_TypeNumber%%);
+  org_trifort_gc_set_ctor_used(thisref_deref, 1);
+  org_trifort_gc_set_size(thisref_deref, 48);
+  org_trifort_gc_init_monitor(thisref_deref);
+
+  instance_setter_java_lang_Float_value(thisref, value, exception);
+  return thisref;
+}
+
+$$__device__$$
+int java_lang_Double_initab850b60f96d11de8a390800200c9a66(
+  double value, int * exception){
+  int thisref;
+  char * thisref_deref;
+
+  thisref = -1;
+  thisref = org_trifort_gc_malloc(64);
+  if ( thisref ==-1 ) { 
+    * exception = %%java_lang_OutOfMemoryError_TypeNumber%%; 
+    return-1 ; 
+  }
+  thisref_deref = org_trifort_gc_deref(thisref);
+  org_trifort_gc_set_count(thisref_deref, 0);
+  org_trifort_gc_set_color(thisref_deref, COLOR_GREY);
+  org_trifort_gc_set_type(thisref_deref, %%java_lang_Double_TypeNumber%%);
+  org_trifort_gc_set_ctor_used(thisref_deref, 1);
+  org_trifort_gc_set_size(thisref_deref, 64);
+  org_trifort_gc_init_monitor(thisref_deref);
+
+  instance_setter_java_lang_Double_value(thisref, value, exception);
+  return thisref;
+}
+$$__device__$$
+int java_lang_Boolean_valueOf(bool bool_value, int * exception) {
+  int return_obj = -1;
+  
+  org_trifort_gc_assign(
+    &return_obj, java_lang_Boolean_initab850b60f96d11de8a390800200c9a66(
+    bool_value, exception));
+  
+  if(*exception != 0) {
+    return 0; 
+  }
+
+  return return_obj;
+}
+
+$$__device__$$
+int java_lang_Byte_valueOf(char byte_value, int * exception) {
+  int return_obj = -1;
+  
+  org_trifort_gc_assign(
+    &return_obj, java_lang_Byte_initab850b60f96d11de8a390800200c9a66(
+    byte_value, exception));
+  
+  if(*exception != 0) {
+    return 0; 
+  }
+
+  return return_obj;
+}
+
+$$__device__$$
+int java_lang_Character_valueOf(char char_value, int * exception) {
+  int return_obj = -1;
+  
+  org_trifort_gc_assign(
+    &return_obj, java_lang_Character_initab850b60f96d11de8a390800200c9a66(
+    char_value, exception));
+  
+  if(*exception != 0) {
+    return 0; 
+  }
+
+  return return_obj;
+}
+
+$$__device__$$
+int java_lang_Short_valueOf(short short_value, int * exception) {
+  int return_obj = -1;
+  
+  org_trifort_gc_assign(
+    &return_obj, java_lang_Short_initab850b60f96d11de8a390800200c9a66(
+    short_value, exception));
+  
+  if(*exception != 0) {
+    return 0; 
+  }
+
+  return return_obj;
+}
+
 $$__device__$$
 int java_lang_Integer_valueOf(int int_value, int * exception) {
   int return_obj = -1;
@@ -1646,6 +1871,51 @@ int java_lang_Integer_valueOf(int int_value, int * exception) {
   org_trifort_gc_assign(
     &return_obj, java_lang_Integer_initab850b60f96d11de8a390800200c9a66(
     int_value, exception));
+  
+  if(*exception != 0) {
+    return 0; 
+  }
+
+  return return_obj;
+}
+
+$$__device__$$
+int java_lang_Long_valueOf(long long_value, int * exception) {
+  int return_obj = -1;
+  
+  org_trifort_gc_assign(
+    &return_obj, java_lang_Long_initab850b60f96d11de8a390800200c9a66(
+    long_value, exception));
+  
+  if(*exception != 0) {
+    return 0; 
+  }
+
+  return return_obj;
+}
+
+$$__device__$$
+int java_lang_Float_valueOf(float float_value, int * exception) {
+  int return_obj = -1;
+  
+  org_trifort_gc_assign(
+    &return_obj, java_lang_Float_initab850b60f96d11de8a390800200c9a66(
+    float_value, exception));
+  
+  if(*exception != 0) {
+    return 0; 
+  }
+
+  return return_obj;
+}
+
+$$__device__$$
+int java_lang_Double_valueOf(double double_value, int * exception) {
+  int return_obj = -1;
+  
+  org_trifort_gc_assign(
+    &return_obj, java_lang_Double_initab850b60f96d11de8a390800200c9a66(
+    double_value, exception));
   
   if(*exception != 0) {
     return 0; 

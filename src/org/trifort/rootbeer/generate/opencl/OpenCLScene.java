@@ -383,11 +383,15 @@ public class OpenCLScene {
     replaceTypeNumber("java.lang.NullPointerException", "%%java_lang_NullPointerException_TypeNumber%%");
     replaceTypeNumber("java.lang.OutOfMemoryError", "%%java_lang_OutOfMemoryError_TypeNumber%%");
     replaceTypeNumber("java.lang.String", "%%java_lang_String_TypeNumber%%");
+
+    replaceTypeNumber("java.lang.Boolean", "%%java_lang_Boolean_TypeNumber%%");
+    replaceTypeNumber("java.lang.Byte", "%%java_lang_Byte_TypeNumber%%");
+    replaceTypeNumber("java.lang.Character", "%%java_lang_Character_TypeNumber%%");
+    replaceTypeNumber("java.lang.Short", "%%java_lang_Short_TypeNumber%%");
     replaceTypeNumber("java.lang.Integer", "%%java_lang_Integer_TypeNumber%%");
     replaceTypeNumber("java.lang.Long", "%%java_lang_Long_TypeNumber%%");
     replaceTypeNumber("java.lang.Float", "%%java_lang_Float_TypeNumber%%");
     replaceTypeNumber("java.lang.Double", "%%java_lang_Double_TypeNumber%%");
-    replaceTypeNumber("java.lang.Boolean", "%%java_lang_Boolean_TypeNumber%%");
     
     int size = Configuration.compilerInstance().getSharedMemSize();
     String size_str = ""+size;

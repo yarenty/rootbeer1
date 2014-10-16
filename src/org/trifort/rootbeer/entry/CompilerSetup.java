@@ -127,7 +127,6 @@ public class CompilerSetup {
     ret.add("<java.lang.String: int indexOf(java.lang.String,int)>");  
     ret.add("<java.lang.String: java.lang.String[] split(java.lang.String)>");
     ret.add("<java.lang.String: java.lang.String[] split(java.lang.String,int)>");
-    ret.add("<java.lang.String: java.lang.String valueOf(java.lang.Object)>");
 
     ret.add("<java.io.PrintStream: void println()>");
     ret.add("<java.io.PrintStream: void println(java.lang.String)>");
@@ -161,8 +160,6 @@ public class CompilerSetup {
     ret.add("<java.lang.Integer: java.lang.String toString(int)>");
     ret.add("<java.lang.Long: java.lang.String toString(long)>");
 
-    ret.add("<java.lang.Integer: void <init>(int)>");
-    ret.add("<java.lang.Integer: java.lang.Integer valueOf(int)>");
     ret.add("<java.lang.Integer: int parseInt(java.lang.String)>");
     ret.add("<java.lang.Long: long parseLong(java.lang.String)>");
     ret.add("<java.lang.Float: float parseFloat(java.lang.String)>");
@@ -170,6 +167,24 @@ public class CompilerSetup {
 
     ret.add("<java.lang.StringBuilder: java.lang.StringBuilder append(double)>");
     ret.add("<java.lang.StringBuilder: java.lang.StringBuilder append(float)>");
+
+    ret.add("<java.lang.Boolean: void <init>(boolean)>");
+    ret.add("<java.lang.Byte: void <init>(byte)>");
+    ret.add("<java.lang.Character: void <init>(char)>");
+    ret.add("<java.lang.Short: void <init>(short)>");
+    ret.add("<java.lang.Integer: void <init>(int)>");
+    ret.add("<java.lang.Long: void <init>(long)>");
+    ret.add("<java.lang.Float: void <init>(float)>");
+    ret.add("<java.lang.Double: void <init>(double)>");
+    
+    ret.add("<java.lang.Boolean: java.lang.Boolean valueOf(boolean)>");
+    ret.add("<java.lang.Byte: java.lang.Byte valueOf(byte)>");
+    ret.add("<java.lang.Character: java.lang.Character valueOf(char)>");
+    ret.add("<java.lang.Short: java.lang.Short valueOf(short)>");
+    ret.add("<java.lang.Integer: java.lang.Integer valueOf(int)>");
+    ret.add("<java.lang.Long: java.lang.Long valueOf(long)>");
+    ret.add("<java.lang.Float: java.lang.Float valueOf(float)>");
+    ret.add("<java.lang.Double: java.lang.Double valueOf(double)>");
     
     return ret;
   }
@@ -282,21 +297,36 @@ public class CompilerSetup {
     ret.add("<java.lang.Object: java.lang.Class getClass()>");
     ret.add("<java.lang.StringValue: char[] 'from'(char[])>");
     ret.add("<java.util.Arrays: java.lang.Object[] copyOf(java.lang.Object[],int)>");
-    ret.add("<java.lang.Integer: void <init>(int)>");
-    ret.add("<java.lang.Integer: java.lang.Integer valueOf(int)>");
     ret.add("<java.lang.String: java.lang.String substring(int)>");
     ret.add("<java.lang.String: java.lang.String substring(int,int)>");
     ret.add("<java.lang.String: int indexOf(java.lang.String)>");
     ret.add("<java.lang.String: int indexOf(java.lang.String,int)>");  
     ret.add("<java.lang.String: java.lang.String[] split(java.lang.String)>");
     ret.add("<java.lang.String: java.lang.String[] split(java.lang.String,int)>");
-    ret.add("<java.lang.String: java.lang.String valueOf(java.lang.Object)>");
     ret.add("<java.lang.Integer: int parseInt(java.lang.String)>");
     ret.add("<java.lang.Long: long parseLong(java.lang.String)>");
     ret.add("<java.lang.Float: float parseFloat(java.lang.String)>");
     ret.add("<java.lang.Double: double parseDouble(java.lang.String)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerAtomicInt: int atomicAdd(int)>");
     ret.add("<org.trifort.rootbeer.runtimegpu.GpuException: org.trifort.rootbeer.runtimegpu.GpuException arrayOutOfBounds(int,int,int)>");
+
+    ret.add("<java.lang.Boolean: void <init>(boolean)>");
+    ret.add("<java.lang.Byte: void <init>(byte)>");
+    ret.add("<java.lang.Character: void <init>(char)>");
+    ret.add("<java.lang.Short: void <init>(short)>");
+    ret.add("<java.lang.Integer: void <init>(int)>");
+    ret.add("<java.lang.Long: void <init>(long)>");
+    ret.add("<java.lang.Float: void <init>(float)>");
+    ret.add("<java.lang.Double: void <init>(double)>");
+    
+    ret.add("<java.lang.Boolean: java.lang.Boolean valueOf(boolean)>");
+    ret.add("<java.lang.Byte: java.lang.Byte valueOf(byte)>");
+    ret.add("<java.lang.Character: java.lang.Character valueOf(char)>");
+    ret.add("<java.lang.Short: java.lang.Short valueOf(short)>");
+    ret.add("<java.lang.Integer: java.lang.Integer valueOf(int)>");
+    ret.add("<java.lang.Long: java.lang.Long valueOf(long)>");
+    ret.add("<java.lang.Float: java.lang.Float valueOf(float)>");
+    ret.add("<java.lang.Double: java.lang.Double valueOf(double)>");
     return ret;
   }
 
