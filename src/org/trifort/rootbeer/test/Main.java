@@ -47,8 +47,8 @@ public class Main implements TestSerializationFactory {
     ret.add(new CharArrays());
     ret.add(new ShortArrays());
     ret.add(new IntArrays());
-    //ret.add(new FloatArrays());
-    //ret.add(new DoubleArrays());
+    ret.add(new FloatArrays());
+    ret.add(new DoubleArrays());
     ret.add(new StaticsTest1());
     ret.add(new StaticsTest2());
     ret.add(new StaticsTest3());

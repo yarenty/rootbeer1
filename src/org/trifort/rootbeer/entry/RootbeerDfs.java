@@ -97,7 +97,6 @@ public class RootbeerDfs {
       } else if(value instanceof InvokeExpr){
         InvokeExpr invokeExpr = (InvokeExpr) value;
         SootMethod invokeMethod = invokeExpr.getMethod();
-        DfsInfo.v().addMethod(invokeMethod);
         queue.add(invokeMethod.getSignature());
       } else if(value instanceof Local){ 
         Local local = (Local) value;
