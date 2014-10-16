@@ -183,6 +183,7 @@ public class Main {
     if(m_printDeviceInfo){
       if(m_num_args == 1){
         printDeviceInfo();
+        return;
       } else {
         System.out.println("-printdeviceinfo can only be used by itself. Remove other arguments.");  
         System.out.flush();
