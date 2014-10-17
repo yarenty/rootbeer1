@@ -22,11 +22,9 @@ import soot.rtaclassload.RTAMethod;
 
 public class KernelEntryPointDetector implements EntryMethodTester {
 
-  private boolean runTests;
   private Set<String> newInvokes;
   
-  public KernelEntryPointDetector(boolean run_tests){
-    runTests = run_tests;
+  public KernelEntryPointDetector(){
     newInvokes = new TreeSet<String>();
   }
   
@@ -35,10 +33,8 @@ public class KernelEntryPointDetector implements EntryMethodTester {
       return false;
     }
     RTAClass rtaClass = sm.getRTAClass();
-    if(runTests == false){
-      if(rtaClass.getName().startsWith("org.trifort.rootbeer.testcases.")){
-        return false;
-      }
+    if(rtaClass.getName().startsWith("org.trifort.rootbeer.testcases.")){
+      return false;
     }
     Iterator<String> iter = rtaClass.getInterfaceStrings().iterator();
     while(iter.hasNext()){

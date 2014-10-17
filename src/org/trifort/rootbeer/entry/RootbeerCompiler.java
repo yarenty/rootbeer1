@@ -38,6 +38,7 @@ import soot.rtaclassload.BytecodeFile;
 import soot.rtaclassload.EntryMethodTester;
 import soot.rtaclassload.ListClassTester;
 import soot.rtaclassload.ListMethodTester;
+import soot.rtaclassload.MainEntryMethodTester;
 import soot.rtaclassload.MethodFieldFinder;
 import soot.rtaclassload.MethodTester;
 import soot.rtaclassload.RTAClassLoader;
@@ -135,6 +136,10 @@ public class RootbeerCompiler {
     RTAClassLoader.v().addToSignaturesMethodTester(toSigMethods);
     RTAClassLoader.v().addClassRemapping("java.util.concurrent.atomic.AtomicLong", "org.trifort.rootbeer.remap.GpuAtomicLong");
     RTAClassLoader.v().addClassRemapping("org.trifort.rootbeer.testcases.rootbeertest.remaptest.CallsPrivateMethod", "org.trifort.rootbeer.remap.DoesntCallPrivateMethod");
+    
+    if(runtests == false){
+      RTAClassLoader.v().addCallGraphLink("<org.trifort.rootbeer.runtime.Rootbeer: void <init>()>", "<org.trifort.rootbeer.runtime.Kernel: void gpuMethod()>");
+    }
     RTAClassLoader.v().loadNecessaryClasses();
   }
   
@@ -157,7 +162,11 @@ public class RootbeerCompiler {
   public void compile(String inputJarFilename, String outputJarFilename, boolean run_tests) throws Exception {
     this.inputJarFilename = inputJarFilename;
     this.outputJarFilename = outputJarFilename;
-    entryDetector = new KernelEntryPointDetector(run_tests);
+    if(run_tests){
+      entryDetector = new KernelEntryPointDetector();
+    } else {
+      entryDetector = new MainEntryMethodTester();
+    }
     setupSoot(run_tests);
     
     entryMethods = RTAClassLoader.v().getEntryPoints();
@@ -243,19 +252,25 @@ public class RootbeerCompiler {
   }
   
   private boolean isRuntimePackage(String filename){
-    for(String runtimePackage : runtimePackages){
-      if(filename.startsWith(runtimePackage)){
-        return true;
-      }
+    if(filename.startsWith("org/trifort/rootbeer/runtime")){
+      return true;
+    } else if(filename.startsWith("org/trifort/rootbeer/configuration/RootbeerPaths")){
+      return true;
+    } else if(filename.startsWith("com/lmax/disruptor/")){
+      return true;
+    } else if(filename.startsWith("org/trifort/rootbeer/util/ResourceReader")){
+      return true;
+    } else if(filename.startsWith("org/trifort/rootbeer/configuration/Configuration")){
+      return true;
     }
     return false;
   }
   
   private Map<String, byte[]> readJar(String inputFilename) throws Exception {
     Map<String, byte[]> ret = new TreeMap<String, byte[]>();
-    JarInputStream jarInput = new JarInputStream(new FileInputStream(inputFilename));
+    ZipInputStream jarInput = new ZipInputStream(new FileInputStream(inputFilename));
     while(true){
-      JarEntry jarEntry = jarInput.getNextJarEntry();
+      ZipEntry jarEntry = jarInput.getNextEntry();
       if(jarEntry == null){
         break;
       }
