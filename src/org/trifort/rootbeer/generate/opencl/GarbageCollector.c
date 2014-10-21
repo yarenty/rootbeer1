@@ -584,13 +584,42 @@ int org_trifort_rootbeer_runtime_RootbeerGpu_getThreadIdxx(int * exception){
 }
 
 $$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_getThreadIdxy(int * exception){
+  return getThreadIdxy();
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_getThreadIdxz(int * exception){
+  return getThreadIdxz();
+}
+
+$$__device__$$ 
 int org_trifort_rootbeer_runtime_RootbeerGpu_getBlockIdxx(int * exception){
   return getBlockIdxx();
 }
 
 $$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_getBlockIdxy(int * exception){
+  return getBlockIdxy();
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_getBlockIdxz(int * exception){
+  return getBlockIdxz();
+}
+
+$$__device__$$ 
 int org_trifort_rootbeer_runtime_RootbeerGpu_getBlockDimx(int * exception){
   return getBlockDimx();
+}
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_getBlockDimy(int * exception){
+  return getBlockDimy();
+}
+
+$$__device__$$ 
+int org_trifort_rootbeer_runtime_RootbeerGpu_getBlockDimz(int * exception){
+  return getBlockDimz();
 }
 
 $$__device__$$ 
@@ -598,6 +627,15 @@ long long org_trifort_rootbeer_runtime_RootbeerGpu_getGridDimx(int * exception){
   return getGridDimx();
 }
 
+$$__device__$$ 
+long long org_trifort_rootbeer_runtime_RootbeerGpu_getGridDimy(int * exception){
+  return getGridDimy();
+}
+
+$$__device__$$ 
+long long org_trifort_rootbeer_runtime_RootbeerGpu_getGridDimz(int * exception){
+  return getGridDimz();
+}
 
 $$__device__$$ 
 long long org_trifort_rootbeer_runtime_RootbeerGpu_getRef(int ref, int * exception){

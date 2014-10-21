@@ -48,8 +48,7 @@ long long java_lang_System_nanoTime(int * exception){
 __global__ void entry(int * handles, int * exceptions, int numBlocks, 
   int usingKernelTemplates){
 
-  int loop_control = blockIdx.x * blockDim.x + threadIdx.x;
- 
+  int loop_control = getThreadId();
   if(loop_control < numBlocks){
     int exception = 0; 
     int handle;

@@ -31,7 +31,7 @@ public class SharedMemoryArraysTest implements TestKernelTemplate {
 
   @Override
   public ThreadConfig getThreadConfig() {
-    return new ThreadConfig(threadSize, blockSize, threadSize * blockSize);
+    return new ThreadConfig(threadSize, 1, 1, blockSize, 1, threadSize * blockSize);
   }
 
   @Override

@@ -26,7 +26,8 @@ struct ContextState {
   jlong cpu_class_mem_size;
 
   jint * info_space;
-  jint grid_shape_x;
+  jint block_count_x;
+  jint block_count_y;
   jint using_kernel_templates_offset;
   jint using_exceptions;
   jint context_built;
@@ -128,8 +129,9 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_freeNativeC
 
 JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuildState
   (JNIEnv *env, jobject this_ref, jlong nativeContext, jint device_index,
-   jbyteArray cubin_file, jint cubin_length, jint block_shape_x,
-   jint grid_shape_x, jint num_threads, jobject object_mem, jobject handles_mem,
+   jbyteArray cubin_file, jint cubin_length, jint thread_count_x, jint thread_count_y,
+   jint thread_count_z, jint block_count_x, jint block_count_y,
+   jint num_threads, jobject object_mem, jobject handles_mem,
    jobject exceptions_mem, jobject class_mem,
    jint using_exceptions, jint cache_config)
 
@@ -142,7 +144,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
 
   struct ContextState * stateObject = (struct ContextState *) nativeContext;
 
-  stateObject->grid_shape_x = grid_shape_x;
+  stateObject->block_count_x = block_count_x;
+  stateObject->block_count_y = block_count_y;
   stateObject->using_exceptions = using_exceptions;
 
   status = cuDeviceGet(&(stateObject->device), device_index);
@@ -237,7 +240,7 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_nativeBuild
   stateObject->using_kernel_templates_offset = offset;
   offset += sizeof(int);
 
-  status = cuFuncSetBlockShape(stateObject->function, block_shape_x, 1, 1);
+  status = cuFuncSetBlockShape(stateObject->function, thread_count_x, thread_count_y, thread_count_z);
   CHECK_STATUS(env, "Error in cuFuncSetBlockShape", status, stateObject->device);
 
   stateObject->context_built = 1;
@@ -311,7 +314,8 @@ JNIEXPORT void JNICALL Java_org_trifort_rootbeer_runtime_CUDAContext_cudaRun
   status = cuParamSeti(stateObject->function, stateObject->using_kernel_templates_offset, using_kernel_templates);
   CHECK_STATUS(env, "Error in cuParamSeti: using_kernel_templates", status, stateObject->device)
 
-  status = cuLaunchGrid(stateObject->function, stateObject->grid_shape_x, 1);
+  status = cuLaunchGrid(stateObject->function, stateObject->block_count_x,
+    stateObject->block_count_y);
   CHECK_STATUS(env, "Error in cuLaunchGrid", status, stateObject->device)
 
   status = cuCtxSynchronize();

@@ -9,8 +9,12 @@ public interface Context extends Closeable {
   public void setUsingHandles(boolean value);
   public void setMemorySize(long memorySize);
   public void setCacheConfig(CacheConfig config);
-  public void setThreadConfig(ThreadConfig thread_config);
-  public void setThreadConfig(int block_shape_x, int grid_shape_x, int num_threads);
+  public void setThreadConfig(ThreadConfig threadConfig);
+  public void setThreadConfig(int threadCountX, int blockCountX, int num_threads);
+  public void setThreadConfig(int threadCountX, int threadCountY, 
+      int blockCountX, int blockCountY, int num_threads);
+  public void setThreadConfig(int threadCountX, int threadCountY, int threadCountZ, 
+      int blockCountX, int blockCountY, int num_threads);
   public void setKernel(Kernel kernelTemple);
   public void useCheckedMemory();
   public void buildState();

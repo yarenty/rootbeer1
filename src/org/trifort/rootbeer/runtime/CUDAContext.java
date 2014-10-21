@@ -133,6 +133,31 @@ public class CUDAContext implements Context {
   public void useCheckedMemory(){
     this.usingUncheckedMemory = false;
   }
+
+  @Override
+  public void setThreadConfig(ThreadConfig threadConfig) {
+    this.threadConfig = threadConfig;
+  }
+  
+  @Override
+  public void setThreadConfig(int threadCountX, int blockCountX,
+      int numThreads) {
+    setThreadConfig(threadCountX, 1, 1, blockCountX, 1, numThreads);
+  }
+  
+  @Override
+  public void setThreadConfig(int threadCountX, int threadCountY,
+      int blockCountX, int blockCountY, int numThreads) {
+    setThreadConfig(threadCountX, threadCountY, 1, blockCountX, blockCountY, numThreads);
+  }
+
+  @Override
+  public void setThreadConfig(int threadCountX, int threadCountY,
+      int threadCountZ, int blockCountX, int blockCountY,
+      int numThreads) {
+    this.threadConfig = new ThreadConfig(threadCountX, threadCountY, threadCountZ,
+        blockCountX, blockCountY, numThreads);
+  }
   
   @Override
   public void buildState(){
@@ -240,17 +265,6 @@ public class CUDAContext implements Context {
   public long getRequiredMemory() {
     return requiredMemorySize;
   }
-
-  @Override
-  public void setThreadConfig(ThreadConfig threadConfig){
-    this.threadConfig = threadConfig;
-  }
-  
-  @Override
-  public void setThreadConfig(int block_shape_x, int grid_shape_x,
-      int num_threads) {
-    this.threadConfig = new ThreadConfig(block_shape_x, grid_shape_x, num_threads);
-  }
   
   @Override
   public void run(){
@@ -299,8 +313,9 @@ public class CUDAContext implements Context {
         case NATIVE_BUILD_STATE:
           boolean usingExceptions = Configuration.runtimeInstance().getExceptions();
           nativeBuildState(nativeContext, gpuDevice.getDeviceId(), cubinFile, 
-              cubinFile.length, threadConfig.getBlockShapeX(), 
-              threadConfig.getGridShapeX(), threadConfig.getNumThreads(), 
+              cubinFile.length, threadConfig.getThreadCountX(), threadConfig.getThreadCountY(),
+              threadConfig.getThreadCountZ(), threadConfig.getBlockCountX(),
+              threadConfig.getBlockCountY(), threadConfig.getNumThreads(), 
               objectMemory, handlesMemory, exceptionsMemory, classMemory, 
               b2i(usingExceptions), cacheConfig.ordinal());
           gpuEvent.getFuture().signal();
@@ -458,10 +473,12 @@ public class CUDAContext implements Context {
   private native void freeNativeContext(long nativeContext);
   
   private native void nativeBuildState(long nativeContext, int deviceIndex, byte[] cubinFile, 
-      int cubinLength, int blockShapeX, int gridShapeX, int numThreads, 
+      int cubinLength, int threadCountX, int threadCountY, int threadCountZ,
+      int blockCountX, int blockCountY, int numThreads, 
       Memory objectMem, Memory handlesMem, Memory exceptionsMem, Memory classMem, 
       int usingExceptions, int cacheConfig);
   
   private native void cudaRun(long nativeContext, Memory objectMem, 
       int usingKernelTemplates, StatsRow stats);
+
 }

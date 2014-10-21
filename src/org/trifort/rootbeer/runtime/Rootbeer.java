@@ -71,8 +71,8 @@ public class Rootbeer {
     BlockShaper block_shaper = new BlockShaper();
     block_shaper.run(kernels.size(), device.getMultiProcessorCount());
     
-    return new ThreadConfig(block_shaper.getMaxThreadsPerBlock(), 
-                            block_shaper.getMaxBlocksPerProc(),
+    return new ThreadConfig(block_shaper.getMaxThreadsPerBlock(), 1, 1,
+                            block_shaper.getMaxBlocksPerProc(), 1,
                             kernels.size());
   }
 

@@ -14,7 +14,7 @@ public class GpuParametersTest implements TestKernelTemplate {
 
   @Override
   public ThreadConfig getThreadConfig() {
-    return new ThreadConfig(8, 16, 120);
+    return new ThreadConfig(8, 1, 1, 16, 1, 120);
   }
 
   @Override

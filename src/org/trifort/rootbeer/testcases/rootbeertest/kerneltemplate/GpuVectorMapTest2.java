@@ -33,7 +33,7 @@ public class GpuVectorMapTest2 implements TestKernelTemplate {
 
   @Override
   public ThreadConfig getThreadConfig() {
-    return new ThreadConfig(blockSize, gridSize, blockSize * gridSize);
+    return new ThreadConfig(blockSize, 1, 1, gridSize, 1, blockSize * gridSize);
   }
 
   @Override
