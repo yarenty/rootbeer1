@@ -52,6 +52,7 @@ import soot.rtaclassload.MethodFieldFinder;
 import soot.rtaclassload.MethodSignature;
 import soot.rtaclassload.NumberedType;
 import soot.rtaclassload.RTAClassLoader;
+import soot.rtaclassload.StringToType;
 import soot.rtaclassload.TypeToString;
 import soot.util.Chain;
 
@@ -69,9 +70,10 @@ public class OpenCLScene {
   private List<SootMethod> methods;
   private ClassConstantNumbers constantNumbers;
   private FieldCodeGeneration fieldCodeGeneration;
-  private List<Type> typeNumbers;
+  private Map<Integer, OpenCLNumberedType> typeNumbers;
+  private Map<String, OpenCLNumberedType> typeNumberStrings;
+  private int maxTypeNumber;
   private Set<Type> allTypes;
-  private int typeNumber;
   private String cudaCode;
   
   static {
@@ -89,7 +91,9 @@ public class OpenCLScene {
     methods = new ArrayList<SootMethod>();
     constantNumbers = new ClassConstantNumbers();
     fieldCodeGeneration = new FieldCodeGeneration();
-    typeNumbers = new ArrayList<Type>();
+    typeNumbers = new HashMap<Integer, OpenCLNumberedType>();
+    typeNumberStrings = new HashMap<String, OpenCLNumberedType>();
+    maxTypeNumber = 0;
     allTypes = new HashSet<Type>();
     loadTypes(); 
   }
@@ -120,21 +124,17 @@ public class OpenCLScene {
   }
 
   public int getTypeNumber(Type type){
-    if(typeNumbers.contains(type) == false){
-      numberType(type);
-    }
-    for(int i = 0; i < typeNumbers.size(); ++i){
-      Type curr = typeNumbers.get(i);
-      if(curr.equals(type)){
-        return i;
-      }
-    }
-    throw new RuntimeException();
+    return getTypeNumber(type.toString());
   }
 
-  public int getTypeNumber(String className) {
-    SootClass sootClass = Scene.v().getSootClass(className);
-    return getTypeNumber(sootClass.getType());
+  public int getTypeNumber(String typeName) {
+    if(typeNumberStrings.containsKey(typeName)){
+      OpenCLNumberedType numberedType = typeNumberStrings.get(typeName);
+      return numberedType.getNumber();
+    } else {
+      numberType(typeName);
+      return getTypeNumber(typeName);
+    }
   }
   
   public void addMethod(SootMethod sootMethod){
@@ -216,9 +216,9 @@ public class OpenCLScene {
   private void writeTypesToFile(){
     try {
       PrintWriter writer = new PrintWriter(RootbeerPaths.v().getTypeFile());
-      for(Type type : allTypes){
-        String typeStr = TypeToString.convert(type);
-        writer.println(getTypeNumber(type)+" "+typeStr);
+      List<OpenCLNumberedType> numberedTypes = getNumberedTypes();
+      for(OpenCLNumberedType numberedType : numberedTypes){
+        writer.println(numberedType.getNumber()+" "+numberedType.getName());
       }
       writer.flush();
       writer.close();
@@ -232,21 +232,38 @@ public class OpenCLScene {
     return getTypeNumber(sootClass.getType());
   }
   
-  private void addType(String className){
-    SootClass sootClass = Scene.v().getSootClass(className);
-    allTypes.add(sootClass.getType());
-  }
-  
   private void loadTypes(){
-    addType("java.lang.OutOfMemoryError");
-    addType("java.lang.StringBuilder");
-    addType("java.lang.NullPointerException");
-    addType("java.lang.String");
-    addType("java.lang.Integer");
-    addType("java.lang.Long");
-    addType("java.lang.Float");
-    addType("java.lang.Double");
-    addType("java.lang.Boolean");
+    numberType("void");                         //0
+    numberType("boolean");                      //1
+    numberType("byte");                         //2
+    numberType("char");                         //3
+    numberType("short");                        //4
+    numberType("int");                          //5
+    numberType("long");                         //6
+    numberType("float");                        //7
+    numberType("double");                       //8
+    numberType("java.lang.String");             //9
+    numberType("java.lang.StringBuilder");      //10
+    numberType("boolean[]");                    //11
+    numberType("byte[]");                       //12
+    numberType("char[]");                       //13
+    numberType("short[]");                      //14
+    numberType("int[]");                        //15
+    numberType("long[]");                       //16
+    numberType("float[]");                      //17
+    numberType("double[]");                     //18
+    numberType("java.lang.OutOfMemoryError");
+    numberType("java.lang.NullPointerException");
+    numberType("java.lang.Integer");
+    numberType("java.lang.Long");
+    numberType("java.lang.Float");
+    numberType("java.lang.Double");
+    numberType("java.lang.Boolean");
+    
+    List<NumberedType> numberedTypes = RTAClassLoader.v().getNumberedTypes();
+    for(NumberedType type : numberedTypes){
+      numberType(type.getType().toSootType().toString());
+    }
     
     Set<SootMethod> methods = DfsInfo.v().getMethods();  
     MethodSignatureUtil util = new MethodSignatureUtil();
@@ -290,22 +307,23 @@ public class OpenCLScene {
     }
     
     buildCompositeFields();  
-    numberTypes();
-  }
-  
-  private void numberTypes() {
-    List<NumberedType> numberedTypes = RTAClassLoader.v().getNumberedTypes();
-    for(NumberedType type : numberedTypes){
-      numberType(type.getType().toSootType());
-    }
+    
     for(OpenCLArrayType arrayType : arrayTypes){
-      numberType(arrayType.getArrayType());
+      numberType(arrayType.getArrayType().toString());
     }
   }
   
-  private void numberType(Type type){
-    if(typeNumbers.contains(type) == false){
-      typeNumbers.add(type);
+  private void numberType(String typeString){
+    if(typeNumberStrings.containsKey(typeString)){
+      return;
+    } else {
+      OpenCLNumberedType numberedType = new OpenCLNumberedType(typeString, maxTypeNumber);
+      typeNumberStrings.put(typeString, numberedType);
+      typeNumbers.put(maxTypeNumber, numberedType);
+      ++maxTypeNumber;
+      
+      Type sootType = StringToType.convert(typeString);
+      allTypes.add(sootType);
     }
   }
 
@@ -357,9 +375,7 @@ public class OpenCLScene {
     writer.println(cuda_windows);
     writer.flush();
     writer.close();
-    
-    NameMangling.v().writeTypesToFile();
-        
+     
     String[] ret = new String[2];
     ret[0] = cuda_unix;
     ret[1] = cuda_windows;
@@ -513,6 +529,8 @@ public class OpenCLScene {
   }
   
   public List<MethodSignature> getVirtualMethods(String signature){
+    //System.out.println("getVirtualMethods: "+signature);
+    
     List<MethodSignature> ret = new ArrayList<MethodSignature>();
     
     MethodSignatureUtil util = new MethodSignatureUtil();
@@ -522,6 +540,7 @@ public class OpenCLScene {
     SootClass sootClass = sootMethod.getDeclaringClass();
     
     if(sootMethod.isStatic()){
+      //System.out.println("  static");
       util.parse(sootMethod.getSignature());
       MethodSignature methodSignature = new MethodSignature(util);
       ret.add(methodSignature);
@@ -534,6 +553,7 @@ public class OpenCLScene {
     for(SootMethod method : methodList){
       util.parse(method.getSignature());
       MethodSignature methodSignature = new MethodSignature(util);
+      //System.out.println("  method: "+methodSignature.toString());
       ret.add(methodSignature);
     }
     
@@ -666,8 +686,11 @@ public class OpenCLScene {
     return constantNumbers;
   }
 
-  public List<Type> getNumberedTypes() {
-    return typeNumbers;
+  public List<OpenCLNumberedType> getNumberedTypes() {
+    List<OpenCLNumberedType> ret = new ArrayList<OpenCLNumberedType>();
+    ret.addAll(typeNumbers.values());
+    Collections.sort(ret);
+    return ret;
   }
 
 }

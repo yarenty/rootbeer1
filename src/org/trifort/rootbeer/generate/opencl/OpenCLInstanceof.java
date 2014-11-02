@@ -28,6 +28,7 @@ import soot.jimple.InstanceOfExpr;
 import soot.rtaclassload.NumberedType;
 import soot.rtaclassload.RTAClassLoader;
 import soot.rtaclassload.StringNumbers;
+import soot.rtaclassload.StringToType;
 
 public class OpenCLInstanceof {
 
@@ -111,10 +112,11 @@ public class OpenCLInstanceof {
 
   private List<Integer> getTypeList(Type type) {
     List<Integer> ret = new ArrayList<Integer>();
-    List<Type> numberedTypes = OpenCLScene.v().getNumberedTypes();
+    List<OpenCLNumberedType> numberedTypes = OpenCLScene.v().getNumberedTypes();
     for(int i = 0; i < numberedTypes.size(); ++i){
       int number = i;
-      Type currType = numberedTypes.get(i);
+      String currTypeName = numberedTypes.get(i).getName();
+      Type currType = StringToType.convert(currTypeName);
       if(parent(type, currType) || parent(currType, type)){
         ret.add(number);
       }

@@ -38,15 +38,33 @@ public class IsPolymorphic {
     SootClass sootClass = sootMethod.getDeclaringClass();
     if(sootMethod.isConstructor() || specialInvoke || sootMethod.isNative()){
       highestType = sootClass.getType();
+      //System.out.println("not poly: "+sootMethod.getSignature()+" ctor/etc");
+      //printHighestType();
       return false;
     } else {
       List<MethodSignature> methods = OpenCLScene.v().getVirtualMethods(sootMethod.getSignature());
       findHighestType(methods);
       if(methods.size() == 1){
+        //System.out.println("not poly: "+sootMethod.getSignature()+" methods.size() == 1");
+        //printMethods(methods);
+        //printHighestType();
         return false;
       } else {
+        //System.out.println("poly: "+sootMethod.getSignature());
+        //printMethods(methods);
+        //printHighestType();
         return true;
       }
+    }
+  }
+  
+  private void printHighestType(){
+    System.out.println("  highest type: "+highestType.toString());
+  }
+  
+  private void printMethods(List<MethodSignature> methods){
+    for(MethodSignature sig : methods){
+      System.out.println("  methodSig: "+sig.toString());
     }
   }
 

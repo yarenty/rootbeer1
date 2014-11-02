@@ -185,6 +185,7 @@ public class CompilerSetup {
     ret.add("<java.lang.Long: java.lang.Long valueOf(long)>");
     ret.add("<java.lang.Float: java.lang.Float valueOf(float)>");
     ret.add("<java.lang.Double: java.lang.Double valueOf(double)>");
+    ret.add("<java.lang.String: java.lang.String valueOf(java.lang.Object)>");
     
     return ret;
   }
@@ -193,6 +194,7 @@ public class CompilerSetup {
     Set<String> ret = new HashSet<String>();
     ret.add("<java.lang.String: void <init>(java.lang.String)>");
     ret.add("<java.lang.String: void <init>(char[])>");
+    ret.add("<java.lang.String: java.lang.String valueOf(java.lang.Object)>");
     ret.add("<java.lang.StringBuilder: void <init>()>");
     ret.add("<java.lang.StringBuilder: void <init>(java.lang.String)>");
     ret.add("<java.lang.StringBuilder: java.lang.StringBuilder append(boolean)>");
@@ -327,6 +329,7 @@ public class CompilerSetup {
     ret.add("<java.lang.Long: java.lang.Long valueOf(long)>");
     ret.add("<java.lang.Float: java.lang.Float valueOf(float)>");
     ret.add("<java.lang.Double: java.lang.Double valueOf(double)>");
+    ret.add("<java.lang.String: java.lang.String valueOf(java.lang.Object)>");
     return ret;
   }
 

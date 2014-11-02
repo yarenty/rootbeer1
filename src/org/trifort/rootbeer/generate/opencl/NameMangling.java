@@ -20,8 +20,6 @@ import soot.Type;
 public class NameMangling {
 
   private static NameMangling m_instance = null;
-  private Map<String, Integer> m_mangleMap;
-  private int m_lastInt;
   
   public static NameMangling v(){
     if(m_instance == null)
@@ -30,36 +28,6 @@ public class NameMangling {
   }
   
   private NameMangling(){
-    m_mangleMap = new HashMap<String, Integer>();
-    m_lastInt = 0;
-    addBuiltIns();
-  }
-  
-  private void addBuiltIns(){
-    addBuiltIn("void");                         //0
-    addBuiltIn("boolean");                      //1
-    addBuiltIn("byte");                         //2
-    addBuiltIn("char");                         //3
-    addBuiltIn("short");                        //4
-    addBuiltIn("int");                          //5
-    addBuiltIn("long");                         //6
-    addBuiltIn("float");                        //7
-    addBuiltIn("double");                       //8
-    addBuiltIn("java.lang.String");             //9
-    addBuiltIn("java.lang.StringBuilder");      //10
-    addBuiltIn("boolean[]");                    //11
-    addBuiltIn("byte[]");                       //12
-    addBuiltIn("char[]");                       //13
-    addBuiltIn("short[]");                      //14
-    addBuiltIn("int[]");                        //15
-    addBuiltIn("long[]");                       //16
-    addBuiltIn("float[]");                      //17
-    addBuiltIn("double[]");                     //18
-  }
-  
-  private void addBuiltIn(String type){
-    m_mangleMap.put(type, m_lastInt);
-    ++m_lastInt;
   }
   
   public String mangleArgs(SootMethod method){
@@ -80,14 +48,7 @@ public class NameMangling {
     String name_without_arrays = type.toString();
     name_without_arrays = name_without_arrays.replace("\\[", "a");
 
-    int number;
-    if(m_mangleMap.containsKey(name_without_arrays)){
-      number = m_mangleMap.get(name_without_arrays);
-    } else {
-      number = m_lastInt;
-      m_lastInt++;
-      m_mangleMap.put(name_without_arrays, number);
-    }
+    int number = OpenCLScene.v().getTypeNumber(name_without_arrays);
 
     int dims = arrayDimensions(type);
     String ret = "";
@@ -106,19 +67,5 @@ public class NameMangling {
         ret++;
     }
     return ret;
-  }
-  
-  public void writeTypesToFile(){
-    try {
-      PrintWriter writer = new PrintWriter(RootbeerPaths.v().getRootbeerHome()+"mangling");
-      for(String name : m_mangleMap.keySet()){
-        int number = m_mangleMap.get(name);
-        writer.println(number+" "+name);
-      }
-      writer.flush();
-      writer.close();
-    } catch(Exception ex){
-      ex.printStackTrace();
-    }
   }
 }
