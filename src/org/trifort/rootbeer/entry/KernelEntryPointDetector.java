@@ -7,18 +7,16 @@
 
 package org.trifort.rootbeer.entry;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import soot.SootClass;
-import soot.SootMethod;
 import soot.rtaclassload.EntryMethodTester;
-import soot.rtaclassload.MethodTester;
+import soot.rtaclassload.MethodSignature;
 import soot.rtaclassload.RTAClass;
+import soot.rtaclassload.RTAClassLoader;
 import soot.rtaclassload.RTAMethod;
+import soot.rtaclassload.RTAType;
+import soot.rtaclassload.StringNumbers;
 
 public class KernelEntryPointDetector implements EntryMethodTester {
 
@@ -28,19 +26,26 @@ public class KernelEntryPointDetector implements EntryMethodTester {
     newInvokes = new TreeSet<String>();
   }
   
-  public boolean matches(RTAMethod sm) {
-    if(sm.getSignature().getSubSignatureString().equals("void gpuMethod()") == false){
+  public boolean matches(RTAMethod rtaMethod) {
+    String methodName = StringNumbers.v().getString(rtaMethod.getSignature().getMethodName());
+    if(methodName.equals("create") == false){
       return false;
     }
-    RTAClass rtaClass = sm.getRTAClass();
-    if(rtaClass.getName().startsWith("org.trifort.rootbeer.testcases.")){
-      return false;
-    }
-    Iterator<String> iter = rtaClass.getInterfaceStrings().iterator();
-    while(iter.hasNext()){
-      String iface = iter.next();
-      if(iface.equals("org.trifort.rootbeer.runtime.Kernel")){
-        newInvokes.add(rtaClass.getName());
+    RTAClass rtaClass = rtaMethod.getRTAClass();
+    RTAType[] ifaces = rtaClass.getInterfaces();
+    for(RTAType iface : ifaces){
+      if(iface.toString().equals("org.trifort.rootbeer.test.TestKernelTemplate") ||
+         iface.toString().equals("org.trifort.rootbeer.test.TestSerialization") || 
+         iface.toString().equals("org.trifort.rootbeer.test.TestException")){
+        
+        RTAClass kernelClass = KernelFinder.find(rtaMethod);
+        RTAMethod[] methods = kernelClass.getMethods();
+        for(RTAMethod method : methods){
+          MethodSignature sig = method.getSignature();
+          if(StringNumbers.v().getString(sig.getMethodName()).equals("<init>")){
+            RTAClassLoader.v().addCallGraphLink(sig.toString(), "<org.trifort.rootbeer.runtime.Kernel: void gpuMethod()>");
+          }
+        }
         return true;
       }
     }
