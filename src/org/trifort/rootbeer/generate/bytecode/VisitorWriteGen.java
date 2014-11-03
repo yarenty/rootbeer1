@@ -44,8 +44,9 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   private SootClass m_CurrClass;
   private List<Value> m_ValuesWritten;
   private Local m_Array;
+  private SootClass visitorClass;
   
-  public VisitorWriteGen(List<Type> ordered_history, String class_name, 
+  public VisitorWriteGen(List<Type> ordered_history, SootClass visitorClass, 
     BytecodeLanguage bcl){
     
     m_bcl = new Stack<BytecodeLanguage>();
@@ -58,11 +59,13 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     
     m_CurrentMem = new Stack<Local>();
     m_gcObjVisitor = new Stack<Local>();
+    
+    this.visitorClass = visitorClass;
   }
     
   public void makeWriteToHeapMethod() {
     for(Type type : m_OrderedHistory){
-      makeWriteToHeapMethodForType(type);
+      makeWriteToHeapMethodForType(type, visitorClass);
     }
 
     SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
@@ -110,7 +113,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     bcl.label(label);
     
     for(Type type : m_OrderedHistory){
-      callWriteToHeapMethodForType(type);
+      callWriteToHeapMethodForType(type, visitorClass);
     }
 
     bcl.returnVoid();
@@ -118,7 +121,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     m_CurrentMem.pop();
   }
   
-  private boolean shouldAnalyze(Type type){
+  private boolean shouldAnalyze(Type type, SootClass visitorClass){
     if(type instanceof ArrayType == false &&
         type instanceof RefType == false){
        
@@ -130,7 +133,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
       SootClass soot_class = ref_type.getSootClass();
       if(soot_class.getName().equals("java.lang.Object"))
         return false; 
-      if(differentPackageAndPrivate(ref_type)){
+      if(differentPackageAndPrivate(visitorClass, ref_type)){
         return false;  
       }
       if(soot_class.isInterface()){
@@ -149,16 +152,16 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   }
   
   
-  private void callWriteToHeapMethodForType(Type type){
-    if(shouldAnalyze(type)){
-     String label = getNextLabel();
-     BytecodeLanguage bcl = m_bcl.top();
-     bcl.ifInstanceOfStmt(m_Param0, type, label);
-
-     SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
-     bcl.pushMethod(m_thisRef, "doWriteToHeap"+md5(type), VoidType.v(), obj_cls.getType(), BooleanType.v(), LongType.v(), BooleanType.v());
-     bcl.invokeMethodNoRet(m_thisRef, m_Param0, m_Param1, m_RefParam, m_ReadOnlyParam);
-     bcl.label(label);
+  private void callWriteToHeapMethodForType(Type type, SootClass visitorClass){
+    if(shouldAnalyze(type, visitorClass)){
+      String label = getNextLabel();
+      BytecodeLanguage bcl = m_bcl.top();
+      bcl.ifInstanceOfStmt(m_Param0, type, label);
+    
+      SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
+      bcl.pushMethod(m_thisRef, "doWriteToHeap"+md5(type), VoidType.v(), obj_cls.getType(), BooleanType.v(), LongType.v(), BooleanType.v());
+      bcl.invokeMethodNoRet(m_thisRef, m_Param0, m_Param1, m_RefParam, m_ReadOnlyParam);
+      bcl.label(label);
     }
   }
   
@@ -166,8 +169,8 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     return DigestUtils.md5Hex(type.toString());
   }
   
-  private void makeWriteToHeapMethodForType(Type type){
-    if(shouldAnalyze(type)){
+  private void makeWriteToHeapMethodForType(Type type, SootClass visitorClass){
+    if(shouldAnalyze(type, visitorClass)){
       if(mWriteToHeapMethodsMade.contains(type)){
         return;
       }
@@ -199,6 +202,7 @@ public class VisitorWriteGen extends AbstractVisitorGen {
       }
       bcl.endMethod();
       m_CurrentMem.pop();
+      m_gcObjVisitor.pop();
     }
   }
   

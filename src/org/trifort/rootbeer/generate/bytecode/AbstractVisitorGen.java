@@ -44,11 +44,9 @@ public class AbstractVisitorGen {
     m_classesToIgnore.add("org.trifort.rootbeer.runtimegpu.GpuException");
   }
   
-  protected boolean differentPackageAndPrivate(RefType ref_inspecting) {
-    RefType ref_type = (RefType) m_thisRef.getType();
-    SootClass this_class = getClassForType(ref_type);
+  protected boolean differentPackageAndPrivate(SootClass visitorClass, RefType ref_inspecting) {
     SootClass class_inspecting = getClassForType(ref_inspecting);
-    if(this_class.getPackageName().equals(class_inspecting.getPackageName()))
+    if(visitorClass.getPackageName().equals(class_inspecting.getPackageName()))
       return false;
     if(class_inspecting.isPublic() == false)
       return true;

@@ -29,6 +29,7 @@ public class VisitorGen extends AbstractVisitorGen {
   private String m_className;
   private Set<Type> m_getSizeMethodsMade;
   private Set<String> m_sentinalCtorsCreated;
+  private SootClass visitorClass;
 
   //Locals from code generation
   private Local m_param0;
@@ -62,6 +63,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_className = base_name+"Serializer";
     RTAClassLoader.v().addModifiedClass(m_className);
     m_bcl.top().makeClass(m_className, "org.trifort.rootbeer.runtime.Serializer");
+    visitorClass = Scene.v().getSootClass(m_className);
   }
     
   private void makeGetLengthMethod(){    
@@ -72,7 +74,7 @@ public class VisitorGen extends AbstractVisitorGen {
     
     List<Type> types = DfsInfo.v().getOrderedRefLikeTypes();
     for(Type type : types){
-      makeGetSizeMethodForType(type);
+      makeGetSizeMethodForType(type, visitorClass);
     }
 
     m_bcl.top().returnValue(IntConstant.v(0));
@@ -106,7 +108,7 @@ public class VisitorGen extends AbstractVisitorGen {
     m_bcl.top().label(label);
   }
 
-  private void makeGetSizeMethodForType(Type type) {
+  private void makeGetSizeMethodForType(Type type, SootClass visitorClass) {
     if(type instanceof ArrayType == false &&
        type instanceof RefType == false){
       return;
@@ -124,7 +126,7 @@ public class VisitorGen extends AbstractVisitorGen {
       if(soot_class.isInterface()){
         return;
       }
-      if(differentPackageAndPrivate(ref_type)){
+      if(differentPackageAndPrivate(visitorClass, ref_type)){
         return;  
       }
     }
@@ -163,14 +165,14 @@ public class VisitorGen extends AbstractVisitorGen {
   private void makeWriteToHeapMethod() {
     List<Type> types = DfsInfo.v().getOrderedRefLikeTypes();
     VisitorWriteGen write_gen = new VisitorWriteGen(types, 
-      m_className, m_bcl.top());
+      visitorClass, m_bcl.top());
     write_gen.makeWriteToHeapMethod();
   }
       
   private void makeReadFromHeapMethod() {
     List<Type> types = DfsInfo.v().getOrderedRefLikeTypes();
     VisitorReadGen read_gen = new VisitorReadGen(types, 
-      m_className, m_bcl.top());
+      visitorClass, m_bcl.top());
     read_gen.makeReadFromHeapMethod();
   }
 

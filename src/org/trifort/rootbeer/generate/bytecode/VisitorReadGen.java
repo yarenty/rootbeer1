@@ -39,8 +39,9 @@ public class VisitorReadGen extends AbstractVisitorGen {
   private Map<Type, Local> m_ctorReadFromHeapMethodsMade;
   private List<Type> m_orderedHistory;
   private Set<String> m_visitedReader;
+  private SootClass visitorClass;
   
-  public VisitorReadGen(List<Type> ordered_history, String class_name, 
+  public VisitorReadGen(List<Type> ordered_history, SootClass visitorClass, 
     BytecodeLanguage bcl){
     
     m_readFromHeapMethodsMade = new HashMap<Type, Local>();
@@ -53,6 +54,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
     m_objSerializing = new Stack<Local>();
     m_currMem = new Stack<Local>();
     m_currObj = new Stack<Local>();
+    this.visitorClass = visitorClass;
   }
   
   public void makeReadFromHeapMethod() {
@@ -158,7 +160,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
       if(soot_class.isInterface()){
         return false;
       }
-      if(differentPackageAndPrivate(ref_type)){
+      if(differentPackageAndPrivate(visitorClass, ref_type)){
         return false;  
       }
     }
@@ -249,7 +251,7 @@ public class VisitorReadGen extends AbstractVisitorGen {
       if(soot_class.isInterface()){
         return;
       }
-      if(differentPackageAndPrivate(ref_type)){
+      if(differentPackageAndPrivate(visitorClass, ref_type)){
         return;  
       }
     }
