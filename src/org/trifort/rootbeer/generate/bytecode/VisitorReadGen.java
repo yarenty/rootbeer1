@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 import org.trifort.rootbeer.generate.opencl.OpenCLType;
 import org.trifort.rootbeer.generate.opencl.fields.OpenCLField;
@@ -55,6 +56,13 @@ public class VisitorReadGen extends AbstractVisitorGen {
   }
   
   public void makeReadFromHeapMethod() {
+    for(Type type : m_orderedHistory){
+      makeReadFromHeapMethodForType(type, false);
+    }
+    
+    RefType obj = RefType.v("java.lang.Object");
+    makeReadFromHeapMethodForType(obj, true);    
+    
     BytecodeLanguage bcl = m_bcl.top();
     SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
     bcl.startMethod("doReadFromHeap", obj_cls.getType(), obj_cls.getType(), BooleanType.v(), LongType.v());
@@ -115,7 +123,6 @@ public class VisitorReadGen extends AbstractVisitorGen {
       makeCtorReadFromHeapMethodForType(type, false, class_number, ctor_used, after_ctors_label);
     }
 
-    RefType obj = RefType.v("java.lang.Object");
     makeCtorReadFromHeapMethodForType(obj, true, class_number, ctor_used, after_ctors_label);
 
     bcl.label(increment_addr_label);
@@ -125,62 +132,99 @@ public class VisitorReadGen extends AbstractVisitorGen {
     bcl_mem.incrementAddress(16);
 
     for(Type type : m_orderedHistory){
-      makeReadFromHeapMethodForType(type, false, ctor_used);
+      callReadFromHeapMethodForType(type, false);
     }
     
-    makeReadFromHeapMethodForType(obj, true, ctor_used);    
+    callReadFromHeapMethodForType(obj, true);    
     
     bcl.returnValue(NullConstant.v());
     bcl.endMethod();
   }
    
-  private void makeReadFromHeapMethodForType(Type type, boolean doing_object, 
-      Local ctor_used)
-  {
+  private boolean shouldAnalyze(Type type, boolean doing_object){
     if(type instanceof ArrayType == false &&
-       type instanceof RefType == false){
-      return;
+        type instanceof RefType == false){
+       return false;
     }
-    
-    if(m_readFromHeapMethodsMade.containsKey(type))
-      return;
     
     if(type instanceof RefType){
       RefType ref_type = (RefType) type;
       if(ref_type.getClassName().equals("java.lang.Object")){
         if(!doing_object){
-          return;
+          return false;
         }
       }
       SootClass soot_class = ref_type.getSootClass();
       if(soot_class.isInterface()){
-        return;
+        return false;
       }
       if(differentPackageAndPrivate(ref_type)){
-        return;  
+        return false;  
       }
     }
-    
-    String label = getNextLabel();
-    BytecodeLanguage bcl = m_bcl.top();
-        
-    bcl.ifInstanceOfStmt(m_param0, type, label);
-    
-    //bcl.println("reading: "+type.toString());
-    //BclMemory bcl_mem = new BclMemory(bcl, m_mem);
-    //Local ptr = bcl_mem.getPointer();
-    //bcl.println(ptr);
-    
-    Local ret;
-    if(type instanceof ArrayType){
-      ret = makeReadFromHeapBodyForArrayType((ArrayType) type);
+    return true;
+  }
+
+  private void callReadFromHeapMethodForType(Type type, boolean doing_object)
+  {
+    if(shouldAnalyze(type, doing_object)){
+      String label = getNextLabel();
+      BytecodeLanguage bcl = m_bcl.top();
+          
+      bcl.ifInstanceOfStmt(m_param0, type, label);
+      
+      //bcl.println("reading: "+type.toString());
+      //BclMemory bcl_mem = new BclMemory(bcl, m_mem);
+      //Local ptr = bcl_mem.getPointer();
+      //bcl.println(ptr);
+
+      SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
+      bcl.pushMethod(m_thisRef, "doReadFromHeap"+md5(type), obj_cls.getType(), obj_cls.getType(), BooleanType.v(), LongType.v());
+      Local ret = bcl.invokeMethodRet(m_thisRef, m_param0, m_param1, m_refParam);
+      bcl.returnValue(ret);
+      bcl.label(label);
     }
-    else {
-      ret = makeReadFromHeapBodyForSootClass((RefType) type);
+  }
+  
+  private String md5(Type type){
+    return DigestUtils.md5Hex(type.toString());
+  }
+
+  private void makeReadFromHeapMethodForType(Type type, boolean doing_object)
+  {
+    if(shouldAnalyze(type, doing_object)){
+      if(m_readFromHeapMethodsMade.containsKey(type)){
+        return;
+      }
+      
+      BytecodeLanguage bcl = m_bcl.top();
+      SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
+      bcl.startMethod("doReadFromHeap"+md5(type), obj_cls.getType(), obj_cls.getType(), BooleanType.v(), LongType.v());
+      m_thisRef = bcl.refThis();
+      m_gcObjVisitor.push(m_thisRef);
+      m_param0 = bcl.refParameter(0);
+      m_objSerializing.push(m_param0);
+      m_param1 = bcl.refParameter(1);
+      m_refParam = bcl.refParameter(2);
+      SootClass memoryClass = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
+      bcl.pushMethod(m_thisRef, "getMem", memoryClass.getType());
+      m_mem = bcl.invokeMethodRet(m_thisRef); 
+      bcl.pushMethod(m_thisRef, "getTextureMem", memoryClass.getType());
+      m_textureMem = bcl.invokeMethodRet(m_thisRef); 
+      m_currMem.push(m_mem);
+      
+      Local ret;
+      if(type instanceof ArrayType){
+        ret = makeReadFromHeapBodyForArrayType((ArrayType) type);
+      }
+      else {
+        ret = makeReadFromHeapBodyForSootClass((RefType) type);
+      }
+      m_readFromHeapMethodsMade.put(type, ret);
+      bcl.returnValue(ret);
+      bcl.endMethod();
+      m_currMem.pop();
     }
-    m_readFromHeapMethodsMade.put(type, ret);
-    bcl.returnValue(ret);
-    bcl.label(label);
   }
 
   private void makeCtorReadFromHeapMethodForType(Type type, boolean doing_object, 
