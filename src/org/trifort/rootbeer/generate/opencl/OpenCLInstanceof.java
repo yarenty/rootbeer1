@@ -58,11 +58,20 @@ public class OpenCLInstanceof {
   }
 
   public String getBody() {
-    if(m_type instanceof RefType == false){
+    List<Integer> type_list = null;
+    if(m_type instanceof ArrayType){
+      ArrayType arrayType = (ArrayType) m_type;
+      int objectTypeNumber = OpenCLScene.v().getTypeNumber("java.lang.Object");
+      int typeNumber = OpenCLScene.v().getTypeNumber(arrayType);
+      type_list = new ArrayList<Integer>();
+      type_list.add(typeNumber);
+      type_list.add(objectTypeNumber);
+    } else if(m_type instanceof RefType){
+      RefType refType = (RefType) m_type;    
+      type_list = getTypeList(refType);
+    } else {
       throw new RuntimeException("not supported yet: instanceof "+m_type.toString());
     }
-    RefType ref_type = (RefType) m_type;    
-    List<Integer> type_list = getTypeList(ref_type);
     
     String ret = getDecl();
     ret += "{\n";
