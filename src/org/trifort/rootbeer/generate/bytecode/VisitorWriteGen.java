@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.trifort.rootbeer.generate.opencl.OpenCLClass;
 import org.trifort.rootbeer.generate.opencl.OpenCLScene;
 import org.trifort.rootbeer.generate.opencl.OpenCLType;
@@ -60,6 +61,10 @@ public class VisitorWriteGen extends AbstractVisitorGen {
   }
     
   public void makeWriteToHeapMethod() {
+    for(Type type : m_OrderedHistory){
+      makeWriteToHeapMethodForType(type);
+    }
+
     SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
     BytecodeLanguage bcl = m_bcl.top();
     bcl.startMethod("doWriteToHeap", VoidType.v(), obj_cls.getType(), BooleanType.v(), LongType.v(), BooleanType.v());
@@ -105,53 +110,96 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     bcl.label(label);
     
     for(Type type : m_OrderedHistory){
-      makeWriteToHeapMethodForType(type);
+      callWriteToHeapMethodForType(type);
     }
 
     bcl.returnVoid();
     bcl.endMethod();
+    m_CurrentMem.pop();
   }
   
-  private void makeWriteToHeapMethodForType(Type type){
+  private boolean shouldAnalyze(Type type){
     if(type instanceof ArrayType == false &&
-       type instanceof RefType == false){
-      return;
+        type instanceof RefType == false){
+       
+      return false;
     }
-    
-    if(mWriteToHeapMethodsMade.contains(type))
-      return;
-    mWriteToHeapMethodsMade.add(type);
     
     if(type instanceof RefType){
       RefType ref_type = (RefType) type;
       SootClass soot_class = ref_type.getSootClass();
       if(soot_class.getName().equals("java.lang.Object"))
-        return; 
+        return false; 
       if(differentPackageAndPrivate(ref_type)){
-        return;  
+        return false;  
       }
       if(soot_class.isInterface()){
-        return;
+        return false;
       }
       if(m_classesToIgnore.contains(ref_type.getSootClass().getName())){
-        return; 
+        return false; 
       }              
     }
     
-    if(typeIsPublic(type) == false)
-      return;
-    
-    String label = getNextLabel();
-    BytecodeLanguage bcl = m_bcl.top();
-    bcl.ifInstanceOfStmt(m_Param0, type, label);
-        
-    if(type instanceof ArrayType){
-      makeWriteToHeapBodyForArrayType((ArrayType) type);
-    } else {
-      RefType ref_type = (RefType) type;
-      makeWriteToHeapBodyForRefType(ref_type);
+    if(typeIsPublic(type) == false){
+      return false;
     }
-    bcl.label(label);
+    
+    return true;
+  }
+  
+  
+  private void callWriteToHeapMethodForType(Type type){
+    if(shouldAnalyze(type)){
+     String label = getNextLabel();
+     BytecodeLanguage bcl = m_bcl.top();
+     bcl.ifInstanceOfStmt(m_Param0, type, label);
+
+     SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
+     bcl.pushMethod(m_thisRef, "doWriteToHeap"+md5(type), VoidType.v(), obj_cls.getType(), BooleanType.v(), LongType.v(), BooleanType.v());
+     bcl.invokeMethodNoRet(m_thisRef, m_Param0, m_Param1, m_RefParam, m_ReadOnlyParam);
+     bcl.label(label);
+    }
+  }
+  
+  private String md5(Type type){
+    return DigestUtils.md5Hex(type.toString());
+  }
+  
+  private void makeWriteToHeapMethodForType(Type type){
+    if(shouldAnalyze(type)){
+      if(mWriteToHeapMethodsMade.contains(type)){
+        return;
+      }
+      mWriteToHeapMethodsMade.add(type);
+      
+      SootClass obj_cls = Scene.v().getSootClass("java.lang.Object");
+      BytecodeLanguage bcl = m_bcl.top();
+      bcl.startMethod("doWriteToHeap"+md5(type), VoidType.v(), obj_cls.getType(), BooleanType.v(), LongType.v(), BooleanType.v());
+      m_thisRef = bcl.refThis();
+      m_gcObjVisitor.push(m_thisRef);
+      m_Param0 = bcl.refParameter(0);
+      m_Param1 = bcl.refParameter(1);
+      m_RefParam = bcl.refParameter(2);
+      m_ReadOnlyParam = bcl.refParameter(3);    
+      
+      SootClass memoryClass = Scene.v().getSootClass("org.trifort.rootbeer.runtime.Memory");
+      bcl.pushMethod(m_thisRef, "getMem", memoryClass.getType());
+      Value valueMem = bcl.invokeMethodRet(m_thisRef); 
+      Local mem = bcl.local(memoryClass.getType());
+      bcl.assign(mem, valueMem);
+      m_CurrentMem.push(mem);
+      
+      if(type instanceof ArrayType){
+        ArrayType arrayType = (ArrayType) type;
+        makeWriteToHeapBodyForArrayType(arrayType);
+      } else {
+        RefType refType = (RefType) type;
+        makeWriteToHeapBodyForRefType(refType);
+      }
+      bcl.endMethod();
+      m_CurrentMem.pop();
+    }
   }
   
   private void makeWriteToHeapBodyForArrayType(ArrayType type) {
@@ -346,11 +394,8 @@ public class VisitorWriteGen extends AbstractVisitorGen {
     
     writeFields(false); 
     bcl_mem.setAddress(after_array_write_address);    
-    
-    BclMemory bcl_mem0 = new BclMemory(bcl, m_Mem);
-    bcl_mem0.align();
-    BclMemory bcl_mem1 = new BclMemory(bcl, m_TextureMem);
-    bcl_mem1.align();         
+
+    bcl_mem.align();
 
     bcl.returnVoid();
     
