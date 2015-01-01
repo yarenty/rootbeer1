@@ -10,7 +10,6 @@ package org.trifort.rootbeer.testcases.rootbeertest.baseconversion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.trifort.rootbeer.entry.Aug4th2011PerformanceStudy;
 import org.trifort.rootbeer.runtime.Kernel;
 import org.trifort.rootbeer.test.TestSerialization;
 
