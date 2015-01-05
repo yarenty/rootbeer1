@@ -45,21 +45,21 @@ long long java_lang_System_nanoTime(int * exception){
   return (long long) clock64();
 }
 
-__global__ void entry(int * handles, int * exceptions, int numBlocks, 
+__global__ void entry(int * handles, int * exceptions, int numThreads, 
   int usingKernelTemplates){
 
-  int loop_control = getThreadId();
-  if(loop_control < numBlocks){
+  int totalThreadId = getThreadId();
+  if(totalThreadId < numThreads){
     int exception = 0; 
     int handle;
     if(usingKernelTemplates){
       handle = handles[0];
     } else {
-      handle = handles[loop_control];
+      handle = handles[totalThreadId];
     }
     %%invoke_run%%(handle, &exception);  
     if(%%using_exceptions%%){
-      exceptions[loop_control] = exception;
+      exceptions[totalThreadId] = exception;
     }
   }
 }
