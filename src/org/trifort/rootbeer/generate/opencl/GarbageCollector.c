@@ -19,6 +19,7 @@
 #define INT_SIZE 4
 #define LONG_SIZE 8
 #define FLOAT_SIZE 4
+#define DOUBLE_SIZE 8
 
 $$__device__$$ void org_trifort_gc_collect();
 $$__device__$$ void org_trifort_gc_assign(int * lhs, int rhs);
@@ -191,6 +192,30 @@ float org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a17_5_7_(int arr
   array_deref += ARRAY_HEADER_SIZE + (FLOAT_SIZE * index);
   float_handle = (float *) array_deref;
   return atomicAdd(float_handle, value);
+}
+
+$$__device__$$ 
+double org_trifort_rootbeer_runtime_RootbeerGpu_atomicAddGlobal0_a18_5_8_(int array, int index, double value, int * exception){
+  char * array_deref;
+  double * float_handle;
+  int length;
+  
+#ifdef ARRAY_CHECKS
+  length = org_trifort_array_length(array, exception);
+  if(*exception != 0){
+    return 0;
+  }
+  if(index < 0 || index >= length){
+    *exception = org_trifort_rootbeer_runtimegpu_GpuException_arrayOutOfBounds( 
+      index, 0, length, exception);
+    return 0;
+  }
+#endif
+
+  array_deref = org_trifort_gc_deref(array);
+  array_deref += ARRAY_HEADER_SIZE + (DOUBLE_SIZE * index);
+  double_handle = (double *) array_deref;
+  return atomicAdd(double_handle, value);
 }
 
 $$__device__$$ 
