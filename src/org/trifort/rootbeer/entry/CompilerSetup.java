@@ -104,6 +104,7 @@ public class CompilerSetup {
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicAddGlobal(int[],int,int)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: long atomicAddGlobal(long[],int,long)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: float atomicAddGlobal(float[],int,float)>");
+    ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: double atomicAddGlobal(double[],int,double)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicSubGlobal(int[],int,int)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: int atomicExchGlobal(int[],int,int)>");
     ret.add("<org.trifort.rootbeer.runtime.RootbeerGpu: long atomicExchGlobal(long[],int,long)>");
