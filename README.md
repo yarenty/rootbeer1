@@ -12,7 +12,7 @@ Be aware that you should not expect to get a speedup using a GPU by doing someth
 like multiplying each element in an array by a scalar. Serialization time is a large bottleneck
 and usually you need an algorithm that is O(n^2) to O(n^3) per O(n) elements of data.
 
-GPU PROGRAMMING IS NOT FOR THE FAINT OF HEART, EVEN WITH ROOTBEER. EXPECT TO SPEND A MONTH OPTIMIZING TRIVIAL EXAMPLES.
+GPU PROGRAMMING IS EASY, EVEN WITH ROOTBEER. EXPECT TO SPEND A MONTH OPTIMIZING TRIVIAL EXAMPLES.
 
 FEEL FREE TO EMAIL ME FOR DISCUSSIONS BEFORE ATTEMPTING TO USE ROOTBEER
 
