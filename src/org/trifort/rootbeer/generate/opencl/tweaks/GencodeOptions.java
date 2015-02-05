@@ -26,6 +26,10 @@ public class GencodeOptions {
     ALL, SM_11, SM_12, SM_20, SM_21, SM_30, SM_35;
   }
   
+  private boolean versionMatches(String versionString, String version){
+    return versionString.contains("release "+version);
+  }
+  
   public String getOptions(){
     String version = getVersion();
     String sm_35;
@@ -62,10 +66,10 @@ public class GencodeOptions {
       sm_11 = "";
     }
     
-    if ((version.equals("Cuda compilation tools, release 6.5, V6.5.12")) ||
-        (version.equals("Cuda compilation tools, release 6.0, V6.0.1")) ||
-        (version.equals("Cuda compilation tools, release 5.5, V5.5.0")) ||
-        (version.equals("Cuda compilation tools, release 5.0, V0.2.1221"))){
+    if(versionMatches(version, "6.5") ||
+       versionMatches(version, "6.0") ||
+       versionMatches(version, "5.5") ||
+       versionMatches(version, "5.0")){
       switch (Configuration.compilerInstance().getComputeCapability()) {
         case ALL:
           return sm_35 + sm_30 + sm_21 + sm_20 + sm_12 + sm_11;
@@ -84,10 +88,10 @@ public class GencodeOptions {
         default:
           return sm_35 + sm_30 + sm_21 + sm_20 + sm_12 + sm_11;
       }
-    } else if ((version.equals("Cuda compilation tools, release 4.2, V0.2.1221")) ||
-        (version.equals("Cuda compilation tools, release 4.1, V0.2.1221")) ||
-        (version.equals("Cuda compilation tools, release 4.0, V0.2.1221")) ||
-        (version.equals("Cuda compilation tools, release 3.2, V0.2.1221"))){
+    } else if(versionMatches(version, "4.2") ||
+              versionMatches(version, "4.1") ||
+              versionMatches(version, "4.0") ||
+              versionMatches(version, "3.2")){
       switch (Configuration.compilerInstance().getComputeCapability()) {
         case ALL:
           return sm_30 + sm_21 + sm_20 + sm_12 + sm_11;
@@ -104,8 +108,8 @@ public class GencodeOptions {
         default:
           return sm_30 + sm_21 + sm_20 + sm_12 + sm_11;
       }
-    } else if((version.equals("Cuda compilation tools, release 3.1, V0.2.1221")) ||
-        (version.equals("Cuda compilation tools, release 3.0, V0.2.1221"))){
+    } else if(versionMatches(version, "3.1") ||
+              versionMatches(version, "3.0")){
       switch (Configuration.compilerInstance().getComputeCapability()) {
         case ALL:
           return sm_20 + sm_12 + sm_11;
