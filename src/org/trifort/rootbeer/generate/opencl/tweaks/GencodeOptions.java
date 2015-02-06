@@ -153,6 +153,5 @@ public class GencodeOptions {
     
     String last_line = lines.get(lines.size()-1);
     return last_line;
-  }
-  
+  } 
 }

@@ -11,11 +11,11 @@ import org.trifort.rootbeer.runtime.Kernel;
 import org.trifort.rootbeer.runtime.ThreadConfig;
 import org.trifort.rootbeer.test.TestKernelTemplate;
 
-
 public class BigGridSizeTest implements TestKernelTemplate {
 
   private int m_blockSize;
   private int m_gridSize;
+  
   public BigGridSizeTest(){ 
     m_blockSize = 1024;
     m_gridSize = 1024;
@@ -36,5 +36,4 @@ public class BigGridSizeTest implements TestKernelTemplate {
     EmptyKernel rhs = (EmptyKernel) from_heap;
     return lhs.compare(rhs);
   }
-
 }

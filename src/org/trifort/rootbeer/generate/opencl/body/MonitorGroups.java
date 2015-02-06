@@ -20,9 +20,25 @@ import soot.Value;
 import soot.jimple.EnterMonitorStmt;
 import soot.jimple.ExitMonitorStmt;
 
+import soot.toolkits.graph.ExceptionalBlockGraph;
+import soot.toolkits.graph.Block;
+
 public class MonitorGroups {
  
   public List<MonitorGroupItem> getItems(Body body){
+    //TODO: Look at 
+    /*
+    ExceptionalBlockGraph graph = new ExceptionalBlockGraph(body);
+    System.out.println("========================================");
+    System.out.println("= blocks");
+    System.out.println("========================================");
+    List<Block> blocks = graph.getBlocks();
+    for(Block block : blocks){
+      System.out.println(block);
+    }
+    System.out.println("========================================");
+    */
+    
     List<MonitorGroupItem> ret = new ArrayList<MonitorGroupItem>();
     Stack<MonitorGroupItem> stack = new Stack<MonitorGroupItem>();
     MonitorGroupItem curr_monitor = new MonitorGroupItem();
