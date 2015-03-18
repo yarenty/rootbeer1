@@ -44,6 +44,7 @@ This simple example uses kernel lists and no thread config or context. Rootbeer 
 <b>ScalarAddApp.java:</b>  
 See the [example](https://github.com/pcpratts/rootbeer1/tree/master/examples/ScalarAddApp)
 
+```java
     package org.trifort.rootbeer.examples.scalaradd;
 
     import java.util.List;
@@ -83,10 +84,11 @@ See the [example](https://github.com/pcpratts/rootbeer1/tree/master/examples/Sca
         app.printArray("end", array);
       }
     }
-
+```
 
 <b>ScalarAddKernel:</b>
 
+```java
     package org.trifort.rootbeer.examples.scalaradd;
 
     import org.trifort.rootbeer.runtime.Kernel;
@@ -105,6 +107,7 @@ See the [example](https://github.com/pcpratts/rootbeer1/tree/master/examples/Sca
         array[index] += 1;
       }
     }
+```
 
 ### High Performance Example - Batcher's Even Odd Sort
 See the [example](https://github.com/pcpratts/rootbeer1/tree/master/examples/sort)  
@@ -112,6 +115,7 @@ See the [slides](http://trifort.org/ads/index.php/lecture/index/27/)
 
 <b>GPUSort.java</b>  
 
+```java
     package org.trifort.rootbeer.sort;
 
     import org.trifort.rootbeer.runtime.Rootbeer;
@@ -244,9 +248,11 @@ See the [slides](http://trifort.org/ads/index.php/lecture/index/27/)
         }
       }
     }
+```
 
 <b>GPUSortKernel.java</b>
 
+```java
     package org.trifort.rootbeer.sort;
 
     import org.trifort.rootbeer.runtime.Kernel;
@@ -302,6 +308,7 @@ See the [slides](http://trifort.org/ads/index.php/lecture/index/27/)
         array[index1b] = RootbeerGpu.getSharedInteger(index1b_shared);
       }
     }
+```
 
 
 ### Compiling Rootbeer Enabled Projects
@@ -345,16 +352,19 @@ You can use System.out.println in a limited way while on the GPU. Printing in Ja
 
 Since you are running on a parallel GPU, it is nice to print from a single thread
 
+```java
     public void gpuMethod(){
       if(RootbeerGpu.getThreadIdxx() == 0 && RootbeerGpu.getBlockIdxx() == 0){
         System.out.println("hello world");
       }
     }
+```
 
 Once you are done debugging, you can get a performance improvement by disabling exceptions and array bounds checks (see command line options).
 
 ### Multi-GPUs (untested)
 
+```java
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
     GpuDevice device1 = devices.get(1);
@@ -381,9 +391,11 @@ Once you are done debugging, you can get a performance improvement by disabling 
       future1.take();
       future2.take();
     }
+```
 
 ### RootbeerGpu Builtins (compiles directly to CUDA statements)
 
+```java
     public class RootbeerGpu (){
         //returns true if on the gpu
         public static boolean isOnGpu();
@@ -514,6 +526,7 @@ Once you are done debugging, you can get a performance improvement by disabling 
         //The function returns old."
         public static int atomicXorGlobal(int[] array, int index, int value);
     }
+```
 
 ### Viewing Code Generation
 
