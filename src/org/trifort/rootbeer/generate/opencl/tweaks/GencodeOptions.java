@@ -26,12 +26,12 @@ public class GencodeOptions {
     ALL, SM_11, SM_12, SM_20, SM_21, SM_30, SM_35;
   }
   
-  private boolean versionMatches(String versionString, String version){
+  private boolean versionMatches(final String versionString, final String version){
     return versionString.contains("release "+version);
   }
   
   public String getOptions(){
-    String version = getVersion();
+    final String version = getVersion();
     String sm_35;
     String sm_30;
     String sm_21;
@@ -66,7 +66,7 @@ public class GencodeOptions {
       sm_11 = "";
     }
     
-    if(versionMatches(version, "6.5") ||
+    if(versionMatches(version, "7.0") || versionMatches(version, "6.5") ||
        versionMatches(version, "6.0") ||
        versionMatches(version, "5.5") ||
        versionMatches(version, "5.0")){
@@ -128,30 +128,30 @@ public class GencodeOptions {
   }
 
   private String getVersion() {
-    CudaPath cuda_path = new CudaPath();
-    String cmd[] = new String[2];
+    final CudaPath cuda_path = new CudaPath();
+    final String cmd[] = new String[2];
     if(File.separator.equals("/")){
-      String nvcc_path = cuda_path.get() + "nvcc";
+      final String nvcc_path = cuda_path.get() + "nvcc";
       cmd[0] = nvcc_path;
       cmd[1] = "--version";
     } else {
-      String nvcc_path = cuda_path.get();
+      final String nvcc_path = cuda_path.get();
       cmd[0] = nvcc_path;
       cmd[1] = "--version";
     }
     
-    CmdRunner runner = new CmdRunner();
+    final CmdRunner runner = new CmdRunner();
     runner.run(cmd, new File("."));
-    List<String> lines = runner.getOutput();
+    final List<String> lines = runner.getOutput();
     if(lines.isEmpty()){
-      List<String> error_lines = runner.getError();
-      for(String error_line : error_lines){
+      final List<String> error_lines = runner.getError();
+      for(final String error_line : error_lines){
         System.out.println(error_line);
       }
       throw new RuntimeException("error detecting nvcc version.");
     }
     
-    String last_line = lines.get(lines.size()-1);
+    final String last_line = lines.get(lines.size()-1);
     return last_line;
   } 
 }
