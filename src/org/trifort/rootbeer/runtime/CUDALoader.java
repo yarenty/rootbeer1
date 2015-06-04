@@ -97,11 +97,13 @@ public class CUDALoader {
   }
 
   private void extract(String filename) {
-    String path = "/org/trifort/rootbeer/runtime/binaries/"+filename;
-    try {
+    //String path = "/org/trifort/rootbeer/runtime/binaries/"+filename;
+    String path = "/"+filename;
+     try {
       InputStream is = CUDALoader.class.getResourceAsStream(path);
       if(is == null){
-        path = "src"+path;
+          path = "csrc"+path;
+          //path = "src"+path;
         is = new FileInputStream(path);
       }
       OutputStream os = new FileOutputStream(RootbeerPaths.v().getRootbeerHome()+filename);

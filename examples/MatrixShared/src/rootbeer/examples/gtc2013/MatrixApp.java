@@ -5,6 +5,11 @@ import org.trifort.rootbeer.runtime.Rootbeer;
 import org.trifort.rootbeer.runtime.Kernel;
 import org.trifort.rootbeer.runtime.StatsRow;
 import org.trifort.rootbeer.runtime.ThreadConfig;
+
+import rootbeer.examples.gtc2013.Calculation;
+import rootbeer.examples.gtc2013.MatrixCpuThread;
+import rootbeer.examples.gtc2013.MatrixKernel;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -61,7 +66,7 @@ public class MatrixApp {
     }
 
     m_transposeWatch.stop();
-    System.out.println("transpose time: "+m_transposeWatch.getAverageTime()+" ms");
+    System.out.println("transpose time: "+m_transposeWatch.elapsedTimeMillis()+" ms");
   }
 
   private void printMatrix(int[] matrix, int block_size, String heading){
@@ -108,7 +113,7 @@ public class MatrixApp {
       thread.join();
     }
     m_cpuWatch.stop();
-    System.out.println("avg cpu time: "+m_cpuWatch.getAverageTime()+" ms");
+    System.out.println("avg cpu time: "+m_cpuWatch.elapsedTimeMillis()+" ms");
     
     //runs on cpu without transpose
     //threads = new ArrayList<MatrixCpuThread>();
@@ -128,10 +133,15 @@ public class MatrixApp {
     MatrixKernel matrix_kernel = new MatrixKernel(m_a, m_bgpu, m_cgpu, m_blockSize, 
       m_gridSize, m_blockIters);
     Rootbeer rootbeer = new Rootbeer();
-    ThreadConfig thread_config = new ThreadConfig(1024, m_gridSize, 1024 * m_gridSize);
-    rootbeer.run(matrix_kernel, thread_config);
+    
+    ThreadConfig thread_config = new ThreadConfig(1024,1,1, m_gridSize,1, 1024 * m_gridSize);
+    
+    List<Kernel> kernels = new ArrayList<Kernel>();
+    kernels.add(matrix_kernel);
+    
+    rootbeer.run(kernels); //matrix_kernel, thread_config);
     m_gpuWatch.stop();
-    System.out.println("avg gpu time: "+m_gpuWatch.getAverageTime()+" ms");
+    System.out.println("avg gpu time: "+m_gpuWatch.elapsedTimeMillis()+" ms");
 
     List<Calculation> calc_list = matrix_kernel.m_calcList.getList();
     for(Calculation calc : calc_list){

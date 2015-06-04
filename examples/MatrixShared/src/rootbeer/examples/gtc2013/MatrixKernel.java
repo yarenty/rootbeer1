@@ -4,6 +4,8 @@ import org.trifort.rootbeer.runtime.Kernel;
 import org.trifort.rootbeer.runtime.RootbeerGpu;
 import org.trifort.rootbeer.runtimegpu.GpuException;
 
+import rootbeer.examples.gtc2013.CalcList;
+
 import java.util.List;
 import java.util.ArrayList;
 
